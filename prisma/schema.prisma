@@ -1,0 +1,413 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ═══════════════════════════════════════
+//  ENUMS
+// ═══════════════════════════════════════
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum HotelType {
+  LOCAL      // فنادق محلية — تُدار مركزياً
+  INTERNATIONAL // فنادق عالمية — من API خارجي
+}
+
+enum AmenityCategory {
+  GENERAL
+  SPORT
+  DINING
+  WELLNESS
+  BUSINESS
+  ROOM
+}
+
+enum BookingStatus {
+  PENDING    // بانتظار التأكيد
+  CONFIRMED  // مؤكد
+  CANCELLED  // ملغي
+  COMPLETED  // مكتمل
+  NO_SHOW    // لم يحضر
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER   // حوالة بنكية
+  WHATSAPP        // حجز ودفع عبر واتساب
+  PAY_ON_ARRIVAL  // دفع عند الوصول
+  PAYPAL          // PayPal
+  CREDIT_CARD     // بطاقة ائتمان عبر PayPal
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+// ═══════════════════════════════════════
+//  المستخدمون
+// ═══════════════════════════════════════
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  emailVerified DateTime?  // Required by Auth.js adapter
+  name          String
+  image         String?    // Required by Auth.js adapter (maps to avatarUrl)
+  phone         String?
+  passwordHash  String?    // null if OAuth used in future
+  role          UserRole   @default(CUSTOMER)
+  isActive      Boolean    @default(true)
+  avatarUrl     String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Auth.js adapter relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Application relations
+  bookings      Booking[]
+  reviews       Review[]
+  favorites     Favorite[]
+
+  @@map("users")
+}
+
+// ═══════════════════════════════════════
+//  Auth.js — OAuth Accounts (future use)
+// ═══════════════════════════════════════
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// ═══════════════════════════════════════
+//  Auth.js — Database Sessions
+// ═══════════════════════════════════════
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
+}
+
+// ═══════════════════════════════════════
+//  Auth.js — Email Verification Tokens
+// ═══════════════════════════════════════
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ═══════════════════════════════════════
+//  المدن والمحافظات
+// ═══════════════════════════════════════
+
+model City {
+  id             String  @id @default(cuid())
+  nameAr         String
+  nameEn         String
+  governorateAr  String
+  governorateEn  String
+  imageUrl       String?
+  hotelCount     Int     @default(0)
+  isActive       Boolean @default(true)
+
+  hotels         Hotel[]
+
+  @@map("cities")
+}
+
+// ═══════════════════════════════════════
+//  المرافق والخدمات (مشترك بين الفنادق والغرف)
+// ═══════════════════════════════════════
+
+model Amenity {
+  id        String          @id @default(cuid())
+  nameAr    String
+  nameEn    String
+  icon      String          // lucide icon name e.g. "wifi", "pool"
+  category  AmenityCategory
+
+  hotels    HotelAmenity[]
+  rooms     RoomAmenity[]
+
+  @@map("amenities")
+}
+
+// ═══════════════════════════════════════
+//  الفنادق المحلية
+// ═══════════════════════════════════════
+
+model Hotel {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  type           HotelType @default(LOCAL)
+  nameAr         String
+  nameEn         String
+  descriptionAr  String    @db.Text
+  descriptionEn  String?   @db.Text
+  address        String
+  mapUrl         String?   @db.Text
+  lat            Float?
+  lng            Float?
+  stars          Int       @default(3)   // 1 - 5
+  rating         Float     @default(4.0)
+  reviewCount    Int       @default(0)
+  priceFrom      Float     @default(0)
+  currency       String    @default("USD")
+  thumbnailUrl   String?
+  isFeatured     Boolean   @default(false)
+  isActive       Boolean   @default(true)
+  cityId         String
+  city           City      @relation(fields: [cityId], references: [id])
+
+  policyAr       String?   @db.Text
+  policyEn       String?   @db.Text
+
+  rooms          Room[]
+  images         HotelImage[]
+  amenities      HotelAmenity[]
+  bookings       Booking[]
+  reviews        Review[]
+  favorites      Favorite[]
+  discount       Discount?
+
+  // للهجرة من WordPress — يُحذف بعد اكتمال الهجرة
+  wpId           Int?      @unique
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("hotels")
+}
+
+model HotelImage {
+  id       String  @id @default(cuid())
+  url      String
+  altAr    String?
+  altEn    String?
+  order    Int     @default(0)
+  hotelId  String
+  hotel    Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@map("hotel_images")
+}
+
+model HotelAmenity {
+  hotelId   String
+  amenityId String
+  hotel     Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  amenity   Amenity @relation(fields: [amenityId], references: [id])
+
+  @@id([hotelId, amenityId])
+  @@map("hotel_amenities")
+}
+
+// ═══════════════════════════════════════
+//  الغرف والأجنحة
+// ═══════════════════════════════════════
+
+model Room {
+  id             String        @id @default(cuid())
+  nameAr         String
+  nameEn         String
+  descriptionAr  String?       @db.Text
+  descriptionEn  String?       @db.Text
+  capacity       Int           @default(2)
+  pricePerNight  Float
+  isAvailable    Boolean       @default(true)
+  hotelId        String
+  hotel          Hotel         @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  images         RoomImage[]
+  amenities      RoomAmenity[]
+  bookings       Booking[]
+
+  @@map("rooms")
+}
+
+model RoomImage {
+  id     String  @id @default(cuid())
+  url    String
+  order  Int     @default(0)
+  roomId String
+  room   Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("room_images")
+}
+
+model RoomAmenity {
+  roomId    String
+  amenityId String
+  room      Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  amenity   Amenity @relation(fields: [amenityId], references: [id])
+
+  @@id([roomId, amenityId])
+  @@map("room_amenities")
+}
+
+// ═══════════════════════════════════════
+//  الخصومات والعروض
+// ═══════════════════════════════════════
+
+model Discount {
+  id          String   @id @default(cuid())
+  percentage  Int      // 0 - 100
+  validFrom   DateTime
+  validTo     DateTime
+  hotelId     String   @unique
+  hotel       Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@map("discounts")
+}
+
+model Offer {
+  id        String   @id @default(cuid())
+  titleAr   String
+  titleEn   String?
+  imageUrl  String
+  link      String
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("offers")
+}
+
+// ═══════════════════════════════════════
+//  الحجوزات
+// ═══════════════════════════════════════
+
+model Booking {
+  id              String        @id @default(cuid())
+  code            String        @unique  // MS-XXXXXX يُولَّد في الـ API لا العميل
+
+  // نوع الحجز
+  isInternational Boolean       @default(false)
+  externalHotelId String?       // ID من Agoda/Booking.com إذا كان دولياً
+  externalProvider String?       // "agoda" | "ratehawk" | "hotelbeds"
+
+  // حالة الحجز والدفع
+  status          BookingStatus @default(PENDING)
+  paymentMethod   PaymentMethod?
+  paymentStatus   PaymentStatus @default(UNPAID)
+  paypalOrderId   String?       // لتتبع دفعات PayPal
+
+  // التواريخ والتفاصيل
+  checkIn         DateTime
+  checkOut        DateTime
+  nights          Int
+  guests          Int
+  totalPrice      Float
+  currency        String        @default("USD")
+  notes           String?       @db.Text
+
+  // بيانات الضيف (تُحفظ لضمان البيانات حتى لو حُذف المستخدم)
+  guestName       String
+  guestEmail      String
+  guestPhone      String
+
+  // العلاقات
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id])
+  hotelId         String?
+  hotel           Hotel?        @relation(fields: [hotelId], references: [id])
+  roomId          String?
+  room            Room?         @relation(fields: [roomId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("bookings")
+}
+
+// ═══════════════════════════════════════
+//  التقييمات
+// ═══════════════════════════════════════
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Float    // 1 - 5
+  comment   String   @db.Text
+  isVisible Boolean  @default(true)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  hotelId   String
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("reviews")
+}
+
+// ═══════════════════════════════════════
+//  المفضلة
+// ═══════════════════════════════════════
+
+model Favorite {
+  userId    String
+  hotelId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hotel     Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, hotelId])
+  @@map("favorites")
+}
+
+// ═══════════════════════════════════════
+//  إعدادات الموقع
+// ═══════════════════════════════════════
+
+model SiteSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}

@@ -1,0 +1,23 @@
+{
+  "Header": {
+    "home": "Home",
+    "localHotels": "Local Hotels",
+    "globalHotels": "Global Hotels",
+    "flights": "Flights",
+    "carServices": "Car Services",
+    "login": "Login",
+    "profile": "Profile",
+    "myBookings": "My Bookings",
+    "logout": "Logout",
+    "language": "عربي"
+  },
+  "Hero": {
+    "badge": "First Travel Platform in Yemen",
+    "title": "Your Next Journey Starts Here",
+    "subtitle": "Book your hotel, flight, and transfers in Yemen and the world — all in one place.",
+    "search": "Search",
+    "hotels": "Hotels",
+    "flights": "Flights",
+    "cars": "Cars"
+  }
+}
