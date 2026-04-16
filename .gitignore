@@ -4,7 +4,7 @@
 /node_modules
 /.pnp
 .pnp.*
-.yarn/*
+.yarn/*ّ
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -63,3 +63,7 @@ next-env.d.ts
 # Testing
 # ======================
 /coverage
+.env
+.env.local
+.env.*
+node_modules

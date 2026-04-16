@@ -65,7 +65,6 @@ enum PaymentStatus {
 model User {
   id            String     @id @default(cuid())
   email         String     @unique
-  emailVerified DateTime?  // Required by Auth.js adapter
   name          String
   image         String?    // Required by Auth.js adapter (maps to avatarUrl)
   phone         String?
@@ -363,6 +362,16 @@ model Booking {
 
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+
+  // ── Indexes ────────────────────────────────────────────────────────────────
+  // Overlap check: WHERE roomId = ? AND status IN (...) AND checkIn < ? AND checkOut > ?
+  @@index([roomId, status, checkIn, checkOut])
+  // getMyBookings: WHERE userId = ?
+  @@index([userId])
+  // Admin filter: WHERE hotelId = ? AND status = ?
+  @@index([hotelId, status])
+  // Admin list: WHERE status = ? ORDER BY createdAt DESC
+  @@index([status, createdAt])
 
   @@map("bookings")
 }
