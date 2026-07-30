@@ -1,0 +1,38 @@
+DELETE FROM "hotel_amenities";
+DELETE FROM "room_amenities";
+DELETE FROM "amenities";
+
+INSERT INTO "amenities" ("id", "nameAr", "nameEn", "icon", "category") VALUES
+('1', 'بقالة', 'Grocery', 'ShoppingCart', 'HOTEL_AMENITIES'),
+('2', 'مطعم', 'Restaurant', 'UtensilsCrossed', 'HOTEL_AMENITIES'),
+('3', 'كافيه', 'Cafe', 'Coffee', 'HOTEL_AMENITIES'),
+('4', 'كافتيريا', 'Cafeteria', 'CupSoda', 'HOTEL_AMENITIES'),
+('5', 'حراسة أمنية', 'Security', 'ShieldCheck', 'HOTEL_AMENITIES'),
+('6', 'صالون حلاقة', 'Barber', 'Scissors', 'HOTEL_AMENITIES'),
+('7', 'خدمة الغرف', 'Room Service', 'BellRing', 'HOTEL_AMENITIES'),
+('8', 'مسبح', 'Pool', 'Waves', 'HOTEL_AMENITIES'),
+('9', 'خدمة النقل للمطار', 'Airport Shuttle', 'Car', 'HOTEL_AMENITIES'),
+('10', 'مغسلة', 'Laundry', 'Shirt', 'HOTEL_AMENITIES'),
+('11', 'موقف سيارات', 'Parking', 'ParkingCircle', 'HOTEL_AMENITIES'),
+('12', 'منتزه', 'Park', 'Trees', 'HOTEL_AMENITIES'),
+('13', 'نادي صحي', 'Gym', 'Dumbbell', 'HOTEL_AMENITIES'),
+('14', 'شيش ومعسل', 'Shisha', 'Flame', 'HOTEL_AMENITIES'),
+('15', 'طيرمانات', 'Balcony', 'Home', 'HOTEL_AMENITIES'),
+('16', 'إنترنت', 'Internet', 'Wifi', 'HOTEL_AMENITIES'),
+('17', 'مصعد', 'Elevator', 'ArrowUpDown', 'HOTEL_AMENITIES'),
+('18', 'وسط المدينة', 'City Center', 'MapPin', 'HOTEL_AMENITIES'),
+('19', 'قريب المطار', 'Near Airport', 'Plane', 'HOTEL_AMENITIES'),
+('20', 'قاعات إجتماعات وتدريب', 'Meeting Rooms', 'Presentation', 'HOTEL_AMENITIES'),
+('21', 'تكييف', 'AC', 'Wind', 'ROOM_FEATURES'),
+('22', 'شاشة ذكية', 'Smart TV', 'Tv', 'ROOM_FEATURES'),
+('23', 'طاولة طعام', 'Dining Table', 'Table', 'ROOM_FEATURES'),
+('24', 'خزنة', 'Safe', 'Lock', 'ROOM_FEATURES'),
+('25', 'ثلاجة', 'Fridge', 'Refrigerator', 'ROOM_FEATURES'),
+('26', 'إنترنت', 'Internet', 'Wifi', 'ROOM_FEATURES'),
+('27', 'إطلالة على البحر', 'Sea View', 'Waves', 'ROOM_FEATURES'),
+('28', 'إطلالة على المدينة', 'City View', 'Building2', 'ROOM_FEATURES'),
+('29', 'مجفف شعر', 'Hair Dryer', 'Wind', 'ROOM_FEATURES'),
+('30', 'سخان', 'Heater', 'Flame', 'ROOM_FEATURES'),
+('31', 'جاكوزي', 'Jacuzzi', 'Bath', 'ROOM_FEATURES'),
+('32', 'غلاية كهربائية', 'Kettle', 'Coffee', 'ROOM_FEATURES'),
+('33', 'ساونا', 'Sauna', 'ThermometerSun', 'ROOM_FEATURES');

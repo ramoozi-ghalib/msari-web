@@ -1,0 +1,101 @@
+import Image from 'next/image';
+import { QrCode } from 'lucide-react';
+
+export default function AppDownloadSection() {
+  return (
+    <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page">
+      <div className="container-msari">
+        {/* Single compact banner */}
+        <div
+          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20"
+          style={{ background: 'linear-gradient(135deg, #23096E 0%, #2d1580 50%, #3A1C8F 100%)' }}
+        >
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-0 px-6 py-8 lg:py-6 lg:px-10" style={{ direction: 'rtl' }}>
+
+            {/* Right: Text + Store Buttons */}
+            <div className="flex-1 text-center lg:text-start">
+              <h2 className="text-xl sm:text-2xl font-black text-white mb-1.5 drop-shadow-sm">
+                حمل تطبيق مساري الآن
+              </h2>
+              <p className="text-[#F4F2F8] text-xs sm:text-sm font-bold mb-5">
+                احجز فنادقك ورحلاتك من أي مكان وفي أي وقت بسهولة وأمان
+              </p>
+
+              {/* Official Store badges */}
+              <div className="flex items-center justify-center lg:justify-start gap-3">
+                <a
+                  href="https://play.google.com/store/apps/details?id=net.msari.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"
+                >
+                  <svg className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" viewBox="0 0 512 512">
+                    <path fill="#410593" d="M72.8 30.5L257.6 256 72.8 481.5z"/>
+                    <path fill="#04e578" d="M328.7 185L72.8 30.5 257.6 256z"/>
+                    <path fill="#ff3a44" d="M328.7 327L257.6 256 72.8 481.5z"/>
+                    <path fill="#ffc107" d="M439.2 237.4l-110.5-62.4L257.6 256l71.1 81 110.5-62.4c15.8-8.9 15.8-28.3 0-37.2z"/>
+                  </svg>
+                  <div className="text-start">
+                    <p className="text-[8px] text-slate-500 group-hover:text-white/80 font-bold uppercase leading-none">GET IT ON</p>
+                    <p className="text-[11px] font-black leading-tight">Google Play</p>
+                  </div>
+                </a>
+                <a
+                  href="https://apps.apple.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"
+                >
+                  <svg className="w-5 h-5 fill-current text-[#23096E] group-hover:text-white shrink-0 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                    <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,21.97C7.79,22 6.87,20.68 6.03,19.47C4.31,17 3,12.5 4.79,9.39C5.68,7.85 7.26,6.87 8.97,6.84C10.27,6.81 11.5,7.71 12.3,7.71C13.1,7.71 14.61,6.62 16.19,6.79C16.85,6.82 18.73,7.06 19.92,8.8C19.82,8.86 17.58,10.17 17.61,12.83C17.64,16.03 20.43,17.09 20.46,17.1C20.43,17.17 20,18.66 18.71,19.5M15.8,5.17C16.5,4.32 16.97,3.14 16.84,1.96C15.83,2 14.6,2.64 13.88,3.48C13.23,4.23 12.75,5.44 12.91,6.6C14.04,6.69 15.1,5.91 15.8,5.17Z" />
+                  </svg>
+                  <div className="text-start">
+                    <p className="text-[8px] text-slate-500 group-hover:text-white/80 font-bold uppercase leading-none">Download on the</p>
+                    <p className="text-[11px] font-black leading-tight">App Store</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            {/* Center: Phone Mockups */}
+            <div className="flex-shrink-0 flex items-center justify-center lg:mx-6">
+              <div className="relative flex items-end">
+                {/* Phone 1 */}
+                <div className="relative w-28 sm:w-32 h-48 sm:h-56 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl -rotate-3 bg-slate-950">
+                  <Image
+                    src="https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FBmS2C5c4z23UfUv3T0oG%2Fimg_0.jpg?alt=media&token=7fa51dd1-b3b3-4f05-8968-3f596a77d542"
+                    alt="تطبيق مساري"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                </div>
+                {/* Phone 2 */}
+                <div className="relative w-28 sm:w-32 h-52 sm:h-60 rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl rotate-3 -ms-8 z-10 bg-slate-950">
+                  <Image
+                    src="https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FIOfiz4EpAILtuN0nc7zg%2Fimg_0.jpg?alt=media&token=2b00ded4-8b95-4efe-bc46-62e0ebdb178e"
+                    alt="حجز فنادق اليمن"
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                </div>
+              </div>
+            </div>
+
+            {/* Left: QR Code */}
+            <div className="flex-shrink-0 hidden xl:flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+              <div className="w-14 h-14 bg-white p-1 rounded-lg flex items-center justify-center">
+                <QrCode className="w-full h-full text-[#23096E]" />
+              </div>
+              <div className="text-white text-xs font-bold max-w-[100px] leading-tight">
+                امسح الرمز للتحميل المباشر
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

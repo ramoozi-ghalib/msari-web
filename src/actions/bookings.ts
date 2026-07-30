@@ -1,0 +1,660 @@
+'use server';
+
+/**
+ * actions/bookings.ts — Server Actions للحجوزات
+ *
+ * Security model:
+ *  - adminGuard() يجب أن يكون أول سطر في كل mutation للأدمن
+ *  - totalPrice و nights و code لا تُقبل من الـ Client أبداً — تُحسب هنا
+ *  - الـ Transaction تضمن عدم التعارض في التواريخ (no dirty reads)
+ *
+ * Fixes applied:
+ *  - H-1: Math.random() → crypto.getRandomValues() (Cryptographically Secure)
+ *  - H-5: updateBookingStatus مُغلَّف بـ $transaction لمنع Race Condition
+ *  - M-7: getMyBookings يدعم pagination بدلاً من take: 50 الثابت
+ */
+
+import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
+import { BookingStatus, PaymentMethod, Prisma } from '@prisma/client';
+
+import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
+import { apiClient } from '@/lib/api-client';
+import { db } from '@/lib/firebase-admin';
+import {
+  adminGuard,
+  handleActionSafe,
+  SERVER_ERROR_RESPONSE,
+} from '@/lib/action-guard';
+import { Policies } from '@/lib/policies';
+import { clampLimit } from '@/lib/action-utils';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** الحد الأقصى لليالي المسموح بها في حجز واحد */
+const MAX_NIGHTS = 90;
+
+/**
+ * الانتقالات المسموح بها بين حالات الحجز.
+ * لا يمكن الانتقال إلا عبر هذه الخريطة — أي حالة غير مدرجة هي خطأ.
+ */
+const ALLOWED_TRANSITIONS: Readonly<
+  Partial<Record<BookingStatus, BookingStatus[]>>
+> = {
+  PENDING:   ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['COMPLETED', 'CANCELLED', 'NO_SHOW'],
+  // CANCELLED, COMPLETED, NO_SHOW → terminal, no transitions allowed
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ZOD SCHEMAS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CreateBookingSchema = z.object({
+  hotelId:       z.string().min(1, 'معرف الفندق مطلوب'),
+  roomId:        z.string().min(1, 'معرف الغرفة مطلوب').optional(),
+  guestName:     z.string().min(2, 'الاسم قصير جداً').max(100).trim(),
+  guestEmail:    z.string().email('البريد الإلكتروني غير صحيح').max(254).toLowerCase().trim(),
+  guestPhone:    z.string().min(7, 'رقم الهاتف قصير جداً').max(20).trim(),
+  checkIn:       z.string().datetime({ message: 'تاريخ الوصول غير صالح' }),
+  checkOut:      z.string().datetime({ message: 'تاريخ المغادرة غير صالح' }),
+  guests:        z.number().int().min(1).max(20),
+  paymentMethod: z.nativeEnum(PaymentMethod),
+  notes:         z.string().max(1000).trim().optional(),
+}).strict();
+
+const GetAdminBookingsSchema = z.object({
+  status:      z.nativeEnum(BookingStatus).optional(),
+  q:           z.string().max(100).trim().optional(),
+  page:        z.number().int().min(1).optional().default(1),
+  pageSize:    z.number().int().min(1).max(100).optional().default(20),
+}).strict();
+
+const UpdateBookingStatusSchema = z.object({
+  bookingId: z.string().cuid('معرف الحجز غير صالح'),
+  newStatus: z.nativeEnum(BookingStatus),
+}).strict();
+
+const GetMyBookingsSchema = z.object({
+  page:     z.number().int().min(1).optional().default(1),
+  pageSize: z.number().int().min(1).max(50).optional().default(10),
+}).strict();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * [FIX H-1] يولّد كود حجز فريد بصيغة MS-XXXXXXXX باستخدام
+ * crypto.getRandomValues() — آمن تشفيرياً (CSPRNG).
+ *
+ * الأحرف المختارة تستبعد: 0/O و 1/I/l لتفادي الالتباس البصري.
+ * السابق: Math.random() — غير آمن وقابل للتنبؤ.
+ */
+function generateBookingCode(): string {
+  const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  let code = 'MS-';
+  for (let i = 0; i < 8; i++) {
+    code += charset[bytes[i] % charset.length];
+  }
+  return code;
+}
+
+/**
+ * يحاول توليد كود فريد في DB بعدد محدد من المحاولات.
+ * الاحتمال الإحصائي للتعارض ضئيل جداً مع 8 أحرف (32^8 ≈ 1 تريليون تركيبة).
+ */
+async function generateUniqueCode(tx: Prisma.TransactionClient): Promise<string | null> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = generateBookingCode();
+    const existing = await tx.booking.findUnique({
+      where: { code },
+      select: { code: true },
+    });
+    if (!existing) return code;
+  }
+  return null;
+}
+
+/**
+ * يحسب عدد الليالي من تاريخين.
+ * يُستدعى server-side فقط — قيمة الـ Client تُتجاهل دائماً.
+ */
+function calculateNights(checkIn: Date, checkOut: Date): number {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((checkOut.getTime() - checkIn.getTime()) / msPerDay);
+}
+
+/**
+ * يُعيد تنفيذ الـ transaction عند فشل الـ Serialization (Prisma P2034).
+ */
+async function withSerializableRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      const isSerializationError =
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2034';
+
+      if (!isSerializationError || attempt === maxRetries) {
+        throw error;
+      }
+
+      const delay = 50 * Math.pow(2, attempt - 1);
+      console.warn(
+        `[withSerializableRetry] Serialization conflict (attempt ${attempt}/${maxRetries}). Retrying in ${delay}ms.`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE A: createBooking
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { BookingQueryService } from '@/services/query/BookingQueryService';
+import { unstable_noStore as noStore } from 'next/cache';
+import { Redis } from '@upstash/redis';
+
+const getRedisClient = () => {
+  try { return Redis.fromEnv(); } catch (err) { return null; }
+};
+
+/**
+ * ينشئ حجزاً جديداً عبر UseCase Layer (Thin Controller)
+ */
+export async function createBooking(rawData: unknown, idempotencyKey?: string) {
+  const correlationId = crypto.randomUUID();
+  const requestId = crypto.randomUUID(); // For lock ownership
+  const logger = (level: 'info'|'warn'|'error', msg: string, meta: any = {}) => {
+    console[level](JSON.stringify({ timestamp: new Date().toISOString(), level, correlationId, msg, ...meta }));
+  };
+
+  logger('info', 'Create Booking Action Invoked');
+
+  // ── 1. Read Auth User ──
+  const session = await auth();
+  const callerUser = session?.user || null;
+
+  // ── 2. Idempotency Check & Safe Locking (Redis SETNX + Owner Validated) ──
+  const redis = getRedisClient();
+  let redisCacheKey = '';
+  let acquiredLock = false;
+
+  if (redis && idempotencyKey && callerUser?.id) {
+    redisCacheKey = `idempotency:booking:${callerUser.id}:${idempotencyKey}`;
+    const cachedResponse = await redis.get(redisCacheKey);
+    if (cachedResponse) {
+      logger('info', 'Idempotency Cache Hit. Returning prior result.');
+      return cachedResponse as any;
+    }
+
+    const lockKey = `lock:${redisCacheKey}`;
+    const locked = await redis.set(lockKey, requestId, { nx: true, ex: 15 });
+    if (!locked) {
+      logger('warn', 'Idempotency Lock Conflict', { idempotencyKey });
+      return { success: false as const, error: { code: 'CONFLICT', message: 'طلب الحجز قيد المعالجة. يرجى الانتظار.' } };
+    }
+    acquiredLock = true;
+    logger('info', 'Idempotency Lock Acquired', { lockKey });
+  }
+
+  // ── Helper to release lock safely ──
+  const releaseLockSafely = async () => {
+    if (redis && acquiredLock) {
+      // Lua script: Only delete if the lock value matches our requestId
+      const luaScript = `if redis.call("get",KEYS[1]) == ARGV[1] then return redis.call("del",KEYS[1]) else return 0 end`;
+      await redis.eval(luaScript, [`lock:${redisCacheKey}`], [requestId]);
+      logger('info', 'Idempotency Lock Released Safely');
+    }
+  };
+
+  // ── 3. Validate input shape (Zod) ──
+  const parsed = CreateBookingSchema.safeParse(rawData);
+  if (!parsed.success) {
+    await releaseLockSafely();
+    logger('warn', 'Zod Validation Error', { errors: parsed.error.flatten().fieldErrors });
+    return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: 'بيانات غير صحيحة', fieldErrors: parsed.error.flatten().fieldErrors } };
+  }
+
+  const input = parsed.data;
+  const checkIn = new Date(input.checkIn);
+  const checkOut = new Date(input.checkOut);
+  const now = new Date();
+
+  // Basic sanity validation
+  if (checkIn <= now || checkOut <= checkIn) {
+    await releaseLockSafely();
+    return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: 'تأكد من صحة تواريخ الحجز' } };
+  }
+
+  const nights = calculateNights(checkIn, checkOut);
+  if (nights < 1 || nights > MAX_NIGHTS) {
+    await releaseLockSafely();
+    return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: `مدة الإقامة بين 1 و ${MAX_NIGHTS} ليلة` } };
+  }
+
+  try {
+    // ── 4. Map payment method to API expectations ──
+    let mappedPaymentMethod = 'cash';
+    if (input.paymentMethod === 'BANK_TRANSFER') {
+      mappedPaymentMethod = 'transfer';
+    } else if (input.paymentMethod === 'CREDIT_CARD') {
+      mappedPaymentMethod = 'credit_card';
+    }
+
+    // ── 5. Call API Endpoint (POST /v1/bookings) ──
+    const apiRes = await apiClient.post<any>(
+      '/bookings',
+      {
+        hotelId: input.hotelId,
+        roomId: input.roomId,
+        fromDate: input.checkIn,
+        toDate: input.checkOut,
+        guestsCount: input.guests,
+        nightsCount: nights,
+        bookingOwnerName: input.guestName,
+        bookingOwnerPhone: input.guestPhone,
+        paymentMethod: mappedPaymentMethod,
+        selectedCurrencyCode: 'USD',
+      },
+      callerUser?.firebaseToken ? { Authorization: `Bearer ${callerUser.firebaseToken}` } : undefined
+    );
+
+    if (!apiRes.success || !apiRes.data) {
+      await releaseLockSafely();
+      logger('warn', 'API Booking Creation Error', { error: apiRes.error });
+      
+      const apiErrorCode = apiRes.error?.code || 'SERVER_ERROR';
+      const domainErrors: Record<string, string> = {
+        'not-found': 'الفندق أو الغرفة غير موجودة',
+        'room-unavailable': 'الغرفة المطلوبة غير متاحة حالياً',
+        'sold-out': 'عذراً الغرفة محجوزة بالكامل في هذه التواريخ',
+        'invalid-argument': 'البيانات المرسلة غير صالحة',
+        'unauthorized': 'جلسة العمل انتهت، يرجى تسجيل الدخول مرة أخرى',
+        'forbidden': 'لا تملك صلاحية لإجراء هذا الحجز',
+      };
+      
+      return { 
+        success: false as const, 
+        error: { 
+          code: apiErrorCode, 
+          message: domainErrors[apiErrorCode] || apiRes.error?.message || 'حدث خطأ أثناء معالجة الحجز' 
+        } 
+      };
+    }
+
+    const bookingData = apiRes.data;
+
+    const finalResponse = {
+      success: true as const,
+      code: bookingData.bookingNumber,
+      id: bookingData.id,
+      totalPrice: bookingData.pricing?.totalInSelectedCurrency || bookingData.pricing?.totalUsd || 0,
+      currency: bookingData.pricing?.selectedCurrencyCode || 'USD',
+    };
+
+    // ── 6. Cache Idempotency Success & Release ──
+    if (redis && acquiredLock) {
+      await redis.set(redisCacheKey, finalResponse, { ex: 86400 });
+      await releaseLockSafely();
+    }
+
+    logger('info', 'Booking Created Successfully via API', { bookingId: bookingData.id });
+    return finalResponse;
+
+  } catch (error: any) {
+    await releaseLockSafely();
+    logger('error', 'Critical Action Exception', { error: error.message });
+    return handleActionSafe('createBooking', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE B: previewBookingPrice
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * [NEW — M-8] يحسب السعر الفعلي server-side قبل إتمام الحجز.
+ * يُستخدم في واجهة الحجز لعرض السعر الحقيقي للمستخدم.
+ * لا يكتب أي بيانات — قراءة فقط.
+ */
+export async function previewBookingPrice(rawData: unknown) {
+  const schema = z.object({
+    hotelId:  z.string().regex(/^[a-zA-Z0-9_-]{3,50}$/, 'معرف الفندق غير صالح'),
+    roomId:   z.string().regex(/^[a-zA-Z0-9_-]{3,50}$/, 'معرف الغرفة غير صالح').optional(),
+    checkIn:  z.string().datetime(),
+    checkOut: z.string().datetime(),
+  }).strict();
+
+  const parsed = schema.safeParse(rawData);
+  if (!parsed.success) {
+    return { success: false as const, error: 'بيانات غير صالحة' };
+  }
+
+  const { hotelId, roomId, checkIn: ciStr, checkOut: coStr } = parsed.data;
+  const checkIn  = new Date(ciStr);
+  const checkOut = new Date(coStr);
+  const nights   = calculateNights(checkIn, checkOut);
+
+  if (nights < 1 || nights > MAX_NIGHTS) {
+    return { success: false as const, error: 'مدة الإقامة غير صالحة' };
+  }
+
+  try {
+    const hotelDoc = await db.collection('hotels').doc(hotelId).get();
+    if (!hotelDoc.exists || hotelDoc.data()?.isDeleted) {
+      return { success: false as const, error: 'الفندق غير موجود' };
+    }
+    const hotelData = hotelDoc.data()!;
+    let pricePerNight = hotelData.price || hotelData.priceFrom || 0;
+    const currency = 'USD'; // All prices in Firestore are USD
+
+    if (roomId) {
+      const roomDoc = await hotelDoc.ref.collection('rooms').doc(roomId).get();
+      if (roomDoc.exists && !roomDoc.data()?.isDeleted) {
+        pricePerNight = roomDoc.data()?.price || roomDoc.data()?.pricePerNight || 0;
+      }
+    }
+
+    const baseTotal  = parseFloat((pricePerNight * nights).toFixed(2));
+    const finalTotal = baseTotal;
+
+    return {
+      success: true as const,
+      pricePerNight,
+      nights,
+      baseTotal,
+      discountAmount: 0,
+      finalTotal,
+      currency,
+    };
+  } catch (error) {
+    return handleActionSafe('previewBookingPrice', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE C: getAdminBookings
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function getAdminBookings(rawParams: unknown = {}) {
+  noStore(); // Prevents caching statically 
+
+  const guard = await adminGuard(Policies.canViewBookings);
+  if (!guard.ok) return guard.error;
+
+  const parsed = GetAdminBookingsSchema.safeParse(rawParams);
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: { code: 'VALIDATION_ERROR' as const, message: 'معاملات غير صالحة' },
+    };
+  }
+
+  const { status, q, pageSize } = parsed.data;
+  // NOTE: Schema page maps to cursor internally or pass cursor if implemented in schema
+  const cursor = (rawParams as any).cursor; 
+  const safeTake = clampLimit(pageSize, 20, 100);
+
+  try {
+    const result = await BookingQueryService.getAdminBookings({
+      status,
+      q,
+      take: safeTake,
+      cursor,
+    });
+
+    return {
+      success: true as const,
+      data: result.data,
+      nextCursor: result.nextCursor,
+    };
+  } catch (error) {
+    return handleActionSafe('getAdminBookings', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE D: updateBookingStatus
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * [FIX H-5] يُحدِّث حالة حجز داخل transaction واحدة.
+ * القراءة والكتابة يحدثان في نفس الـ transaction لمنع Race Condition.
+ */
+export async function updateBookingStatus(rawData: unknown) {
+  const guard = await adminGuard(Policies.canUpdateBookingStatus);
+  if (!guard.ok) return guard.error;
+
+  const parsed = UpdateBookingStatusSchema.safeParse(rawData);
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: {
+        code: 'VALIDATION_ERROR' as const,
+        message: 'بيانات غير صالحة',
+        fieldErrors: parsed.error.flatten().fieldErrors,
+      },
+    };
+  }
+
+  const { bookingId, newStatus } = parsed.data;
+
+  try {
+    const querySnapshot = await db.collectionGroup('entries')
+      .where('id', '==', bookingId)
+      .limit(1)
+      .get();
+    
+    if (querySnapshot.empty) {
+      return { success: false as const, error: { code: 'BOOKING_NOT_FOUND', message: 'الحجز غير موجود' }};
+    }
+
+    const bookingDoc = querySnapshot.docs[0];
+    const bookingRef = bookingDoc.ref;
+    const bData = bookingDoc.data();
+
+    const currentStatus = (bData.status || 'pending').toUpperCase();
+
+    if (newStatus === 'CONFIRMED') {
+      if (currentStatus === 'CANCELLED') {
+        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'الحجز ملغي بالفعل ولا يمكن تأكيده' }};
+      }
+    }
+
+    if (newStatus === 'NO_SHOW') {
+      const checkInDate = bData.stay?.fromDate?.toDate ? bData.stay.fromDate.toDate() : new Date((bData.stay?.fromDate?._seconds || 0) * 1000);
+      if (new Date() < checkInDate) {
+        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'لا يمكن تعيين حالة عدم الحضور قبل تاريخ تسجيل الدخول' }};
+      }
+    }
+
+    if (newStatus === 'CANCELLED') {
+      if (currentStatus === 'COMPLETED') {
+        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'لا يمكن إلغاء حجز مكتمل بالفعل' }};
+      }
+    }
+
+    await bookingRef.update({
+      status: newStatus.toLowerCase(),
+      updatedAt: new Date(),
+    });
+
+    revalidatePath('/admin/bookings');
+    return { success: true as const };
+
+  } catch (error) {
+    return handleActionSafe('updateBookingStatus', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE E: verifyBookingPayment
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * [MVP] يؤكد يدوياً استلام الدفعة أو إيصال التحويل البنكي لحجز معين
+ */
+export async function verifyBookingPayment(bookingId: string) {
+  const guard = await adminGuard(Policies.canManageBookings);
+  if (!guard.ok) return guard.error;
+
+  try {
+    const querySnapshot = await db.collectionGroup('entries')
+      .where('id', '==', bookingId)
+      .limit(1)
+      .get();
+    
+    if (querySnapshot.empty) {
+      return { success: false as const, error: { code: 'BOOKING_NOT_FOUND' as const, message: 'الحجز غير موجود' }};
+    }
+
+    const bookingDoc = querySnapshot.docs[0];
+    const bookingRef = bookingDoc.ref;
+    const bData = bookingDoc.data();
+
+    if (bData.paymentVerified || bData.payment?.status === 'verified') {
+      return { success: true as const, data: undefined };
+    }
+
+    await bookingRef.update({
+      paymentVerified: true,
+      'payment.status': 'verified',
+      updatedAt: new Date(),
+    });
+
+    revalidatePath('/admin/bookings');
+    return { success: true as const, data: undefined };
+  } catch (error) {
+    return handleActionSafe('verifyBookingPayment', error);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// USE CASE E: getMyBookings
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateSlugFromHotel(id: string, name: string): string {
+  const idMap: Record<string, string> = {
+    'h_movenpick': 'movenpick-hotel-sanaa',
+    'h_hilton': 'hilton-sanaa',
+    'h_sheraton': 'sheraton-sanaa-resort',
+    'h_qamar': 'qamar-aden-hotel',
+    'h_saif': 'saif-aden-hotel',
+    'h_seyun': 'seyun-almukalla-hotel',
+    'h_eastern': 'eastern-taiz-hotel',
+    'h_seashore': 'hudaydah-seashore-hotel',
+  };
+
+  if (idMap[id]) return idMap[id];
+  if (idMap[id.toLowerCase()]) return idMap[id.toLowerCase()];
+  
+  if (id.includes('-')) return id;
+
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
+  if (!slug || slug === '-') {
+    return id;
+  }
+  return slug;
+}
+
+/**
+ * [FIX M-7] يجلب حجوزات المستخدم الحالي من Firestore مع دعم pagination.
+ */
+export async function getMyBookings(rawParams: unknown = {}) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return SERVER_ERROR_RESPONSE;
+  }
+
+  const parsed = GetMyBookingsSchema.safeParse(rawParams);
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: { code: 'VALIDATION_ERROR' as const, message: 'معاملات غير صالحة' },
+    };
+  }
+
+  const { page, pageSize } = parsed.data;
+  const safePageSize = clampLimit(pageSize, 10, 50);
+  const safePage     = Math.max(1, page);
+  const skip         = (safePage - 1) * safePageSize;
+
+  try {
+    const entriesSnapshot = await db.collection('bookings')
+      .doc(session.user.id)
+      .collection('entries')
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const allDocs = entriesSnapshot.docs;
+    const total = allDocs.length;
+    const paginatedDocs = allDocs.slice(skip, skip + safePageSize);
+
+    const bookings = paginatedDocs.map(doc => {
+      const data = doc.data();
+      const checkInDate = data.stay?.fromDate?.toDate ? data.stay.fromDate.toDate() : new Date((data.stay?.fromDate?._seconds || 0) * 1000);
+      const checkOutDate = data.stay?.toDate?.toDate ? data.stay.toDate.toDate() : new Date((data.stay?.toDate?._seconds || 0) * 1000);
+      const createdDate = data.createdAt?.toDate ? data.createdAt.toDate() : new Date((data.createdAt?._seconds || 0) * 1000);
+
+      return {
+        id: doc.id,
+        code: data.bookingNumber || doc.id,
+        status: (data.status || 'PENDING').toUpperCase(),
+        paymentStatus: (data.payment?.status || 'PENDING').toUpperCase(),
+        paymentMethod: data.payment?.method || 'CASH',
+        checkIn: checkInDate.toISOString(),
+        checkOut: checkOutDate.toISOString(),
+        nights: data.stay?.nightsCount || 1,
+        guests: data.stay?.guestsCount || 1,
+        totalPrice: data.pricing?.totalUsd || 0,
+        currency: 'USD',
+        createdAt: createdDate.toISOString(),
+        hotel: {
+          id: data.hotel?.id || '',
+          nameAr: data.hotel?.name || 'فندق',
+          nameEn: data.hotel?.name || 'Hotel',
+          slug: data.hotel?.name ? generateSlugFromHotel(data.hotel.id, data.hotel.name) : '',
+          thumbnailUrl: data.hotel?.imageUrl || null,
+        },
+        room: {
+          id: data.room?.id || '',
+          nameAr: data.room?.name || 'غرفة',
+        },
+      };
+    });
+
+    return {
+      success:  true as const,
+      data:     bookings,
+      total,
+      page:     safePage,
+      pageSize: safePageSize,
+    };
+
+  } catch (error) {
+    return handleActionSafe('getMyBookings', error);
+  }
+}

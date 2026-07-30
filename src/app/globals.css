@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+:root {
+  /* ===== MSARI OFFICIAL BRAND PRIMITIVES ===== */
+  --brand-primary: #23096E;        /* Royal Deep Purple */
+  --brand-secondary: #3A1C8F;      /* Secondary Vibrant Purple */
+  --brand-white: #F4F2F8;          /* Logo White / Soft Pearl */
+  --brand-accent: #FF3B30;         /* Accent Red Official */
+  --brand-success: #10B981;        /* Emerald Green */
+  --brand-dark: #0A0912;           /* Deep Charcoal Neutral */
+
+  /* ===== SEMANTIC SURFACE TOKENS ===== */
+  --surface-page: #F4F2F8;
+  --surface-card: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-hero-gradient: linear-gradient(135deg, #23096E 0%, #2d1580 50%, #3A1C8F 100%);
+  --surface-dark: #0A0912;
+  --surface-overlay: rgba(10, 9, 18, 0.65);
+  --surface-interactive: #F4F2F8;
+
+  /* ===== SEMANTIC TEXT TOKENS ===== */
+  --text-primary: #0A0912;         /* High Contrast 16.5:1 on light */
+  --text-secondary: #423861;       /* Subtitles / Body 7.2:1 */
+  --text-muted: #5c4f82;           /* Captions & Meta */
+  --text-on-dark: #FFFFFF;         /* Pure White 14.8:1 on dark */
+  --text-on-dark-muted: #F4F2F8;   /* Light Pearl on dark */
+  --text-brand: #23096E;          /* Brand Primary Text */
+  --text-accent: #FF3B30;         /* Brand Accent Red Text */
+  --text-link: #23096E;            /* Interactive Link Text */
+
+  /* ===== SEMANTIC BORDER TOKENS ===== */
+  --border-default: rgba(35, 9, 110, 0.12);
+  --border-subtle: #ede9f5;
+  --border-strong: #23096E;
+  --border-accent: #FF3B30;
+  --border-focus: #3A1C8F;
+
+  /* ===== STATE TOKENS ===== */
+  --state-hover-overlay: rgba(35, 9, 110, 0.04);
+  --state-pressed-overlay: rgba(35, 9, 110, 0.1);
+  --state-focus-ring: 0 0 0 3px rgba(255, 59, 48, 0.35);
+  --state-disabled: #d8d0eb;
+
+  /* ===== SHADOWS ===== */
+  --shadow-card: 0 4px 6px -1px rgba(35, 9, 110, 0.06), 0 2px 4px -2px rgba(35, 9, 110, 0.04);
+  --shadow-elevated: 0 10px 25px -5px rgba(35, 9, 110, 0.12), 0 8px 10px -6px rgba(35, 9, 110, 0.08);
+  --shadow-floating: 0 20px 60px -15px rgba(35, 9, 110, 0.2);
+
+  /* ===== LAYOUT & SPACING ===== */
+  --container-max: 1280px;
+  --header-height: 72px;
+
+  /* ===== RADIUS ===== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ===== TRANSITIONS ===== */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+}
+
+/* =================== BASE =================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Cairo', 'Inter', sans-serif;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* RTL / LTR Font Governance */
+html[dir="rtl"] body {
+  font-family: 'Cairo', sans-serif;
+}
+
+html[dir="ltr"] body {
+  font-family: 'Inter', 'Cairo', sans-serif;
+}
+
+/* =================== CONTEXTUAL TYPOGRAPHY GOVERNANCE =================== */
+/* Base Heading rules without un-scoped color overrides */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* Contextual Surface Color Cascade */
+.surface-dark h1, .surface-dark h2, .surface-dark h3, .surface-dark h4, .surface-dark h5, .surface-dark h6,
+.surface-hero h1, .surface-hero h2, .surface-hero h3, .surface-hero h4, .surface-hero h5, .surface-hero h6,
+footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
+  color: var(--text-on-dark) !important;
+}
+
+.surface-light h1, .surface-light h2, .surface-light h3, .surface-light h4, .surface-light h5, .surface-light h6,
+.surface-card h1, .surface-card h2, .surface-card h3, .surface-card h4, .surface-card h5, .surface-card h6 {
+  color: var(--text-brand);
+}
+
+/* =================== UTILITY SURFACES =================== */
+.surface-page {
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+}
+
+.surface-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.surface-card:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+.surface-hero {
+  background: var(--surface-hero-gradient);
+  color: var(--text-on-dark);
+}
+
+.surface-dark {
+  background-color: var(--brand-primary);
+  color: var(--text-on-dark);
+}
+
+/* =================== CONTAINER =================== */
+.container-msari {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* =================== BUTTONS SYSTEM =================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  color: var(--text-on-dark);
+  box-shadow: 0 4px 15px rgba(35, 9, 110, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(35, 9, 110, 0.35);
+  color: var(--text-on-dark);
+}
+
+.btn-accent {
+  background-color: var(--brand-accent);
+  color: var(--text-on-dark);
+  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.25);
+}
+
+.btn-accent:hover {
+  background-color: #e02d23;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 59, 48, 0.35);
+  color: var(--text-on-dark);
+}
+
+.btn-white {
+  background-color: #FFFFFF;
+  color: var(--brand-primary);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-white:hover {
+  background-color: var(--brand-accent);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--brand-primary);
+  border: 2px solid var(--brand-primary);
+}
+
+.btn-outline:hover {
+  background: var(--brand-primary);
+  color: var(--text-on-dark);
+  transform: translateY(-2px);
+}
+
+/* =================== SCROLLBAR =================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-primary);
+}
+
+/* =================== ANIMATIONS =================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
