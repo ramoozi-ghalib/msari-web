@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { User, Mail, Phone, Edit3, LogOut, Save, CheckCircle, Shield, BookOpen, Heart } from 'lucide-react';
 import { Policies } from '@/lib/policies';
-// import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-[#23096e]/20 border-t-[#23096e] rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-[var(--brand-primary)]/20 border-t-[var(--brand-primary)] rounded-full animate-spin" />
       </div>
     );
   }
@@ -60,10 +60,10 @@ export default function ProfilePage() {
   const joinDate = new Date(user.createdAt).toLocaleDateString('ar-YE', { year: 'numeric', month: 'long' });
 
   return (
-    <div className="min-h-screen bg-[#f8f8fa]">
+    <div className="min-h-screen bg-[var(--surface-page)]">
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-[#23096e] to-[#3A1C8F] pt-28 pb-20">
+      <section className="bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] pt-28 pb-20">
         <div className="container-msari">
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 bg-white/20 border-4 border-white/30 rounded-2xl flex items-center justify-center text-white text-3xl font-black">
@@ -98,7 +98,7 @@ export default function ProfilePage() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${item.active ? 'bg-[#23096e] text-white' : 'text-neutral-600 hover:bg-neutral-50'}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${item.active ? 'bg-[var(--brand-primary)] text-white' : 'text-neutral-600 hover:bg-neutral-50'}`}
                   >
                     <item.icon size={18} />
                     {item.label}
@@ -133,7 +133,7 @@ export default function ProfilePage() {
                 <h2 className="text-xl font-black text-neutral-900">المعلومات الشخصية</h2>
                 <button
                   onClick={() => setEditing(e => !e)}
-                  className="flex items-center gap-2 text-sm text-[#23096e] font-bold hover:underline"
+                  className="flex items-center gap-2 text-sm text-[var(--brand-primary)] font-bold hover:underline"
                 >
                   <Edit3 size={16} />
                   {editing ? 'إلغاء' : 'تعديل'}
@@ -161,13 +161,14 @@ export default function ProfilePage() {
                       dir="ltr"
                     />
                   </div>
-                  <button
+                  <Button
+                    variant="primary"
+                    size="md"
                     onClick={handleSave}
-                    className="flex items-center gap-2 bg-[#23096e] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1a0654] transition-colors"
+                    icon={<Save size={16} />}
                   >
-                    <Save size={16} />
                     حفظ التغييرات
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-5">
@@ -177,8 +178,8 @@ export default function ProfilePage() {
                     { icon: Phone, label: 'رقم الهاتف', value: user.phone || 'لم يُضَف بعد' },
                   ].map(row => (
                     <div key={row.label} className="flex items-center gap-4 py-3 border-b border-neutral-50 last:border-0">
-                      <div className="w-10 h-10 bg-[#23096e]/10 rounded-xl flex items-center justify-center shrink-0">
-                        <row.icon size={18} className="text-[#23096e]" />
+                      <div className="w-10 h-10 bg-[var(--brand-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                        <row.icon size={18} className="text-[var(--brand-primary)]" />
                       </div>
                       <div>
                         <div className="text-xs text-neutral-400 font-medium">{row.label}</div>
@@ -194,13 +195,13 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-neutral-100">
               <h2 className="text-xl font-black text-neutral-900 mb-6">إجراءات سريعة</h2>
               <div className="grid grid-cols-2 gap-4">
-                <Link href="/account/bookings" className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 hover:border-[#23096e]/40 hover:bg-[#23096e]/5 transition-all group">
-                  <BookOpen size={20} className="text-[#23096e]" />
-                  <span className="font-semibold text-sm text-neutral-700 group-hover:text-[#23096e]">حجوزاتي</span>
+                <Link href="/account/bookings" className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 hover:border-[var(--brand-primary)]/40 hover:bg-[var(--brand-primary)]/5 transition-all group">
+                  <BookOpen size={20} className="text-[var(--brand-primary)]" />
+                  <span className="font-semibold text-sm text-neutral-700 group-hover:text-[var(--brand-primary)]">حجوزاتي</span>
                 </Link>
-                <Link href="/hotels" className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 hover:border-[#23096e]/40 hover:bg-[#23096e]/5 transition-all group">
-                  <Heart size={20} className="text-[#23096e]" />
-                  <span className="font-semibold text-sm text-neutral-700 group-hover:text-[#23096e]">تصفح الفنادق</span>
+                <Link href="/hotels" className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 hover:border-[var(--brand-primary)]/40 hover:bg-[var(--brand-primary)]/5 transition-all group">
+                  <Heart size={20} className="text-[var(--brand-primary)]" />
+                  <span className="font-semibold text-sm text-neutral-700 group-hover:text-[var(--brand-primary)]">تصفح الفنادق</span>
                 </Link>
               </div>
             </div>

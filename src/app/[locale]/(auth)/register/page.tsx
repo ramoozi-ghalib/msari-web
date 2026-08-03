@@ -8,6 +8,7 @@ import { Mail, Lock, Eye, EyeOff, User, Phone, AlertCircle, UserPlus, CheckCircl
 import { signIn } from 'next-auth/react';
 import { registerUser } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
+import { Button } from '@/components/ui/Button';
 
 type RegisterActionResult = Awaited<ReturnType<typeof registerUser>>;
 
@@ -60,7 +61,7 @@ function RegisterForm() {
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1644406213799-a8648fc9b08f?q=80&w=2000&auto=format&fit=crop")' }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#23096e]/70 via-[#23096e]/40 to-black/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary)]/70 via-[var(--brand-primary)]/40 to-black/80 backdrop-blur-[2px]" />
       </div>
 
       {/* Form Card (Glassmorphism) */}
@@ -134,21 +135,22 @@ function RegisterForm() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-br from-[#23096e] to-[#3A1C8F] text-white font-black py-4 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
+              variant="primary"
+              size="lg"
+              fullWidth
+              loading={loading}
+              icon={<UserPlus size={18} />}
+              className="mt-2"
             >
-              {loading
-                ? <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                : <><UserPlus size={18} /> إنشاء الحساب</>
-              }
-            </button>
+              إنشاء الحساب
+            </Button>
           </form>
 
           <p className="text-center text-neutral-500 text-sm mt-8">
             لديك حساب بالفعل؟{' '}
-            <Link href={`/login?redirect=${encodedRedirect}`} className="text-[#23096e] font-bold hover:underline">
+            <Link href={`/login?redirect=${encodedRedirect}`} className="text-[var(--brand-primary)] font-bold hover:underline">
               تسجيل الدخول
             </Link>
           </p>

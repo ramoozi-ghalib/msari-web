@@ -76,19 +76,19 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-2">
               📍 استكشف اليمن
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#23096E] mb-1">
+            <h2 className="text-2xl sm:text-4xl font-black text-[var(--brand-primary)] mb-1">
               وجهات رائجة
             </h2>
-            <p className="text-[#423861] text-sm sm:text-base font-semibold">
+            <p className="text-[var(--text-secondary)] text-sm sm:text-base font-semibold">
               اكتشف أجمل مدن اليمن واحجز فندقك المفضل
             </p>
           </div>
           <Link
             href="/hotels"
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#23096E] text-[#23096E] hover:bg-[#23096E] hover:text-white font-black text-sm transition-all"
+            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white font-black text-sm transition-all"
           >
             عرض الكل
             <ArrowLeft size={16} />

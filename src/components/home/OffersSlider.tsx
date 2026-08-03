@@ -87,11 +87,11 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
         {/* Section Header */}
         <div className="flex items-end justify-between mb-8 pb-3 border-b border-slate-200/80">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] text-xs font-extrabold mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-extrabold mb-2">
               <Sparkles className="w-3.5 h-3.5" />
               <span>🔥 أحدث العروض والخصومات</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#23096E]">
+            <h2 className="text-2xl sm:text-4xl font-black text-[var(--brand-primary)]">
               العروض الحصرية
             </h2>
           </div>
@@ -102,14 +102,14 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={prevSlide}
-                  className="w-10 h-10 rounded-full bg-white text-[#23096E] flex items-center justify-center border border-slate-200 shadow-md hover:bg-[#23096E] hover:text-white transition-all active:scale-95"
+                  className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-slate-200 shadow-md hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
                   aria-label="العرض السابق"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
                 <button
                   onClick={nextSlide}
-                  className="w-10 h-10 rounded-full bg-white text-[#23096E] flex items-center justify-center border border-slate-200 shadow-md hover:bg-[#23096E] hover:text-white transition-all active:scale-95"
+                  className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-slate-200 shadow-md hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
                   aria-label="العرض التالي"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -119,7 +119,7 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
 
             <Link
               href="/hotels"
-              className="inline-flex items-center gap-1 text-sm font-black text-[#23096E] hover:text-[#FF3B30] transition-colors ps-2"
+              className="inline-flex items-center gap-1 text-sm font-black text-[var(--brand-primary)] hover:text-[var(--brand-accent)] transition-colors ps-2"
             >
               <span>عرض الكل</span>
               <ArrowLeft className="w-4 h-4" />
@@ -175,7 +175,7 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
 
                   {/* Badge */}
                   <div className="absolute top-4 start-4 z-20">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-600 text-white text-xs font-black shadow-lg">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--brand-accent)] text-white text-xs font-black shadow-lg">
                       <Tag className="w-3.5 h-3.5" />
                       <span>عرض خاص</span>
                     </span>
@@ -191,7 +191,7 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
 
                     <Link
                       href={offer.link || '/hotels'}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-xs transition-all shadow-md group-hover:scale-105 shrink-0 me-auto sm:me-0"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand-accent)] hover:opacity-90 text-white font-black text-xs transition-all shadow-md group-hover:scale-105 shrink-0 me-auto sm:me-0"
                     >
                       <span>احجز الآن واستفد من العرض</span>
                       <ArrowLeft className="w-3.5 h-3.5 text-white" />
@@ -215,8 +215,8 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
                   className={cn(
                     'h-2.5 rounded-full transition-all duration-500',
                     i === realIndex
-                      ? 'w-8 bg-[#23096E] shadow-md'
-                      : 'w-2.5 bg-slate-300 hover:bg-[#23096E]/50'
+                      ? 'w-8 bg-[var(--brand-primary)] shadow-md'
+                      : 'w-2.5 bg-slate-300 hover:bg-[var(--brand-primary)]/50'
                   )}
                   aria-label={`الذهاب للعرض ${i + 1}`}
                 />

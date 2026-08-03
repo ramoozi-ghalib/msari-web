@@ -123,7 +123,7 @@ export default function OffersManagement() {
         
         <button 
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-[#23096e] hover:bg-[#1a0654] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md">
+          className="flex items-center gap-2 bg-[var(--brand-primary)] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md">
           <Plus size={18} /> إضافة عرض إعلاني جديد
         </button>
       </div>
@@ -135,7 +135,7 @@ export default function OffersManagement() {
           <input 
             type="text"
             placeholder="ابحث باسم العرض أو الرابط..."
-            className="w-full pl-4 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl outline-none focus:border-[#23096e] focus:bg-white text-sm"
+            className="w-full pl-4 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl outline-none focus:border-[var(--brand-primary)] focus:bg-white text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -160,7 +160,7 @@ export default function OffersManagement() {
         ) : (
           <div className="grid grid-cols-1 gap-6">
             {filteredOffers.map((offer, index) => (
-              <div key={offer.id} className="flex flex-col md:flex-row gap-6 p-4 rounded-2xl border border-neutral-200 hover:border-[#23096e]/30 transition-colors bg-neutral-50/50 items-center">
+              <div key={offer.id} className="flex flex-col md:flex-row gap-6 p-4 rounded-2xl border border-neutral-200 hover:border-[var(--brand-primary)]/30 transition-colors bg-neutral-50/50 items-center">
                 
                 {/* Image Preview */}
                 <div className="w-full md:w-64 h-32 rounded-xl border border-neutral-200 overflow-hidden relative group shrink-0 shadow-sm">
@@ -169,7 +169,7 @@ export default function OffersManagement() {
                     <span className="text-white text-xs font-bold drop-shadow-md">معاينة الصورة</span>
                   </div>
                   {!offer.isActive && (
-                    <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
+                    <div className="absolute top-2 right-2 bg-[var(--brand-accent)] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
                       غير مفعل
                     </div>
                   )}
@@ -183,7 +183,7 @@ export default function OffersManagement() {
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--brand-primary)] bg-[var(--brand-primary)]/10 px-3 py-1.5 rounded-lg border border-purple-100 font-medium">
                       <LinkIcon size={12} /> 
                       <span className="dir-ltr">{offer.link}</span>
                     </div>
@@ -201,14 +201,14 @@ export default function OffersManagement() {
                     <button 
                       onClick={() => moveOrder(offer.id, 'up')}
                       disabled={index === 0}
-                      className="p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-[#23096e] rounded disabled:opacity-30 disabled:hover:bg-transparent" title="نقل لأعلى">
+                      className="p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-[var(--brand-primary)] rounded disabled:opacity-30 disabled:hover:bg-transparent" title="نقل لأعلى">
                       <MoveVertical size={14} className="rotate-180"/>
                     </button>
                     <div className="w-px h-4 bg-neutral-200"></div>
                     <button 
                       onClick={() => moveOrder(offer.id, 'down')}
                       disabled={index === offers.length - 1}
-                      className="p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-[#23096e] rounded disabled:opacity-30 disabled:hover:bg-transparent" title="نقل لأسفل">
+                      className="p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-[var(--brand-primary)] rounded disabled:opacity-30 disabled:hover:bg-transparent" title="نقل لأسفل">
                       <MoveVertical size={14} />
                     </button>
                   </div>
@@ -222,7 +222,7 @@ export default function OffersManagement() {
                   <div className="flex gap-2">
                     <button 
                       onClick={() => handleOpenEdit(offer)}
-                      className="p-2 border border-neutral-200 bg-white text-blue-600 hover:bg-blue-50 rounded-lg transition-colors shadow-sm" title="تعديل">
+                      className="p-2 border border-neutral-200 bg-white text-[var(--brand-primary)] hover:bg-purple-50 rounded-lg transition-colors shadow-sm" title="تعديل">
                       <Edit2 size={16} />
                     </button>
                     <button 
@@ -247,7 +247,7 @@ export default function OffersManagement() {
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
             <div className="bg-white border-b border-neutral-100 p-6 flex justify-between items-center shrink-0">
               <h2 className="text-2xl font-black text-neutral-900 flex items-center gap-3">
-                <Megaphone size={24} className="text-[#23096e]" />
+                <Megaphone size={24} className="text-[var(--brand-primary)]" />
                 {editingOffer ? 'تحديث الإعلان / العرض' : 'إضافة إعلان جديد للسلايدر'}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-neutral-100 rounded-full text-neutral-400 transition-colors">
@@ -265,7 +265,7 @@ export default function OffersManagement() {
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="مثال: خصم 50% على الطيران"
-                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#23096e] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-colors"
                   />
                   <p className="text-[10px] text-neutral-400">يستخدم كبديل نصي ولقارئات الشاشة</p>
                 </div>
@@ -277,7 +277,7 @@ export default function OffersManagement() {
                     value={formData.titleEn}
                     onChange={(e) => setFormData({...formData, titleEn: e.target.value})}
                     placeholder="e.g. 50% Off Flights"
-                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#23096e] focus:bg-white transition-colors text-left dir-ltr"
+                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-colors text-left dir-ltr"
                     dir="ltr"
                   />
                 </div>
@@ -292,7 +292,7 @@ export default function OffersManagement() {
                     value={formData.link}
                     onChange={(e) => setFormData({...formData, link: e.target.value})}
                     placeholder="مثال: /hotels أو https://google.com"
-                    className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#23096e] focus:bg-white transition-colors text-left dir-ltr"
+                    className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-colors text-left dir-ltr"
                     dir="ltr"
                   />
                 </div>
@@ -307,7 +307,7 @@ export default function OffersManagement() {
                     min="1"
                     value={formData.order}
                     onChange={(e) => setFormData({...formData, order: Number(e.target.value)})}
-                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#23096e] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[var(--brand-primary)] focus:bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -320,8 +320,8 @@ export default function OffersManagement() {
                       <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
-                  <div className="w-full border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center hover:bg-[#23096e]/5 hover:border-[#23096e]/30 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center text-[#23096e] mb-1">
+                  <div className="w-full border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center hover:bg-[var(--brand-primary)]/5 hover:border-[var(--brand-primary)]/30 transition-colors cursor-pointer flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center text-[var(--brand-primary)] mb-1">
                       <UploadCloud size={24} />
                     </div>
                     <span className="text-base font-black text-neutral-800">رفع صورة بانر إعلانية</span>
@@ -336,7 +336,7 @@ export default function OffersManagement() {
                     type="checkbox" 
                     checked={formData.isActive}
                     onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                    className="w-5 h-5 text-[#23096e] rounded border-neutral-300 focus:ring-[#23096e]" 
+                    className="w-5 h-5 text-[var(--brand-primary)] rounded border-neutral-300 focus:ring-[var(--brand-primary)]" 
                   />
                   <div>
                     <div className="font-bold text-neutral-900 text-sm mb-1">تفعيل ونشر العرض فوراً</div>
@@ -355,7 +355,7 @@ export default function OffersManagement() {
               </button>
               <button 
                 onClick={handleSave}
-                className="px-8 py-2.5 bg-[#23096e] hover:bg-[#1a0654] text-white rounded-xl font-bold text-sm transition-all shadow-md">
+                className="px-8 py-2.5 bg-[var(--brand-primary)] hover:opacity-90 text-white rounded-xl font-bold text-sm transition-all shadow-md">
                 {editingOffer ? 'حفظ التغييرات' : 'إضافة البانر للسلايدر'}
               </button>
             </div>

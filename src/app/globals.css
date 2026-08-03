@@ -90,12 +90,31 @@ html[dir="ltr"] body {
   font-family: 'Inter', 'Cairo', sans-serif;
 }
 
-/* =================== CONTEXTUAL TYPOGRAPHY GOVERNANCE =================== */
-/* Base Heading rules without un-scoped color overrides */
-h1, h2, h3, h4, h5, h6 {
+/* =================== OFFICIAL TYPE SCALE GOVERNANCE =================== */
+h1, .heading-1 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h2, .heading-2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 800;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+}
+
+h3, .heading-3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h4, .heading-4 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 /* Contextual Surface Color Cascade */

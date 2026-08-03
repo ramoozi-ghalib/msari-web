@@ -71,10 +71,10 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#F4F2F8] surface-page">
+    <div className="min-h-screen bg-[var(--surface-page)] surface-page">
 
       {/* Hero */}
-      <section className="relative pt-28 pb-16 bg-gradient-to-br from-[#23096e] to-[#3A1C8F]">
+      <section className="relative pt-28 pb-16 bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]">
         <div className="container-msari text-center">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4">سياسة الخصوصية</h1>
           <p className="text-white/80 text-lg max-w-xl mx-auto">
@@ -91,9 +91,9 @@ export default function PrivacyPage() {
         <div className="max-w-3xl mx-auto">
 
           {/* Intro */}
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-10">
-            <p className="text-blue-800 text-sm leading-relaxed">
-              <strong>ملخص مختصر:</strong> نجمع فقط ما نحتاجه لإتمام حجوزاتك. لا نبيع بياناتك. يمكنك طلب حذف بياناتك في أي وقت. إذا كانت لديك أسئلة، تواصل معنا على <a href="mailto:info@msari.net" className="text-blue-600 underline">info@msari.net</a>
+          <div className="bg-[var(--brand-primary)]/5 border border-[var(--brand-primary)]/20 rounded-2xl p-6 mb-10">
+            <p className="text-neutral-800 text-sm leading-relaxed">
+              <strong>ملخص مختصر:</strong> نجمع فقط ما نحتاجه لإتمام حجوزاتك. لا نبيع بياناتك. يمكنك طلب حذف بياناتك في أي وقت. إذا كانت لديك أسئلة، تواصل معنا على <a href="mailto:info@msari.net" className="text-[var(--brand-primary)] font-bold underline">info@msari.net</a>
             </p>
           </div>
 
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
                 <ul className="space-y-3">
                   {section.content.map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-neutral-600 text-sm leading-relaxed">
-                      <span className="w-5 h-5 bg-[#23096e]/10 text-[#23096e] rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
+                      <span className="w-5 h-5 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
                       {item}
                     </li>
                   ))}
@@ -115,12 +115,12 @@ export default function PrivacyPage() {
           </div>
 
           {/* Contact */}
-          <div className="mt-10 bg-[#23096e] rounded-2xl p-8 text-center">
+          <div className="mt-10 bg-[var(--brand-primary)] rounded-2xl p-8 text-center">
             <h3 className="text-xl font-black text-white mb-3">هل لديك استفسار حول خصوصيتك؟</h3>
             <p className="text-white/70 text-sm mb-6">تواصل مع فريق حماية البيانات لدينا</p>
             <a
               href="mailto:privacy@msari.net"
-              className="inline-block bg-white text-[#23096e] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
+              className="inline-block bg-white text-[var(--brand-primary)] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
             >
               privacy@msari.net
             </a>

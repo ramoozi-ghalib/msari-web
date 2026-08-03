@@ -370,7 +370,7 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
           <p className="text-neutral-500 font-medium">أضف، عدل، خصص الخصومات وأظهر المرافق</p>
         </div>
         <button onClick={openAdd}
-          className="flex items-center gap-2 bg-[#23096e] hover:bg-[#1a0654] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all">
+          className="flex items-center gap-2 bg-[var(--brand-primary)] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all">
           <Plus size={18} /> إضافة فندق جديد
         </button>
       </div>
@@ -379,7 +379,7 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
       <div className="bg-white rounded-t-2xl shadow-sm border border-neutral-100 border-b-0 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-96">
           <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-          <input className="w-full pl-4 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl outline-none focus:border-[#23096e] focus:bg-white text-sm"
+          <input className="w-full pl-4 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl outline-none focus:border-[var(--brand-primary)] focus:bg-white text-sm"
             placeholder="بحث بالاسم أو المدينة..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
         </div>
         <div className="px-4 py-2 bg-neutral-50 rounded-xl border border-neutral-200 text-sm font-bold text-neutral-600 flex items-center gap-2">
@@ -409,8 +409,8 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
                     {hotel.thumbnail?.startsWith('http') ? (
                       <img src={hotel.thumbnail} alt={hotel.name} className="w-12 h-12 rounded-lg object-cover border border-neutral-200" />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#23096e15] to-[#3A1C8F25] border border-neutral-200 flex items-center justify-center">
-                        <Building2 size={20} className="text-[#23096e50]" />
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-secondary)]/20 border border-neutral-200 flex items-center justify-center">
+                        <Building2 size={20} className="text-[var(--brand-primary)]/50" />
                       </div>
                     )}
                     <div>
@@ -437,13 +437,13 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
                 </td>
                 <td className="py-4 px-6">
                   {hotel.isFeatured
-                    ? <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#23096e]/10 text-[#23096e] inline-flex items-center gap-1"><Check size={11} /> مميز</span>
+                    ? <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] inline-flex items-center gap-1"><Check size={11} /> مميز</span>
                     : <span className="text-xs text-neutral-400">عادي</span>
                   }
                 </td>
                 <td className="py-4 px-6 text-end">
                   <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => openEdit(hotel)} className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors" title="تعديل">
+                    <button onClick={() => openEdit(hotel)} className="p-2 bg-blue-50 text-[var(--brand-primary)] hover:bg-blue-100 rounded-lg transition-colors" title="تعديل">
                       <Edit2 size={16} />
                     </button>
                     <button onClick={() => handleDelete(hotel)} disabled={isPending} className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50" title="حذف">
@@ -469,7 +469,7 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
             {/* Modal header */}
             <div className="p-6 border-b border-neutral-100 flex justify-between items-center shrink-0">
               <h2 className="text-xl font-black text-neutral-900 flex items-center gap-3">
-                <Building2 size={22} className="text-[#23096e]" />
+                <Building2 size={22} className="text-[var(--brand-primary)]" />
                 {editingHotel ? `تعديل: ${editingHotel.name}` : 'إضافة فندق جديد'}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-neutral-100 rounded-full text-neutral-400">
@@ -481,7 +481,7 @@ export default function HotelsManagementClient({ initialHotels, initialCities, d
             <div className="flex border-b border-neutral-100 px-6 bg-white shrink-0 gap-1 overflow-x-auto pt-3">
               {(Object.keys(tabLabels) as Tab[]).map(tab => (
                 <button key={tab} onClick={() => { setActiveTab(tab); setRoomForm(null); }}
-                  className={`px-5 py-2.5 font-bold whitespace-nowrap border-b-2 text-sm transition-colors ${activeTab === tab ? 'text-[#23096e] border-[#23096e]' : 'text-neutral-400 border-transparent hover:text-neutral-700'}`}>
+                  className={`px-5 py-2.5 font-bold whitespace-nowrap border-b-2 text-sm transition-colors ${activeTab === tab ? 'text-[var(--brand-primary)] border-[var(--brand-primary)]' : 'text-neutral-400 border-transparent hover:text-neutral-700'}`}>
                   {tabLabels[tab]}
                 </button>
               ))}

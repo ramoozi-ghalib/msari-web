@@ -7,6 +7,8 @@ import {
   ArrowRight, Calendar, Clock, User, Tag, 
   Sparkles, BookOpen, Share2
 } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -60,7 +62,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+    <div className="min-h-screen bg-[var(--surface-page)] pb-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -72,7 +74,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           {/* Back Navigation Button */}
           <Link
             href={`/${currentLocale}/blog`}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-colors mb-6"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة لجميع الأدلة والمقالات</span>
@@ -80,11 +82,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
           {/* Category & Meta Pills */}
           <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm font-semibold mb-4">
-            <span className="px-3.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+            <Badge variant="primary" size="md">
               {post.category}
-            </span>
+            </Badge>
             <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <Clock className="w-4 h-4 text-blue-500" />
+              <Clock className="w-4 h-4 text-[var(--brand-primary)]" />
               {post.readTimeMinutes} دقائق قراءة
             </span>
             <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
@@ -119,7 +121,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         <article className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-12 shadow-md border border-slate-200/80 dark:border-slate-800/80">
           
           {/* Excerpt Lead Box */}
-          <div className="mb-10 p-6 sm:p-8 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border-s-4 border-blue-600 dark:border-blue-500 text-slate-800 dark:text-slate-200 font-semibold text-base sm:text-lg leading-relaxed">
+          <div className="mb-10 p-6 sm:p-8 rounded-2xl bg-[var(--surface-page)] border-s-4 border-[var(--brand-primary)] text-slate-800 dark:text-slate-200 font-semibold text-base sm:text-lg leading-relaxed">
             {post.excerpt}
           </div>
 
@@ -127,7 +129,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           <div
             className="prose prose-slate dark:prose-invert max-w-none 
                        prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:font-black prose-h2:text-slate-900 dark:prose-h2:text-white prose-h2:mt-10 prose-h2:mb-6 prose-h2:border-b prose-h2:border-slate-100 dark:prose-h2:border-slate-800 prose-h2:pb-3
-                       prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:font-bold prose-h3:text-blue-900 dark:prose-h3:text-blue-300 prose-h3:mt-8 prose-h3:mb-4
+                       prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:font-bold prose-h3:text-[var(--brand-primary)] dark:prose-h3:text-[var(--brand-secondary)] prose-h3:mt-8 prose-h3:mb-4
                        prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-p:sm:text-lg prose-p:leading-8 prose-p:mb-6 prose-p:font-normal
                        prose-ul:my-6 prose-ul:space-y-3 prose-ul:list-disc prose-ul:ps-6
                        prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:text-base prose-li:sm:text-lg prose-li:leading-relaxed"
@@ -155,22 +157,20 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           {/* ─── Author Info Box at Bottom of Article ─── */}
           <div className="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 bg-slate-50 dark:bg-slate-800/40 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md border-2 border-white dark:border-slate-700">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--brand-primary)] to-[var(--brand-secondary)] flex items-center justify-center text-white font-black text-xl shadow-md border-2 border-white dark:border-slate-700">
                 {post.authorName.slice(0, 1)}
               </div>
               <div>
-                <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-0.5">بقلم الكاتب</p>
+                <p className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-wider mb-0.5">بقلم الكاتب</p>
                 <h4 className="text-lg font-extrabold text-slate-900 dark:text-white">{post.authorName}</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">محرر وخبير أدلة السفر في منصة مساري</p>
               </div>
             </div>
 
-            <Link
-              href={`/${currentLocale}/blog`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow transition-colors"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>استعرض كافة المقالات</span>
+            <Link href={`/${currentLocale}/blog`}>
+              <Button variant="primary" icon={<BookOpen className="w-4 h-4" />}>
+                استعرض كافة المقالات
+              </Button>
             </Link>
           </div>
         </article>

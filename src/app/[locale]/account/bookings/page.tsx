@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { BookOpen, Hotel, Clock, ArrowRight } from 'lucide-react';
 import { auth } from '@/auth';
 import { getMyBookings } from '@/actions/bookings';
+import { Button } from '@/components/ui/Button';
 
 export default async function AccountBookingsPage(props: {
   params: Promise<{ locale: string }>;
@@ -36,9 +37,9 @@ export default async function AccountBookingsPage(props: {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f8fa]">
+    <div className="min-h-screen bg-[var(--surface-page)]">
       {/* Hero */}
-      <section className="relative pt-28 pb-16 bg-gradient-to-br from-[#23096e] to-[#3A1C8F]">
+      <section className="relative pt-28 pb-16 bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)]">
         <div className="container-msari">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
@@ -83,8 +84,8 @@ export default async function AccountBookingsPage(props: {
                 <div key={booking.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#23096e]/10 rounded-xl flex items-center justify-center">
-                        <Hotel size={18} className="text-[#23096e]" />
+                      <div className="w-10 h-10 bg-[var(--brand-primary)]/10 rounded-xl flex items-center justify-center">
+                        <Hotel size={18} className="text-[var(--brand-primary)]" />
                       </div>
                       <div>
                         <div className="font-black text-neutral-900">
@@ -120,14 +121,14 @@ export default async function AccountBookingsPage(props: {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-xs text-neutral-400">إجمالي الحجز </span>
-                      <span className="font-black text-[#23096e] text-lg">${booking.totalPrice}</span>
+                      <span className="font-black text-[var(--brand-primary)] text-lg">${booking.totalPrice}</span>
                     </div>
                     {booking.status === 'CONFIRMED' && (
                       <a
                         href={`https://wa.me/967784644466?text=${encodeURIComponent('أريد الاستفسار عن حجزي رقم ' + booking.code)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-bold text-[#23096e] hover:underline flex items-center gap-1"
+                        className="text-sm font-bold text-[var(--brand-primary)] hover:underline flex items-center gap-1"
                       >
                         تواصل معنا <ArrowRight size={14} className="rtl:rotate-180" />
                       </a>
@@ -140,13 +141,15 @@ export default async function AccountBookingsPage(props: {
 
           {/* CTA */}
           <div className="mt-10 bg-white rounded-2xl p-8 shadow-sm border border-neutral-100 text-center">
-            <div className="w-14 h-14 bg-[#23096e]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Hotel size={28} className="text-[#23096e]" />
+            <div className="w-14 h-14 bg-[var(--brand-primary)]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Hotel size={28} className="text-[var(--brand-primary)]" />
             </div>
             <h3 className="text-xl font-black text-neutral-900 mb-3">هل تريد حجزاً جديداً؟</h3>
             <p className="text-neutral-500 text-sm mb-6">تصفح الفنادق واحجز إقامتك القادمة</p>
-            <Link href="/hotels" className="btn btn-primary">
-              تصفح الفنادق
+            <Link href="/hotels">
+              <Button variant="primary">
+                تصفح الفنادق
+              </Button>
             </Link>
           </div>
         </div>

@@ -51,7 +51,7 @@ export default function AdminSidebar({ isFullAdmin }: { isFullAdmin?: boolean })
   });
 
   return (
-    <aside className="w-64 bg-[#23096e] text-white flex flex-col h-full shrink-0">
+    <aside className="w-64 bg-[var(--brand-primary)] text-white flex flex-col h-full shrink-0">
       <div className="p-6 pb-4">
         <Link href={isFullAdmin ? "/admin" : "/admin/bookings"} className="flex items-center gap-3 transition-opacity hover:opacity-80">
           <div className="relative w-10 h-10 shrink-0 rounded-sm overflow-hidden">
@@ -83,7 +83,7 @@ export default function AdminSidebar({ isFullAdmin }: { isFullAdmin?: boolean })
                 isActive ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"
               )}
             >
-              <item.icon size={18} className={isActive ? "text-[#a78bfa]" : ""} />
+              <item.icon size={18} className={isActive ? "text-[var(--brand-accent)]" : ""} />
               {item.label}
             </Link>
           );

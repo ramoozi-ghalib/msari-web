@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
+import { Badge } from '@/components/ui/Badge';
 
 const toIconRecord = LucideIcons as unknown as Record<string, ComponentType<{ size?: number; className?: string; style?: CSSProperties; color?: string }>>;
 
@@ -142,7 +143,7 @@ export default function HotelDetailClient({ hotel }: Props) {
   };
 
   return (
-    <div className="bg-[#f8f8fa] min-h-screen">
+    <div className="bg-[var(--surface-page)] min-h-screen">
 
       {bookingError && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-0">
@@ -195,7 +196,7 @@ export default function HotelDetailClient({ hotel }: Props) {
 
         <div className="absolute top-4 end-4 z-20 flex gap-2">
           <button onClick={() => setFav(f => !f)}
-            className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center transition-all ${fav ? 'bg-red-500 text-white' : 'bg-black/30 text-white hover:bg-black/50'}`}>
+            className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center transition-all ${fav ? 'bg-[var(--brand-accent)] text-white' : 'bg-black/30 text-white hover:bg-black/50'}`}>
             <Heart size={17} fill={fav ? 'currentColor' : 'none'} />
           </button>
           <button className="w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm flex items-center justify-center">
@@ -212,15 +213,15 @@ export default function HotelDetailClient({ hotel }: Props) {
               {hotel.name}
             </h1>
             <div className="flex items-center gap-1.5 text-neutral-500 text-sm">
-              <MapPin size={14} className="text-[#23096e]" />
+              <MapPin size={14} className="text-[var(--brand-primary)]" />
               {hotel.address}
             </div>
           </div>
           {hotel.discount && (
             <div className="flex items-center gap-1 bg-white rounded-full px-4 py-2 shadow-sm border border-neutral-100 shrink-0">
-              <span className="text-xs font-bold bg-red-500 text-white px-2.5 py-1 rounded-full">
+              <Badge variant="accent" size="sm">
                 خصم {hotel.discount.percentage}%
-              </span>
+              </Badge>
             </div>
           )}
         </div>

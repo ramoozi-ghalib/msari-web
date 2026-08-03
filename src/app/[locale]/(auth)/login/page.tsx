@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Mail, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { getSafeRedirect } from '@/lib/safeRedirect';
+import { Button } from '@/components/ui/Button';
 
 function LoginForm() {
   const params = useSearchParams();
@@ -59,7 +60,7 @@ function LoginForm() {
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1644406213799-a8648fc9b08f?q=80&w=2000&auto=format&fit=crop")' }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#23096e]/70 via-[#23096e]/40 to-black/80 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary)]/70 via-[var(--brand-primary)]/40 to-black/80 backdrop-blur-[2px]" />
       </div>
 
       {/* Form Card (Glassmorphism) */}
@@ -105,7 +106,7 @@ function LoginForm() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="password" className="block text-sm font-semibold text-neutral-700">كلمة المرور</label>
-                <Link href={`/forgot-password?redirect=${encodedRedirect}`} className="text-sm font-medium text-[#23096e] hover:underline">
+                <Link href={`/forgot-password?redirect=${encodedRedirect}`} className="text-sm font-medium text-[var(--brand-primary)] hover:underline">
                   نسيت كلمة المرور؟
                 </Link>
               </div>
@@ -132,22 +133,21 @@ function LoginForm() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-br from-[#23096e] to-[#3A1C8F] text-white font-black py-4 rounded-xl hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60 flex items-center justify-center gap-2"
+              variant="primary"
+              size="lg"
+              fullWidth
+              loading={loading}
+              icon={<LogIn size={18} />}
             >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              ) : (
-                <><LogIn size={18} /> تسجيل الدخول</>
-              )}
-            </button>
+              تسجيل الدخول
+            </Button>
           </form>
 
           <p className="text-center text-neutral-500 text-sm mt-8">
             ليس لديك حساب؟{' '}
-            <Link href={`/register?redirect=${encodedRedirect}`} className="text-[#23096e] font-bold hover:underline">
+            <Link href={`/register?redirect=${encodedRedirect}`} className="text-[var(--brand-primary)] font-bold hover:underline">
               إنشاء حساب جديد
             </Link>
           </p>

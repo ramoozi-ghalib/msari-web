@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getBlogPosts } from '@/actions/blog';
 import { BookOpen, Calendar, Clock, User, ArrowLeft, Tag, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
 
 export const metadata: Metadata = {
   title: 'مدونة مساري | دليل السفر والفنادق في اليمن والعالم',
@@ -15,12 +16,12 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
   const posts = await getBlogPosts();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-[var(--surface-page)]">
       {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 py-16 sm:py-24 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-60 pointer-events-none" />
+      <section className="relative overflow-hidden bg-gradient-to-r from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-dark)] py-16 sm:py-24 text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[var(--brand-secondary)]/30 via-transparent to-transparent opacity-60 pointer-events-none" />
         <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>دليلك الشامل لخدمات السفر والإقامة</span>
           </div>
@@ -40,9 +41,9 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">أحدث المقالات والأدلة</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">تصفح المقالات الموصى بها للتخطيط لرحلتك القادمة</p>
           </div>
-          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-900">
+          <Badge variant="primary" size="md">
             {posts.length} مقالات
-          </span>
+          </Badge>
         </div>
 
         {/* ─── Articles Grid ─── */}
@@ -62,9 +63,9 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute top-4 start-4 z-10">
-                  <span className="inline-block px-3 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-xs font-semibold rounded-md shadow-sm">
+                  <Badge variant="primary" size="sm">
                     {post.category}
-                  </span>
+                  </Badge>
                 </div>
               </div>
 
@@ -74,7 +75,7 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
                   {/* Meta Details */}
                   <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-3">
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-blue-500" />
+                      <Clock className="w-3.5 h-3.5 text-[var(--brand-primary)]" />
                       {post.readTimeMinutes} دقائق قراءة
                     </span>
                     <span className="flex items-center gap-1">
@@ -84,7 +85,7 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
                   </div>
 
                   {/* Article Title */}
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-3">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-[var(--brand-primary)] transition-colors line-clamp-2 mb-3">
                     <Link href={`/${currentLocale}/blog/${post.slug}`} className="focus:outline-none">
                       {post.title}
                     </Link>
@@ -105,7 +106,7 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
 
                   <Link
                     href={`/${currentLocale}/blog/${post.slug}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-[-4px] transition-transform"
+                    className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-primary)] group-hover:translate-x-[-4px] transition-transform"
                   >
                     <span>اقرأ المقال</span>
                     <ArrowLeft className="w-4 h-4" />

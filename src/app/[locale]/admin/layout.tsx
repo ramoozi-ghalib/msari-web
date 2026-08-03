@@ -24,7 +24,7 @@ export default async function AdminLayout({
   // ────────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-screen bg-[#f8f8fa] overflow-hidden text-neutral-900 selection:bg-[#23096e]/20" dir="rtl">
+    <div className="flex h-screen bg-[var(--surface-page)] overflow-hidden text-neutral-900 selection:bg-[var(--brand-primary)]/20" dir="rtl">
       {/* Sidebar */}
       <AdminSidebar isFullAdmin={isFullAdmin} />
       
@@ -38,7 +38,7 @@ export default async function AdminLayout({
               {isFullAdmin ? 'تم تسجيل الدخول بحساب الإدارة الكاملة' : 'تم تسجيل الدخول بحساب إدارة الحجوزات'}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#23096e]/10 border border-[#23096e]/20 flex items-center justify-center text-[#23096e] font-bold">
+          <div className="w-10 h-10 rounded-full bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/20 flex items-center justify-center text-[var(--brand-primary)] font-bold">
             {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
           </div>
         </header>

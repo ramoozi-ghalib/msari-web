@@ -8,10 +8,10 @@ export default function AdminDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
-          { label: 'إجمالي الحجوزات', value: '1,248', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+          { label: 'إجمالي الحجوزات', value: '1,248', icon: Activity, color: 'text-[var(--brand-primary)]', bg: 'bg-[var(--brand-primary)]/10', border: 'border-purple-100' },
           { label: 'إجمالي الإيرادات', value: '$84,000', icon: Wallet, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
           { label: 'بانتظار الاعتماد', value: '14', icon: BellDot, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-          { label: 'مستخدمين نشطين', value: '342', icon: ShieldCheck, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
+          { label: 'مستخدمين نشطين', value: '342', icon: ShieldCheck, color: 'text-[var(--brand-secondary)]', bg: 'bg-[var(--brand-secondary)]/10', border: 'border-purple-100' },
         ].map(s => (
           <div key={s.label} className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100 relative overflow-hidden group">
             <div className={`w-12 h-12 rounded-xl ${s.bg} ${s.color} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
@@ -27,7 +27,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 min-h-[400px]">
            <h2 className="text-lg font-black text-neutral-900 mb-6 flex items-center gap-2">
-             <Activity className="text-[#23096e]" size={20} />
+             <Activity className="text-[var(--brand-primary)]" size={20} />
              نشاط الحجوزات الأخير
            </h2>
            <div className="flex flex-col items-center justify-center py-20 text-center opacity-60">
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6">
            <h2 className="text-lg font-black text-neutral-900 mb-6 flex items-center gap-2">
-             <MapPin className="text-[#23096e]" size={20} />
+             <MapPin className="text-[var(--brand-primary)]" size={20} />
              الوجهات الأكثر نشاطاً
            </h2>
            <div className="space-y-4">
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
                    <span className="text-neutral-500">{d.perc}%</span>
                  </div>
                  <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
-                   <div className="h-full bg-gradient-to-r from-[#23096e] to-[#3A1C8F] rounded-full" style={{ width: `${d.perc}%` }} />
+                   <div className="h-full bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-secondary)] rounded-full" style={{ width: `${d.perc}%` }} />
                  </div>
                </div>
              ))}

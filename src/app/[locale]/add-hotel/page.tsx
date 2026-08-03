@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Hotel, MapPin, Phone, Mail, User, Send, CheckCircle, Building2, Star } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 const cities = ['صنعاء', 'عدن', 'مأرب', 'المكلا', 'تعز', 'الحديدة', 'إب', 'ذمار', 'حضرموت', 'سيئون', 'أخرى'];
 
@@ -26,15 +27,12 @@ export default function AddHotelPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: ربط مع Firestore لحفظ الطلب في مجموعة hotel_join_requests
-    // const docData = { ...form, status: 'pending', createdAt: new Date() };
-    // await addDoc(collection(db, 'hotel_join_requests'), docData);
     setSent(true);
   };
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-[#f8f8fa] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[var(--surface-page)] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle size={48} className="text-green-500" />
@@ -43,19 +41,19 @@ export default function AddHotelPage() {
           <p className="text-neutral-500 text-base mb-8 leading-relaxed">
             تم استلام طلبك بنجاح. سيتواصل معك فريقنا خلال ٢٤ ساعة لمراجعة الطلب وإتمام الإجراءات.
           </p>
-          <button onClick={() => setSent(false)} className="btn btn-primary">
+          <Button variant="primary" onClick={() => setSent(false)}>
             إرسال طلب آخر
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8fa]">
+    <div className="min-h-screen bg-[var(--surface-page)]">
 
       {/* Hero */}
-      <section className="relative pt-28 pb-20 bg-gradient-to-br from-[#23096e] via-[#2d1580] to-[#3A1C8F] overflow-hidden">
+      <section className="relative pt-28 pb-20 bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-dark)] overflow-hidden">
         <div className="container-msari relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-6 border border-white/20">
             <Building2 size={14} />
@@ -96,7 +94,7 @@ export default function AddHotelPage() {
             {/* Hotel Info */}
             <div className="pb-4 border-b border-neutral-100">
               <h3 className="font-black text-neutral-800 mb-4 flex items-center gap-2">
-                <Hotel size={18} className="text-[#23096e]" /> معلومات الفندق
+                <Hotel size={18} className="text-[var(--brand-primary)]" /> معلومات الفندق
               </h3>
               <div className="space-y-4">
                 <div>
@@ -142,7 +140,7 @@ export default function AddHotelPage() {
             {/* Contact Info */}
             <div className="pb-4">
               <h3 className="font-black text-neutral-800 mb-4 flex items-center gap-2">
-                <User size={18} className="text-[#23096e]" /> معلومات التواصل
+                <User size={18} className="text-[var(--brand-primary)]" /> معلومات التواصل
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -172,10 +170,9 @@ export default function AddHotelPage() {
               </div>
             </div>
 
-            <button type="submit" className="w-full bg-gradient-to-br from-[#23096e] to-[#3A1C8F] text-white font-black py-4 rounded-2xl hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2">
-              <Send size={18} />
+            <Button type="submit" variant="primary" size="lg" fullWidth icon={<Send size={18} />}>
               إرسال الطلب
-            </button>
+            </Button>
           </form>
         </div>
       </section>

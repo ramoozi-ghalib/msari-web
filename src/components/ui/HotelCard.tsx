@@ -10,6 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
+import { Badge } from '@/components/ui/Badge';
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -26,53 +27,53 @@ function getAmenityIcon(iconKey?: string, name?: any) {
   const t = `${key} ${label}`;
 
   if (t.includes('wifi') || t.includes('internet') || t.includes('إنترنت') || t.includes('انترنت') || t.includes('واي')) {
-    return <Wifi size={12} className="text-[#23096e] shrink-0" />;
+    return <Wifi size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('park') || t.includes('car') || t.includes('موقف') || t.includes('سيار') || t.includes('مركب')) {
-    return <Car size={12} className="text-[#23096e] shrink-0" />;
+    return <Car size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('room_service') || t.includes('room service') || t.includes('bell') || t.includes('خدمة الغرف') || t.includes('خدمة غرف') || t.includes('غرفة')) {
-    return <Bell size={12} className="text-[#23096e] shrink-0" />;
+    return <Bell size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('pool') || t.includes('swim') || t.includes('wave') || t.includes('مسبح') || t.includes('سباحة')) {
-    return <Waves size={12} className="text-[#23096e] shrink-0" />;
+    return <Waves size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('restaur') || t.includes('food') || t.includes('utensil') || t.includes('مطعم') || t.includes('طعام') || t.includes('أكل')) {
-    return <Coffee size={12} className="text-[#23096e] shrink-0" />;
+    return <Coffee size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('grocery') || t.includes('shop') || t.includes('بقالة') || t.includes('سوبرماركت') || t.includes('محل')) {
-    return <ShoppingCart size={12} className="text-[#23096e] shrink-0" />;
+    return <ShoppingCart size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('laundry') || t.includes('wash') || t.includes('shirt') || t.includes('مغسلة') || t.includes('كوي') || t.includes('تنظيف')) {
-    return <Shirt size={12} className="text-[#23096e] shrink-0" />;
+    return <Shirt size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('elevator') || t.includes('lift') || t.includes('مصعد')) {
-    return <ArrowUpDown size={12} className="text-[#23096e] shrink-0" />;
+    return <ArrowUpDown size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('meeting') || t.includes('conference') || t.includes('presentation') || t.includes('قاعة') || t.includes('قاعات') || t.includes('تدريب')) {
-    return <Presentation size={12} className="text-[#23096e] shrink-0" />;
+    return <Presentation size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('majlis') || t.includes('terrace') || t.includes('rooftop') || t.includes('طيرمانات') || t.includes('طيرمانة') || t.includes('مجلس')) {
-    return <Home size={12} className="text-[#23096e] shrink-0" />;
+    return <Home size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('location') || t.includes('center') || t.includes('وسط المدينة') || t.includes('موقع') || t.includes('خريطة')) {
-    return <MapPin size={12} className="text-[#23096e] shrink-0" />;
+    return <MapPin size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('cafe') || t.includes('coffee') || t.includes('كافيه') || t.includes('مقهى') || t.includes('شاي') || t.includes('cafeteria') || t.includes('كافتيريا')) {
-    return <Coffee size={12} className="text-[#23096e] shrink-0" />;
+    return <Coffee size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('secur') || t.includes('guard') || t.includes('shield') || t.includes('أمان') || t.includes('حراسة') || t.includes('حماية')) {
-    return <Shield size={12} className="text-[#23096e] shrink-0" />;
+    return <Shield size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('tv') || t.includes('television') || t.includes('تلفاز') || t.includes('تلفزيون') || t.includes('شاشة')) {
-    return <Tv size={12} className="text-[#23096e] shrink-0" />;
+    return <Tv size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
   if (t.includes('gym') || t.includes('fitness') || t.includes('sport') || t.includes('جيم') || t.includes('رياضة') || t.includes('لياقة') || t.includes('dumbbell')) {
-    return <Dumbbell size={12} className="text-[#23096e] shrink-0" />;
+    return <Dumbbell size={12} className="text-[var(--brand-primary)] shrink-0" />;
   }
 
   // Generic fallback
-  return <Check size={10} className="text-[#23096e] shrink-0" />;
+  return <Check size={10} className="text-[var(--brand-primary)] shrink-0" />;
 }
 
 export default function HotelCard({ hotel, className }: HotelCardProps) {
@@ -124,7 +125,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#23096e22] to-[#3A1C8F33]" />
+          <div className="w-full h-full bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-secondary)]/20" />
         )}
 
         {/* Overlay gradient */}
@@ -133,9 +134,9 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
         {/* Discount Badge */}
         {hotel.discount && (
           <div className="absolute top-3 start-3 z-10">
-            <span className="bg-[#FF3B30] text-white font-black text-xs px-2.5 py-1 rounded-full shadow-md">
+            <Badge variant="accent" size="sm">
               🏷️ خصم {hotel.discount.percentage}%
-            </span>
+            </Badge>
           </div>
         )}
 
@@ -144,7 +145,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
           onClick={(e) => { e.preventDefault(); }}
           className="absolute top-3 end-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all hover:scale-110 shadow-md"
         >
-          <Heart size={16} className="text-neutral-400 hover:text-[#FF3B30] transition-colors duration-300" />
+          <Heart size={16} className="text-neutral-400 hover:text-[var(--brand-accent)] transition-colors duration-300" />
         </button>
       </div>
 
@@ -152,7 +153,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
       <div className="p-4">
         {/* Name and Stars Row */}
         <div className="flex items-center justify-between gap-2 mb-1">
-          <h3 className="font-bold text-[#0A0912] text-base sm:text-lg leading-snug line-clamp-1 group-hover:text-[#23096E] transition-colors duration-300">
+          <h3 className="font-bold text-[var(--text-primary)] text-base sm:text-lg leading-snug line-clamp-1 group-hover:text-[var(--brand-primary)] transition-colors duration-300">
             {hotel.name}
           </h3>
           {/* Star Rating on Left */}
@@ -165,7 +166,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
 
         {/* Address */}
         <div className="flex items-center gap-1.5 text-xs text-neutral-500 mb-3 group-hover:text-neutral-600 transition-colors duration-300">
-          <MapPin size={13} className="shrink-0 text-[#23096e]" />
+          <MapPin size={13} className="shrink-0 text-[var(--brand-primary)]" />
           <span className="truncate">{hotel.address}</span>
         </div>
 
@@ -196,7 +197,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
           <div className="flex flex-col">
             <span className="text-[10px] text-neutral-400 font-semibold leading-none mb-0.5">تبدأ من</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-base sm:text-lg font-black text-[#FF3B30]">
+              <span className="text-base sm:text-lg font-black text-[var(--brand-accent)]">
                 {formatPrice(finalPrice)}
               </span>
               {hotel.discount && (
