@@ -145,8 +145,8 @@ footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
 }
 
 /* =================== INTERACTIVE CARDS & ANIMATIONS =================== */
-.card, .surface-card, .interactive-card {
-  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+.card, .surface-card, .interactive-card, .why-card {
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1), border-color 400ms ease !important;
   will-change: transform, box-shadow;
 }
 
@@ -154,6 +154,21 @@ footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
   transform: translateY(-6px) !important;
   box-shadow: 0 20px 35px -10px rgba(35, 9, 110, 0.16), 0 10px 15px -5px rgba(35, 9, 110, 0.08) !important;
   border-color: rgba(35, 9, 110, 0.25) !important;
+}
+
+.why-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 25px 50px -12px rgba(35, 9, 110, 0.18) !important;
+  border-color: rgba(35, 9, 110, 0.3) !important;
+}
+
+.why-card:hover .why-icon {
+  transform: scale(1.15) rotate(4deg) !important;
+}
+
+.why-icon {
+  transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform;
 }
 
 .group:hover img, .group:hover .img-zoom {

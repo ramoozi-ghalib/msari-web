@@ -68,15 +68,15 @@ export default function WhyMsari() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group p-6 rounded-2xl border border-slate-200/80 hover:border-transparent hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+              className="why-card group p-6 rounded-2xl border border-neutral-200/80 bg-white cursor-pointer"
             >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center text-2xl mb-5 shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+              <div className={`why-icon w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center text-2xl mb-5 shadow-md`}>
                 {feature.emoji}
               </div>
-              <h3 className="text-lg font-bold text-neutral-900 mb-2 group-hover:text-[#23096E] transition-colors duration-300">
+              <h3 className="text-lg font-bold text-neutral-900 mb-2 group-hover:text-[var(--brand-primary)] transition-colors duration-300">
                 {feature.title}
               </h3>
-              <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-600 transition-colors duration-300">
+              <p className="text-neutral-500 text-sm leading-relaxed group-hover:text-neutral-700 transition-colors duration-300">
                 {feature.desc}
               </p>
             </div>
