@@ -32,10 +32,10 @@ export const Card: React.FC<CardProps> = ({
   }[padding];
 
   const variantClasses = {
-    default: 'border border-[#23096e]/10 shadow-sm',
-    elevated: 'border border-[#23096e]/10 shadow-md hover:shadow-xl',
-    bordered: 'border-2 border-[#23096e]/15',
-    interactive: 'border border-[#23096e]/10 shadow-sm hover:shadow-xl hover:-translate-y-1 cursor-pointer',
+    default: 'border border-[#23096e]/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300',
+    elevated: 'border border-[#23096e]/10 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300',
+    bordered: 'border-2 border-[#23096e]/15 hover:border-[var(--brand-primary)]/40 hover:shadow-lg transition-all duration-300',
+    interactive: 'border border-[#23096e]/10 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 active:scale-[0.99] cursor-pointer transition-all duration-300',
   }[variant];
 
   return (

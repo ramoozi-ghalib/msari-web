@@ -113,7 +113,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
   const starsCount = Math.min(Math.max(Number(hotel.stars) || 5, 1), 5);
 
   return (
-    <Link href={cardHref} className={cn('card group block bg-white rounded-2xl overflow-hidden border border-neutral-100 shadow-sm hover:shadow-xl transition-all duration-300', className)}>
+    <Link href={cardHref} className={cn('card group block bg-white rounded-2xl overflow-hidden border border-neutral-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 hover:border-[var(--brand-primary)]/30 transition-all duration-300 ease-out', className)}>
       {/* Image */}
       <div className="relative aspect-[4/3] bg-neutral-200 overflow-hidden">
         {hotel.thumbnail && hotel.thumbnail.startsWith('http') ? (

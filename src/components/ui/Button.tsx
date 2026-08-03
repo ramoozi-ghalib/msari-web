@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'btn';
+  const baseClasses = 'btn active:scale-95 transition-all duration-300 ease-out';
   
   const variantClasses = {
     primary: 'btn-primary',
