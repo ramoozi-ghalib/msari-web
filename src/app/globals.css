@@ -141,11 +141,28 @@ footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
   color: var(--text-primary);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.surface-card:hover {
-  box-shadow: var(--shadow-elevated);
+/* =================== INTERACTIVE CARDS & ANIMATIONS =================== */
+.card, .surface-card, .interactive-card {
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, box-shadow;
+}
+
+.card:hover, .surface-card:hover, .interactive-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 20px 35px -10px rgba(35, 9, 110, 0.16), 0 10px 15px -5px rgba(35, 9, 110, 0.08) !important;
+  border-color: rgba(35, 9, 110, 0.25) !important;
+}
+
+.group:hover img, .group:hover .img-zoom {
+  transform: scale(1.06) !important;
+}
+
+img {
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform;
 }
 
 .surface-hero {
