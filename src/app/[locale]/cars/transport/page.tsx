@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Car, MapPin, Clock, Shield, Users, CheckCircle, ArrowRight } from 'lucide-react';
+import { whatsappLink } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   title: 'النقل بين المدن — مساري',
   description: 'خدمة نقل مريحة وآمنة بين جميع مدن اليمن مع سائقين محترفين.',
+  alternates: { canonical: 'https://msari.net/ar/cars/transport' },
+  openGraph: {
+    title: 'النقل بين المدن — مساري',
+    description: 'خدمة نقل مريحة وآمنة بين جميع مدن اليمن مع سائقين محترفين.',
+    url: 'https://msari.net/ar/cars/transport',
+  },
 };
 
 const routes = [
@@ -52,7 +59,7 @@ export default function TransportPage() {
             خدمة نقل مريحة وموثوقة بين جميع مدن اليمن مع سائقين محترفين وأسعار تنافسية
           </p>
           <a
-            href="https://wa.me/967770000000?text=مرحباً، أريد حجز رحلة نقل بين المدن"
+            href={whatsappLink('مرحباً، أريد حجز رحلة نقل بين المدن')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white font-black px-8 py-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl text-lg"
@@ -71,7 +78,7 @@ export default function TransportPage() {
             {routes.map((route) => (
               <a
                 key={`${route.from}-${route.to}`}
-                href={`https://wa.me/967770000000?text=أريد حجز رحلة من ${route.from} إلى ${route.to}`}
+                href={whatsappLink(`أريد حجز رحلة من ${route.from} إلى ${route.to}`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 p-5 rounded-2xl border border-neutral-100 hover:border-[#23096e]/30 hover:bg-[#23096e]/5 transition-all duration-300 group"
@@ -139,7 +146,7 @@ export default function TransportPage() {
           </div>
           <div className="text-center mt-10">
             <a
-              href="https://wa.me/967770000000?text=مرحباً، أريد حجز رحلة نقل بين المدن"
+              href={whatsappLink('مرحباً، أريد حجز رحلة نقل بين المدن')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white text-[#23096e] font-black px-8 py-4 rounded-2xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1"

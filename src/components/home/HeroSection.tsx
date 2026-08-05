@@ -268,8 +268,8 @@ export default function HeroSection() {
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ direction: 'rtl' }}>
             {[
               { value: '5000+', label: 'مستخدم سعيد', icon: Users, color: '#23096E' },
-              { value: '100+', label: 'فندق', icon: Hotel, color: '#23096E' },
-              { value: '6', label: 'محافظات', icon: MapPin, color: '#FF3B30' },
+              { value: '50+', label: 'فندق', icon: Hotel, color: '#23096E' },
+              { value: '10', label: 'مدن', icon: MapPin, color: '#FF3B30' },
             ].map((stat, i) => (
               <div
                 key={i}

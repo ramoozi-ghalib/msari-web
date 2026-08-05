@@ -7,6 +7,7 @@ import {
   Search, ArrowRightLeft, ShieldCheck, Clock, CreditCard, Globe
 } from 'lucide-react';
 import Image from 'next/image';
+import { whatsappLink } from '@/lib/site-config';
 
 export default function FlightsPage() {
   const [flightScope, setFlightScope] = useState<'yemen' | 'global'>('yemen');
@@ -38,9 +39,7 @@ export default function FlightsPage() {
       msg += `المسافرون: ${passengers}\n`;
       msg += `الدرجة: ${flightClass}\n`;
 
-      const encodedMsg = encodeURIComponent(msg);
-      // Replace with your actual WhatsApp business number
-      window.open(`https://wa.me/967770000000?text=${encodedMsg}`, '_blank');
+      window.open(whatsappLink(msg), '_blank');
     } else {
       // Global flights -> redirect to internal search results (Travelpayouts API later)
       alert('سيتم توجيهك قريباً لصفحة نتائج الطيران العالمي...');

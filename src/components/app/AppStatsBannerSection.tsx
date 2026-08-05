@@ -32,7 +32,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
     },
     {
       icon: Building2,
-      value: data?.hotels || '100+',
+      value: data?.hotels || '50+',
       label: isEn ? 'Hotels & Stays in Yemen' : 'فندق ومكان إقامة في اليمن',
       color: 'text-[#FF3B30]',
       bg: 'bg-[#FF3B30]/10 border-[#FF3B30]/20',

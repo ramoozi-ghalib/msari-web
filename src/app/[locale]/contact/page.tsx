@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle, CheckCircle } from 'lucide-react';
+import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
 
 const contactInfo = [
   {
     icon: Phone,
     title: 'واتساب',
-    value: '+967 770 000 000',
-    action: 'https://wa.me/967770000000',
+    value: WHATSAPP_DISPLAY,
+    action: whatsappLink(),
     actionLabel: 'ابدأ المحادثة',
     color: 'bg-green-500',
   },
@@ -52,7 +53,7 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const msg = `مرحباً، أود التواصل معكم:\n\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالموضوع: ${form.subject}\nالرسالة: ${form.message}`;
-    window.open(`https://wa.me/967770000000?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(whatsappLink(msg), '_blank');
     setSent(true);
     setTimeout(() => setSent(false), 4000);
   };
@@ -202,7 +203,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <a
-                href="https://wa.me/967770000000"
+                href={whatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-colors duration-300"

@@ -2,10 +2,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Car, MapPin, Clock, Shield, Star, Phone, CheckCircle, ArrowLeft } from 'lucide-react';
+import { whatsappLink } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   title: 'تاكسي المطار — مساري',
   description: 'احجز تاكسي المطار في اليمن بسهولة. خدمة استقبال احترافية من وإلى المطار في صنعاء وعدن.',
+  alternates: { canonical: 'https://msari.net/ar/cars/airport' },
+  openGraph: {
+    title: 'تاكسي المطار — مساري',
+    description: 'احجز تاكسي المطار في اليمن بسهولة. خدمة استقبال احترافية من وإلى المطار في صنعاء وعدن.',
+    url: 'https://msari.net/ar/cars/airport',
+  },
 };
 
 const airports = [
@@ -56,7 +63,7 @@ export default function AirportTaxiPage() {
             احجز سيارتك من وإلى المطار مسبقاً وتجنب عناء البحث عن وسيلة نقل
           </p>
           <a
-            href="https://wa.me/967770000000?text=مرحباً، أريد حجز تاكسي من المطار"
+            href={whatsappLink('مرحباً، أريد حجز تاكسي من المطار')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white font-black px-8 py-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl text-lg"
@@ -72,7 +79,7 @@ export default function AirportTaxiPage() {
           {packages.map((pkg) => (
             <a
               key={pkg.name}
-              href={`https://wa.me/967770000000?text=أريد حجز ${pkg.name} من المطار، السعر المبدئي $${pkg.price}`}
+              href={whatsappLink(`أريد حجز ${pkg.name} من المطار، السعر المبدئي $${pkg.price}`)}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-3xl p-8 shadow-xl border border-neutral-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center group"

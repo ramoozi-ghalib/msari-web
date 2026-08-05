@@ -19,6 +19,11 @@ export const metadata = {
       'x-default': 'https://msari.net/ar/hotels',
     },
   },
+  openGraph: {
+    title: 'فنادق يمنية - حجز جميع الفنادق في اليمن | مساري',
+    description: 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية بأسعار حصرية وخيارات تناسب جميع الميزانيات.',
+    url: 'https://msari.net/ar/hotels',
+  },
 };
 
 /**

@@ -3,6 +3,12 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'شروط الاستخدام — مساري',
   description: 'شروط وأحكام استخدام منصة مساري لخدمات السفر والحجز في اليمن.',
+  alternates: { canonical: 'https://msari.net/ar/terms' },
+  openGraph: {
+    title: 'شروط الاستخدام — مساري',
+    description: 'شروط وأحكام استخدام منصة مساري لخدمات السفر والحجز في اليمن.',
+    url: 'https://msari.net/ar/terms',
+  },
 };
 
 const sections = [

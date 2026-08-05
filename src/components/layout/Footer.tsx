@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Hotel, Plane, Car, Globe, Phone, Mail, MapPin, Heart } from 'lucide-react';
+import { whatsappLink, WHATSAPP_TEL_LINK, WHATSAPP_DISPLAY } from '@/lib/site-config';
 
 export default function Footer() {
   return (
@@ -34,7 +35,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <a
-                href="https://wa.me/967784644466"
+                href={whatsappLink()}
                 className="w-9 h-9 rounded-lg bg-green-600 flex items-center justify-center hover:bg-green-500 transition-colors"
                 aria-label="WhatsApp"
               >
@@ -104,7 +105,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-center gap-4 text-sm text-white">
                 <Phone size={16} className="text-white/60 shrink-0" />
-                <a href="tel:+967784644466" className="hover:text-white/80 transition-colors font-medium">+967 784644466</a>
+                <a href={WHATSAPP_TEL_LINK} className="hover:text-white/80 transition-colors font-medium">{WHATSAPP_DISPLAY}</a>
               </li>
               <li className="flex items-center gap-4 text-sm text-white">
                 <Mail size={16} className="text-white/60 shrink-0" />

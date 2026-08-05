@@ -4,6 +4,7 @@ import { BookOpen, Hotel, Clock, ArrowRight } from 'lucide-react';
 import { auth } from '@/auth';
 import { getMyBookings } from '@/actions/bookings';
 import { Button } from '@/components/ui/Button';
+import { whatsappLink } from '@/lib/site-config';
 
 export default async function AccountBookingsPage(props: {
   params: Promise<{ locale: string }>;
@@ -64,7 +65,7 @@ export default async function AccountBookingsPage(props: {
               <p className="text-amber-700 text-sm">
                 ستتمكن من رؤية حجوزاتك الحقيقية والتحقق منها مباشرة.
                 للاستفسار عن أي حجز بشكل فوري، تواصل معنا عبر{' '}
-                <a href="https://wa.me/967784644466" target="_blank" rel="noopener noreferrer" className="underline font-bold">واتساب</a>.
+                <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="underline font-bold">واتساب</a>.
               </p>
             </div>
           </div>
@@ -125,7 +126,7 @@ export default async function AccountBookingsPage(props: {
                     </div>
                     {booking.status === 'CONFIRMED' && (
                       <a
-                        href={`https://wa.me/967784644466?text=${encodeURIComponent('أريد الاستفسار عن حجزي رقم ' + booking.code)}`}
+                        href={whatsappLink('أريد الاستفسار عن حجزي رقم ' + booking.code)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm font-bold text-[var(--brand-primary)] hover:underline flex items-center gap-1"

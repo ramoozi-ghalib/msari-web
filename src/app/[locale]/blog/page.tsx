@@ -8,6 +8,12 @@ import { Badge } from '@/components/ui/Badge';
 export const metadata: Metadata = {
   title: 'مدونة مساري | دليل السفر والفنادق في اليمن والعالم',
   description: 'اكتشف أفضل النصائح، الأدلة السياحية، وترشيحات الفنادق في صنعاء، عدن، حضرموت، وكافة المدن اليابسة والعالمية.',
+  alternates: { canonical: 'https://msari.net/ar/blog' },
+  openGraph: {
+    title: 'مدونة مساري | دليل السفر والفنادق في اليمن والعالم',
+    description: 'اكتشف أفضل النصائح، الأدلة السياحية، وترشيحات الفنادق في صنعاء، عدن، حضرموت، وكافة المدن اليمنية والعالمية.',
+    url: 'https://msari.net/ar/blog',
+  },
 };
 
 export default async function BlogIndexPage(props: { params: Promise<{ locale: string }> }) {

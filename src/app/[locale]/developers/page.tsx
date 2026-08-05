@@ -3,11 +3,11 @@
 import { CheckCircle2, Zap, Server, ShieldCheck, MessageSquare, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { whatsappLink } from '@/lib/site-config';
 
 export default function DeveloperPortal() {
   const openWhatsApp = (planName: string) => {
-    const text = encodeURIComponent(`مرحباً مساري، نود الاشتراك في ${planName} للربط المباشر عبر API.`);
-    window.open(`https://wa.me/967770000000?text=${text}`, '_blank');
+    window.open(whatsappLink(`مرحباً مساري، نود الاشتراك في ${planName} للربط المباشر عبر API.`), '_blank');
   };
 
   return (

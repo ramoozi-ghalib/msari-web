@@ -24,7 +24,6 @@ export const metadata: Metadata = {
     template: '%s | مساري',
   },
   description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك في عدن، صنعاء، تعز، والمكلا.',
-  keywords: ['فنادق اليمن', 'حجز فنادق اليمن', 'أفضل فنادق اليمن', 'فنادق عدن', 'فنادق صنعاء', 'فنادق تعز', 'فنادق الحديدة', 'فنادق إب', 'فنادق المكلا', 'فنادق المهرة', 'فنادق سيئون', 'مساري'],
   authors: [{ name: 'مساري', url: 'https://msari.net' }],
   formatDetection: { email: false, address: false, telephone: false },
   openGraph: {
@@ -55,7 +54,6 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
 import AuthProvider from '@/components/providers/AuthProvider';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  console.log('[BOOT-4] Executing src/app/layout.tsx -> RootLayout Render');
   return (
     <html
       lang="ar"

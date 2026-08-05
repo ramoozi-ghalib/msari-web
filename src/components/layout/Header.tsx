@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 // Auth context removed for backend migration - using mock state
 import { cn } from '@/lib/utils';
+import { whatsappLink } from '@/lib/site-config';
 const navLinks = [
   { href: '/', labelAr: 'الرئيسية', labelEn: 'Home', icon: Home },
   { href: '/hotels', labelAr: 'فنادق محلية', labelEn: 'Local Hotels', icon: Hotel },
@@ -231,7 +232,7 @@ export default function Header() {
 
             {/* WhatsApp */}
             <a
-              href="https://wa.me/967XXXXXXXXX"
+              href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-all hidden sm:flex items-center justify-center shadow-md hover:shadow-xl hover:scale-110"
