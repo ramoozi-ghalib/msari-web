@@ -3,10 +3,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Globe, Search, Star, MapPin, Wifi, Coffee, Shield, CreditCard, HeartHandshake } from 'lucide-react';
 import Heading from '@/components/ui/Heading';
+import { whatsappLink } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   title: 'فنادق عالمية — مساري',
   description: 'احجز أفضل الفنادق العالمية حول العالم بأسعار تنافسية مع مساري.',
+  alternates: { canonical: 'https://msari.net/ar/hotels/international' },
+  openGraph: {
+    title: 'فنادق عالمية — مساري',
+    description: 'احجز أفضل الفنادق العالمية حول العالم بأسعار تنافسية مع مساري.',
+    url: 'https://msari.net/ar/hotels/international',
+  },
 };
 
 const destinations = [
@@ -55,7 +62,7 @@ export default function InternationalHotelsPage() {
           </p>
           {/* Quick WhatsApp CTA */}
           <a
-            href="https://wa.me/967784644466?text=مرحباً، أرغب في حجز فندق عالمي"
+            href={whatsappLink('مرحباً، أرغب في حجز فندق عالمي')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black px-8 py-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-xl text-lg"
@@ -75,7 +82,7 @@ export default function InternationalHotelsPage() {
               {destinations.map((dest) => (
                 <a
                   key={dest.city}
-                  href={`https://wa.me/967784644466?text=مرحباً، أريد حجز فندق في ${dest.city}، ${dest.country}`}
+                  href={whatsappLink(`مرحباً، أريد حجز فندق في ${dest.city}، ${dest.country}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="relative rounded-2xl overflow-hidden h-48 group cursor-pointer shadow-md hover:shadow-xl transition-all duration-300"
@@ -120,7 +127,7 @@ export default function InternationalHotelsPage() {
               تواصل معنا مباشرة وسنساعدك في إيجاد أفضل فندق لوجهتك المفضلة
             </p>
             <a
-              href="https://wa.me/967784644466?text=مرحباً، أريد مساعدة في حجز فندق عالمي"
+              href={whatsappLink('مرحباً، أريد مساعدة في حجز فندق عالمي')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black px-8 py-4 rounded-2xl shadow-xl transition-all hover:-translate-y-1"

@@ -9,6 +9,12 @@ import AppDownloadCtaSection from '@/components/app/AppDownloadCtaSection';
 export const metadata: Metadata = {
   title: 'تطبيق مساري حجز الفنادق والطيران والسيارات | مساري',
   description: 'حمّل تطبيق مساري واستمتع بتجربة حجز مميزة وسريعة لأفضل الفنادق في اليمن، ومقارنة أسعار الفنادق حول العالم وحجز رحلات الطيران والسيارات.',
+  alternates: { canonical: 'https://msari.net/ar/app' },
+  openGraph: {
+    title: 'تطبيق مساري حجز الفنادق والطيران والسيارات | مساري',
+    description: 'حمّل تطبيق مساري واستمتع بتجربة حجز مميزة وسريعة لأفضل الفنادق في اليمن.',
+    url: 'https://msari.net/ar/app',
+  },
 };
 
 export default async function AppPage(

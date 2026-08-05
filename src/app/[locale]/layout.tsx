@@ -2,6 +2,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
+import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
 
 // JSON-LD structured data for SEO
 const jsonLd = {
@@ -17,7 +18,7 @@ const jsonLd = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: '+967-000-0000',
+    telephone: WHATSAPP_DISPLAY,
     contactType: 'customer service',
     areaServed: 'YE',
     availableLanguage: ['ar', 'en'],
@@ -33,7 +34,6 @@ export default async function LocaleLayout(
   props: { children: React.ReactNode; params: Promise<{ locale: string }> }
 ) {
   const { locale } = await props.params;
-  console.log('[BOOT-5] Executing src/app/[locale]/layout.tsx -> LocaleLayout Render:', locale);
   setRequestLocale(locale);
   const messages = await getMessages();
 
@@ -48,7 +48,7 @@ export default async function LocaleLayout(
         footer={<Footer />}
         whatsapp={
           <a
-            href="https://wa.me/967XXXXXXXXX"
+            href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-6 end-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110"

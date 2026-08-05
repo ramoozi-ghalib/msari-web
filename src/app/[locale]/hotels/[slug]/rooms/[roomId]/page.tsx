@@ -16,9 +16,15 @@ export async function generateMetadata(props: Props) {
   const room = hotel.rooms?.find(r => r.id === roomId);
   if (!room) return { title: `${hotel.name} | مساري` };
 
+  const pageUrl = `https://msari.net/ar/hotels/${slug}/rooms/${roomId}`;
+  const title = `${room.name} - ${hotel.name} | مساري`;
+  const description = room.description || `احجز ${room.name} في ${hotel.name} بأفضل الأسعار.`;
+
   return {
-    title: `${room.name} - ${hotel.name} | مساري`,
-    description: room.description || `احجز ${room.name} في ${hotel.name} بأفضل الأسعار.`,
+    title,
+    description,
+    alternates: { canonical: pageUrl },
+    openGraph: { title, description, url: pageUrl },
   };
 }
 

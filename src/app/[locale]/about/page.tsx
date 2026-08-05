@@ -6,6 +6,12 @@ import { MapPin, Users, Star, Shield, Zap, HeartHandshake } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'من نحن — مساري لخدمات السفر',
   description: 'مساري هي منصة السفر الأولى في اليمن، نربطك بأفضل الفنادق والرحلات الجوية وخدمات السيارات بأسعار تنافسية.',
+  alternates: { canonical: 'https://msari.net/ar/about' },
+  openGraph: {
+    title: 'من نحن — مساري لخدمات السفر',
+    description: 'مساري هي منصة السفر الأولى في اليمن، نربطك بأفضل الفنادق والرحلات الجوية وخدمات السيارات بأسعار تنافسية.',
+    url: 'https://msari.net/ar/about',
+  },
 };
 
 const values = [
@@ -103,7 +109,7 @@ export default function AboutPage() {
                   <Users size={22} className="text-white" />
                 </div>
                 <div>
-                  <div className="font-black text-neutral-900 text-lg">+500</div>
+                  <div className="font-black text-neutral-900 text-lg">+5000</div>
                   <div className="text-sm text-neutral-500">عميل راضٍ</div>
                 </div>
               </div>

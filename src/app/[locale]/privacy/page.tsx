@@ -11,6 +11,11 @@ export const metadata: Metadata = {
       'x-default': 'https://msari.net/ar/privacy',
     },
   },
+  openGraph: {
+    title: 'سياسة الخصوصية | مساري',
+    description: 'تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية على منصة مساري لخدمات السفر.',
+    url: 'https://msari.net/ar/privacy',
+  },
 };
 
 const sections = [
