@@ -132,6 +132,78 @@ export interface DevelopersPageData {
   }>;
 }
 
+export interface AppPageData {
+  slug: 'app';
+  title: string;
+  titleEn: string;
+  isPublished: boolean;
+  hero: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    downloads: string;
+    rating: string;
+  };
+  stats: Array<{ value: string; label: string }>;
+  features: Array<{ title: string; desc: string; icon: string }>;
+  howItWorks: Array<{ step: string; title: string; desc: string }>;
+  cta: { title: string; subtitle: string };
+}
+
+export interface CarsPageData {
+  slug: 'cars';
+  title: string;
+  titleEn: string;
+  isPublished: boolean;
+  hero: {
+    title: string;
+    subtitle: string;
+    bgImage?: string;
+  };
+  fleet: Array<{ tag: string; desc: string; cap: number; bags: number; price: number; img: string }>;
+  features: Array<{ title: string; desc: string; icon: string }>;
+}
+
+export interface AddHotelPageData {
+  slug: 'add_hotel';
+  title: string;
+  titleEn: string;
+  isPublished: boolean;
+  hero: {
+    badge: string;
+    title: string;
+    subtitle: string;
+  };
+  benefits: Array<{ emoji: string; title: string; desc: string }>;
+}
+
+export interface InternationalHotelsPageData {
+  slug: 'international_hotels';
+  title: string;
+  titleEn: string;
+  isPublished: boolean;
+  hero: {
+    badge: string;
+    title: string;
+    subtitle: string;
+  };
+  topDestinations: Array<{ city: string; country: string; emoji: string; hotels: number; img: string }>;
+  features: Array<{ title: string; desc: string; icon: string }>;
+}
+
+export interface FlightsPageData {
+  slug: 'flights';
+  title: string;
+  titleEn: string;
+  isPublished: boolean;
+  hero: {
+    title: string;
+    subtitle: string;
+    bgImage?: string;
+  };
+  features: Array<{ title: string; desc: string; icon: string }>;
+}
+
 export interface LandmarkData {
   id: string;
   name: string;
@@ -159,3 +231,4 @@ export interface DestinationEditorialData {
   isPublished: boolean;
   updatedAt?: string | null;
 }
+

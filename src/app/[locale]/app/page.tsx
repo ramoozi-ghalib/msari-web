@@ -5,6 +5,7 @@ import AppFeaturesSection from '@/components/app/AppFeaturesSection';
 import AppScreenshotsShowcase from '@/components/app/AppScreenshotsShowcase';
 import AppHowItWorksSection from '@/components/app/AppHowItWorksSection';
 import AppDownloadCtaSection from '@/components/app/AppDownloadCtaSection';
+import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
 export const metadata: Metadata = {
   title: 'تطبيق مساري حجز الفنادق والطيران والسيارات | مساري',
@@ -23,10 +24,28 @@ export default async function AppPage(
   const { locale } = await props.params;
   const isEn = locale === 'en';
 
+  const [appContent, settings] = await Promise.all([
+    PagesCmsService.getAppPage(),
+    SettingsCmsService.getSettings(),
+  ]);
+
+  const heroData = {
+    ...appContent?.hero,
+    googlePlayUrl: settings.playStoreUrl,
+    appStoreUrl: settings.appStoreUrl,
+  };
+
+  const ctaData = {
+    ctaTitle: appContent?.cta?.title,
+    ctaSubtitle: appContent?.cta?.subtitle,
+    googlePlayUrl: settings.playStoreUrl,
+    appStoreUrl: settings.appStoreUrl,
+  };
+
   return (
     <main className="min-h-screen bg-[#F4F2F8] text-slate-900 selection:bg-[#23096E] selection:text-white">
       {/* 1. Hero Section */}
-      <AppHeroSection isEn={isEn} />
+      <AppHeroSection isEn={isEn} data={heroData} />
 
       {/* 2. Stats Banner */}
       <AppStatsBannerSection isEn={isEn} />
@@ -41,7 +60,8 @@ export default async function AppPage(
       <AppHowItWorksSection isEn={isEn} />
 
       {/* 6. Final Conversion Download CTA */}
-      <AppDownloadCtaSection isEn={isEn} />
+      <AppDownloadCtaSection isEn={isEn} data={ctaData} />
     </main>
   );
 }
+

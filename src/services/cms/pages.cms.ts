@@ -277,6 +277,11 @@ async function fetchDevelopersInternal(): Promise<DevelopersPageData> {
   };
 }
 
+async function fetchPageContentInternal(slug: string): Promise<any> {
+  const doc = await CmsClient.getDoc('website_pages', slug);
+  return doc?.content || {};
+}
+
 export class PagesCmsService {
   /**
    * Cached getter for About page (Tagged: 'cms:page:about').
@@ -313,4 +318,50 @@ export class PagesCmsService {
     ['website_pages_developers'],
     { revalidate: 86400, tags: ['cms:pages', 'cms:page:developers'] }
   );
+
+  /**
+   * Cached getter for App page (Tagged: 'cms:page:app').
+   */
+  static getAppPage = unstable_cache(
+    () => fetchPageContentInternal('app'),
+    ['website_pages_app'],
+    { revalidate: 86400, tags: ['cms:pages', 'cms:page:app'] }
+  );
+
+  /**
+   * Cached getter for Cars page (Tagged: 'cms:page:cars').
+   */
+  static getCarsPage = unstable_cache(
+    () => fetchPageContentInternal('cars'),
+    ['website_pages_cars'],
+    { revalidate: 86400, tags: ['cms:pages', 'cms:page:cars'] }
+  );
+
+  /**
+   * Cached getter for Add Hotel page (Tagged: 'cms:page:add_hotel').
+   */
+  static getAddHotelPage = unstable_cache(
+    () => fetchPageContentInternal('add_hotel'),
+    ['website_pages_add_hotel'],
+    { revalidate: 86400, tags: ['cms:pages', 'cms:page:add_hotel'] }
+  );
+
+  /**
+   * Cached getter for International Hotels page (Tagged: 'cms:page:international_hotels').
+   */
+  static getInternationalHotelsPage = unstable_cache(
+    () => fetchPageContentInternal('international_hotels'),
+    ['website_pages_international_hotels'],
+    { revalidate: 86400, tags: ['cms:pages', 'cms:page:international_hotels'] }
+  );
+
+  /**
+   * Cached getter for Flights page (Tagged: 'cms:page:flights').
+   */
+  static getFlightsPage = unstable_cache(
+    () => fetchPageContentInternal('flights'),
+    ['website_pages_flights'],
+    { revalidate: 86400, tags: ['cms:pages', 'cms:page:flights'] }
+  );
 }
+
