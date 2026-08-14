@@ -97,16 +97,8 @@ const sampleBlogPosts: BlogPost[] = [
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    let snap;
-    try {
-      // Try compound query first (requires index)
-      snap = await db.collection('blog_posts')
-        .where('isPublished', '==', true)
-        .orderBy('publishedAt', 'desc')
-        .get();
-    } catch (indexError) {
-      // Fallback: Fetch collection directly if composite index is missing in Firestore Console
-      console.warn('Firestore index missing for blog_posts. Using memory filter/sort fallback.');
+    let snap = await db.collection('web_blog').get();
+    if (snap.empty) {
       snap = await db.collection('blog_posts').get();
     }
 
@@ -114,7 +106,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       return sampleBlogPosts;
     }
 
-    let posts = snap.docs.map(doc => {
+    const posts = snap.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -123,17 +115,17 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         titleEn: data.titleEn || '',
         excerpt: data.excerpt || '',
         excerptEn: data.excerptEn || '',
-        content: data.content || '',
+        content: data.contentHtml || data.content || '',
         contentEn: data.contentEn || '',
         coverImage: data.coverImage || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=1600',
         authorName: data.authorName || 'مساري',
         authorAvatar: data.authorAvatar || '',
-        category: data.category || 'عام',
+        category: data.category || data.categoryId || 'عام',
         categoryEn: data.categoryEn || 'General',
         tags: data.tags || [],
         readTimeMinutes: data.readTimeMinutes || 5,
-        publishedAt: data.publishedAt || new Date().toISOString(),
-        isPublished: data.isPublished !== undefined ? data.isPublished : true,
+        publishedAt: data.publishedAt || data.updatedAt || new Date().toISOString(),
+        isPublished: data.status ? data.status === 'published' : (data.isPublished !== undefined ? data.isPublished : true),
       };
     }).filter(p => p.isPublished);
 
@@ -144,21 +136,46 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     posts.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
     return posts;
   } catch (error) {
-    console.error('Error fetching blog posts from Firestore:', error);
+    console.error('Error in getBlogPosts:', error);
     return sampleBlogPosts;
   }
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const snap = await db.collection('blog_posts').where('slug', '==', slug).limit(1).get();
-    if (!snap || snap.empty) {
+    // 1. Direct Document ID lookup (Atomic Document ID = slug strategy)
+    const directDoc = await db.collection('web_blog').doc(slug).get();
+    let doc = directDoc.exists ? directDoc : null;
+
+    // 2. Query fallback if not found by direct doc ID
+    if (!doc) {
+      const snap = await db.collection('web_blog').where('slug', '==', slug).limit(1).get();
+      if (!snap.empty) {
+        doc = snap.docs[0];
+      }
+    }
+
+    // 3. Fallback to legacy blog_posts collection
+    if (!doc) {
+      const legacySnap = await db.collection('blog_posts').where('slug', '==', slug).limit(1).get();
+      if (!legacySnap.empty) {
+        doc = legacySnap.docs[0];
+      }
+    }
+
+    // 4. In-memory sample fallback
+    if (!doc) {
       const match = sampleBlogPosts.find(p => p.slug === slug);
       return match || null;
     }
 
-    const doc = snap.docs[0];
-    const data = doc.data();
+    const data = doc.data() || {};
+    // Canonical status check: status is canonical SoT, isPublished is derived
+    const isPublished = data.status ? data.status === 'published' : (data.isPublished !== undefined ? data.isPublished : true);
+    if (!isPublished) {
+      return null;
+    }
+
     return {
       id: doc.id,
       slug: data.slug || doc.id,
@@ -166,16 +183,16 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       titleEn: data.titleEn || '',
       excerpt: data.excerpt || '',
       excerptEn: data.excerptEn || '',
-      content: data.content || '',
+      content: data.contentHtml || data.content || '',
       contentEn: data.contentEn || '',
       coverImage: data.coverImage || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=1600',
       authorName: data.authorName || 'مساري',
       authorAvatar: data.authorAvatar || '',
-      category: data.category || 'عام',
+      category: data.category || data.categoryId || 'عام',
       categoryEn: data.categoryEn || 'General',
       tags: data.tags || [],
       readTimeMinutes: data.readTimeMinutes || 5,
-      publishedAt: data.publishedAt || new Date().toISOString(),
+      publishedAt: data.publishedAt || data.updatedAt || new Date().toISOString(),
       isPublished: true,
     };
   } catch (error) {

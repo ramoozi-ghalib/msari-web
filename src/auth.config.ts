@@ -11,6 +11,17 @@ import type { NextAuthConfig } from 'next-auth';
 
 export const authConfig: NextAuthConfig = {
   trustHost: true,
+  cookies: {
+    sessionToken: {
+      name: 'msari.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   // Override default Auth.js pages with our own routes
   pages: {
     signIn: '/login',

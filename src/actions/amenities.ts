@@ -1,7 +1,6 @@
 'use server';
 
 import { db } from '@/lib/firebase-admin';
-import { revalidatePath } from 'next/cache';
 import { adminGuard } from '@/lib/action-guard';
 import { Policies } from '@/lib/policies';
 
@@ -42,8 +41,6 @@ export async function createAmenity(data: { nameAr: string; nameEn: string; icon
       createdAt: new Date().toISOString(),
     });
     
-    revalidatePath('/admin/settings');
-    revalidatePath('/admin/hotels');
     return { success: true };
   } catch (error) {
     return { success: false, error: { message: 'Failed to create amenity' } };
@@ -60,8 +57,6 @@ export async function deleteAmenity(id: string) {
       updatedAt: new Date().toISOString(),
     });
     
-    revalidatePath('/admin/settings');
-    revalidatePath('/admin/hotels');
     return { success: true };
   } catch (error) {
     return { success: false, error: { message: 'Failed to delete amenity' } };
@@ -126,9 +121,6 @@ export async function reseedAmenities() {
     }
 
     await batch.commit();
-
-    revalidatePath('/admin/settings');
-    revalidatePath('/admin/hotels');
     
     return { success: true, count: all.length };
   } catch (error: any) {

@@ -1,30 +1,48 @@
 import Image from 'next/image';
 import { QrCode } from 'lucide-react';
+import type { HomepageContentData } from '@/services/cms';
 
-export default function AppDownloadSection() {
+interface AppDownloadSectionProps {
+  appDownload?: HomepageContentData['appDownload'];
+}
+
+export default function AppDownloadSection({ appDownload }: AppDownloadSectionProps) {
+  const title = appDownload?.titleAr || 'حمّل تطبيق مساري الآن';
+  const subtitle = appDownload?.subtitleAr || 'احجز فنادقك ورحلاتك من أي مكان وفي أي وقت بسهولة وأمان';
+  const playStore = appDownload?.playStoreUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
+  const appStore = appDownload?.appStoreUrl || 'https://apps.apple.com';
+
   return (
     <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page">
       <div className="container-msari">
         {/* Single compact banner */}
         <div
-          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20"
+          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-geo-pattern"
           style={{ background: 'linear-gradient(135deg, #23096E 0%, #2d1580 50%, #3A1C8F 100%)' }}
         >
+          <div
+            className="pointer-events-none absolute -top-10 -start-10 w-52 h-52 rounded-full opacity-40"
+            style={{ background: 'radial-gradient(circle, rgba(232,169,58,.35), transparent 70%)' }}
+          />
           <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-0 px-6 py-8 lg:py-6 lg:px-10" style={{ direction: 'rtl' }}>
 
             {/* Right: Text + Store Buttons */}
             <div className="flex-1 text-center lg:text-start">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/80 text-[11px] font-black mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E8A93A]" />
+                <span>تطبيق مساري للهواتف الذكية</span>
+              </div>
               <h2 className="text-xl sm:text-2xl font-black text-white mb-1.5 drop-shadow-sm">
-                حمل تطبيق مساري الآن
+                {title}
               </h2>
               <p className="text-[#F4F2F8] text-xs sm:text-sm font-bold mb-5">
-                احجز فنادقك ورحلاتك من أي مكان وفي أي وقت بسهولة وأمان
+                {subtitle}
               </p>
 
               {/* Official Store badges */}
               <div className="flex items-center justify-center lg:justify-start gap-3">
                 <a
-                  href="https://play.google.com/store/apps/details?id=net.msari.app"
+                  href={playStore}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"
@@ -41,7 +59,7 @@ export default function AppDownloadSection() {
                   </div>
                 </a>
                 <a
-                  href="https://apps.apple.com"
+                  href={appStore}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"

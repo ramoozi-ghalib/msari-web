@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Tag, Sparkles, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Offer } from '@/types';
 
@@ -17,9 +17,7 @@ interface OffersSliderProps {
   offers: Offer[];
 }
 
-export default function OffersSlider({ offers }: OffersSliderProps) {
-  if (!offers || offers.length === 0) return null;
-
+export default function OffersSlider({ offers = [] }: OffersSliderProps) {
   const count = offers.length;
 
   // Build cloned array for smooth infinite loop: [last2, ...offers, first2]
@@ -38,7 +36,19 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(count > 1 ? 2 : 0);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Touch gesture support for mobile swiping
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Real active index for pagination dots (0 to count - 1)
   const realIndex = count > 1 ? (currentIndex - 2 + count) % count : 0;
@@ -74,32 +84,58 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
 
     autoPlayRef.current = setInterval(() => {
       nextSlide();
-    }, 4000);
+    }, 4500);
 
     return () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
     };
-  }, [nextSlide, count, isHovered]);
+  }, [count, isHovered, nextSlide]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const distance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    // In RTL, positive distance (swiping left) moves to next
+    if (distance > minSwipeDistance) {
+      nextSlide();
+    } else if (distance < -minSwipeDistance) {
+      prevSlide();
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
+  if (!offers || offers.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-20 bg-white">
+    <section className="py-10 sm:py-16 bg-white overflow-hidden w-full">
       <div className="container-msari">
-        {/* Section Header */}
-        <div className="flex items-end justify-between mb-8 pb-3 border-b border-slate-200/80">
+        {/* Section Header: Clean single-row layout without clutter */}
+        <div className="flex items-center justify-between mb-6 sm:mb-8 pb-3 border-b border-slate-200/80">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-extrabold mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-extrabold mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>🔥 أحدث العروض والخصومات</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-[var(--brand-primary)]">
+            <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)]">
               العروض الحصرية
             </h2>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Arrow Navigation Controls */}
+            {/* Arrow Navigation Controls — Desktop only */}
             {count > 1 && (
-              <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 <button
                   onClick={prevSlide}
                   className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-slate-200 shadow-md hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
@@ -119,7 +155,7 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
 
             <Link
               href="/hotels"
-              className="inline-flex items-center gap-1 text-sm font-black text-[var(--brand-primary)] hover:text-[var(--brand-accent)] transition-colors ps-2"
+              className="inline-flex items-center gap-1 text-xs sm:text-sm font-black text-[var(--brand-primary)] hover:text-[var(--brand-accent)] transition-colors ps-2 whitespace-nowrap"
             >
               <span>عرض الكل</span>
               <ArrowLeft className="w-4 h-4" />
@@ -127,20 +163,25 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
           </div>
         </div>
 
-        {/* ── Smooth Infinite Dual-Card Carousel Track ── */}
+        {/* ── Smooth Responsive Carousel Track ── */}
         <div
           className="relative w-full overflow-hidden py-2"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           <div
             onTransitionEnd={handleTransitionEnd}
             className={cn(
-              'flex gap-6 dir-rtl',
+              'flex gap-4 sm:gap-6 dir-rtl',
               isTransitioning ? 'transition-transform duration-700 ease-out' : 'transition-none'
             )}
             style={{
-              transform: `translateX(calc(${currentIndex} * (50% + 12px)))`,
+              transform: isMobile
+                ? `translateX(calc(${currentIndex} * (100% + 16px)))`
+                : `translateX(calc(${currentIndex} * (50% + 12px)))`,
             }}
           >
             {extendedOffers.map((offer, idx) => (
@@ -148,9 +189,11 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
                 key={`${offer.id || idx}-${idx}`}
                 className="w-full md:w-[calc(50%-12px)] flex-shrink-0 relative"
               >
-                {/* Responsive Aspect Ratio Card */}
-                <div className="group relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 dark:border-slate-800 aspect-[16/9] sm:aspect-[2.1/1] flex flex-col justify-end p-5 sm:p-7 bg-slate-950 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-                  
+                {/* Entire Card is a Clean Clickable Link */}
+                <Link
+                  href={offer.link || '/hotels'}
+                  className="group block relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 dark:border-slate-800 aspect-[16/9] sm:aspect-[2.1/1] p-5 sm:p-7 bg-slate-950 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                >
                   {/* Full Edge-to-Edge Banner Image */}
                   {offer.image ? (
                     <Image
@@ -171,40 +214,22 @@ export default function OffersSlider({ offers }: OffersSliderProps) {
                   )}
 
                   {/* Gentle Contrast Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent z-10" />
 
-                  {/* Badge */}
-                  <div className="absolute top-4 start-4 z-20">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[var(--brand-accent)] text-white text-xs font-black shadow-lg">
-                      <Tag className="w-3.5 h-3.5" />
-                      <span>عرض خاص</span>
-                    </span>
+                  {/* Content Overlay — Clean Title with gentle hover glow */}
+                  <div className="absolute bottom-5 start-5 end-5 z-20 text-white">
+                    <h3 className="text-base sm:text-xl font-black leading-snug drop-shadow-md line-clamp-1 group-hover:text-[var(--brand-accent)] transition-colors">
+                      {offer.title}
+                    </h3>
                   </div>
-
-                  {/* Content Overlay — Title on Right, Button aligned to Left */}
-                  <div className="relative z-20 text-white flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-black leading-snug drop-shadow-md line-clamp-1">
-                        {offer.title}
-                      </h3>
-                    </div>
-
-                    <Link
-                      href={offer.link || '/hotels'}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand-accent)] hover:opacity-90 text-white font-black text-xs transition-all shadow-md group-hover:scale-105 shrink-0 me-auto sm:me-0"
-                    >
-                      <span>احجز الآن واستفد من العرض</span>
-                      <ArrowLeft className="w-3.5 h-3.5 text-white" />
-                    </Link>
-                  </div>
-                </div>
+                </Link>
               </div>
             ))}
           </div>
 
           {/* Dots Indicator Bar */}
           {count > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-8">
+            <div className="flex items-center justify-center gap-2 mt-6 sm:mt-8">
               {offers.map((_, i) => (
                 <button
                   key={i}

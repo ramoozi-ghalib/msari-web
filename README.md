@@ -1,6 +1,10 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# منصة مساري الرقمية (Msari Web Platform)
 
-## Getting Started
+منصة مساري لحجز الفنادق والخدمات السياحية في اليمن المبنية باستخدام Next.js (App Router)، Next-Intl، Firebase Firestore، و TailwindCSS.
+
+---
+
+## 🚀 Getting Started
 
 First, run the development server:
 
@@ -16,35 +20,25 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You can start editing the page by modifying `src/app/[locale]/page.tsx`. The page auto-updates as you edit the file.
 
 ---
 
-## 🏛️ Architecture Documentation & Governance
+## 🏗️ Architecture & Documentation Governance
 
-The official architectural specifications and governance rules for this project are maintained under `docs/architecture/` as the **Single Source of Truth**:
+The active documentation and architectural guidelines for this project are maintained under `docs/`:
 
-- 📜 [Project Architecture Specification](docs/architecture/PROJECT_ARCHITECTURE.md) — Executive summary, principles, system overview, and admin separation.
-- 📊 [Final Data Architecture Specification](docs/architecture/FINAL_DATA_ARCHITECTURE.md) — 3-Layer data architecture, Firestore collections design, CMS modules, and ownership matrix.
-- 📜 [Architecture Decision Records (ADRs)](docs/architecture/ARCHITECTURE_DECISIONS.md) — ADR-001: 3-Layer data architecture adoption.
-- 🤖 [AI Agent & Developer Guide](docs/architecture/AI_AGENT_GUIDE.md) — Mandatory governance rules for human developers and AI coding agents.
+- 🤖 **AI Agent & Developer Guide**: [`docs/architecture/AI_AGENT_GUIDE.md`](docs/architecture/AI_AGENT_GUIDE.md) — Mandatory governance rules for human developers and AI coding agents.
+- 🚀 **Production Deployment Guide**: [`docs/deployment/PRODUCTION_DEPLOYMENT_GUIDE.md`](docs/deployment/PRODUCTION_DEPLOYMENT_GUIDE.md) — Production PM2, Nginx, and host deployment instructions.
+- ⚙️ **Hostinger Environment**: [`docs/deployment/HOSTINGER_ENVIRONMENT.md`](docs/deployment/HOSTINGER_ENVIRONMENT.md) — Server environment configuration.
+- 🗺️ **SEO Migration Guide**: [`SEO_MIGRATION_AR.md`](SEO_MIGRATION_AR.md) — SEO redirects and migration mapping.
 
-> **CRITICAL**: Every developer and AI agent MUST read and adhere strictly to these architectural specifications before writing code or modifying features.
+> ℹ️ **Historical Documents**: Legacy blueprints and superseded proposals are archived under [`docs/archive/`](docs/archive/) for historical reference only and do not represent the current architecture.
 
+---
+
+## 🛡️ Protected Operational Data & Architecture
+
+- **Primary Database**: Firebase Firestore (operational collections: `hotels`, `destinations`, `discounts`, `bookings`, `users`, `bank_accounts`).
+- **Clean Slate**: The legacy Website CMS has been removed; public website routes operate autonomously from baseline data and active Firestore collections.
+- **Strict Data Protection**: Operational collections and user booking data are strictly protected and must never be altered or deleted during development or cleanup tasks.

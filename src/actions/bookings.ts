@@ -66,22 +66,11 @@ const CreateBookingSchema = z.object({
   notes:         z.string().max(1000).trim().optional(),
 }).strict();
 
-const GetAdminBookingsSchema = z.object({
-  status:      z.nativeEnum(BookingStatus).optional(),
-  q:           z.string().max(100).trim().optional(),
-  page:        z.number().int().min(1).optional().default(1),
-  pageSize:    z.number().int().min(1).max(100).optional().default(20),
-}).strict();
-
-const UpdateBookingStatusSchema = z.object({
-  bookingId: z.string().cuid('معرف الحجز غير صالح'),
-  newStatus: z.nativeEnum(BookingStatus),
-}).strict();
-
 const GetMyBookingsSchema = z.object({
   page:     z.number().int().min(1).optional().default(1),
   pageSize: z.number().int().min(1).max(50).optional().default(10),
 }).strict();
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -168,8 +157,6 @@ async function withSerializableRetry<T>(
 // USE CASE A: createBooking
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { BookingQueryService } from '@/services/query/BookingQueryService';
-import { unstable_noStore as noStore } from 'next/cache';
 import { Redis } from '@upstash/redis';
 
 const getRedisClient = () => {
@@ -390,162 +377,6 @@ export async function previewBookingPrice(rawData: unknown) {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// USE CASE C: getAdminBookings
-// ─────────────────────────────────────────────────────────────────────────────
-
-export async function getAdminBookings(rawParams: unknown = {}) {
-  noStore(); // Prevents caching statically 
-
-  const guard = await adminGuard(Policies.canViewBookings);
-  if (!guard.ok) return guard.error;
-
-  const parsed = GetAdminBookingsSchema.safeParse(rawParams);
-  if (!parsed.success) {
-    return {
-      success: false as const,
-      error: { code: 'VALIDATION_ERROR' as const, message: 'معاملات غير صالحة' },
-    };
-  }
-
-  const { status, q, pageSize } = parsed.data;
-  // NOTE: Schema page maps to cursor internally or pass cursor if implemented in schema
-  const cursor = (rawParams as any).cursor; 
-  const safeTake = clampLimit(pageSize, 20, 100);
-
-  try {
-    const result = await BookingQueryService.getAdminBookings({
-      status,
-      q,
-      take: safeTake,
-      cursor,
-    });
-
-    return {
-      success: true as const,
-      data: result.data,
-      nextCursor: result.nextCursor,
-    };
-  } catch (error) {
-    return handleActionSafe('getAdminBookings', error);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// USE CASE D: updateBookingStatus
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * [FIX H-5] يُحدِّث حالة حجز داخل transaction واحدة.
- * القراءة والكتابة يحدثان في نفس الـ transaction لمنع Race Condition.
- */
-export async function updateBookingStatus(rawData: unknown) {
-  const guard = await adminGuard(Policies.canUpdateBookingStatus);
-  if (!guard.ok) return guard.error;
-
-  const parsed = UpdateBookingStatusSchema.safeParse(rawData);
-  if (!parsed.success) {
-    return {
-      success: false as const,
-      error: {
-        code: 'VALIDATION_ERROR' as const,
-        message: 'بيانات غير صالحة',
-        fieldErrors: parsed.error.flatten().fieldErrors,
-      },
-    };
-  }
-
-  const { bookingId, newStatus } = parsed.data;
-
-  try {
-    const querySnapshot = await db.collectionGroup('entries')
-      .where('id', '==', bookingId)
-      .limit(1)
-      .get();
-    
-    if (querySnapshot.empty) {
-      return { success: false as const, error: { code: 'BOOKING_NOT_FOUND', message: 'الحجز غير موجود' }};
-    }
-
-    const bookingDoc = querySnapshot.docs[0];
-    const bookingRef = bookingDoc.ref;
-    const bData = bookingDoc.data();
-
-    const currentStatus = (bData.status || 'pending').toUpperCase();
-
-    if (newStatus === 'CONFIRMED') {
-      if (currentStatus === 'CANCELLED') {
-        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'الحجز ملغي بالفعل ولا يمكن تأكيده' }};
-      }
-    }
-
-    if (newStatus === 'NO_SHOW') {
-      const checkInDate = bData.stay?.fromDate?.toDate ? bData.stay.fromDate.toDate() : new Date((bData.stay?.fromDate?._seconds || 0) * 1000);
-      if (new Date() < checkInDate) {
-        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'لا يمكن تعيين حالة عدم الحضور قبل تاريخ تسجيل الدخول' }};
-      }
-    }
-
-    if (newStatus === 'CANCELLED') {
-      if (currentStatus === 'COMPLETED') {
-        return { success: false as const, error: { code: 'BOOKING_BUSINESS_RULE_VIOLATION', message: 'لا يمكن إلغاء حجز مكتمل بالفعل' }};
-      }
-    }
-
-    await bookingRef.update({
-      status: newStatus.toLowerCase(),
-      updatedAt: new Date(),
-    });
-
-    revalidatePath('/admin/bookings');
-    return { success: true as const };
-
-  } catch (error) {
-    return handleActionSafe('updateBookingStatus', error);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// USE CASE E: verifyBookingPayment
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * [MVP] يؤكد يدوياً استلام الدفعة أو إيصال التحويل البنكي لحجز معين
- */
-export async function verifyBookingPayment(bookingId: string) {
-  const guard = await adminGuard(Policies.canManageBookings);
-  if (!guard.ok) return guard.error;
-
-  try {
-    const querySnapshot = await db.collectionGroup('entries')
-      .where('id', '==', bookingId)
-      .limit(1)
-      .get();
-    
-    if (querySnapshot.empty) {
-      return { success: false as const, error: { code: 'BOOKING_NOT_FOUND' as const, message: 'الحجز غير موجود' }};
-    }
-
-    const bookingDoc = querySnapshot.docs[0];
-    const bookingRef = bookingDoc.ref;
-    const bData = bookingDoc.data();
-
-    if (bData.paymentVerified || bData.payment?.status === 'verified') {
-      return { success: true as const, data: undefined };
-    }
-
-    await bookingRef.update({
-      paymentVerified: true,
-      'payment.status': 'verified',
-      updatedAt: new Date(),
-    });
-
-    revalidatePath('/admin/bookings');
-    return { success: true as const, data: undefined };
-  } catch (error) {
-    return handleActionSafe('verifyBookingPayment', error);
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // USE CASE E: getMyBookings

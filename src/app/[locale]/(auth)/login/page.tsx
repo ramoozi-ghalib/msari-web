@@ -35,20 +35,22 @@ function LoginForm() {
     setError('');
     setLoading(true);
 
-    // We use NextAuth's built-in redirect mechanism.
-    // If the user is an admin, the redirect to /admin will be handled by the middleware 
-    // when they hit the root or an admin-only path.
     try {
-      await signIn('credentials', {
+      const res = await signIn('credentials', {
         email,
         password,
-        redirect: true,
-        callbackUrl: safeRedirect,
+        redirect: false,
       });
+
+      if (res?.error) {
+        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        setLoading(false);
+      } else {
+        const targetUrl = (redirect && redirect !== '/') ? safeRedirect : '/';
+        window.location.href = targetUrl;
+      }
     } catch {
       setError('حدث خطأ أثناء تسجيل الدخول، يرجى المحاولة مرة أخرى');
-    } finally {
-      // Fallback if redirect: true fails or is slow
       setLoading(false);
     }
   };

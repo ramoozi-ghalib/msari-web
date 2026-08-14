@@ -210,7 +210,7 @@ class ApiClient {
   private getBaseUrl(): string {
     const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     if (envUrl) return envUrl.replace(/\/$/, '');
-    return 'https://europe-west1-msari-travel.cloudfunctions.net/api/v1';
+    return 'https://us-central1-msariapp-v2.cloudfunctions.net/api/v1';
   }
 
   private getApiKey(): string {
@@ -335,7 +335,7 @@ class ApiClient {
       phoneNumber: string;
     }>('/me', { Authorization: `Bearer ${res.data.token}` });
 
-    const role = email === 'admin@msari.net' ? 'ADMIN' as const : 'CUSTOMER' as const;
+    const role = (email.endsWith('@msari.net') || email === 'admin@msari.net') ? 'ADMIN' as const : 'CUSTOMER' as const;
 
     return {
       success: true,

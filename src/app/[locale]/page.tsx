@@ -8,6 +8,7 @@ import AppDownloadSection from '@/components/home/AppDownloadSection';
 import { getLocalHotels } from '@/actions/hotels';
 import { getActiveOffers } from '@/actions/offers';
 import { getActiveCities } from '@/actions/cities';
+import { HomepageCmsService, SettingsCmsService } from '@/services/cms';
 
 export const metadata: Metadata = {
   title: {
@@ -25,24 +26,30 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  console.log('[BOOT-6] Executing src/app/[locale]/page.tsx -> HomePage Render');
-  const [{ data: hotels }, offers, cities] = await Promise.all([
+  const [{ data: hotels }, offers, cities, homepageContent, settings] = await Promise.all([
     getLocalHotels({ sort: 'recommended', pageSize: 12 }),
     getActiveOffers(),
     getActiveCities(),
+    HomepageCmsService.getHomepageContent(),
+    SettingsCmsService.getSettings(),
   ]);
 
   const featuredHotels = hotels.filter((h) => h.isFeatured);
 
+  const appDownloadFixed = {
+    ...homepageContent.appDownload,
+    playStoreUrl: settings.playStoreUrl,
+    appStoreUrl: settings.appStoreUrl,
+  };
+
   return (
     <>
-      <HeroSection />
+      <HeroSection hero={homepageContent.hero} />
       <OffersSlider offers={offers} />
       <FeaturedHotels hotels={featuredHotels} />
       <CitiesSection cities={cities} />
-      <WhyMsari />
-      <AppDownloadSection />
+      <WhyMsari whyMsari={homepageContent.whyMsari} />
+      <AppDownloadSection appDownload={appDownloadFixed} />
     </>
   );
 }
-

@@ -64,7 +64,6 @@ export async function createCity(rawData: unknown) {
   try {
     const id = await CityService.createCity(data);
 
-    revalidatePath('/admin/destinations');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const, id };
@@ -88,7 +87,6 @@ export async function updateCity(rawId: unknown, rawData: unknown) {
   try {
     await CityService.updateCity(id, data);
 
-    revalidatePath('/admin/destinations');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const };
@@ -112,7 +110,6 @@ export async function deleteCity(rawId: unknown) {
   try {
     await CityService.deleteCity(id);
 
-    revalidatePath('/admin/destinations');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const };
