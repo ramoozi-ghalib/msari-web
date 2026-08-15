@@ -51,17 +51,16 @@ export default async function AppPage(
       <AppStatsBannerSection isEn={isEn} />
 
       {/* 3. Key Features */}
-      <AppFeaturesSection isEn={isEn} />
+      <AppFeaturesSection isEn={isEn} features={appContent?.features} />
 
       {/* 4. Interactive App Showcase */}
-      <AppScreenshotsShowcase isEn={isEn} />
+      <AppScreenshotsShowcase isEn={isEn} screensShowcase={appContent?.screensShowcase} />
 
       {/* 5. How It Works in 3 Steps */}
-      <AppHowItWorksSection isEn={isEn} />
+      <AppHowItWorksSection isEn={isEn} howItWorks={appContent?.howItWorks} />
 
-      {/* 6. Final Conversion Download CTA */}
+      {/* 6. Bottom Sticky Download CTA Banner */}
       <AppDownloadCtaSection isEn={isEn} data={ctaData} />
     </main>
   );
 }
-

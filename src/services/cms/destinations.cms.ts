@@ -9,32 +9,39 @@ import { CmsClient } from './cms.client';
 import type { DestinationEditorialData } from './types';
 import { getDestinationData } from '@/data/destinations';
 
+function resolveContent(data: Record<string, any>): Record<string, any> {
+  if (data.content && typeof data.content === 'object' && !Array.isArray(data.content)) {
+    return { ...data.content, ...data };
+  }
+  return data;
+}
+
 async function fetchEditorialGuideInternal(slug: string): Promise<DestinationEditorialData | null> {
   const cleanSlug = slug.trim().toLowerCase();
-  const data = await CmsClient.getDoc<Record<string, any>>('website_destinations', cleanSlug);
+  const raw = await CmsClient.getDoc<Record<string, any>>('website_destinations', cleanSlug);
 
-  if (data) {
-    const status = data.status || (data.isPublished ? 'published' : 'draft');
-    if (status === 'published') {
+  if (raw) {
+    const isPub = raw.isPublished !== false && raw.status !== 'draft';
+    if (isPub) {
+      const data = resolveContent(raw);
       return {
         slug: cleanSlug,
-        cityId: data.cityId || cleanSlug,
-        tagline: data.tagline || '',
-        taglineEn: data.taglineEn || '',
-        heroImage: data.heroImage || '',
-        overview: data.overview || {
+        cityId: data.cityId || raw.cityId || cleanSlug,
+        tagline: data.tagline || raw.tagline || '',
+        taglineEn: data.taglineEn || raw.taglineEn || '',
+        heroImage: data.heroImage || raw.heroImage || '',
+        overview: data.overview || raw.overview || {
           history: '',
           climate: '',
           culture: '',
           bestTimeToVisit: '',
         },
-        landmarks: Array.isArray(data.landmarks) ? data.landmarks : [],
+        landmarks: Array.isArray(data.landmarks) ? data.landmarks : (Array.isArray(raw.landmarks) ? raw.landmarks : []),
         status: 'published',
         isPublished: true,
-        updatedAt: data.updatedAt ? String(data.updatedAt) : null,
+        updatedAt: raw.updatedAt ? String(raw.updatedAt) : null,
       };
     }
-    // Explicit draft or archived in CMS -> do not expose draft edits
     return null;
   }
 

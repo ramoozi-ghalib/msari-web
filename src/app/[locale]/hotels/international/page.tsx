@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { Globe, Shield, CreditCard, HeartHandshake } from 'lucide-react';
+import { Globe, Shield, CreditCard, HeartHandshake, Star } from 'lucide-react';
 import Heading from '@/components/ui/Heading';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
@@ -31,6 +31,14 @@ const DEFAULT_FEATURES = [
   { icon: HeartHandshake, title: 'دعم ٢٤/٧', desc: 'فريقنا متاح على مدار الساعة لمساعدتك' },
 ];
 
+const ICON_MAP: Record<string, any> = {
+  Globe,
+  Shield,
+  CreditCard,
+  HeartHandshake,
+  Star,
+};
+
 export default async function InternationalHotelsPage() {
   const [intlContent, settings] = await Promise.all([
     PagesCmsService.getInternationalHotelsPage(),
@@ -40,9 +48,17 @@ export default async function InternationalHotelsPage() {
   const badge = intlContent?.hero?.badge || '+١٠٠٠ وجهة عالمية';
   const title = intlContent?.hero?.title || 'فنادق عالمية بأسعار لا تُنافَس';
   const subtitle = intlContent?.hero?.subtitle || 'احجز إقامتك في أفضل الفنادق حول العالم بأسعار تنافسية وخدمة عربية متميزة';
+  const bgImage = intlContent?.hero?.bgImage || 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2000&auto=format&fit=crop';
   const destinations = (intlContent?.topDestinations && intlContent.topDestinations.length > 0)
     ? intlContent.topDestinations
     : DEFAULT_DESTINATIONS;
+
+  const features = (intlContent?.features && intlContent.features.length > 0)
+    ? intlContent.features
+    : DEFAULT_FEATURES;
+
+  const ctaTitle = intlContent?.cta?.title || 'هل لم تجد وجهتك؟';
+  const ctaSubtitle = intlContent?.cta?.subtitle || 'تواصل معنا مباشرة وسنساعدك في إيجاد أفضل فندق لوجهتك المفضلة';
 
   const makeWaLink = (text: string) => `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(text)}`;
 
@@ -52,7 +68,7 @@ export default async function InternationalHotelsPage() {
       <section className="relative pt-32 pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#23096E]">
           <Image
-            src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2000&auto=format&fit=crop"
+            src={bgImage}
             alt="فنادق عالمية"
             fill
             priority
@@ -117,15 +133,18 @@ export default async function InternationalHotelsPage() {
       <section className="py-12 bg-white">
         <div className="container-msari">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {DEFAULT_FEATURES.map((f) => (
-              <div key={f.title} className="bg-[#F4F2F8] rounded-2xl p-6 border border-slate-200/80 text-center hover:shadow-md transition-all">
-                <div className="w-12 h-12 bg-[#23096E]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <f.icon size={24} className="text-[#23096E]" />
+            {features.map((f: any, idx: number) => {
+              const Icon = (typeof f.icon === 'string' ? ICON_MAP[f.icon] : f.icon) || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
+              return (
+                <div key={idx} className="bg-[#F4F2F8] rounded-2xl p-6 border border-slate-200/80 text-center hover:shadow-md transition-all">
+                  <div className="w-12 h-12 bg-[#23096E]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Icon size={24} className="text-[#23096E]" />
+                  </div>
+                  <h3 className="font-black text-[#23096E] mb-2 text-base">{f.title}</h3>
+                  <p className="text-[#423861] text-xs font-semibold leading-relaxed">{f.desc}</p>
                 </div>
-                <h3 className="font-black text-[#23096E] mb-2 text-base">{f.title}</h3>
-                <p className="text-[#423861] text-xs font-semibold leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -134,9 +153,9 @@ export default async function InternationalHotelsPage() {
       <section className="py-16 bg-[#F4F2F8]">
         <div className="container-msari">
           <div className="bg-gradient-to-br from-[#23096E] via-[#2d1580] to-[#3A1C8F] rounded-3xl p-10 sm:p-14 text-center text-white shadow-2xl">
-            <h2 className="text-2xl sm:text-4xl font-black mb-4 text-white">هل لم تجد وجهتك؟</h2>
+            <h2 className="text-2xl sm:text-4xl font-black mb-4 text-white">{ctaTitle}</h2>
             <p className="text-[#F4F2F8] text-base sm:text-lg mb-8 max-w-xl mx-auto font-semibold">
-              تواصل معنا مباشرة وسنساعدك في إيجاد أفضل فندق لوجهتك المفضلة
+              {ctaSubtitle}
             </p>
             <a
               href={makeWaLink('مرحباً، أريد مساعدة في حجز فندق عالمي')}

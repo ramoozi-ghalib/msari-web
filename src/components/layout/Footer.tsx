@@ -25,6 +25,10 @@ export default async function Footer() {
   const settings = await SettingsCmsService.getSettings();
   const whatsappUrl = `https://wa.me/${settings.whatsappNumber}`;
   const telUrl = `tel:+${settings.whatsappNumber}`;
+  const footerDesc = settings.footerDescriptionAr || 'منصة السفر الأولى في اليمن — نوفر لك أفضل خيارات الإقامة والطيران وخدمات النقل.';
+  const copyright = settings.copyrightTextAr || 'جميع الحقوق محفوظة لـ مساري لخدمات السفر والسياحة.';
+  const playStore = settings.playStoreUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
+  const appStore = settings.appStoreUrl || 'https://apps.apple.com';
 
   return (
     <footer className="relative bg-[#160549] bg-gradient-to-br from-[#160549] via-[#23096e] to-[#3A1C8F] text-white pt-12 pb-6 mt-16 shadow-inner bg-geo-pattern">
@@ -52,7 +56,7 @@ export default async function Footer() {
               </div>
             </Link>
             <p className="text-white text-sm leading-relaxed mb-5">
-              منصة السفر الأولى في اليمن — نوفر لك أفضل خيارات الإقامة والطيران وخدمات النقل.
+              {footerDesc}
             </p>
             <div className="flex items-center gap-3">
               <a
@@ -135,7 +139,7 @@ export default async function Footer() {
                 </Link>
                 <div className="flex gap-2">
                   <a
-                    href={settings.appStoreUrl}
+                    href={appStore}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-colors text-xs font-semibold text-white"
@@ -143,7 +147,7 @@ export default async function Footer() {
                     <span></span> App Store
                   </a>
                   <a
-                    href={settings.playStoreUrl}
+                    href={playStore}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg transition-colors text-xs font-semibold text-white"
@@ -199,7 +203,7 @@ export default async function Footer() {
                 <span>{settings.infoEmail}</span>
               </a>
               <a
-                href={settings.playStoreUrl}
+                href={playStore}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-xs font-semibold text-white"
@@ -216,7 +220,7 @@ export default async function Footer() {
       <div className="border-t border-white/20 relative z-10 bg-black/10">
         <div className="container-msari py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-white text-sm text-center font-medium">
-            © {new Date().getFullYear()} جميع الحقوق محفوظة لـ مساري لخدمات السفر والسياحة.
+            © {new Date().getFullYear()} {copyright}
           </p>
           <div className="flex items-center gap-8">
             <Link href="/privacy" className="text-white hover:text-white/80 text-xs transition-colors font-semibold">

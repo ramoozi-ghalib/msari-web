@@ -149,15 +149,18 @@ export default function FlightsClient({
       {/* ─── Features ─── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {DEFAULT_FEATURES.map((f, idx) => (
-            <div key={idx} className="bg-white rounded-3xl p-6 border border-neutral-100 shadow-sm text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#23096e]/10 text-[#23096e] flex items-center justify-center mx-auto mb-4">
-                <f.icon size={24} />
+          {((pageContent?.features && pageContent.features.length > 0) ? pageContent.features : DEFAULT_FEATURES).map((f: any, idx: number) => {
+            const Icon = f.icon && typeof f.icon !== 'string' ? f.icon : DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
+            return (
+              <div key={idx} className="bg-white rounded-3xl p-6 border border-neutral-100 shadow-sm text-center">
+                <div className="w-12 h-12 rounded-2xl bg-[#23096e]/10 text-[#23096e] flex items-center justify-center mx-auto mb-4">
+                  <Icon size={24} />
+                </div>
+                <h3 className="font-black text-neutral-900 mb-2">{f.title}</h3>
+                <p className="text-xs text-neutral-500 font-medium leading-relaxed">{f.desc}</p>
               </div>
-              <h3 className="font-black text-neutral-900 mb-2">{f.title}</h3>
-              <p className="text-xs text-neutral-500 font-medium leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

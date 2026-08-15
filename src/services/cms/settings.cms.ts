@@ -20,11 +20,22 @@ const FALLBACK_SETTINGS: WebsiteSettingsData = {
   headquartersEn: "Sana'a & Aden — Yemen",
   playStoreUrl: 'https://play.google.com/store/apps/details?id=net.msari.app',
   appStoreUrl: 'https://apps.apple.com',
+  footerDescriptionAr: 'منصة السفر الأولى في اليمن — نوفر لك أفضل خيارات الإقامة والطيران وخدمات النقل بأمان وموثوقية.',
+  footerDescriptionEn: "Yemen's #1 Travel Platform — providing premium hotel bookings, flights, and transportation.",
+  copyrightTextAr: 'جميع الحقوق محفوظة لـ مساري لخدمات السفر والسياحة.',
+  copyrightTextEn: 'All rights reserved to Msari Travel & Tourism Services.',
   socialLinks: {
-    facebook: 'https://facebook.com/msari.travel',
-    instagram: 'https://instagram.com/msari.travel',
-    twitter: 'https://twitter.com/msari_travel',
+    facebook: 'https://facebook.com/msariapp',
+    instagram: 'https://instagram.com/msariapp',
+    twitter: 'https://twitter.com/msariapp',
+    linkedin: 'https://linkedin.com/company/msariapp',
   },
+  contactFaqs: [
+    { q: 'كيف يمكنني تأكيد حجزي؟', a: 'بعد إتمام الحجز، ستظهر لك صفحة تأكيد وستصلك رسالة واتساب تحتوي على تفاصيل حجزك كاملة.' },
+    { q: 'هل يمكنني إلغاء أو تعديل الحجز؟', a: 'نعم، يمكنك التواصل معنا عبر واتساب وسنقوم بمساعدتك في الإلغاء أو التعديل خلال 24 ساعة.' },
+    { q: 'ما هي طرق الدفع المتاحة؟', a: 'نقبل الحوالات البنكية، الدفع عند الوصول، والدفع عبر واتساب. وجاري تفعيل الدفع الإلكتروني قريباً.' },
+    { q: 'هل تشملون فنادق خارج اليمن؟', a: 'نعم، لدينا قسم مخصص للفنادق العالمية يمكنك تصفحه والتواصل معنا للحجز المباشر.' },
+  ],
   updatedAt: null,
 };
 
@@ -47,7 +58,12 @@ async function fetchSettingsInternal(): Promise<WebsiteSettingsData> {
     headquartersEn: data.headquartersEn || FALLBACK_SETTINGS.headquartersEn,
     playStoreUrl: data.playStoreUrl || FALLBACK_SETTINGS.playStoreUrl,
     appStoreUrl: data.appStoreUrl || FALLBACK_SETTINGS.appStoreUrl,
+    footerDescriptionAr: data.footerDescriptionAr || FALLBACK_SETTINGS.footerDescriptionAr,
+    footerDescriptionEn: data.footerDescriptionEn || FALLBACK_SETTINGS.footerDescriptionEn,
+    copyrightTextAr: data.copyrightTextAr || FALLBACK_SETTINGS.copyrightTextAr,
+    copyrightTextEn: data.copyrightTextEn || FALLBACK_SETTINGS.copyrightTextEn,
     socialLinks: data.socialLinks || FALLBACK_SETTINGS.socialLinks,
+    contactFaqs: Array.isArray(data.contactFaqs) && data.contactFaqs.length > 0 ? data.contactFaqs : FALLBACK_SETTINGS.contactFaqs,
     updatedAt: data.updatedAt ? String(data.updatedAt) : null,
   };
 }

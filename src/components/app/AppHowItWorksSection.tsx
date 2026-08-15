@@ -4,38 +4,47 @@ import { Smartphone, Search, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
+  howItWorks?: Array<{
+    step?: string;
+    title: string;
+    desc: string;
+  }>;
 }
 
-export default function AppHowItWorksSection({ isEn = false }: Props) {
-  const steps = [
-    {
-      num: '01',
-      icon: Smartphone,
-      title: isEn ? '1. Download the App' : '1. حمّل التطبيق',
-      desc: isEn
-        ? 'Choose your preferred store or scan the QR code to install Msari App on your phone.'
-        : 'اختر متجرك المفضل أو امسح رمز الـ QR لتثبيت التطبيق على جوالك.',
-      color: 'bg-[#23096E]',
-    },
-    {
-      num: '02',
-      icon: Search,
-      title: isEn ? '2. Choose Destination & Hotel' : '2. اختر وجهتك وفندقك',
-      desc: isEn
-        ? 'Browse hundreds of hotel options across Aden, Sanaa, Hadramout, and all cities.'
-        : 'تصفح مئات الفنادق والخيارات في عدن، صنعاء، الحضرموت، وجميع المدن.',
-      color: 'bg-[#3A1C8F]',
-    },
-    {
-      num: '03',
-      icon: CheckCircle2,
-      title: isEn ? '3. Book & Enjoy' : '3. احجز واستمتع بتجربتك',
-      desc: isEn
-        ? 'Get instant voucher confirmation and enjoy premier 24/7 customer service.'
-        : 'احصل على تأكيد فوري لقسيمة حجزك واستمتع بخدمة عملاء متميزة.',
-      color: 'bg-[#FF3B30]',
-    },
-  ];
+const DEFAULT_STEPS = [
+  {
+    num: '01',
+    icon: Smartphone,
+    title: '1. حمّل التطبيق',
+    desc: 'اختر متجرك المفضل Google Play أو App Store لتثبيت التطبيق مجاناً على جوالك.',
+    color: 'bg-[#23096E]',
+  },
+  {
+    num: '02',
+    icon: Search,
+    title: '2. اختر وجهتك وفندقك',
+    desc: 'تصفح مئات الفنادق والخيارات وقارن الأسعار والصور المناسبة لك في جميع المدن.',
+    color: 'bg-[#3A1C8F]',
+  },
+  {
+    num: '03',
+    icon: CheckCircle2,
+    title: '3. احجز واستلم القسيمة',
+    desc: 'أكد حجزك فورياً واستلم قسيمة إقامتك المعتمدة مباشرة مع دعم فني متواصل على مدار 24/7.',
+    color: 'bg-[#FF3B30]',
+  },
+];
+
+export default function AppHowItWorksSection({ isEn = false, howItWorks }: Props) {
+  const steps = (howItWorks && howItWorks.length > 0)
+    ? howItWorks.map((s, idx) => ({
+        num: s.step || `0${idx + 1}`,
+        icon: DEFAULT_STEPS[idx % DEFAULT_STEPS.length].icon,
+        title: s.title,
+        desc: s.desc,
+        color: DEFAULT_STEPS[idx % DEFAULT_STEPS.length].color,
+      }))
+    : DEFAULT_STEPS;
 
   return (
     <section className="py-20 lg:py-28 bg-[#F4F2F8] text-slate-900 relative">
@@ -49,6 +58,11 @@ export default function AppHowItWorksSection({ isEn = false }: Props) {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E]">
             {isEn ? 'How to Get Started in 3 Easy Steps?' : 'كيف تبدأ في 3 خطوات بسيطة؟'}
           </h2>
+          <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
+            {isEn
+              ? 'From search to confirmed reservation with full peace of mind in less than a minute.'
+              : 'من البحث وحتى استلام القسيمة وتأكيد الحجز بكل سهولة وسرعة.'}
+          </p>
         </div>
 
         {/* Steps Grid */}
@@ -58,25 +72,26 @@ export default function AppHowItWorksSection({ isEn = false }: Props) {
             return (
               <div
                 key={idx}
-                className="relative bg-white border border-slate-200/90 rounded-3xl p-8 text-center space-y-5 hover:border-[#23096E]/40 transition-all duration-300 transform hover:-translate-y-2 shadow-md hover:shadow-xl hover:shadow-[#23096E]/10"
+                className="relative bg-white border border-slate-200/90 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-center space-y-6 flex flex-col items-center justify-between"
               >
-                {/* Step Badge & Icon */}
-                <div className="relative inline-flex items-center justify-center">
-                  <div className={`w-16 h-16 rounded-2xl ${step.color} text-white flex items-center justify-center shadow-lg`}>
-                    <Icon className="w-8 h-8" />
-                  </div>
-                  <span className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#23096E] text-white text-xs font-black flex items-center justify-center shadow">
-                    {step.num}
-                  </span>
+                {/* Step Number Bubble */}
+                <div className={`w-14 h-14 rounded-2xl ${step.color} text-white font-black text-xl flex items-center justify-center shadow-md`}>
+                  {step.num}
                 </div>
 
-                <h3 className="text-xl font-black text-[#23096E]">
-                  {step.title}
-                </h3>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-black text-slate-900">
+                    {step.title}
+                  </h3>
+                  <p className="text-[#423861] text-sm leading-relaxed font-semibold">
+                    {step.desc}
+                  </p>
+                </div>
 
-                <p className="text-slate-600 text-sm leading-relaxed font-bold">
-                  {step.desc}
-                </p>
+                {/* Sub Icon Footer */}
+                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                  <Icon size={20} />
+                </div>
               </div>
             );
           })}
