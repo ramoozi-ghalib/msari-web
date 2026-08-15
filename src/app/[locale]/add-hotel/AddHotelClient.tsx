@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Hotel, MapPin, Phone, Mail, User, Send, CheckCircle, Building2, Star, AlertCircle, Loader2 } from 'lucide-react';
+import { Hotel, User, Send, CheckCircle, Building2, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 const cities = ['صنعاء', 'عدن', 'مأرب', 'المكلا', 'تعز', 'الحديدة', 'إب', 'ذمار', 'حضرموت', 'سيئون', 'أخرى'];
 
 const DEFAULT_BENEFITS = [
-  { emoji: '📈', title: 'أكثر حجوزات', desc: 'وصول لآلاف المسافرين شهرياً وزيادة نسبة الإشغال على مدار العام' },
-  { emoji: '💰', title: 'عمولة منخفضة', desc: 'أفضل شروط عمولة تنافسية في السوق اليمني مع تسويات سريعة' },
+  { emoji: '📈', title: 'أكثر حجوزات', desc: 'وصول لآلاف المسافرين شهرياً' },
+  { emoji: '💰', title: 'عمولة منخفضة', desc: 'أفضل شروط إذا قارنت بالمنافسين' },
 ];
 
 export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
@@ -20,15 +20,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
   const [form, setForm] = useState({
     hotelName: '',
     city: '',
-    address: '',
     stars: '3',
+    address: '',
+    rooms: '',
+    suites: '',
+    amenities: '',
     ownerName: '',
     position: '',
     phone: '',
     email: '',
-    rooms: '',
-    suites: '0',
-    amenities: '',
     message: '',
   });
 
@@ -38,21 +38,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
     e.preventDefault();
     setErrorMsg(null);
 
-    // Strict validation
+    // Validate required fields
     if (
       !form.hotelName.trim() ||
       !form.city.trim() ||
-      !form.address.trim() ||
       !form.ownerName.trim() ||
       !form.position.trim() ||
-      !form.phone.trim() ||
-      !form.email.trim() ||
-      !form.rooms.trim() ||
-      !form.suites.trim() ||
-      !form.amenities.trim() ||
-      !form.message.trim()
+      !form.phone.trim()
     ) {
-      setErrorMsg('يرجى ملء جميع الحقول المطلوبة قبل إرسال الطلب.');
+      setErrorMsg('يرجى ملء جميع الحقول المطلوبة الإلزامية (*) قبل إرسال الطلب.');
       return;
     }
 
@@ -61,7 +55,20 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
       const res = await fetch('/api/partners/hotel-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          hotelName: form.hotelName,
+          city: form.city,
+          address: form.address || form.city,
+          stars: form.stars || '3',
+          ownerName: form.ownerName,
+          position: form.position,
+          phone: form.phone,
+          email: form.email || `${form.phone.replace(/[^0-9]/g, '')}@msari.partner`,
+          rooms: form.rooms || '10',
+          suites: form.suites || '0',
+          amenities: form.amenities || 'مرافق وخدمات فندقية',
+          message: form.message || 'طلب انضمام جديد عبر الموقع',
+        }),
       });
 
       const data = await res.json();
@@ -83,7 +90,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
   const subtitle = pageContent?.hero?.subtitle || 'اعرض فندقك أمام آلاف المسافرين يومياً واحصل على حجوزات أكثر';
   const benefits = (pageContent?.benefits && pageContent.benefits.length > 0) ? pageContent.benefits : DEFAULT_BENEFITS;
   const formTitle = pageContent?.formHeader?.title || 'نموذج تقديم الطلب';
-  const formSubtitle = pageContent?.formHeader?.subtitle || 'أملأ البيانات وسيتواصل معك فريقنا خلال ٢٤ ساعة لمراجعة الطلب وإتمام الربط.';
+  const formSubtitle = pageContent?.formHeader?.subtitle || 'أملأ البيانات وسيتواصل معك فريقنا خلال ٢٤ ساعة لمراجعة الطلب';
   const successTitle = pageContent?.successState?.title || 'تم إرسال الطلب بنجاح!';
   const successDesc = pageContent?.successState?.desc || 'تم استلام طلبك بنجاح. سيتواصل معك فريقنا خلال ٢٤ ساعة لمراجعة الطلب وإتمام الإجراءات.';
   const successBtnText = pageContent?.successState?.buttonText || 'إرسال طلب آخر';
@@ -113,15 +120,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               setForm({
                 hotelName: '',
                 city: '',
-                address: '',
                 stars: '3',
+                address: '',
+                rooms: '',
+                suites: '',
+                amenities: '',
                 ownerName: '',
                 position: '',
                 phone: '',
                 email: '',
-                rooms: '',
-                suites: '0',
-                amenities: '',
                 message: '',
               });
             }}
@@ -177,28 +184,28 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Hotel Info */}
-            <div className="pb-5 border-b border-neutral-100">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* معلومات الفندق */}
+            <div className="pb-4 border-b border-neutral-100">
               <h3 className="font-black text-neutral-800 mb-4 flex items-center gap-2">
                 <Hotel size={18} className="text-[var(--brand-primary)]" /> معلومات الفندق
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-neutral-700 mb-1.5">اسم الفندق *</label>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">اسم الفندق *</label>
                   <input
                     type="text"
+                    placeholder="مثال: فندق الأمل"
                     required
                     value={form.hotelName}
                     onChange={e => set('hotelName', e.target.value)}
-                    placeholder="مثال: فندق التاج الذهبي"
                     className="input-msari"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">المدينة *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">المدينة *</label>
                     <select
                       required
                       value={form.city}
@@ -210,171 +217,150 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">تصنيف النجوم *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">التصنيف (نجوم)</label>
                     <select
-                      required
                       value={form.stars}
                       onChange={e => set('stars', e.target.value)}
                       className="input-msari"
                     >
-                      {['1', '2', '3', '4', '5'].map(s => (
-                        <option key={s} value={s}>{s} {s === '1' ? 'نجمة' : 'نجوم'}</option>
-                      ))}
+                      <option value="1">1 نجوم ⭐</option>
+                      <option value="2">2 نجوم ⭐⭐</option>
+                      <option value="3">3 نجوم ⭐⭐⭐</option>
+                      <option value="4">4 نجوم ⭐⭐⭐⭐</option>
+                      <option value="5">5 نجوم ⭐⭐⭐⭐⭐</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-neutral-700 mb-1.5">العنوان بالتفصيل *</label>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">العنوان التفصيلي</label>
                   <input
                     type="text"
-                    required
+                    placeholder="الحي / الشارع / المجاور"
                     value={form.address}
                     onChange={e => set('address', e.target.value)}
-                    placeholder="الشارع، الحي، أقرب معلم"
+                    className="input-msari"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">عدد الغرف</label>
+                    <input
+                      type="number"
+                      placeholder="مثال: 30"
+                      min="1"
+                      value={form.rooms}
+                      onChange={e => set('rooms', e.target.value)}
+                      className="input-msari"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">عدد الأجنحة</label>
+                    <input
+                      type="number"
+                      placeholder="مثال: 5"
+                      min="0"
+                      value={form.suites}
+                      onChange={e => set('suites', e.target.value)}
+                      className="input-msari"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">المرافق والخدمات</label>
+                  <input
+                    type="text"
+                    placeholder="مثال: واي فاي، مسبح، مطعم، موقف سيارات"
+                    value={form.amenities}
+                    onChange={e => set('amenities', e.target.value)}
                     className="input-msari"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Contact Info */}
-            <div className="pb-5 border-b border-neutral-100">
+            {/* معلومات التواصل */}
+            <div className="pb-4">
               <h3 className="font-black text-neutral-800 mb-4 flex items-center gap-2">
-                <User size={18} className="text-[var(--brand-primary)]" /> بيانات المسؤول
+                <User size={18} className="text-[var(--brand-primary)]" /> معلومات التواصل
               </h3>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">اسم المسؤول *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">اسم المسؤول (مقدم الطلب) *</label>
                     <input
                       type="text"
+                      placeholder="اسمك الكامل"
                       required
                       value={form.ownerName}
                       onChange={e => set('ownerName', e.target.value)}
-                      placeholder="الاسم الكامل"
                       className="input-msari"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">المسمى الوظيفي *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">الصفة *</label>
                     <input
                       type="text"
+                      placeholder="مالك / مدير / مسؤول حجوزات"
                       required
                       value={form.position}
                       onChange={e => set('position', e.target.value)}
-                      placeholder="المدير العام، مسؤول الحجوزات..."
                       className="input-msari"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">رقم الهاتف / واتساب *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">رقم الهاتف *</label>
                     <input
                       type="tel"
+                      placeholder="+967 7XX"
                       required
+                      dir="ltr"
                       value={form.phone}
                       onChange={e => set('phone', e.target.value)}
-                      placeholder="777000000"
-                      dir="ltr"
-                      className="input-msari text-right"
+                      className="input-msari"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">البريد الإلكتروني *</label>
+                    <label className="block text-sm font-semibold text-neutral-700 mb-2">البريد الإلكتروني</label>
                     <input
                       type="email"
-                      required
+                      placeholder="hotel@email.com"
+                      dir="ltr"
                       value={form.email}
                       onChange={e => set('email', e.target.value)}
-                      placeholder="hotel@example.com"
-                      dir="ltr"
-                      className="input-msari text-right"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Capacity & Details */}
-            <div className="pb-5 border-b border-neutral-100">
-              <h3 className="font-black text-neutral-800 mb-4 flex items-center gap-2">
-                <Building2 size={18} className="text-[var(--brand-primary)]" /> سعة الفندق ومرافقه
-              </h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">عدد الغرف *</label>
-                    <input
-                      type="number"
-                      min="1"
-                      required
-                      value={form.rooms}
-                      onChange={e => set('rooms', e.target.value)}
-                      placeholder="مثال: 40"
-                      className="input-msari"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-neutral-700 mb-1.5">عدد الأجنحة *</label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={form.suites}
-                      onChange={e => set('suites', e.target.value)}
-                      placeholder="0 إذا لم يتوفر"
                       className="input-msari"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-neutral-700 mb-1.5">أهم المرافق والخدمات *</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.amenities}
-                    onChange={e => set('amenities', e.target.value)}
-                    placeholder="واي فاي مجاني، مسبح، مطعم، موقف سيارات، مصعد..."
-                    className="input-msari"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-neutral-700 mb-1.5">رسالة أو ملاحظات إضافية *</label>
+                  <label className="block text-sm font-semibold text-neutral-700 mb-2">رسالة إضافية</label>
                   <textarea
-                    required
+                    placeholder="أي تفاصيل إضافية تريد إخبارنا بها..."
                     rows={3}
                     value={form.message}
                     onChange={e => set('message', e.target.value)}
-                    placeholder="أي معلومات إضافية ترغب في مشاركتها معنا بخصوص الفندق أو عروض الأسعار"
                     className="input-msari resize-none"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Submit Button */}
             <Button
               type="submit"
               variant="primary"
               size="lg"
+              fullWidth
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-base font-black shadow-lg shadow-[#23096e]/20"
+              icon={isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  جاري إرسال الطلب...
-                </>
-              ) : (
-                <>
-                  <Send size={18} />
-                  إرسال طلب الشراكة
-                </>
-              )}
+              {isSubmitting ? 'جاري إرسال الطلب...' : 'إرسال الطلب'}
             </Button>
           </form>
         </div>

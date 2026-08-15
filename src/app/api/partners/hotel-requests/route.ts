@@ -12,16 +12,16 @@ import { db } from '@/lib/firebase-admin';
 const hotelPartnerSchema = z.object({
   hotelName: z.string().min(2, 'اسم الفندق مطلوب'),
   city: z.string().min(2, 'المدينة مطلوبة'),
-  address: z.string().min(3, 'العنوان بالتفصيل مطلوب'),
-  stars: z.string().min(1, 'تصنيف النجوم مطلوب'),
+  address: z.string().optional().default(''),
+  stars: z.string().optional().default('3'),
   ownerName: z.string().min(2, 'اسم المسؤول مطلوب'),
   position: z.string().min(2, 'المسمى الوظيفي مطلوب'),
   phone: z.string().min(6, 'رقم الهاتف مطلوب'),
-  email: z.string().email('البريد الإلكتروني غير صالح').or(z.string().min(3)),
-  rooms: z.string().min(1, 'عدد الغرف مطلوب'),
-  suites: z.string().min(1, 'عدد الأجنحة مطلوب'),
-  amenities: z.string().min(2, 'المرافق والخدمات مطلوبة'),
-  message: z.string().min(2, 'الرسالة أو الملاحظات مطلوبة'),
+  email: z.string().optional().default(''),
+  rooms: z.string().optional().default(''),
+  suites: z.string().optional().default('0'),
+  amenities: z.string().optional().default(''),
+  message: z.string().optional().default(''),
 });
 
 export async function POST(req: NextRequest) {
