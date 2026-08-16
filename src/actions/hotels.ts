@@ -214,19 +214,21 @@ export async function getHotelBySlug(slug: string): Promise<Hotel | null> {
 
       roomsSnapshot.docs.filter(rdoc => rdoc.data().isDeleted !== true).forEach(rdoc => {
         const rdata = rdoc.data();
+        const rawFeatures = rdata.features || rdata.amenities || [];
         rooms.push(mapApiRoomToRoom({
           id: rdoc.id,
           hotelId: foundDoc.id,
           name: rdata.name || { ar: '', en: '' },
           description: rdata.description || { ar: '', en: '' },
           price: Number(rdata.price || rdata.pricePerNight || 0),
-          numberOfPersons: Number(rdata.capacity || rdata.maxGuests || rdata.numberOfPersons || 2),
+          numberOfPersons: Number(rdata.numberOfPersons || rdata.capacity || rdata.maxGuests || 2),
           numberOfBeds: Number(rdata.numberOfBeds || 1),
           numberOfBathrooms: Number(rdata.numberOfBathrooms || 1),
           numberOfRooms: Number(rdata.numberOfRooms || 1),
+          area: rdata.area || rdata.roomArea || rdata.space,
           images: rdata.images || (rdata.mainImageUrl ? [rdata.mainImageUrl] : []),
           mainImageUrl: rdata.mainImageUrl || '',
-          features: mapAmenitiesToDTO(rdata.amenities),
+          features: mapAmenitiesToDTO(rawFeatures),
           isPublished: rdata.isPublished !== false,
           updatedAt: rdata.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
           isDeleted: rdata.isDeleted || false,

@@ -9,7 +9,8 @@ import {
   Calendar, Users, Check, ArrowRight, BedDouble,
   ChevronLeft, ChevronRight as ChevronR, Clock,
   Sofa, Wind, Tv, Shield, Shirt, Coffee, HelpCircle,
-  ShoppingBag, Bell, ArrowUpDown, Key, Dumbbell
+  ShoppingBag, Bell, ArrowUpDown, Key, Dumbbell,
+  Bath, Eye, Maximize2, DoorOpen
 } from 'lucide-react';
 import type { Hotel, Room } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
@@ -23,24 +24,35 @@ const FALLBACK_SLIDES = [
 ];
 
 const AMENITY_CFG: Record<string, { icon: React.ReactNode; color: string }> = {
-  wifi:           { icon: <Wifi size={18}/>,         color: '#23096e' },
-  pool:           { icon: <Waves size={18}/>,        color: '#0284c7' },
-  utensils:       { icon: <Utensils size={18}/>,     color: '#d97706' },
-  restaurant:     { icon: <Utensils size={18}/>,     color: '#d97706' },
-  parking:        { icon: <Car size={18}/>,          color: '#16a34a' },
-  tv:             { icon: <Tv size={18}/>,           color: '#8b5cf6' },
-  wind:           { icon: <Wind size={18}/>,         color: '#0ea5e9' },
-  waves:          { icon: <Waves size={18}/>,        color: '#0284c7' },
-  sofa:           { icon: <Sofa size={18}/>,         color: '#f59e0b' },
-  grocery:        { icon: <ShoppingBag size={18}/>,  color: '#e11d48' },
-  cafe:           { icon: <Coffee size={18}/>,        color: '#b45309' },
-  security:       { icon: <Shield size={18}/>,       color: '#059669' },
-  room_service:   { icon: <Bell size={18}/>,         color: '#6d28d9' },
-  laundry:        { icon: <Shirt size={18}/>,        color: '#4f46e5' },
-  elevator:       { icon: <ArrowUpDown size={18}/>,  color: '#0891b2' },
-  majlis_terrace: { icon: <Sofa size={18}/>,         color: '#b45309' },
-  gym:            { icon: <Dumbbell size={18}/>,     color: '#db2777' },
-  reception:      { icon: <Key size={18}/>,          color: '#475569' },
+  internet:         { icon: <Wifi size={18}/>,         color: '#23096e' },
+  wifi:             { icon: <Wifi size={18}/>,         color: '#23096e' },
+  air_conditioning: { icon: <Wind size={18}/>,         color: '#0ea5e9' },
+  wind:             { icon: <Wind size={18}/>,         color: '#0ea5e9' },
+  smart_tv:         { icon: <Tv size={18}/>,           color: '#8b5cf6' },
+  tv:               { icon: <Tv size={18}/>,           color: '#8b5cf6' },
+  fridge:           { icon: <Coffee size={18}/>,       color: '#b45309' },
+  dining_table:     { icon: <Utensils size={18}/>,     color: '#d97706' },
+  wardrobe:         { icon: <Shirt size={18}/>,        color: '#4f46e5' },
+  city_view:        { icon: <Eye size={18}/>,          color: '#0284c7' },
+  hair_dryer:       { icon: <Wind size={18}/>,         color: '#ec4899' },
+  electric_kettle:  { icon: <Coffee size={18}/>,       color: '#d97706' },
+  bathtub:          { icon: <Bath size={18}/>,         color: '#06b6d4' },
+  bath:             { icon: <Bath size={18}/>,         color: '#06b6d4' },
+  pool:             { icon: <Waves size={18}/>,        color: '#0284c7' },
+  utensils:         { icon: <Utensils size={18}/>,     color: '#d97706' },
+  restaurant:       { icon: <Utensils size={18}/>,     color: '#d97706' },
+  parking:          { icon: <Car size={18}/>,          color: '#16a34a' },
+  waves:            { icon: <Waves size={18}/>,        color: '#0284c7' },
+  sofa:             { icon: <Sofa size={18}/>,         color: '#f59e0b' },
+  grocery:          { icon: <ShoppingBag size={18}/>,  color: '#e11d48' },
+  cafe:             { icon: <Coffee size={18}/>,        color: '#b45309' },
+  security:         { icon: <Shield size={18}/>,       color: '#059669' },
+  room_service:     { icon: <Bell size={18}/>,         color: '#6d28d9' },
+  laundry:          { icon: <Shirt size={18}/>,        color: '#4f46e5' },
+  elevator:         { icon: <ArrowUpDown size={18}/>,  color: '#0891b2' },
+  majlis_terrace:   { icon: <Sofa size={18}/>,         color: '#b45309' },
+  gym:              { icon: <Dumbbell size={18}/>,     color: '#db2777' },
+  reception:        { icon: <Key size={18}/>,          color: '#475569' },
 };
 
 interface Props {
@@ -204,44 +216,106 @@ export default function RoomDetailClient({ hotel, room }: Props) {
 
             {/* Description & Specs */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100">
-              <h2 className="text-lg font-black text-neutral-900 mb-4">وصف الغرفة</h2>
-              <p className="text-neutral-500 leading-8 text-[15px] mb-8">{room.description}</p>
+              {room.description ? (
+                <>
+                  <h2 className="text-lg font-black text-neutral-900 mb-3">وصف الغرفة</h2>
+                  <p className="text-neutral-600 leading-8 text-[15px] mb-8 whitespace-pre-line">{room.description}</p>
+                </>
+              ) : null}
 
-              <h2 className="text-lg font-black text-neutral-900 mb-4 pt-4 border-t border-neutral-100">تفاصيل المساحة والسعة</h2>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center justify-center flex-col sm:flex-row gap-3 bg-neutral-50 rounded-xl px-5 py-4 border border-neutral-100 flex-1 min-w-[200px]">
-                  <Users size={20} className="text-[#23096e]" />
-                  <span className="text-sm font-bold text-neutral-800 text-center">السعة {room.capacity} {room.capacity === 1 ? 'ضيف' : 'ضيوف'}</span>
+              <h2 className={`text-lg font-black text-neutral-900 mb-4 ${room.description ? 'pt-6 border-t border-neutral-100' : ''}`}>تفاصيل المساحة والسعة</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                {/* 1. Capacity */}
+                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                    <Users size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-400 font-medium">السعة</div>
+                    <div className="text-sm font-bold text-neutral-900">{room.capacity} {room.capacity === 1 ? 'نزيل' : 'نزلاء'}</div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-center flex-col sm:flex-row gap-3 bg-neutral-50 rounded-xl px-5 py-4 border border-neutral-100 flex-1 min-w-[200px]">
-                  <BedDouble size={20} className="text-[#23096e]" />
-                  <span className="text-sm font-bold text-neutral-800 text-center">سرير مريح</span>
+
+                {/* 2. Beds */}
+                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                    <BedDouble size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-400 font-medium">الأسرة</div>
+                    <div className="text-sm font-bold text-neutral-900">
+                      {room.numberOfBeds && room.numberOfBeds > 1 ? `${room.numberOfBeds} أسرة` : '1 سرير'}
+                    </div>
+                  </div>
                 </div>
-                {room.name.includes('جناح') && (
-                  <div className="flex items-center justify-center flex-col sm:flex-row gap-3 bg-neutral-50 rounded-xl px-5 py-4 border border-neutral-100 w-full">
-                    <Sofa size={20} className="text-[#23096e]" />
-                    <span className="text-sm font-bold text-neutral-800 text-center">جناح مقسم: غرفة معيشة + غرفة نوم</span>
+
+                {/* 3. Bathrooms */}
+                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                    <Bath size={18} />
+                  </div>
+                  <div>
+                    <div className="text-xs text-neutral-400 font-medium">دورات المياه</div>
+                    <div className="text-sm font-bold text-neutral-900">
+                      {room.numberOfBathrooms && room.numberOfBathrooms > 1 ? `${room.numberOfBathrooms} حمامات` : '1 حمام خاص'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Rooms or Area */}
+                {room.numberOfRooms && room.numberOfRooms > 1 ? (
+                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                      <DoorOpen size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-neutral-400 font-medium">الغرف</div>
+                      <div className="text-sm font-bold text-neutral-900">{room.numberOfRooms} غرف نوم</div>
+                    </div>
+                  </div>
+                ) : room.area ? (
+                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                      <Maximize2 size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-neutral-400 font-medium">المساحة</div>
+                      <div className="text-sm font-bold text-neutral-900">{room.area} م²</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
+                      <DoorOpen size={18} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-neutral-400 font-medium">الغرف</div>
+                      <div className="text-sm font-bold text-neutral-900">غرفة واحدة</div>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Amenities Specific to Room */}
-            {room.amenities?.length > 0 && (
+            {room.amenities && room.amenities.length > 0 && (
               <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100">
-                <h2 className="text-lg font-black text-neutral-900 mb-5">تجهيزات الغرفة</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {room.amenities.map(a => {
-                    const cfg = AMENITY_CFG[a.icon] ?? { icon: <Check size={18}/>, color: '#23096e' };
+                <h2 className="text-lg font-black text-neutral-900 mb-5">تجهيزات ومرافق الغرفة</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                  {room.amenities.map((a, idx) => {
+                    const iconKey = (a.icon || '').toLowerCase();
+                    const cfg = AMENITY_CFG[iconKey] ?? { icon: <Check size={18}/>, color: '#23096e' };
                     return (
-                      <div key={a.id} className="flex items-center gap-4 p-4 rounded-xl border border-neutral-100 bg-neutral-50 hover:border-[#23096e]/20 transition-colors">
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                      <div key={a.id || idx} className="flex items-center gap-3 p-3.5 rounded-2xl border border-neutral-100 bg-neutral-50 hover:border-[#23096e]/20 transition-all">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
                           style={{ backgroundColor: `${cfg.color}14`, color: cfg.color }}>
                           {cfg.icon}
                         </div>
-                        <div>
-                          <p className="font-semibold text-sm text-neutral-800">{a.name}</p>
-                          <p className="text-xs text-neutral-400">{a.nameEn}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm text-neutral-800 truncate">{a.name}</p>
+                          {a.nameEn && a.nameEn !== a.name && (
+                            <p className="text-xs text-neutral-400 truncate">{a.nameEn}</p>
+                          )}
                         </div>
                       </div>
                     );

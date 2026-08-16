@@ -44,6 +44,10 @@ export interface Room {
   nameEn: string;
   description: string;
   capacity: number;
+  numberOfBeds?: number;
+  numberOfBathrooms?: number;
+  numberOfRooms?: number;
+  area?: number | string;
   pricePerNight: number;
   images: string[];
   amenities: Amenity[];

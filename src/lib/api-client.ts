@@ -133,18 +133,29 @@ export function mapApiCityToCity(api: any, hotelCount = 0): City {
   };
 }
 
-export function mapApiRoomToRoom(api: ApiRoom): Room {
+export function mapApiRoomToRoom(api: any): Room {
+  const nameAr = typeof api.name === 'object' && api.name !== null ? (api.name.ar || api.name.en || '') : String(api.name || '');
+  const nameEn = typeof api.name === 'object' && api.name !== null ? (api.name.en || api.name.ar || '') : String(api.name || '');
+  const descAr = typeof api.description === 'object' && api.description !== null ? (api.description.ar || api.description.en || '') : String(api.description || '');
+
+  const rawFeatures = Array.isArray(api.features) ? api.features : (Array.isArray(api.amenities) ? api.amenities : []);
+  const amenities = rawFeatures.map((f: any) => mapApiAmenityToAmenity(f, 'room'));
+
   return {
     id: api.id,
     hotelId: api.hotelId,
-    name: api.name.ar,
-    nameEn: api.name.en,
-    description: api.description.ar,
-    capacity: api.numberOfPersons || 2,
-    pricePerNight: api.price,
+    name: nameAr || 'غرفة',
+    nameEn: nameEn || 'Room',
+    description: descAr,
+    capacity: Number(api.numberOfPersons || api.capacity || api.maxGuests || 2),
+    numberOfBeds: Number(api.numberOfBeds || 1),
+    numberOfBathrooms: Number(api.numberOfBathrooms || 1),
+    numberOfRooms: Number(api.numberOfRooms || 1),
+    area: api.area || api.roomArea || api.space || undefined,
+    pricePerNight: Number(api.price || api.pricePerNight || 0),
     images: api.images && api.images.length > 0 ? api.images : [api.mainImageUrl].filter(Boolean),
-    amenities: (api.features || []).map((f) => mapApiAmenityToAmenity(f, 'room')),
-    isAvailable: !api.isDeleted && api.isPublished,
+    amenities,
+    isAvailable: !api.isDeleted && api.isPublished !== false,
   };
 }
 
