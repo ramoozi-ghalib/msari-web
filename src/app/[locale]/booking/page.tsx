@@ -212,12 +212,13 @@ export default async function Page(props: {
   try {
     const snap = await db.collection('bank_accounts')
       .where('isActive', '==', true)
-      .orderBy('sortOrder', 'asc')
       .get();
-    bankAccounts = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    bankAccounts = snap.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
   } catch (error) {
     console.error('Error fetching bank accounts from Firestore:', error);
   }
