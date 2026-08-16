@@ -288,6 +288,8 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
             transferAmount: input.transferAmount || null,
             transferCurrencyCode: input.transferCurrencyCode || null,
             transferToNumber: input.transferToNumber || '',
+            source: 'website',
+            platform: 'web',
           },
           { Authorization: `Bearer ${callerUser.firebaseToken}` }
         );
@@ -395,12 +397,32 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         }, { merge: true });
 
+        // Helper to extract clean single-string Arabic or localized text matching Flutter model
+        const resolvePlainString = (val: any): string => {
+          if (!val) return '';
+          if (typeof val === 'string') return val.trim();
+          if (typeof val === 'object') {
+            if (typeof val.ar === 'string' && val.ar.trim().length > 0) return val.ar.trim();
+            if (typeof val.name === 'string' && val.name.trim().length > 0) return val.name.trim();
+            if (typeof val.en === 'string' && val.en.trim().length > 0) return val.en.trim();
+            if (typeof val.title === 'string' && val.title.trim().length > 0) return val.title.trim();
+          }
+          return String(val).trim();
+        };
+
+        const resolvedHotelName = resolvePlainString(hotelData.name || hotelData.nameAr || hotelData.title || 'فندق');
+        const resolvedHotelAddress = resolvePlainString(hotelData.address || hotelData.location || hotelData.city || '');
+        const resolvedRoomName = resolvePlainString(roomData?.name || roomData?.nameAr || roomData?.title || 'غرفة');
+
         // Set booking entry snapshot
         transaction.set(bookingEntryRef, {
           id: bookingNumber,
           bookingNumber,
           bookingType: 'hotel',
           status: 'pending',
+          source: 'website',
+          platform: 'web',
+          bookingSource: 'website',
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           customerId: userId,
@@ -411,13 +433,13 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           },
           hotel: {
             id: input.hotelId,
-            name: hotelData.name || { ar: hotelData.nameAr || hotelData.title || '', en: hotelData.nameEn || hotelData.titleEn || '' },
-            location: hotelData.address || { ar: '', en: '' },
+            name: resolvedHotelName,
+            location: resolvedHotelAddress,
             imageUrl: hotelData.images?.[0] || hotelData.thumbnail || hotelData.imageUrl || '',
           },
           room: {
             id: input.roomId || '',
-            name: roomData?.name || { ar: roomData?.nameAr || roomData?.title || '', en: roomData?.nameEn || roomData?.titleEn || '' },
+            name: resolvedRoomName,
             priceUsd: roomPriceUsd,
           },
           stay: {
@@ -458,10 +480,12 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           customerId: userId,
           hotelId: input.hotelId,
           roomId: input.roomId || '',
-          titleAr: 'حجز فندقي جديد',
-          titleEn: 'New hotel booking',
-          messageAr: `تم إرسال حجز جديد رقم ${bookingNumber}`,
-          messageEn: `A new booking #${bookingNumber} has been submitted`,
+          source: 'website',
+          platform: 'web',
+          titleAr: 'حجز فندقي جديد (الموقع الإلكتروني)',
+          titleEn: 'New hotel booking (Website)',
+          messageAr: `تم إرسال حجز جديد رقم ${bookingNumber} عبر الموقع الإلكتروني`,
+          messageEn: `A new booking #${bookingNumber} has been submitted via website`,
           isRead: false,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
