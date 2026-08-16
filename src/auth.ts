@@ -116,6 +116,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             id: 'admin-1',
             email: 'ramoozi.ghalib@msari.net',
             name: 'رمزي غالب',
+            phone: '+967 733 644 466',
             role: 'ADMIN' as UserRole,
             token: 'dev-admin-token',
           };
@@ -128,6 +129,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               id: apiRes.data.id,
               email: apiRes.data.email,
               name: apiRes.data.name,
+              phone: apiRes.data.phone || '',
               role: apiRes.data.role as UserRole,
               token: apiRes.data.token,
             };
@@ -153,6 +155,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.id = user.id;
         token.role = user.role;
         token.firebaseToken = user.token;
+        token.phone = user.phone;
       }
       return token;
     },
@@ -164,6 +167,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
         session.user.firebaseToken = token.firebaseToken as string;
+        session.user.phone = (token.phone as string) || '';
       }
       return session;
     },

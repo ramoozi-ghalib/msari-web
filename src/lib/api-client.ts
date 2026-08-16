@@ -313,6 +313,7 @@ class ApiClient {
     id: string;
     email: string;
     name: string;
+    phone?: string;
     role: 'CUSTOMER' | 'ADMIN' | 'BOOKING_STAFF';
     token?: string;
   }>> {
@@ -343,6 +344,7 @@ class ApiClient {
         id: res.data.uid,
         email: res.data.email,
         name: meRes.success && meRes.data ? `${meRes.data.firstName} ${meRes.data.lastName}`.trim() || 'User' : 'User',
+        phone: meRes.success && meRes.data ? meRes.data.phoneNumber || '' : '',
         role,
         token: res.data.token,
       },
