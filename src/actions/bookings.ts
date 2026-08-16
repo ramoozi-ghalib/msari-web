@@ -262,62 +262,19 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
       mappedPaymentMethod = 'credit_card';
     }
 
-    // ── 5. Call API Endpoint (POST /v1/bookings) or Direct Firestore Transaction ──
-    let bookingData: any = null;
+    // ── 5. Execute Atomic Firestore Transaction for Website Booking ──
+    logger('info', 'Executing direct Firebase Admin atomic transaction for booking creation');
 
-    if (callerUser?.firebaseToken && callerUser.firebaseToken !== 'dev-admin-token') {
-      try {
-        const apiRes = await apiClient.post<any>(
-          '/bookings',
-          {
-            hotelId: input.hotelId,
-            roomId: input.roomId,
-            fromDate: input.checkIn,
-            toDate: input.checkOut,
-            guestsCount: input.guests,
-            nightsCount: nights,
-            bookingOwnerName: input.guestName,
-            bookingOwnerPhone: input.guestPhone,
-            paymentMethod: mappedPaymentMethod,
-            selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
-            isForAnotherGuest: input.isForAnotherGuest || false,
-            anotherGuestName: input.isForAnotherGuest ? (input.anotherGuestName || '') : '',
-            anotherGuestPhone: input.isForAnotherGuest ? (input.anotherGuestPhone || '') : '',
-            senderName: input.senderName || null,
-            senderNumber: input.senderNumber || null,
-            transferAmount: input.transferAmount || null,
-            transferCurrencyCode: input.transferCurrencyCode || null,
-            transferToNumber: input.transferToNumber || '',
-            source: 'website',
-            platform: 'web',
-          },
-          { Authorization: `Bearer ${callerUser.firebaseToken}` }
-        );
+    const userId = callerUser?.id || (session?.user?.id as string) || 'guest_user';
+    const fromDateTime = new Date(input.checkIn);
+    const toDateTime = new Date(input.checkOut);
 
-        if (apiRes.success && apiRes.data) {
-          bookingData = apiRes.data;
-        } else {
-          logger('warn', 'API Endpoint returned non-success, falling back to direct Firebase Admin write', { error: apiRes.error });
-        }
-      } catch (err: any) {
-        logger('warn', 'API Endpoint call failed, falling back to direct Firebase Admin write', { err: err.message });
-      }
-    }
+    // 1. Generate standard Booking Number
+    const part1 = crypto.randomBytes(3).toString('hex').toUpperCase();
+    const part2 = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const bookingNumber = `BK-MS${part1}-${part2}`;
 
-    // Direct Firestore atomic transaction fallback
-    if (!bookingData) {
-      logger('info', 'Executing direct Firebase Admin transaction for booking creation');
-
-      const userId = callerUser?.id || (session?.user?.id as string) || 'guest_user';
-      const fromDateTime = new Date(input.checkIn);
-      const toDateTime = new Date(input.checkOut);
-
-      // 1. Generate standard Booking Number
-      const part1 = crypto.randomBytes(3).toString('hex').toUpperCase();
-      const part2 = crypto.randomBytes(2).toString('hex').toUpperCase();
-      const bookingNumber = `BK-MS${part1}-${part2}`;
-
-      // 2. Upload Receipt to Firebase Storage if provided
+    // 2. Upload Receipt to Firebase Storage if provided
       let receiptUrl = '';
       let receiptStoragePath = '';
       if (input.receiptDataUrl) {
@@ -501,8 +458,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
         };
       });
 
-      bookingData = transactionResult;
-    }
+      const bookingData = transactionResult;
 
     const finalResponse = {
       success: true as const,
