@@ -68,6 +68,7 @@ export async function registerUser(rawData: unknown) {
 }
 
 import { auth, signOut } from '@/auth';
+import { admin } from '@/lib/firebase-admin';
 
 export async function getProfile() {
   const session = await auth();
@@ -80,3 +81,61 @@ export async function getProfile() {
 export async function logoutUser() {
   await signOut({ redirectTo: '/' });
 }
+
+export async function requestPasswordReset(rawEmail: string) {
+  const email = (rawEmail || '').trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    return {
+      success: false as const,
+      error: { code: 'INVALID_EMAIL', message: 'يرجى إدخال بريد إلكتروني صالح' },
+    };
+  }
+
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
+    if (apiKey) {
+      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestType: 'PASSWORD_RESET',
+          email,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        if (data.error.message === 'EMAIL_NOT_FOUND') {
+          return {
+            success: false as const,
+            error: { code: 'EMAIL_NOT_FOUND', message: 'هذا البريد الإلكتروني غير مسجل في المنصة' },
+          };
+        }
+        return {
+          success: false as const,
+          error: { code: data.error.message, message: 'تعذر إرسال رابط الاستعادة، يرجى التحقق من البريد الإلكتروني' },
+        };
+      }
+
+      return { success: true as const };
+    }
+
+    if (admin.apps.length) {
+      await admin.auth().generatePasswordResetLink(email);
+      return { success: true as const };
+    }
+
+    return {
+      success: false as const,
+      error: { code: 'CONFIG_ERROR', message: 'تعذر معالجة الطلب حالياً، يرجى التواصل مع الدعم الفني' },
+    };
+  } catch (error: any) {
+    console.error('Error in requestPasswordReset:', error);
+    return {
+      success: false as const,
+      error: { code: 'SERVER_ERROR', message: 'حدث خطأ في الاتصال، يرجى المحاولة لاحقاً' },
+    };
+  }
+}
+
+
