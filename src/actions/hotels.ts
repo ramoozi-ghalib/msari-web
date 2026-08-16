@@ -169,17 +169,13 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
   }
 }
 
-// Admin: fetch all hotels using getLocalHotels
+// Admin/Public fetch all hotels using getLocalHotels
 export async function getHotels(params?: GetLocalHotelsParams) {
   return getLocalHotels(params);
 }
 
-export async function getHotelForAdmin(id: string): Promise<Hotel | null> {
-  const result = await getHotels({ pageSize: 100 });
-  return result.data.find(h => h.id === id) || null;
-}
-
 export async function getHotelBySlug(slug: string): Promise<Hotel | null> {
+
   try {
     const snapshot = await db.collection("hotels")
       .where("isPublished", "==", true)
@@ -208,7 +204,7 @@ export async function getHotelBySlug(slug: string): Promise<Hotel | null> {
 
     const apiCities = await CityService.getActiveCities(100);
 
-    let rooms: any[] = [];
+    const rooms: any[] = [];
     try {
       const roomsSnapshot = await db.collection("hotels")
         .doc(foundDoc.id)

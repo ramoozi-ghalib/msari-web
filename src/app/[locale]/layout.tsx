@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer';
 
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
+import { safeJsonLd } from '@/lib/sanitize';
 
 // JSON-LD structured data for SEO
 const jsonLd = {
@@ -41,7 +42,7 @@ export default async function LocaleLayout(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <ConditionalLayout
         header={<Header />}
@@ -51,7 +52,7 @@ export default async function LocaleLayout(
             href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-6 end-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110"
+            className="fixed bottom-20 lg:bottom-6 end-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110"
             aria-label="تواصل عبر واتساب"
           >
             <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">

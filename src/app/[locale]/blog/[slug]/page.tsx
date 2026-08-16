@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { sanitizeHtml, safeJsonLd } from '@/lib/sanitize';
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -65,7 +66,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     <div className="min-h-screen bg-[var(--surface-page)] pb-20">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
 
       {/* ─── Ultra-Clear Article Header ─── */}
@@ -133,7 +134,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                        prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-p:sm:text-lg prose-p:leading-8 prose-p:mb-6 prose-p:font-normal
                        prose-ul:my-6 prose-ul:space-y-3 prose-ul:list-disc prose-ul:ps-6
                        prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:text-base prose-li:sm:text-lg prose-li:leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
 
           {/* Tags */}

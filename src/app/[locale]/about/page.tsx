@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Users, Star, Shield, Zap, HeartHandshake } from 'lucide-react';
+import { PagesCmsService } from '@/services/cms';
 
 export const metadata: Metadata = {
   title: 'من نحن — مساري لخدمات السفر',
@@ -14,27 +15,16 @@ export const metadata: Metadata = {
   },
 };
 
-const values = [
-  { icon: Shield, title: 'الثقة والأمان', desc: 'نضمن لك تجربة حجز آمنة وموثوقة مع أفضل الفنادق والمزودين المعتمدين.' },
-  { icon: Zap, title: 'السرعة والسهولة', desc: 'احجز في دقائق مع واجهة سهلة الاستخدام مصممة خصيصاً للمستخدم العربي.' },
-  { icon: HeartHandshake, title: 'دعم متواصل', desc: 'فريق دعم متاح عبر واتساب لمساعدتك في أي وقت قبل وأثناء سفرك.' },
-  { icon: Star, title: 'أفضل الأسعار', desc: 'نضمن لك أفضل الأسعار مع عروض حصرية لا تجدها في أي مكان آخر.' },
-];
+const ICON_MAP: Record<string, any> = {
+  Shield,
+  Zap,
+  HeartHandshake,
+  Star,
+};
 
-const stats = [
-  { value: '+50', label: 'فندق يمني' },
-  { value: '+10', label: 'مدينة مغطاة' },
-  { value: '4.8', label: 'تقييم المستخدمين' },
-  { value: '٢٤/٧', label: 'دعم متواصل' },
-];
+export default async function AboutPage() {
+  const data = await PagesCmsService.getAboutPage();
 
-const team = [
-  { name: 'فريق التطوير', role: 'تقنية المعلومات', emoji: '💻' },
-  { name: 'فريق العمليات', role: 'إدارة الحجوزات', emoji: '📋' },
-  { name: 'فريق الدعم', role: 'خدمة العملاء', emoji: '🎧' },
-];
-
-export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[var(--surface-page)] surface-page">
 
@@ -46,13 +36,13 @@ export default function AboutPage() {
         <div className="container-msari relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-6 border border-white/20">
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            منصة السفر الأولى في اليمن
+            {data.hero.badge}
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-            من نحن
+            {data.hero.title}
           </h1>
           <p className="text-white/80 text-xl max-w-2xl mx-auto leading-relaxed">
-            مساري — رفيقك في كل سفرة، نوفر لك تجربة سفر لا مثيل لها داخل اليمن وحول العالم.
+            {data.hero.subtitle}
           </p>
         </div>
       </section>
@@ -60,7 +50,7 @@ export default function AboutPage() {
       {/* Stats */}
       <section className="container-msari -mt-10 relative z-10 mb-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((s) => (
+          {data.stats.map((s) => (
             <div key={s.label} className="bg-white rounded-2xl p-6 text-center shadow-lg border border-neutral-100 hover:shadow-xl transition-shadow duration-300">
               <div className="text-3xl font-black text-[var(--brand-primary)] mb-1">{s.value}</div>
               <div className="text-sm text-neutral-500 font-medium">{s.label}</div>
@@ -74,29 +64,27 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full text-sm font-bold mb-6">
-              قصتنا
+              {data.story.badge}
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-neutral-900 mb-6 leading-tight">
-              بدأنا بحلم بسيط: <br />
-              <span className="text-[var(--brand-primary)]">تسهيل السفر لكل يمني</span>
+              {data.story.title}
             </h2>
-            <p className="text-neutral-600 text-lg leading-relaxed mb-6">
-              مساري نشأت من رحم الحاجة الحقيقية. لاحظنا أن اليمني يجد صعوبة في إيجاد أسعار موثوقة للفنادق، وحجز تذاكر الطيران، والحصول على سيارات نقل بجودة عالية — كل هذا في مكان واحد.
-            </p>
-            <p className="text-neutral-600 text-lg leading-relaxed mb-8">
-              اليوم، نفخر بخدمة مئات المسافرين شهرياً عبر شبكة من أفضل الفنادق اليمنية والخدمات السياحية الموثوقة.
-            </p>
+            {data.story.paragraphs.map((p, idx) => (
+              <p key={idx} className="text-neutral-600 text-lg leading-relaxed mb-6">
+                {p}
+              </p>
+            ))}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-neutral-700">
                 <MapPin size={18} className="text-[var(--brand-primary)]" />
-                <span className="font-semibold">صنعاء وعدن، اليمن</span>
+                <span className="font-semibold">{data.story.locationText}</span>
               </div>
             </div>
           </div>
           <div className="relative">
             <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?q=80&w=1200&auto=format&fit=crop"
+                src={data.story.image}
                 alt="فريق مساري"
                 fill
                 className="object-cover"
@@ -109,8 +97,8 @@ export default function AboutPage() {
                   <Users size={22} className="text-white" />
                 </div>
                 <div>
-                  <div className="font-black text-neutral-900 text-lg">+5000</div>
-                  <div className="text-sm text-neutral-500">عميل راضٍ</div>
+                  <div className="font-black text-neutral-900 text-lg">{data.story.satisfiedClientsCount?.split(' ')[0] || '+5000'}</div>
+                  <div className="text-sm text-neutral-500">{data.story.satisfiedClientsCount?.split(' ').slice(1).join(' ') || 'عميل راضٍ'}</div>
                 </div>
               </div>
             </div>
@@ -122,19 +110,22 @@ export default function AboutPage() {
       <section className="bg-[var(--brand-primary)] py-24 mb-24">
         <div className="container-msari">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">قيمنا</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{data.values[0] ? 'قيمنا' : 'قيمنا'}</h2>
             <p className="text-white/70 text-lg max-w-xl mx-auto">المبادئ التي تحكم كيف نُقدم خدماتنا لكل مسافر</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((v) => (
-              <div key={v.title} className="bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 backdrop-blur-sm">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                  <v.icon size={24} className="text-white" />
+            {data.values.map((v) => {
+              const Icon = ICON_MAP[v.icon] || Shield;
+              return (
+                <div key={v.title} className="bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                    <Icon size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-white font-black text-lg mb-3">{v.title}</h3>
+                  <p className="text-white/70 text-sm leading-relaxed">{v.desc}</p>
                 </div>
-                <h3 className="text-white font-black text-lg mb-3">{v.title}</h3>
-                <p className="text-white/70 text-sm leading-relaxed">{v.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -146,7 +137,7 @@ export default function AboutPage() {
           <p className="text-neutral-500 text-lg">نخبة من المحترفين تعمل خلف الكواليس لضمان تجربتك</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {team.map((member) => (
+          {data.team.map((member) => (
             <div key={member.name} className="bg-white rounded-2xl p-8 text-center shadow-md border border-neutral-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="text-5xl mb-4">{member.emoji}</div>
               <h3 className="font-black text-neutral-900 text-xl mb-2">{member.name}</h3>
@@ -160,8 +151,8 @@ export default function AboutPage() {
       <section className="container-msari mb-24">
         <div className="bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] rounded-3xl p-12 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-          <h2 className="text-3xl font-black text-white mb-4 relative z-10">مستعد لسفرتك القادمة؟</h2>
-          <p className="text-white/80 text-lg mb-8 relative z-10">احجز الآن واستمتع بأفضل تجربة سفر في اليمن</p>
+          <h2 className="text-3xl font-black text-white mb-4 relative z-10">{data.cta?.title || 'مستعد لسفرتك القادمة؟'}</h2>
+          <p className="text-white/80 text-lg mb-8 relative z-10">{data.cta?.subtitle || 'احجز الآن واستمتع بأفضل تجربة سفر في اليمن'}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <Link href="/hotels" className="btn btn-white">
               تصفح الفنادق

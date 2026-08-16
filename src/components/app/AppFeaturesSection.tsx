@@ -4,47 +4,63 @@ import { Zap, Headphones, Layers, ShieldCheck } from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
+  features?: Array<{
+    title: string;
+    desc: string;
+    icon?: string;
+    badge?: string;
+    color?: string;
+  }>;
 }
 
-export default function AppFeaturesSection({ isEn = false }: Props) {
-  const features = [
-    {
-      icon: Zap,
-      title: isEn ? 'Fast & Effortless Booking' : 'تجربة حجز سهلة وسريعة',
-      desc: isEn
-        ? 'A smooth, intuitive interface that lets you complete your bookings in under a minute.'
-        : 'واجهة مستخدم مرنة وبسيطة تتيح لك إتمام حجوزاتك في دقيقة واحدة دون أي تعقيدات.',
-      color: 'from-[#23096E] to-[#3A1C8F]',
-      badge: isEn ? 'Speed & Precision' : 'سرعة ودقة',
-    },
-    {
-      icon: Headphones,
-      title: isEn ? '24/7 Dedicated Support' : 'دعم فني على مدار الساعة',
-      desc: isEn
-        ? 'A local expert team ready to assist you via WhatsApp and phone around the clock.'
-        : 'فريق محلي متخصص جاهز لمساعدتك عبر الواتساب والاتصال لضمان إقامة مريحة.',
-      color: 'from-[#3A1C8F] to-[#23096E]',
-      badge: isEn ? 'Yemeni Support 24/7' : 'دعم يمني 24/7',
-    },
-    {
-      icon: Layers,
-      title: isEn ? 'All-in-One Travel App' : 'تطبيق شامل ومبتكر',
-      desc: isEn
-        ? 'Book hotels, flight tickets, and car rentals across all Yemeni governorates in one place.'
-        : 'حجز فنادق، تذاكر طيران، وتأجير سيارات ونقل في جميع المحافظات من مكان واحد.',
-      color: 'from-[#FF3B30] to-[#e02d23]',
-      badge: isEn ? 'Hotels, Flights, Cars' : 'فنادق وطيران وسيارات',
-    },
-    {
-      icon: ShieldCheck,
-      title: isEn ? 'Best Price & Security Guarantee' : 'أمان وضمان أفضل سعر',
-      desc: isEn
-        ? 'Direct competitive rates with instant booking confirmation and zero hidden fees.'
-        : 'أسعار مباشرة وتنافسية مع تأكيد حجز فوري ودون أي رسوم خفية.',
-      color: 'from-emerald-600 to-teal-700',
-      badge: isEn ? 'Secured & Guaranteed' : 'أمان وضمان',
-    },
-  ];
+const DEFAULT_FEATURES = [
+  {
+    icon: Zap,
+    title: 'تجربة حجز سهلة وسريعة',
+    desc: 'واجهة مستخدم مرنة وبسيطة تتيح لك إتمام حجوزاتك في دقيقة واحدة دون أي تعقيدات.',
+    color: 'from-[#23096E] to-[#3A1C8F]',
+    badge: 'سرعة ودقة',
+  },
+  {
+    icon: Headphones,
+    title: 'دعم فني على مدار الساعة',
+    desc: 'فريق محلي متخصص جاهز لمساعدتك عبر الواتساب والاتصال لضمان إقامة مريحة.',
+    color: 'from-[#3A1C8F] to-[#23096E]',
+    badge: 'دعم يمني 24/7',
+  },
+  {
+    icon: Layers,
+    title: 'تطبيق شامل ومبتكر',
+    desc: 'حجز فنادق، تذاكر طيران، وتأجير سيارات ونقل في جميع المحافظات من مكان واحد.',
+    color: 'from-[#FF3B30] to-[#e02d23]',
+    badge: 'فنادق وطيران وسيارات',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'أمان وضمان أفضل سعر',
+    desc: 'أسعار مباشرة وتنافسية مع تأكيد حجز فوري ودون أي رسوم خفية.',
+    color: 'from-emerald-600 to-teal-700',
+    badge: 'أمان وضمان',
+  },
+];
+
+const ICON_MAP: Record<string, any> = {
+  Zap,
+  Headphones,
+  Layers,
+  ShieldCheck,
+};
+
+export default function AppFeaturesSection({ isEn = false, features }: Props) {
+  const items = (features && features.length > 0)
+    ? features.map((f, idx) => ({
+        icon: (f.icon && ICON_MAP[f.icon]) || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon,
+        title: f.title,
+        desc: f.desc,
+        color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
+        badge: f.badge || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].badge,
+      }))
+    : DEFAULT_FEATURES;
 
   return (
     <section className="py-20 lg:py-28 bg-[#F4F2F8]/70 relative overflow-hidden">
@@ -59,46 +75,48 @@ export default function AppFeaturesSection({ isEn = false }: Props) {
             {isEn ? 'Features & Benefits' : 'المميزات والفوائد'}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E]">
-            {isEn ? 'Why Choose Msari App?' : 'لماذا تختار تطبيق مساري؟'}
+            {isEn ? 'Why Choose Msari App for Your Travel?' : 'لماذا تختار تطبيق مساري لرحلاتك القادمة؟'}
           </h2>
-          <p className="text-slate-700 text-base sm:text-lg font-bold">
+          <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
             {isEn
-              ? 'Crafted to give you the fastest, easiest accommodation and travel booking experience in Yemen'
-              : 'صُمم التطبيق ليوفر لك أسهل وأسرع تجربة حجز إقامة وسفر في اليمن'}
+              ? 'Everything you need to travel across Yemen safely, smoothly, and at the best guaranteed rates.'
+              : 'كل ما تحتاجه لتجربة سفر مريحة وآمنة في اليمن وبأفضل الأسعار المضمونة.'}
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, idx) => {
-            const Icon = feature.icon;
+        {/* Features 2x2 Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {items.map((feat, idx) => {
+            const Icon = feat.icon;
             return (
               <div
                 key={idx}
-                className="group relative bg-white border border-slate-200/90 rounded-3xl p-8 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl hover:shadow-[#23096E]/10 flex flex-col justify-between"
+                className="group relative bg-white border border-slate-200/90 rounded-3xl p-8 lg:p-10 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col justify-between"
               >
-                <div>
-                  {/* Top Header Badge & Icon */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className={`p-4 rounded-2xl bg-gradient-to-br ${feature.color} text-white shadow-md group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-6 h-6" />
+                {/* Accent Top Line with Dynamic Gradient */}
+                <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${feat.color}`} />
+
+                <div className="space-y-6">
+                  {/* Badge & Icon Row */}
+                  <div className="flex items-center justify-between">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feat.color} text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                      <Icon size={28} />
                     </div>
-                    <span className="text-[11px] font-black px-3 py-1 rounded-full bg-[#F4F2F8] text-[#23096E] border border-slate-200">
-                      {feature.badge}
+                    <span className="text-xs font-black text-slate-700 bg-slate-100 border border-slate-200/80 px-3.5 py-1.5 rounded-full">
+                      {feat.badge}
                     </span>
                   </div>
 
-                  {/* Title & Description */}
-                  <h3 className="text-xl font-black text-slate-900 mb-3 group-hover:text-[#23096E] transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed font-bold">
-                    {feature.desc}
-                  </p>
+                  {/* Text Content */}
+                  <div className="space-y-2.5">
+                    <h3 className="text-xl lg:text-2xl font-black text-slate-900 group-hover:text-[#23096E] transition-colors">
+                      {feat.title}
+                    </h3>
+                    <p className="text-[#423861] text-sm lg:text-base leading-relaxed font-semibold">
+                      {feat.desc}
+                    </p>
+                  </div>
                 </div>
-
-                {/* Subtle Bottom Accent Line */}
-                <div className={`h-1 w-12 rounded-full bg-gradient-to-r ${feature.color} mt-8 group-hover:w-full transition-all duration-500`} />
               </div>
             );
           })}

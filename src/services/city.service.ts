@@ -177,50 +177,57 @@ export class CityService {
   }
 
   /**
-   * Resolves a destination by slug or city name and combines Firestore data + curated dataset
+   * Resolves a destination by slug or city name and combines Firestore operational data + CMS editorial guide
    */
   static async getDestinationBySlug(slug: string) {
-    const curated = getDestinationData(slug);
-    
-    // Look up city from Firestore destinations collection
+    const cleanSlug = slug.trim().toLowerCase();
+
+    // 1. Look up operational city from Firestore destinations collection (Core SoT)
     const snap = await db.collection("destinations").get();
     let firestoreCity: any = null;
 
     const norm = (s: string) => s.replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').trim().toLowerCase();
-    const slugNorm = norm(slug);
+    const slugNorm = norm(cleanSlug);
 
     snap.docs.forEach(doc => {
       const d = doc.data();
       const nameAr = d.name || d.nameAr || '';
       const nameEn = d.nameEn || '';
-      if (doc.id.toLowerCase() === slug.toLowerCase() || norm(nameAr).includes(slugNorm) || nameEn.toLowerCase().includes(slug.toLowerCase())) {
+      if (doc.id.toLowerCase() === cleanSlug || norm(nameAr).includes(slugNorm) || nameEn.toLowerCase().includes(cleanSlug)) {
         firestoreCity = { id: doc.id, ...d };
       }
     });
 
-    const cityName = firestoreCity?.name || firestoreCity?.nameAr || curated?.name || slug;
-    const cityNameEn = firestoreCity?.nameEn || curated?.nameEn || slug;
+    // 2. Fetch editorial CMS content from website_destinations (Editorial SoT)
+    const { DestinationsCmsService } = await import('@/services/cms');
+    const editorial = await DestinationsCmsService.getEditorialGuide(cleanSlug);
+    const curated = getDestinationData(cleanSlug);
 
-    // Fetch hotels for this destination using getLocalHotels for full DTO formatting
+    const cityName = firestoreCity?.name || firestoreCity?.nameAr || curated?.name || cleanSlug;
+    const cityNameEn = firestoreCity?.nameEn || curated?.nameEn || cleanSlug;
+
+    // 3. Fetch operational hotels for this destination
     const { getLocalHotels } = await import('@/actions/hotels');
     const { data: hotels = [] } = await getLocalHotels({ city: cityName, pageSize: 100 });
 
     return {
-      id: firestoreCity?.id || curated?.id || slug,
-      slug: slug,
+      id: firestoreCity?.id || curated?.id || cleanSlug,
+      slug: cleanSlug,
       name: cityName,
       nameEn: cityNameEn,
       governorate: firestoreCity?.governorate || curated?.governorate || 'اليمن',
       governorateEn: firestoreCity?.governorateEn || curated?.governorateEn || 'Yemen',
-      heroImage: firestoreCity?.heroImage || firestoreCity?.imageUrl || curated?.heroImage || '/images/destinations/sanaa.jpg',
-      tagline: firestoreCity?.tagline || curated?.tagline || `اكتشف أجمل المعالم والفنادق في ${cityName}`,
-      overview: firestoreCity?.overview || curated?.overview || {
-        history: `تعتبر ${cityName} من أهم المدن اليمنية التاريخية والثقافية وتتميز بعمارتها العريقة وطبيعتها الساحرة.`,
-        climate: `مناخ معتدل ولطيف يتيح للزوار التمتع بالأجواء الأنيقة والتجول في أرجاء المدينة.`,
-        culture: `ثقافة غنية بالتقاليد الشعبية والأسواق التراثية والمأكولات اليمنية الشهيرة.`,
-        bestTimeToVisit: `متاحة للزيارة والاستمتاع بطقسها ورونقها على مدار العام.`,
+      heroImage: editorial?.heroImage || firestoreCity?.heroImage || firestoreCity?.imageUrl || curated?.heroImage || '/images/destinations/sanaa.jpg',
+      tagline: editorial?.tagline || curated?.tagline || `اكتشف أجمل المعالم والفنادق في ${cityName}`,
+      overview: {
+        history: editorial?.overview?.history || curated?.overview?.history || `تعتبر ${cityName} من أهم المدن اليمنية التاريخية والثقافية وتتميز بعمارتها العريقة وطبيعتها الساحرة.`,
+        climate: editorial?.overview?.climate || curated?.overview?.climate || `مناخ معتدل ولطيف يتيح للزوار التمتع بالأجواء الأنيقة والتجول في أرجاء المدينة.`,
+        culture: editorial?.overview?.culture || curated?.overview?.culture || `ثقافة غنية بالتقاليد الشعبية والأسواق التراثية والمأكولات اليمنية الشهيرة.`,
+        bestTimeToVisit: editorial?.overview?.bestTimeToVisit || curated?.overview?.bestTimeToVisit || `متاحة للزيارة والاستمتاع بطقسها ورونقها على مدار العام.`,
       },
-      landmarks: firestoreCity?.landmarks || curated?.landmarks || [],
+      landmarks: Array.isArray(editorial?.landmarks) && editorial.landmarks.length > 0
+        ? editorial.landmarks
+        : (Array.isArray(curated?.landmarks) && curated.landmarks.length > 0 ? curated.landmarks : []),
       hotelCount: hotels.length,
       rawHotels: hotels,
     };

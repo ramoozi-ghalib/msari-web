@@ -1,6 +1,8 @@
+// src/app/[locale]/destinations/[slug]/page.tsx
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getDestinationBySlug } from '@/actions/cities';
+import { safeJsonLd } from '@/lib/sanitize';
 import DestinationDetailClient from './DestinationDetailClient';
 
 interface PageProps {
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: pageTitle,
     description: pageDesc,
-    keywords: [`فنادق ${destination.name}`, `أفضل فنادق ${destination.name}`, `حجز فنادق ${destination.name}`, `فنادق رخيصة في ${destination.name}`],
+    keywords: [`فنادق ${destination.name}`, `أفضل فنادق ${destination.name}`, `حجز فنادق ${destination.name}`],
     alternates: {
       canonical: `https://msari.net/ar/destinations/${resolvedParams.slug}`,
       languages: {
@@ -69,7 +71,11 @@ export default async function DestinationDetailPage({ params }: PageProps) {
     description: destination.tagline || `دليل السياحة وفنادق الإقامة في ${destination.name}`,
     url: `https://msari.net/ar/destinations/${resolvedParams.slug}`,
     image: destination.heroImage || '',
-    includesAttraction: [],
+    includesAttraction: (destination.landmarks || []).map((a: any) => ({
+      '@type': 'TouristAttraction',
+      name: typeof a === 'string' ? a : a.name,
+      description: typeof a === 'string' ? '' : a.description,
+    })),
   };
 
   const breadcrumbSchema = {
@@ -86,11 +92,11 @@ export default async function DestinationDetailPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(destinationSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(destinationSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
       <DestinationDetailClient
         destination={destination}

@@ -16,6 +16,7 @@ export interface DestinationDetail {
   governorate: string;
   governorateEn: string;
   tagline: string;
+  taglineEn?: string;
   heroImage: string;
   overview: {
     history: string;
@@ -34,32 +35,32 @@ export const DESTINATIONS_DATA: Record<string, DestinationDetail> = {
     nameEn: "Sana'a",
     governorate: 'أمانة العاصمة',
     governorateEn: "Sana'a Governorate",
-    tagline: 'مدينة سام وعروس المباني الطينية التاريخية المسجلة في اليونسكو',
+    tagline: 'مدينة سام وعاصمة التاريخ والحضارة المعمارية الفريدة في التراث العالمي',
     heroImage: '/images/destinations/sanaa.jpg',
     overview: {
-      history: 'تُعد صنعاء واحدة من أقدم المدن المأهولة في العالم، وتُعرف تاريخياً بـ "مدينة سام بن نوح". تتميز بعمارتها الفريدة ذات الأبراج الطينية والقمريات الزجاجية الملونة التي يعود تاريخ بعضها إلى آلاف السنين، وتصنفها اليونسكو ضمن مواقع التراث العالمي.',
-      climate: 'تتمتع صنعاء بمناخ معتدل ولطيف على مدار العام بفضل موقعها الجغرافي المرتفع في السراة (2300 متر فوق سطح البحر)، حيث تكون صيفاً دافئة ومعتدلة وشتائاً باردة وجافة.',
-      culture: 'تشتهر صنعاء بأسواقها القديمة مثل سوق الملح والفضة، وصناعة الجنابي اليمانية الأصيلة، والمجالس الفلكلورية الصنعانية العريقة التي تزخر بالفن والألحان التراثية.',
-      bestTimeToVisit: 'من سبتمبر إلى أبريل، حيث الجو لطيف ومثالي للتجول والاستكشاف.',
+      history: 'تُعد صنعاء واحدة من أقدم المدن المأهولة في التاريخ البشري، وتُعرف بـ "مدينة سام بن نوح". تتميز بنمطها المعماري البرجي الاستثنائي المبني بالحجر والآجر المحروق والمزين بالقمريات الجبسية الملونة والنقوش الهندسية الدقيقة، وهي مدرجة ضمن قائمة مواقع التراث العالمي لليونسكو.',
+      climate: 'تتمتع صنعاء بمناخ جبلي لطيف ومعتدل طوال العام بفضل ارتفاعها لأكثر من 2200 متر فوق سطح البحر، وتتميز بصيف معتدل تتخلله أمطار موسمية منعشة وشتاء جاف ومنعش.',
+      culture: 'حاضرة التراث والفنون والفلكلور اليمني العريق، وتزخر بأسواق الحرف اليدوية كصناعة الجنابي الصنعانية الأصيلة وصياغة الفضة والبهارات في سوق الملح ومجالس الغناء والتوشيح التراثي.',
+      bestTimeToVisit: 'من سبتمبر إلى مايو حيث تكون درجات الحرارة معتدلة ومثالية للتجول واستكشاف المعالم التاريخية.',
     },
     landmarks: [
       {
         id: 'dar_al_hajar',
-        name: 'دار الحجر (قصر الصخرة)',
-        nameEn: 'Dar Al-Hajar',
+        name: 'دار الحجر (قصر الصخرة في وادي ظهر)',
+        nameEn: 'Dar Al-Hajar (Rock Palace)',
         category: 'معماري',
         image: '/images/destinations/dar_al_hajar.jpg',
-        description: 'تحفة معمارية فريدة شُيدت فوق صخرة غراميتية عالية في وادي ظهر، وتعد رمزاً هندسياً يمنياً شهيراً في العالم.',
+        description: 'أيقونة معمارية يمنية شيدت بعبقرية هندسية فوق قمة صخرة طبيعية شاهقة في وادي ظهر الخصيب.',
         locationText: 'وادي ظهر - شمال صنعاء',
       },
       {
         id: 'old_sanaa',
         name: 'مدينة صنعاء القديمة وباب اليمن',
-        nameEn: 'Old City of Sanaa & Bab Al-Yemen',
+        nameEn: 'Old City of Sanaa & Bab Al-Yaman',
         category: 'تاريخي',
-        image: '/images/destinations/sanaa.jpg',
-        description: 'البوابة التاريخية الرئيسية لمدينة صنعاء القديمة المحاطة بأسوار طينية عتيقة تقع داخلها آلاف المنازل الأثرية.',
-        locationText: 'قلب مدينة صنعاء القديمة',
+        image: '/images/destinations/bab_al_yaman.jpg',
+        description: 'البوابة التاريخية العتيقة لمدينة صنعاء القديمة وأسواقها التراثية ومنازلها البرجية المحفوظة عبر القرون.',
+        locationText: 'قلب صنعاء القديمة',
       },
     ],
   },
@@ -70,32 +71,131 @@ export const DESTINATIONS_DATA: Record<string, DestinationDetail> = {
     nameEn: 'Aden',
     governorate: 'محافظة عدن',
     governorateEn: 'Aden Governorate',
-    tagline: 'ثغر اليمن الباسم وعروس البحر الأحمر وخليج عدن',
+    tagline: 'عروس البحر العربي وثغر اليمن الباسم بشواطئها الساحرة وموانئها التاريخية',
     heroImage: '/images/destinations/aden.jpg',
     overview: {
-      history: 'تعد عدن من أهم الموانئ التاريخية والتجارية على مستوى الشرق الأوسط والعالم، بفضل موقعها الاستراتيجي على باب المندب. تتميز بتاريخ حافل بالنشاط التجاري والثقافي المتنوع.',
-      climate: 'مناخ ساحلي دافئ صيفاً ومعتدل ولطيف في فصل الشتاء مع نسائم البحر المنعشة.',
-      culture: 'تتميز عدن بطابعها المدني المفتوح، ومأكولاتها البحرية الشهيرة، والجسور التاريخية، والمقاهي الشعبية المتنوعة على شواطئ صيرة والغدير.',
-      bestTimeToVisit: 'من نوفمبر إلى مارس للاستمتاع بأجواء البحر الساحرة والمناخ المعتدل.',
+      history: 'تعتبر عدن من أقدم وأعرق الموانئ الطبيعية والتجارية في العالم، حيث تقع داخل فوهة بركانية قديمة تشرف على مضيق باب المندب وخليج عدن. شكلت عبر آلاف السنين محطة رئيسية على طريق الحرير والبخور والتجارة البحرية الدولية.',
+      climate: 'مناخ ساحلي دافئ واستوائي يلطفه نسيم البحر العليل، وتكون الأجواء معتدلة ومنعشة جداً خلال فصلي الخريف والشتاء.',
+      culture: 'تتميز عدن بطابع مدني مفتوح ومتنوع يجمع بين التراث البحري العريق والأنشطة الترفيهية والمأكولات البحرية الطازجة كالصيادية والمخبازة، إلى جانب مقاهي كورنيش صيرة وخور مكسر.',
+      bestTimeToVisit: 'من أكتوبر إلى أبريل حيث تكون درجات الحرارة معتدلة ومثالية للسباحة والرحلات البحرية والتنزه الشاطئي.',
     },
     landmarks: [
+      {
+        id: 'tawila_tanks',
+        name: 'صهاريج الطويلة التاريخية',
+        nameEn: 'Cisterns of Tawila',
+        category: 'معماري',
+        image: '/images/destinations/tawila_tanks.jpg',
+        description: 'منظومة مائية هندسية عملاقة منحوتة في صخور جبل شمسان البركانية لجمع وتصريف مياه الأمطار العذبة لحماية وتغذية المدينة.',
+        locationText: 'وادي الطويلة - كريتر',
+      },
       {
         id: 'sira_fortress',
         name: 'قلعة صيرة التاريخية',
         nameEn: 'Sira Fortress',
         category: 'تاريخي',
         image: '/images/destinations/sira_castle.jpg',
-        description: 'قلعة عسكرية أثرية تقف على جزيرة صيرة البركانية، وكانت حارساً تاريخياً لميناء عدن ضد الحملات الغازية.',
-        locationText: 'حي كرتير - صيرة',
+        description: 'حصن دفاعي أثري شامخ على جزيرة صيرة البركانية يوفر إطلالة بانورامية ساحرة على ميناء وخليج عدن.',
+        locationText: 'جزيرة صيرة - كريتر',
       },
       {
-        id: 'tawila_tanks',
-        name: 'صهاريج عدن (صهاريج طويلة)',
-        nameEn: 'Cisterns of Tawila',
+        id: 'gold_mohur_beach',
+        name: 'ساحل جولد مور وقوس خليج الفيل',
+        nameEn: 'Gold Mohur & Elephant Rock Bay',
+        category: 'طبيعي',
+        image: '/images/destinations/gold_mohur.jpg',
+        description: 'شاطئ رملي ذهبي رائع يمتاز بتكوينه الصخري البركاني الفريد على شكل فيل يمتد داخل مياه البحر العربي الصافية.',
+        locationText: 'التواهي - ساحل جولد مور',
+      },
+    ],
+  },
+  mukalla: {
+    id: 'mukalla',
+    slug: 'mukalla',
+    name: 'المكلا',
+    nameEn: 'Al Mukalla',
+    governorate: 'محافظة حضرموت',
+    governorateEn: 'Hadramout Governorate',
+    tagline: 'عروس بحر العرب ودرة شواطئ حضرموت الذهبية والقصور السلاطينية',
+    heroImage: '/images/destinations/mukalla.jpg',
+    overview: {
+      history: 'المكلا هي عاصمة حضرموت الساحلية وميناؤها التاريخي الأبرز. تمتاز بمبانيها البيضاء الناصعة وقصورها السلاطينية ذات الطراز المعماري الهندي والإسلامي الفريد المطل على مياه بحر العرب.',
+      climate: 'مناخ ساحلي استوائي دافئ يتحول إلى أجواء بحرية لطيفة ومعتدلة طوال أشهر الخريف والشتاء، خصوصاً خلال موسم البلدة السياحي.',
+      culture: 'عاصمة الأدب والدان الحضرمي، وتشتهر بأسواقها التراثية لبيع العسل الدوعني الفاخر والمشغولات الفضية والحرف البحرية التقليدية.',
+      bestTimeToVisit: 'من أكتوبر إلى مارس للاستمتاع بخور المكلا والشواطئ ومهرجانات التراث الحضرمي.',
+    },
+    landmarks: [
+      {
+        id: 'quaiti_palace',
+        name: 'قصر السلطان القعيطي (متحف المكلا)',
+        nameEn: 'Sultan Al-Qu\'aiti Palace Museum',
+        category: 'تاريخي',
+        image: '/images/destinations/quaiti_palace.jpg',
+        description: 'تحفة معمارية سلاطينية تجمع بين الفن الهندي والعربي وتشرف مباشرة على خور وميناء المكلا القديم.',
+        locationText: 'كورنيش المكلا القديم',
+      },
+      {
+        id: 'ghuwayzi_fort',
+        name: 'حصن الغويزي التاريخي',
+        nameEn: 'Al-Ghuwayzi Fort',
+        category: 'تاريخي',
+        image: '/images/destinations/ghuwayzi_fort.jpg',
+        description: 'حصن عسكري أثري فريد شيد على قمة صخرة طبيعية مرتفعة لحماية المدخل الشمالي لمدينة المكلا وقوافلها التجارية.',
+        locationText: 'المدخل الشرقي لمدينة المكلا',
+      },
+    ],
+  },
+  seiyun: {
+    id: 'seiyun',
+    slug: 'seiyun',
+    name: 'سيئون',
+    nameEn: 'Seiyun',
+    governorate: 'محافظة حضرموت',
+    governorateEn: 'Hadramout Governorate',
+    tagline: 'مدينة الطويلة وعاصمة وادي حضرموت وقصر الكثيري الطيني المهيب',
+    heroImage: '/images/destinations/seiyun.jpg',
+    overview: {
+      history: 'سيئون هي حاضرة وادي حضرموت التاريخية، وتشتهر بقصر الكثيري الأبيض الذي يُعد أحد أضخم المباني الطينية في العالم. تعود أهميتها لكونها مركزاً للتجارة والعلم والقوافل التاريخية في قلب وادي حضرموت الخصيب.',
+      climate: 'مناخ صحراوي جاف يتميز بأيام مشمسة دافئة وأمسيات لطيفة، ويكون الطقس معتدلاً ومريحاً للغاية في فصل الشتاء.',
+      culture: 'تراث وادي حضرموت الأصيل ومزارع النخيل الباسقة، وتشتهر بصناعة الفخار والمشغولات الخوصية وأجود أنواع تمور الوادي والأهازيج الشعبية.',
+      bestTimeToVisit: 'من نوفمبر إلى مارس للاستمتاع باعتدال الطقس وزيارة القصور والمعالم الأثرية المحيطة.',
+    },
+    landmarks: [
+      {
+        id: 'kathiri_palace',
+        name: 'قصر الكثيري (قصر سيئون الأبيض)',
+        nameEn: 'Kathiri Palace (Al-Kathiri Sultanate Palace)',
         category: 'معماري',
-        image: '/images/destinations/aden.jpg',
-        description: 'شبكة صهاريج مائية هندسية نادرة نحتت في مضيق جبل شمسان لجمع مياه الأمطار لحماية المدينة.',
-        locationText: 'جبل شمسان - كرتير',
+        image: '/images/destinations/seiyun.jpg',
+        description: 'أحد أكبر وأجمل القصور والمباني الطينية في العالم، تميزه عمارته البيضاء الناصعة وأبراجه المتناسقة بين واحات النخيل.',
+        locationText: 'وسط مدينة سيئون - وادي حضرموت',
+      },
+    ],
+  },
+  ibb: {
+    id: 'ibb',
+    slug: 'ibb',
+    name: 'إب',
+    nameEn: 'Ibb',
+    governorate: 'محافظة إب',
+    governorateEn: 'Ibb Governorate',
+    tagline: 'اللواء الأخضر وعاصمة السياحة الطبيعية وجنة الشلالات والمدرجات الجبلية',
+    heroImage: '/images/destinations/ibb.jpg',
+    overview: {
+      history: 'تلقب محافظة إب بـ "اللواء الأخضر" لخصوبة أراضيها ومدرجاتها الجبلية الخلابة التي تحتضن قرى تاريخية معلقة وقلاعاً أثرية شامخة شيدت في عهد الدولة الصليحية والملكة أروى بنت أحمد.',
+      climate: 'أكثر مناطق اليمن هطولاً للأمطار واعتدالاً، حيث تكتسي جبالها وسهولها بالخضرة الدائمة وضباب القمم الساحر على مدار أشهر الصيف والربيع.',
+      culture: 'حياة ريفية جبلية أصيلة، كرم ضيافة وتنوع زراعي للمحاصيل والبن والفواكه، إلى جانب الأسواق الأسبوعية الشعبية في القرى والوديان.',
+      bestTimeToVisit: 'من مايو إلى سبتمبر لمشاهدة مواسم الأمطار والشلالات المتدفقة والمدرجات الخضراء في أبهى حللها.',
+    },
+    landmarks: [
+      {
+        id: 'wadi_banna',
+        name: 'شلالات ومدرجات وادي بنا ووادي الدور',
+        nameEn: 'Wadi Banna Waterfalls & Terraces',
+        category: 'طبيعي',
+        image: '/images/destinations/wadi_banna.jpg',
+        description: 'شلالات مياه طبيعية تتدفق بين المدرجات الزراعية الخضراء والقرى الجبلية المعلقة التي تعانق السحاب.',
+        locationText: 'أرياف محافظة إب',
       },
     ],
   },
@@ -109,10 +209,10 @@ export const DESTINATIONS_DATA: Record<string, DestinationDetail> = {
     tagline: 'عروس البحر الأحمر وبوابة اليمن الغربية على ميناء التجارة التاريخي',
     heroImage: '/images/destinations/hodeidah.jpg',
     overview: {
-      history: 'تعتبر الحديدة من أهم وأعرق المدن المينائية والساحلية في اليمن والمنطقة، وتعتبر عروس البحر الأحمر والحاضرة التاريخية للتجارة والزراعة في إقليم تهامة. يمتد تاريخها لعقود طوال في احتضان ميناء اليمن الرئيسي والأسواق التراثية.',
+      history: 'الحديدة هي الحاضرة التاريخية لسهل تهامة وميناء اليمن الرئيسي على البحر الأحمر، وتمتاز بأسواقها العريقة وتاريخها التجاري والبحري الممتد لقرون.',
       climate: 'مناخ ساحلي تهامي دافئ صيفاً ومعتدل ولطيف للغاية في فصل الشتاء مع نسائم البحر الأحمر الرطبة.',
-      culture: 'تتميز الحديدة بالثقافة التهامية الأصيلة، والمأكولات البحرية والسمك المخبازة التهامية الشهيرة، وفنون الرقص الشعبي التهامي وتراث القش والمصنوعات اليدوية.',
-      bestTimeToVisit: 'من نوفمبر إلى مارس حيث تكون درجات الحرارة معتدلة ومثالية للتنزه على الكورنيش والاستمتاع بالشواطئ.',
+      culture: 'تراث تهامي أصيل يبرز في المأكولات البحرية الطازجة كالسمك المخبازة، وفنون الرقص الفلكلوري التهامي، وصناعات القش والخزف التقليدية.',
+      bestTimeToVisit: 'من نوفمبر إلى مارس حيث تكون درجات الحرارة معتدلة ومثالية للتنزه على الكورنيش.',
     },
     landmarks: [
       {
@@ -124,68 +224,86 @@ export const DESTINATIONS_DATA: Record<string, DestinationDetail> = {
         description: 'شريط ساحلي طويل ممتد على البحر الأحمر يمتاز بنسائمه اللطيفة وجلساته العائلية وغروب الشمس الساحر.',
         locationText: 'شاطئ مدينة الحديدة',
       },
-      {
-        id: 'al_qal_yah',
-        name: 'قلعة القلعية التاريخية وباب المشرف',
-        nameEn: 'Al-Qal\'yah Historical Castle',
-        category: 'تاريخي',
-        image: '/images/destinations/hodeidah.jpg',
-        description: 'قلعة تاريخية عتيقة تمثل الحصن الدفاعي التاريخي لمدينة الحديدة المطل على البحر الأحمر.',
-        locationText: 'وسط مدينة الحديدة القديمة',
-      },
     ],
   },
-  mukalla: {
-    id: 'mukalla',
-    slug: 'mukalla',
-    name: 'المكلا',
-    nameEn: 'Mukalla',
+  shahr: {
+    id: 'shahr',
+    slug: 'shahr',
+    name: 'الشحر',
+    nameEn: 'Ash Shihr',
     governorate: 'محافظة حضرموت',
     governorateEn: 'Hadramout Governorate',
-    tagline: 'عروس بحر العرب وحاضرة حضرموت الجميلة',
-    heroImage: '/images/destinations/mukalla.jpg',
+    tagline: 'مدينة اللبان والشعراء وأقدم موانئ حضرموت التاريخية على بحر العرب',
+    heroImage: '/images/destinations/shahr.jpg',
     overview: {
-      history: 'المكلا هي عاصمة محافظة حضرموت وأكبر مدنها الساحلية. تمتاز ببيوتها البيضاء الناصعة وقصورها التاريخية المطلة على بحر العرب.',
-      climate: 'مناخ ساحلي استوائي دافئ، يتخلله ربيع معتدل وأجواء بحرية لطيفة طوال أشهر الشتاء.',
-      culture: 'تشتهر المكلا بالفنون الحضرمية الأصيلة، والدان الحضرمي، والمأكولات الشهيرة مثل اللخم والصيد الطازج ولحوم المندي.',
-      bestTimeToVisit: 'من أكتوبر إلى مارس للاستمتاع بخور المكلا وفعاليات مهرجانات البلدة.',
+      history: 'الشحر هي إحدى أقدم الموانئ التاريخية على بحر العرب، وعرفت تاريخياً بـ "سعاد الزبينة". اشتهرت بتصدير اللبان والمر والتجارة مع موانئ الهند وشرق أفريقيا، وتضم سورا تاريخياً وقلاعاً عسكرية وبوابات أثرية كبوابة العيدروس.',
+      climate: 'مناخ ساحلي دافئ يلطفه نسيم البحر العربي، وتكون درجات الحرارة معتدلة ولطيفة خلال فصلي الخريف والشتاء.',
+      culture: 'موطن كبار شعراء الدان والقصيد الحضرمي الأصيل كالمحضار، وتمتاز بمهن صيد الأسماك وصناعة السفن الخشبية التراثية (القوارب الشراعية).',
+      bestTimeToVisit: 'من أكتوبر إلى مارس للاستمتاع بالأجواء الشاطئية وزيارة المعالم التراثية والأسواق البحرية.',
     },
     landmarks: [
       {
-        id: 'ghuwayzi_fort',
-        name: 'حصن الغويزي',
-        nameEn: 'Al-Ghuwayzi Fort',
+        id: 'shahr_historic_gate',
+        name: 'سور الشحر وبوابة العيدروس التاريخية',
+        nameEn: 'Ash Shihr Historic Wall & Gate',
         category: 'تاريخي',
-        image: '/images/destinations/mukalla.jpg',
-        description: 'حصن أثري بارز شُيد على صخرة مرتفعة عند المدخل الشمالي للمدينة لرحلات القوافل التاريخية.',
-        locationText: 'مدخل مدينة المكلا',
+        image: '/images/destinations/shahr.jpg',
+        description: 'بوابة دفاعية أثرية وسور حجري عريق كان يحمي مدينة الشحر وميناءها من الغزوات البحرية عبر التاريخ.',
+        locationText: 'المدخل الرئيسي لمدينة الشحر',
       },
     ],
   },
-  ibb: {
-    id: 'ibb',
-    slug: 'ibb',
-    name: 'إب',
-    nameEn: 'Ibb',
-    governorate: 'محافظة إب',
-    governorateEn: 'Ibb Governorate',
-    tagline: 'المدينة الخضراء وعاصمة السياحة الطبيعية في اليمن',
-    heroImage: '/images/destinations/ibb.jpg',
+  'al-mahra': {
+    id: 'al-mahra',
+    slug: 'al-mahra',
+    name: 'المهرة',
+    nameEn: 'Al Mahra',
+    governorate: 'محافظة المهرة',
+    governorateEn: 'Al Mahra Governorate',
+    tagline: 'بوابة الشرق وجنة الضباب الاستوائي ومحمية حوف الطبيعية البكر',
+    heroImage: '/images/destinations/al_mahra.jpg',
     overview: {
-      history: 'تلقب إب بـ "المدينة الخضراء" بفضل مدرجاتها الزراعية الجبلية الخصبة، وتاريخها العريق المرتبط بالدولة الصليحية والملكة أروى بنت أحمد الصليحي.',
-      climate: 'تتمتع بأعلى معدل هطول للأمطار في المنطقة مع مناخ معتدل ومدرجات خضراء تنبض بالحياة خصوصاً في الصيف والربيع.',
-      culture: 'تتميز بجمال طبيعتها الفتاكة، والقلاع الجبلية الشامخة، والعادات والتقاليد الزراعية العريقة.',
-      bestTimeToVisit: 'من مايو إلى سبتمبر لمشاهدة الأمطار والمدرجات الخضراء في أوج جمالها.',
+      history: 'المهرة هي البوابة الشرقية لليمن، وتتميز بطبيعتها البكر وتاريخها العريق ولغتها المهرية السامية الفريدة التي حافظ عليها أهلها عبر آلاف السنين.',
+      climate: 'مناخ استوائي فريد يتحول في موسم الخريف (يونيو إلى سبتمبر) إلى جنة استوائية خضراء يغطيها الضباب والرذاذ الموسمي وتهبط فيها درجات الحرارة لأجواء ربيعية ساحرة.',
+      culture: 'ثقافة مهرية أصيلة غنية بالأهازيج واللغة التراثية، إلى جانب التقاليد البدوية والبحرية وكرم الضيافة المهري المتميز.',
+      bestTimeToVisit: 'من يوليو إلى سبتمبر خلال موسم خريف حوف، وكذلك من نوفمبر إلى مارس للأجواء الشاطئية والبحرية.',
     },
     landmarks: [
       {
-        id: 'ibb_terraces',
-        name: 'المدرجات الخضراء وشلالات وادي بنا',
-        nameEn: 'Ibb Green Terraces',
+        id: 'hawf_reserve',
+        name: 'محمية حوف الطبيعية الساحلية',
+        nameEn: 'Hawf Nature Reserve',
         category: 'طبيعي',
-        image: '/images/destinations/ibb.jpg',
-        description: 'مناظر طبيعية ساحرة ومدرجات جبلية خضراء تعانق السحاب وتشتهر بشلالاتها العذبة.',
-        locationText: 'مرتفعات إب ووديانها',
+        image: '/images/destinations/al_mahra.jpg',
+        description: 'غابات جبلية استوائية نادرة تعانق بحر العرب وتكسوها سحب الضباب والرذاذ الموسمي مع تنوع بيئي ونباتي فريد.',
+        locationText: 'محمية حوف - شرق المهرة',
+      },
+    ],
+  },
+  shabwa: {
+    id: 'shabwa',
+    slug: 'shabwa',
+    name: 'شبوة',
+    nameEn: 'Shabwa',
+    governorate: 'محافظة شبوة',
+    governorateEn: 'Shabwa Governorate',
+    tagline: 'حاضرة ممالك اللبان القديمة وموطن القلاع الحصينة والموانئ التاريخية',
+    heroImage: '/images/destinations/shabwa.jpg',
+    overview: {
+      history: 'شبوة هي مهد الحضارات العربية القديمة كعاصمة مملكة حضرموت التاريخية، ومقر ميناء قنا الأثري (بير علي) الذي انطلقت منه سفن تجارة اللبان والبخور إلى بقاع العالم القديم.',
+      climate: 'مناخ متنوع يجمع بين الأجواء الصحراوية الجافة في الهضاب الداخلية، والأجواء الساحلية المنعشة على شواطئ بحر العرب الجنوبية في بلحاف وبير علي.',
+      culture: 'عادات قبلية عربية أصيلة، فنون الشلات والزوامل الشعبية، وتاريخ حافل بالتجارة البدوية والأسواق التقليدية في عتق وبيحان.',
+      bestTimeToVisit: 'من أكتوبر إلى أبريل حيث تكون الأجواء معتدلة ومثالية لاستكشاف المواقع الأثرية والشواطئ البكر.',
+    },
+    landmarks: [
+      {
+        id: 'qana_historic_port',
+        name: 'ميناء قنا التاريخي وحصن الغراب',
+        nameEn: 'Ancient Port of Qana & Husn Al-Ghurab',
+        category: 'تاريخي',
+        image: '/images/destinations/shabwa.jpg',
+        description: 'أشهر موانئ تجارة اللبان في العالم القديم وبير علي، مع بقايا حصن الغراب الأثري والبحيرات البركانية الساحلية.',
+        locationText: 'بير علي - ساحل شبوة',
       },
     ],
   },
@@ -201,11 +319,35 @@ export function getDestinationData(slugOrName: string): DestinationDetail | unde
   if (DESTINATIONS_DATA[key]) return DESTINATIONS_DATA[key];
   
   // Match by Arabic name or alternative slugs
-  const norm = (s: string) => s.replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').trim().toLowerCase();
+  const norm = (s: string) => s.replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').trim().toLowerCase();
   const targetNorm = norm(key);
 
   if (targetNorm.includes('حديد') || key.includes('huday') || key.includes('hodei')) {
     return DESTINATIONS_DATA['hodeidah'];
+  }
+  if (targetNorm.includes('مكلا') || key.includes('mukalla')) {
+    return DESTINATIONS_DATA['mukalla'];
+  }
+  if (targetNorm.includes('سيئون') || key.includes('seiyun')) {
+    return DESTINATIONS_DATA['seiyun'];
+  }
+  if (targetNorm.includes('شحر') || key.includes('shahr')) {
+    return DESTINATIONS_DATA['shahr'];
+  }
+  if (targetNorm.includes('مهره') || key.includes('mahra')) {
+    return DESTINATIONS_DATA['al-mahra'];
+  }
+  if (targetNorm.includes('شبو') || key.includes('shabwa')) {
+    return DESTINATIONS_DATA['shabwa'];
+  }
+  if (targetNorm.includes('صنعا') || key.includes('sanaa')) {
+    return DESTINATIONS_DATA['sanaa'];
+  }
+  if (targetNorm.includes('عدن') || key.includes('aden')) {
+    return DESTINATIONS_DATA['aden'];
+  }
+  if (targetNorm.includes('اب') || key.includes('ibb')) {
+    return DESTINATIONS_DATA['ibb'];
   }
 
   const foundKey = Object.keys(DESTINATIONS_DATA).find(k => {

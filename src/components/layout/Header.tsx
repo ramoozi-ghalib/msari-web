@@ -85,8 +85,8 @@ export default function Header() {
 
   return (
     <header className={headerClass}>
-      <div className="container-msari">
-        <div className="flex items-center justify-between h-[72px]">
+      <div className="container-msari px-4 sm:px-6">
+        <div className="flex items-center justify-between h-[72px] w-full">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
@@ -132,17 +132,17 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Currency */}
-            <div className="relative hidden sm:block">
+            <div className="relative">
               <button
                 onClick={() => setCurrencyOpen(!currencyOpen)}
                 className={cn(
-                  'flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hover:scale-105',
+                  'flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold sm:font-semibold transition-all hover:scale-105',
                   isTransparentHeader && !scrolled
                     ? 'text-white hover:bg-white/15'
                     : 'text-neutral-600 hover:bg-neutral-100'
                 )}
               >
-                {currency}
+                <span>{currency}</span>
                 <ChevronDown size={14} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
               </button>
               {currencyOpen && (

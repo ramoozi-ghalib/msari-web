@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Car, MapPin, Clock, Shield, Star, Phone, CheckCircle, ArrowLeft } from 'lucide-react';
-import { whatsappLink } from '@/lib/site-config';
+import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
 export const metadata: Metadata = {
   title: 'تاكسي المطار — مساري',
@@ -15,26 +15,33 @@ export const metadata: Metadata = {
   },
 };
 
-const airports = [
-  { name: 'مطار صنعاء الدولي', city: 'صنعاء', code: 'SAH', emoji: '✈️' },
-  { name: 'مطار عدن الدولي', city: 'عدن', code: 'ADE', emoji: '✈️' },
-  { name: 'مطار سيئون', city: 'حضرموت', code: 'GXF', emoji: '✈️' },
-];
+const ICON_MAP: Record<string, any> = {
+  Clock,
+  Shield,
+  Star,
+  Phone,
+  Car,
+  MapPin,
+  CheckCircle,
+};
 
-const features = [
-  { icon: Clock, title: 'تتبع رحلتك', desc: 'السائق يتابع رحلتك ويكون في انتظارك عند الوصول' },
-  { icon: Shield, title: 'سائقون معتمدون', desc: 'جميع سائقينا مدربون ومرخصون رسمياً' },
-  { icon: Star, title: 'سيارات نظيفة ومريحة', desc: 'أسطول متنوع من خصوصي وميني باص' },
-  { icon: Phone, title: 'دعم فوري', desc: 'تواصل معنا في أي وقت قبل وأثناء رحلتك' },
-];
+export default async function AirportTaxiPage() {
+  const [pageContent, settings] = await Promise.all([
+    PagesCmsService.getCarsAirportPage(),
+    SettingsCmsService.getSettings(),
+  ]);
 
-const packages = [
-  { name: 'اقتصادي', desc: 'سيارة خصوصية مريحة', passengers: 4, price: 15, emoji: '🚗' },
-  { name: 'VIP', desc: 'سيارة فاخرة بمرافق', passengers: 4, price: 30, emoji: '🚙' },
-  { name: 'ميني باص', desc: 'مجموعات وعائلات', passengers: 12, price: 45, emoji: '🚌' },
-];
+  const badge = pageContent?.hero?.badge || 'خدمة تاكسي المطار';
+  const title = pageContent?.hero?.title || 'استقبال من المطار\nبكل راحة وأمان';
+  const subtitle = pageContent?.hero?.subtitle || 'احجز سيارتك من وإلى المطار مسبقاً وتجنب عناء البحث عن وسيلة نقل عند الوصول.';
+  const bgImage = pageContent?.hero?.bgImage || 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2000&auto=format&fit=crop';
+  const packages = pageContent?.packages || [];
+  const airports = pageContent?.airports || [];
+  const features = pageContent?.features || [];
 
-export default function AirportTaxiPage() {
+  const waNumber = settings.whatsappNumber || '967733644466';
+  const makeWaLink = (msg: string) => `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+
   return (
     <div className="min-h-screen bg-[#f8f8fa]">
 
@@ -42,7 +49,7 @@ export default function AirportTaxiPage() {
       <section className="relative pt-28 pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[#23096e]">
           <Image
-            src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2000&auto=format&fit=crop"
+            src={bgImage}
             alt="تاكسي المطار"
             fill
             priority
@@ -54,65 +61,82 @@ export default function AirportTaxiPage() {
         <div className="relative z-20 container-msari text-center pt-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-6 border border-white/20">
             <Car size={14} />
-            خدمة تاكسي المطار
+            {badge}
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-            استقبال من المطار<br />بكل راحة وأمان
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight whitespace-pre-line">
+            {title}
           </h1>
-          <p className="text-white/80 text-xl max-w-2xl mx-auto mb-10">
-            احجز سيارتك من وإلى المطار مسبقاً وتجنب عناء البحث عن وسيلة نقل
+          <p className="text-white/80 text-lg max-w-xl mx-auto mb-10">
+            {subtitle}
           </p>
-          <a
-            href={whatsappLink('مرحباً، أريد حجز تاكسي من المطار')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white font-black px-8 py-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl text-lg"
-          >
-            💬 احجز الآن عبر واتساب
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href={makeWaLink('مرحباً، أريد حجز تاكسي مطار')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 rounded-2xl bg-white text-[#23096e] font-black text-base shadow-xl hover:bg-neutral-100 transition-all hover:scale-105"
+            >
+              احجز الآن عبر واتساب
+            </a>
+            <Link
+              href="/cars"
+              className="px-6 py-4 rounded-2xl bg-white/15 text-white font-bold text-base hover:bg-white/25 transition-all border border-white/20"
+            >
+              جميع خدمات النقل ←
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Packages */}
-      <section className="container-msari -mt-16 relative z-10 mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {packages.map((pkg) => (
-            <a
-              key={pkg.name}
-              href={whatsappLink(`أريد حجز ${pkg.name} من المطار، السعر المبدئي $${pkg.price}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white rounded-3xl p-8 shadow-xl border border-neutral-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 text-center group"
-            >
-              <div className="text-5xl mb-4">{pkg.emoji}</div>
-              <h3 className="text-xl font-black text-neutral-900 mb-2">{pkg.name}</h3>
-              <p className="text-neutral-500 text-sm mb-4">{pkg.desc}</p>
-              <div className="flex items-center justify-center gap-2 text-neutral-400 text-sm mb-6">
-                <span>حتى {pkg.passengers} راكب</span>
+      {/* Airports Supported */}
+      <section className="container-msari -mt-12 relative z-30 mb-16">
+        <div className="bg-white rounded-3xl p-6 shadow-xl border border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {airports.map((a) => (
+            <div key={a.name} className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 hover:bg-[#23096e]/5 transition-colors">
+              <div className="text-3xl">{a.emoji || '✈️'}</div>
+              <div>
+                <div className="font-black text-neutral-900 text-sm">{a.name}</div>
+                <div className="text-neutral-500 text-xs">{a.city} • رمز {a.code}</div>
               </div>
-              <div className="text-[#23096e] font-black text-3xl mb-1">${pkg.price}</div>
-              <div className="text-neutral-400 text-xs mb-6">رحلة واحدة</div>
-              <div className="w-full bg-[#23096e] text-white font-bold py-3 rounded-xl group-hover:bg-[#3A1C8F] transition-colors duration-300">
-                احجز الآن
-              </div>
-            </a>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Airports */}
+      {/* Packages */}
       <section className="container-msari mb-20">
-        <h2 className="text-2xl font-black text-neutral-900 mb-8 text-center">المطارات التي نخدمها</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {airports.map((airport) => (
-            <div key={airport.code} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 flex items-center gap-4 hover:shadow-md transition-shadow duration-300">
-              <div className="text-4xl">{airport.emoji}</div>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-black text-neutral-900 mb-3">باقات التوصيل من وإلى المطار</h2>
+          <p className="text-neutral-500 text-sm">اختر الباقة المناسبة لاحتياجاتك واستمتع برحلة مريحة</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          {packages.map((pkg) => (
+            <div
+              key={pkg.name}
+              className="bg-white rounded-3xl p-6 shadow-sm border border-neutral-100 hover:shadow-md hover:border-[#23096e]/30 transition-all flex flex-col justify-between"
+            >
               <div>
-                <div className="font-black text-neutral-900">{airport.name}</div>
-                <div className="text-neutral-500 text-sm">{airport.city} • {airport.code}</div>
+                <div className="text-4xl mb-4">{pkg.emoji}</div>
+                <h3 className="text-xl font-black text-neutral-900 mb-1">{pkg.name}</h3>
+                <p className="text-neutral-500 text-xs mb-4">{pkg.desc}</p>
+                <div className="text-xs text-neutral-600 bg-neutral-50 rounded-xl p-2 mb-6">
+                  يتسع حتى <strong>{pkg.passengers} ركاب</strong>
+                </div>
               </div>
-              <div className="mr-auto">
-                <CheckCircle size={20} className="text-green-500" />
+              <div>
+                <div className="mb-4">
+                  <span className="text-3xl font-black text-[#23096e]">${pkg.price}</span>
+                  <span className="text-neutral-400 text-xs mr-1">/ المشوار</span>
+                </div>
+                <a
+                  href={makeWaLink(`مرحباً، أريد حجز باقة ${pkg.name} لتاكسي المطار ($${pkg.price})`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 rounded-xl bg-[#23096e] text-white text-center font-bold text-sm block hover:bg-[#3A1C8F] transition-colors"
+                >
+                  احجز الباقة
+                </a>
               </div>
             </div>
           ))}
@@ -120,22 +144,23 @@ export default function AirportTaxiPage() {
       </section>
 
       {/* Features */}
-      <section className="bg-[#23096e] py-16 mb-0">
-        <div className="container-msari">
-          <h2 className="text-2xl font-black text-white text-center mb-10">لماذا تختار مساري للنقل؟</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {features.map((f) => (
-              <div key={f.title} className="text-center">
-                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
-                  <f.icon size={26} className="text-white" />
+      <section className="container-msari mb-20">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {features.map((f, idx) => {
+            const Icon = ICON_MAP[f.icon] || Star;
+            return (
+              <div key={idx} className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 text-center">
+                <div className="w-10 h-10 rounded-xl bg-[#23096e]/10 text-[#23096e] flex items-center justify-center mx-auto mb-3">
+                  <Icon size={20} />
                 </div>
-                <h3 className="font-black text-white text-base mb-2">{f.title}</h3>
-                <p className="text-white/70 text-sm">{f.desc}</p>
+                <h4 className="font-bold text-neutral-900 text-sm mb-1">{f.title}</h4>
+                <p className="text-neutral-500 text-xs leading-relaxed">{f.desc}</p>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
+
     </div>
   );
 }

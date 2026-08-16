@@ -1,30 +1,50 @@
 import Image from 'next/image';
 import { QrCode } from 'lucide-react';
+import type { HomepageContentData } from '@/services/cms';
 
-export default function AppDownloadSection() {
+interface AppDownloadSectionProps {
+  appDownload?: HomepageContentData['appDownload'];
+}
+
+export default function AppDownloadSection({ appDownload }: AppDownloadSectionProps) {
+  const badge = appDownload?.badgeAr || 'تطبيق مساري للهواتف الذكية';
+  const title = appDownload?.titleAr || 'حمّل تطبيق مساري الآن';
+  const subtitle = appDownload?.subtitleAr || 'احجز فنادقك ورحلاتك من أي مكان وفي أي وقت بسهولة وأمان';
+  const playStore = appDownload?.playStoreUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
+  const appStore = appDownload?.appStoreUrl || 'https://apps.apple.com';
+  const mockupImage = appDownload?.mockupImageUrl || '/images/app-screen.png';
+
   return (
     <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page">
       <div className="container-msari">
         {/* Single compact banner */}
         <div
-          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20"
+          className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-geo-pattern"
           style={{ background: 'linear-gradient(135deg, #23096E 0%, #2d1580 50%, #3A1C8F 100%)' }}
         >
+          <div
+            className="pointer-events-none absolute -top-10 -start-10 w-52 h-52 rounded-full opacity-40"
+            style={{ background: 'radial-gradient(circle, rgba(232,169,58,.35), transparent 70%)' }}
+          />
           <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-0 px-6 py-8 lg:py-6 lg:px-10" style={{ direction: 'rtl' }}>
 
             {/* Right: Text + Store Buttons */}
             <div className="flex-1 text-center lg:text-start">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/80 text-[11px] font-black mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E8A93A]" />
+                <span>{badge}</span>
+              </div>
               <h2 className="text-xl sm:text-2xl font-black text-white mb-1.5 drop-shadow-sm">
-                حمل تطبيق مساري الآن
+                {title}
               </h2>
               <p className="text-[#F4F2F8] text-xs sm:text-sm font-bold mb-5">
-                احجز فنادقك ورحلاتك من أي مكان وفي أي وقت بسهولة وأمان
+                {subtitle}
               </p>
 
               {/* Official Store badges */}
               <div className="flex items-center justify-center lg:justify-start gap-3">
                 <a
-                  href="https://play.google.com/store/apps/details?id=net.msari.app"
+                  href={playStore}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"
@@ -41,7 +61,7 @@ export default function AppDownloadSection() {
                   </div>
                 </a>
                 <a
-                  href="https://apps.apple.com"
+                  href={appStore}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-[#23096E] hover:bg-[#FF3B30] hover:text-white rounded-xl shadow-md font-black transition-all group"
@@ -57,39 +77,29 @@ export default function AppDownloadSection() {
               </div>
             </div>
 
-            {/* Center: Phone Mockups */}
+            {/* Center: Phone Mockup */}
             <div className="flex-shrink-0 flex items-center justify-center lg:mx-6">
               <div className="relative flex items-end">
-                {/* Phone 1 */}
-                <div className="relative w-28 sm:w-32 h-48 sm:h-56 rounded-xl overflow-hidden border-2 border-white/20 shadow-2xl -rotate-3 bg-slate-950">
+                <div className="relative w-32 sm:w-36 h-52 sm:h-60 rounded-2xl overflow-hidden border-2 border-white/30 shadow-2xl bg-slate-950">
                   <Image
-                    src="https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FBmS2C5c4z23UfUv3T0oG%2Fimg_0.jpg?alt=media&token=7fa51dd1-b3b3-4f05-8968-3f596a77d542"
-                    alt="تطبيق مساري"
+                    src={mockupImage}
+                    alt="تطبيق مساري للجوال"
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-                </div>
-                {/* Phone 2 */}
-                <div className="relative w-28 sm:w-32 h-52 sm:h-60 rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl rotate-3 -ms-8 z-10 bg-slate-950">
-                  <Image
-                    src="https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FIOfiz4EpAILtuN0nc7zg%2Fimg_0.jpg?alt=media&token=2b00ded4-8b95-4efe-bc46-62e0ebdb178e"
-                    alt="حجز فنادق اليمن"
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
                 </div>
               </div>
             </div>
 
-            {/* Left: QR Code */}
-            <div className="flex-shrink-0 hidden xl:flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-              <div className="w-14 h-14 bg-white p-1 rounded-lg flex items-center justify-center">
-                <QrCode className="w-full h-full text-[#23096E]" />
+            {/* Left: Scan QR Badge */}
+            <div className="hidden xl:flex items-center gap-3 bg-white/10 border border-white/20 rounded-2xl px-4 py-3 backdrop-blur-md shrink-0">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-1.5 shadow-md">
+                <QrCode size={36} className="text-[#23096E]" />
               </div>
-              <div className="text-white text-xs font-bold max-w-[100px] leading-tight">
-                امسح الرمز للتحميل المباشر
+              <div className="text-start">
+                <p className="text-white text-xs font-black">امسح للتحميل</p>
+                <p className="text-[#F4F2F8]/75 text-[10px] font-bold">متاح على iOS & Android</p>
               </div>
             </div>
 

@@ -1,6 +1,5 @@
 import * as admin from 'firebase-admin';
-
-console.log('[BOOT-3] Executing src/lib/firebase-admin.ts -> Module Loaded');
+import * as fs from 'fs';
 
 if (!admin.apps.length) {
   const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
@@ -8,6 +7,8 @@ if (!admin.apps.length) {
   const privateKey = process.env.FIREBASE_PRIVATE_KEY
     ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
     : undefined;
+
+  const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '';
 
   if (projectId && clientEmail && privateKey) {
     try {
@@ -19,7 +20,17 @@ if (!admin.apps.length) {
         }),
       });
     } catch (error) {
-      console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK:', error);
+      console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK from env:', error);
+    }
+  } else if (fs.existsSync(keyPath)) {
+    try {
+      const serviceAccount = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+
+    } catch (error) {
+      console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK from key file:', error);
     }
   }
 }
@@ -32,8 +43,15 @@ export const db: admin.firestore.Firestore = new Proxy({} as admin.firestore.Fir
         where: () => dummyChain,
         doc: () => dummyChain,
         collection: () => dummyChain,
+        collectionGroup: () => dummyChain,
         orderBy: () => dummyChain,
         limit: () => dummyChain,
+        offset: () => dummyChain,
+        startAfter: () => dummyChain,
+        startAt: () => dummyChain,
+        endAt: () => dummyChain,
+        endBefore: () => dummyChain,
+        select: () => dummyChain,
         get: async () => ({ docs: [], empty: true, size: 0 }),
         set: async () => {},
         update: async () => {},
