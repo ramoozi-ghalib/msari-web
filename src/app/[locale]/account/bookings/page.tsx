@@ -85,14 +85,30 @@ export default async function AccountBookingsPage(props: {
                 <div key={booking.id} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 hover:shadow-md transition-shadow duration-300">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[var(--brand-primary)]/10 rounded-xl flex items-center justify-center">
-                        <Hotel size={18} className="text-[var(--brand-primary)]" />
-                      </div>
+                      {booking.hotel?.thumbnailUrl ? (
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={booking.hotel.thumbnailUrl}
+                            alt={booking.hotel?.nameAr || 'Hotel'}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 bg-[var(--brand-primary)]/10 rounded-xl flex items-center justify-center shrink-0">
+                          <Hotel size={20} className="text-[var(--brand-primary)]" />
+                        </div>
+                      )}
                       <div>
-                        <div className="font-black text-neutral-900">
+                        <div className="font-black text-neutral-900 text-base">
                           {booking.hotel?.nameAr || booking.hotel?.nameEn || 'فندق'}
                         </div>
-                        <div className="text-neutral-400 text-xs mt-0.5">رقم الحجز: {booking.code}</div>
+                        {booking.room?.nameAr && (
+                          <div className="text-xs font-semibold text-neutral-600 mt-0.5">
+                            {booking.room.nameAr}
+                          </div>
+                        )}
+                        <div className="text-neutral-400 text-xs mt-0.5">رقم الحجز: <span className="font-mono font-bold text-neutral-700">{booking.code}</span></div>
                       </div>
                     </div>
                     <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColors[booking.status] || 'bg-gray-100 text-gray-700'}`}>
@@ -100,7 +116,7 @@ export default async function AccountBookingsPage(props: {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-neutral-100 mb-4">
+                  <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-neutral-100 mb-4 text-center sm:text-start">
                     <div>
                       <div className="text-xs text-neutral-400 mb-1">تاريخ الوصول</div>
                       <div className="font-bold text-neutral-700 text-sm">
@@ -115,25 +131,25 @@ export default async function AccountBookingsPage(props: {
                     </div>
                     <div>
                       <div className="text-xs text-neutral-400 mb-1">عدد الليالي</div>
-                      <div className="font-bold text-neutral-700 text-sm">{booking.nights} ليالٍ</div>
+                      <div className="font-bold text-neutral-700 text-sm">{booking.nights} ليالٍ ({booking.guests} نزلاء)</div>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-neutral-400">إجمالي الحجز </span>
-                      <span className="font-black text-[var(--brand-primary)] text-lg">${booking.totalPrice}</span>
+                      <span className="text-xs text-neutral-400">إجمالي الحجز: </span>
+                      <span className="font-black text-[var(--brand-primary)] text-lg">
+                        {booking.currency === 'USD' ? `$${booking.totalPrice}` : `${booking.totalPrice} ${booking.currency}`}
+                      </span>
                     </div>
-                    {booking.status === 'CONFIRMED' && (
-                      <a
-                        href={whatsappLink('أريد الاستفسار عن حجزي رقم ' + booking.code)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-bold text-[var(--brand-primary)] hover:underline flex items-center gap-1"
-                      >
-                        تواصل معنا <ArrowRight size={14} className="rtl:rotate-180" />
-                      </a>
-                    )}
+                    <a
+                      href={whatsappLink('أريد الاستفسار عن حجزي رقم ' + booking.code)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-bold text-[var(--brand-primary)] hover:underline flex items-center gap-1"
+                    >
+                      تواصل معنا <ArrowRight size={14} className="rtl:rotate-180" />
+                    </a>
                   </div>
                 </div>
               ))

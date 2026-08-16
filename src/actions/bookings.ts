@@ -553,7 +553,7 @@ export async function previewBookingPrice(rawData: unknown) {
 // USE CASE E: getMyBookings
 // ─────────────────────────────────────────────────────────────────────────────
 
-function generateSlugFromHotel(id: string, name: string): string {
+function generateSlugFromHotel(id: string, name: any): string {
   const idMap: Record<string, string> = {
     'h_movenpick': 'movenpick-hotel-sanaa',
     'h_hilton': 'hilton-sanaa',
@@ -565,12 +565,17 @@ function generateSlugFromHotel(id: string, name: string): string {
     'h_seashore': 'hudaydah-seashore-hotel',
   };
 
+  if (!id) return '';
   if (idMap[id]) return idMap[id];
   if (idMap[id.toLowerCase()]) return idMap[id.toLowerCase()];
   
   if (id.includes('-')) return id;
 
-  const slug = name
+  const rawStr = typeof name === 'object' && name !== null 
+    ? (name.en || name.ar || id) 
+    : String(name || id);
+
+  const slug = rawStr
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
@@ -617,9 +622,29 @@ export async function getMyBookings(rawParams: unknown = {}) {
 
     const bookings = paginatedDocs.map(doc => {
       const data = doc.data();
-      const checkInDate = data.stay?.fromDate?.toDate ? data.stay.fromDate.toDate() : new Date((data.stay?.fromDate?._seconds || 0) * 1000);
-      const checkOutDate = data.stay?.toDate?.toDate ? data.stay.toDate.toDate() : new Date((data.stay?.toDate?._seconds || 0) * 1000);
-      const createdDate = data.createdAt?.toDate ? data.createdAt.toDate() : new Date((data.createdAt?._seconds || 0) * 1000);
+
+      const rawHotelName = data.hotel?.name;
+      const hotelNameAr = typeof rawHotelName === 'object' && rawHotelName !== null 
+        ? (rawHotelName.ar || rawHotelName.en || 'فندق') 
+        : (rawHotelName || 'فندق');
+      const hotelNameEn = typeof rawHotelName === 'object' && rawHotelName !== null 
+        ? (rawHotelName.en || rawHotelName.ar || 'Hotel') 
+        : (rawHotelName || 'Hotel');
+
+      const rawRoomName = data.room?.name;
+      const roomNameAr = typeof rawRoomName === 'object' && rawRoomName !== null
+        ? (rawRoomName.ar || rawRoomName.en || 'غرفة')
+        : (rawRoomName || 'غرفة');
+
+      const checkInDate = data.stay?.fromDate?.toDate 
+        ? data.stay.fromDate.toDate() 
+        : (data.stay?.fromDate?._seconds ? new Date(data.stay.fromDate._seconds * 1000) : (data.stay?.fromDate ? new Date(data.stay.fromDate) : new Date()));
+      const checkOutDate = data.stay?.toDate?.toDate 
+        ? data.stay.toDate.toDate() 
+        : (data.stay?.toDate?._seconds ? new Date(data.stay.toDate._seconds * 1000) : (data.stay?.toDate ? new Date(data.stay.toDate) : new Date()));
+      const createdDate = data.createdAt?.toDate 
+        ? data.createdAt.toDate() 
+        : (data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000) : (data.createdAt ? new Date(data.createdAt) : new Date()));
 
       return {
         id: doc.id,
@@ -631,19 +656,19 @@ export async function getMyBookings(rawParams: unknown = {}) {
         checkOut: checkOutDate.toISOString(),
         nights: data.stay?.nightsCount || 1,
         guests: data.stay?.guestsCount || 1,
-        totalPrice: data.pricing?.totalUsd || 0,
-        currency: 'USD',
+        totalPrice: data.pricing?.totalInSelectedCurrency || data.pricing?.totalUsd || 0,
+        currency: (data.pricing?.selectedCurrencyCode || 'USD').toUpperCase(),
         createdAt: createdDate.toISOString(),
         hotel: {
           id: data.hotel?.id || '',
-          nameAr: data.hotel?.name || 'فندق',
-          nameEn: data.hotel?.name || 'Hotel',
-          slug: data.hotel?.name ? generateSlugFromHotel(data.hotel.id, data.hotel.name) : '',
+          nameAr: hotelNameAr,
+          nameEn: hotelNameEn,
+          slug: generateSlugFromHotel(data.hotel?.id, data.hotel?.name),
           thumbnailUrl: data.hotel?.imageUrl || null,
         },
         room: {
           id: data.room?.id || '',
-          nameAr: data.room?.name || 'غرفة',
+          nameAr: roomNameAr,
         },
       };
     });
