@@ -54,16 +54,25 @@ const ALLOWED_TRANSITIONS: Readonly<
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CreateBookingSchema = z.object({
-  hotelId:       z.string().min(1, 'معرف الفندق مطلوب'),
-  roomId:        z.string().min(1, 'معرف الغرفة مطلوب').optional(),
-  guestName:     z.string().min(2, 'الاسم قصير جداً').max(100).trim(),
-  guestEmail:    z.string().email('البريد الإلكتروني غير صحيح').max(254).toLowerCase().trim(),
-  guestPhone:    z.string().min(7, 'رقم الهاتف قصير جداً').max(20).trim(),
-  checkIn:       z.string().datetime({ message: 'تاريخ الوصول غير صالح' }),
-  checkOut:      z.string().datetime({ message: 'تاريخ المغادرة غير صالح' }),
-  guests:        z.number().int().min(1).max(20),
-  paymentMethod: z.nativeEnum(PaymentMethod),
-  notes:         z.string().max(1000).trim().optional(),
+  hotelId:              z.string().min(1, 'معرف الفندق مطلوب'),
+  roomId:               z.string().min(1, 'معرف الغرفة مطلوب').optional(),
+  guestName:            z.string().min(2, 'الاسم قصير جداً').max(100).trim(),
+  guestEmail:           z.string().email('البريد الإلكتروني غير صحيح').max(254).toLowerCase().trim(),
+  guestPhone:           z.string().min(7, 'رقم الهاتف قصير جداً').max(20).trim(),
+  checkIn:              z.string().datetime({ message: 'تاريخ الوصول غير صالح' }),
+  checkOut:             z.string().datetime({ message: 'تاريخ المغادرة غير صالح' }),
+  guests:               z.number().int().min(1).max(20),
+  paymentMethod:        z.string().min(1, 'طريقة الدفع مطلوبة'),
+  selectedCurrencyCode: z.string().optional().default('USD'),
+  isForAnotherGuest:    z.boolean().optional().default(false),
+  anotherGuestName:     z.string().max(100).trim().optional(),
+  anotherGuestPhone:    z.string().max(20).trim().optional(),
+  senderName:           z.string().max(100).trim().optional(),
+  senderNumber:         z.string().max(30).trim().optional(),
+  transferAmount:       z.number().nonnegative().optional(),
+  transferCurrencyCode: z.string().optional(),
+  transferToNumber:     z.string().max(50).trim().optional(),
+  notes:                z.string().max(1000).trim().optional(),
 }).strict();
 
 const GetMyBookingsSchema = z.object({
@@ -239,9 +248,13 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
 
   try {
     // ── 4. Map payment method to API expectations ──
-    let mappedPaymentMethod = 'cash';
-    if (input.paymentMethod === 'BANK_TRANSFER') {
+    let mappedPaymentMethod = input.paymentMethod;
+    if (input.paymentMethod === 'BANK_TRANSFER' || input.paymentMethod === 'transfer') {
       mappedPaymentMethod = 'transfer';
+    } else if (input.paymentMethod === 'WHATSAPP' || input.paymentMethod === 'whatsapp') {
+      mappedPaymentMethod = 'whatsapp';
+    } else if (input.paymentMethod === 'CASH' || input.paymentMethod === 'cash') {
+      mappedPaymentMethod = 'cash';
     } else if (input.paymentMethod === 'CREDIT_CARD') {
       mappedPaymentMethod = 'credit_card';
     }
@@ -259,7 +272,15 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
         bookingOwnerName: input.guestName,
         bookingOwnerPhone: input.guestPhone,
         paymentMethod: mappedPaymentMethod,
-        selectedCurrencyCode: 'USD',
+        selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
+        isForAnotherGuest: input.isForAnotherGuest || false,
+        anotherGuestName: input.isForAnotherGuest ? (input.anotherGuestName || '') : '',
+        anotherGuestPhone: input.isForAnotherGuest ? (input.anotherGuestPhone || '') : '',
+        senderName: input.senderName || null,
+        senderNumber: input.senderNumber || null,
+        transferAmount: input.transferAmount || null,
+        transferCurrencyCode: input.transferCurrencyCode || null,
+        transferToNumber: input.transferToNumber || '',
       },
       callerUser?.firebaseToken ? { Authorization: `Bearer ${callerUser.firebaseToken}` } : undefined
     );

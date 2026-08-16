@@ -103,6 +103,22 @@ export interface Booking {
   createdAt: string;
 }
 
+// =================== BANK ACCOUNT ===================
+export interface BankAccountDetails {
+  currencyCode: string;
+  accountNumber: string;
+}
+
+export interface BankAccount {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  iconUrl?: string;
+  isActive: boolean;
+  sortOrder: number;
+  accounts: BankAccountDetails[];
+}
+
 // =================== USER ===================
 export interface User {
   id: string;

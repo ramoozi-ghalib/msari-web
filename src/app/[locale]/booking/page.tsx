@@ -222,6 +222,12 @@ export default async function Page(props: {
     console.error('Error fetching bank accounts from Firestore:', error);
   }
 
+  const initialUserData = session?.user ? {
+    name: session.user.name || '',
+    email: session.user.email || '',
+    phone: session.user.phone || '',
+  } : undefined;
+
   return (
     <BookingPage
       hotel={hotel}
@@ -234,6 +240,7 @@ export default async function Page(props: {
       guests={guests}
       nights={nights}
       bankAccounts={bankAccounts}
+      initialUser={initialUserData}
     />
   );
 }
