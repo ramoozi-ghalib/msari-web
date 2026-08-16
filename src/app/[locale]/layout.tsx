@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer';
 
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
+import { safeJsonLd } from '@/lib/sanitize';
 
 // JSON-LD structured data for SEO
 const jsonLd = {
@@ -41,7 +42,7 @@ export default async function LocaleLayout(
     <NextIntlClientProvider locale={locale} messages={messages}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <ConditionalLayout
         header={<Header />}

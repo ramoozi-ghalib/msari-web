@@ -245,9 +245,9 @@ export default function DestinationDetailClient({ destination, locale }: Destina
 
             {/* 3D Glassmorphism Landmark Cards Grid inside the card block */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {destination.landmarks.map((landmark: any) => (
+              {destination.landmarks.map((landmark: any, idx: number) => (
                 <div
-                  key={landmark.id}
+                  key={landmark.id || landmark.name || `lm-${idx}`}
                   className="group relative rounded-3xl overflow-hidden bg-[var(--surface-page)]/60 border border-neutral-200/80 shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 transform hover:rotate-1 flex flex-col justify-between"
                 >
                   {/* Landmark Image */}

@@ -219,13 +219,15 @@ export class CityService {
       governorateEn: firestoreCity?.governorateEn || curated?.governorateEn || 'Yemen',
       heroImage: editorial?.heroImage || firestoreCity?.heroImage || firestoreCity?.imageUrl || curated?.heroImage || '/images/destinations/sanaa.jpg',
       tagline: editorial?.tagline || curated?.tagline || `اكتشف أجمل المعالم والفنادق في ${cityName}`,
-      overview: editorial?.overview || curated?.overview || {
-        history: `تعتبر ${cityName} من أهم المدن اليمنية التاريخية والثقافية وتتميز بعمارتها العريقة وطبيعتها الساحرة.`,
-        climate: `مناخ معتدل ولطيف يتيح للزوار التمتع بالأجواء الأنيقة والتجول في أرجاء المدينة.`,
-        culture: `ثقافة غنية بالتقاليد الشعبية والأسواق التراثية والمأكولات اليمنية الشهيرة.`,
-        bestTimeToVisit: `متاحة للزيارة والاستمتاع بطقسها ورونقها على مدار العام.`,
+      overview: {
+        history: editorial?.overview?.history || curated?.overview?.history || `تعتبر ${cityName} من أهم المدن اليمنية التاريخية والثقافية وتتميز بعمارتها العريقة وطبيعتها الساحرة.`,
+        climate: editorial?.overview?.climate || curated?.overview?.climate || `مناخ معتدل ولطيف يتيح للزوار التمتع بالأجواء الأنيقة والتجول في أرجاء المدينة.`,
+        culture: editorial?.overview?.culture || curated?.overview?.culture || `ثقافة غنية بالتقاليد الشعبية والأسواق التراثية والمأكولات اليمنية الشهيرة.`,
+        bestTimeToVisit: editorial?.overview?.bestTimeToVisit || curated?.overview?.bestTimeToVisit || `متاحة للزيارة والاستمتاع بطقسها ورونقها على مدار العام.`,
       },
-      landmarks: editorial?.landmarks || curated?.landmarks || [],
+      landmarks: Array.isArray(editorial?.landmarks) && editorial.landmarks.length > 0
+        ? editorial.landmarks
+        : (Array.isArray(curated?.landmarks) && curated.landmarks.length > 0 ? curated.landmarks : []),
       hotelCount: hotels.length,
       rawHotels: hotels,
     };

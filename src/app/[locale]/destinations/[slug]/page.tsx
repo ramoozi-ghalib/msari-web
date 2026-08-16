@@ -2,6 +2,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getDestinationBySlug } from '@/actions/cities';
+import { safeJsonLd } from '@/lib/sanitize';
 import DestinationDetailClient from './DestinationDetailClient';
 
 interface PageProps {
@@ -91,11 +92,11 @@ export default async function DestinationDetailPage({ params }: PageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(destinationSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(destinationSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
       <DestinationDetailClient
         destination={destination}

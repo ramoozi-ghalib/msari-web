@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getHotelBySlug } from '@/actions/hotels';
+import { safeJsonLd } from '@/lib/sanitize';
 import HotelDetailClient from './HotelDetailClient';
 
 interface Props {
@@ -89,11 +90,11 @@ export default async function HotelDetailPage(props: Props) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(hotelSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
       <HotelDetailClient hotel={hotel!} />
     </>

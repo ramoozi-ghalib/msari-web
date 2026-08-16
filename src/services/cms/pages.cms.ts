@@ -369,7 +369,7 @@ export const FALLBACK_FLIGHTS_PAGE: FlightsPageData = {
 
 function resolveContent(data: Record<string, any>): Record<string, any> {
   if (data.content && typeof data.content === 'object' && !Array.isArray(data.content)) {
-    return { ...data.content, ...data };
+    return { ...data, ...data.content };
   }
   return data;
 }
@@ -654,72 +654,72 @@ async function fetchFlightsPageInternal(): Promise<FlightsPageData> {
   };
 }
 
-// ── Exported CMS Service ───────────────────────────────────────────────────
+const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 10;
 
 export class PagesCmsService {
   static getAboutPage = unstable_cache(
     fetchAboutInternal,
     ['website_page_about'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:about'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:about'] }
   );
 
   static getPrivacyPage = unstable_cache(
     () => fetchLegalInternal('privacy'),
     ['website_page_privacy'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:privacy'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:privacy'] }
   );
 
   static getTermsPage = unstable_cache(
     () => fetchLegalInternal('terms'),
     ['website_page_terms'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:terms'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:terms'] }
   );
 
   static getDevelopersPage = unstable_cache(
     fetchDevelopersInternal,
     ['website_page_developers'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:developers'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:developers'] }
   );
 
   static getAppPage = unstable_cache(
     fetchAppPageInternal,
     ['website_page_app'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:app'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:app'] }
   );
 
   static getCarsPage = unstable_cache(
     fetchCarsPageInternal,
     ['website_page_cars'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:cars'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:cars'] }
   );
 
   static getCarsAirportPage = unstable_cache(
     fetchCarsAirportPageInternal,
     ['website_page_cars_airport'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:cars_airport'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:cars_airport'] }
   );
 
   static getCarsTransportPage = unstable_cache(
     fetchCarsTransportPageInternal,
     ['website_page_cars_transport'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:cars_transport'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:cars_transport'] }
   );
 
   static getAddHotelPage = unstable_cache(
     fetchAddHotelPageInternal,
     ['website_page_add_hotel'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:add_hotel'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:add_hotel'] }
   );
 
   static getInternationalHotelsPage = unstable_cache(
     fetchInternationalHotelsPageInternal,
     ['website_page_international_hotels'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:international_hotels'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:international_hotels'] }
   );
 
   static getFlightsPage = unstable_cache(
     fetchFlightsPageInternal,
     ['website_page_flights'],
-    { revalidate: 3600, tags: ['cms:pages', 'cms:page:flights'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:flights'] }
   );
 }

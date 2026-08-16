@@ -4,6 +4,15 @@ import { db } from '@/lib/firebase-admin';
 import type { BlogPost } from '@/types';
 
 
+function parseFirestoreDate(val: any): string {
+  if (!val) return new Date().toISOString();
+  if (typeof val.toDate === 'function') return val.toDate().toISOString();
+  if (val && typeof val._seconds === 'number') return new Date(val._seconds * 1000).toISOString();
+  if (val instanceof Date) return val.toISOString();
+  if (typeof val === 'string') return val;
+  return new Date().toISOString();
+}
+
 export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
     const snap = await db.collection('web_blog').get();
@@ -24,13 +33,13 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         content: data.contentHtml || data.content || '',
         contentEn: data.contentEn || '',
         coverImage: data.coverImage || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=1600',
-        authorName: data.authorName || 'مساري',
+        authorName: data.author || data.authorName || 'فريق مساري',
         authorAvatar: data.authorAvatar || '',
         category: data.category || data.categoryId || 'عام',
         categoryEn: data.categoryEn || 'General',
         tags: data.tags || [],
-        readTimeMinutes: data.readTimeMinutes || 5,
-        publishedAt: data.publishedAt || data.updatedAt || new Date().toISOString(),
+        readTimeMinutes: data.readTime || data.readTimeMinutes || 5,
+        publishedAt: parseFirestoreDate(data.publishedAt || data.createdAt || data.updatedAt),
         isPublished: data.status ? data.status === 'published' : (data.isPublished !== undefined ? data.isPublished : true),
       };
     }).filter(p => p.isPublished);
@@ -78,13 +87,13 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       content: data.contentHtml || data.content || '',
       contentEn: data.contentEn || '',
       coverImage: data.coverImage || 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=1600',
-      authorName: data.authorName || 'مساري',
+      authorName: data.author || data.authorName || 'فريق مساري',
       authorAvatar: data.authorAvatar || '',
       category: data.category || data.categoryId || 'عام',
       categoryEn: data.categoryEn || 'General',
       tags: data.tags || [],
-      readTimeMinutes: data.readTimeMinutes || 5,
-      publishedAt: data.publishedAt || data.updatedAt || new Date().toISOString(),
+      readTimeMinutes: data.readTime || data.readTimeMinutes || 5,
+      publishedAt: parseFirestoreDate(data.publishedAt || data.createdAt || data.updatedAt),
       isPublished: true,
     };
   } catch (error) {

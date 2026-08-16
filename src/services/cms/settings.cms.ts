@@ -68,6 +68,8 @@ async function fetchSettingsInternal(): Promise<WebsiteSettingsData> {
   };
 }
 
+const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 10;
+
 export class SettingsCmsService {
   /**
    * Cached getter for website settings (Tagged cache: 'cms:settings').
@@ -75,6 +77,6 @@ export class SettingsCmsService {
   static getSettings = unstable_cache(
     fetchSettingsInternal,
     ['website_settings_general'],
-    { revalidate: 3600, tags: ['cms:settings'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:settings'] }
   );
 }

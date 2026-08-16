@@ -10,18 +10,33 @@ import { z } from 'zod';
 import { db } from '@/lib/firebase-admin';
 
 const hotelPartnerSchema = z.object({
-  hotelName: z.string().min(2, 'اسم الفندق مطلوب'),
-  city: z.string().min(2, 'المدينة مطلوبة'),
-  address: z.string().optional().default(''),
-  stars: z.string().optional().default('3'),
-  ownerName: z.string().min(2, 'اسم المسؤول مطلوب'),
-  position: z.string().min(2, 'المسمى الوظيفي مطلوب'),
-  phone: z.string().min(6, 'رقم الهاتف مطلوب'),
-  email: z.string().optional().default(''),
-  rooms: z.string().optional().default(''),
-  suites: z.string().optional().default('0'),
-  amenities: z.string().optional().default(''),
-  message: z.string().optional().default(''),
+  hotelName: z.string().min(2, 'اسم الفندق مطلوب').max(200),
+  city: z.string().min(2, 'المدينة مطلوبة').max(100),
+  address: z.string().max(500).optional().default(''),
+  stars: z.string().optional().default('3').refine((val) => {
+    const n = parseInt(val, 10);
+    return !isNaN(n) && n >= 1 && n <= 5;
+  }, { message: 'التصنيف يجب أن يكون بين 1 و 5 نجوم' }),
+  ownerName: z.string().min(2, 'اسم المسؤول مطلوب').max(200),
+  position: z.string().min(2, 'المسمى الوظيفي مطلوب').max(200),
+  phone: z.string().min(6, 'رقم الهاتف مطلوب').max(20).regex(
+    /^[+]?[\d\s()-]{6,20}$/,
+    'صيغة رقم الهاتف غير صحيحة'
+  ),
+  email: z.string().optional().default('').refine(
+    (val) => val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+    { message: 'صيغة البريد الإلكتروني غير صحيحة' }
+  ),
+  rooms: z.string().optional().default('').refine(
+    (val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: 'عدد الغرف يجب أن يكون رقماً صحيحاً غير سالب' }
+  ),
+  suites: z.string().optional().default('0').refine(
+    (val) => val === '' || val === '0' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: 'عدد الأجنحة يجب أن يكون رقماً صحيحاً غير سالب' }
+  ),
+  amenities: z.string().max(2000).optional().default(''),
+  message: z.string().max(5000).optional().default(''),
 });
 
 export async function POST(req: NextRequest) {

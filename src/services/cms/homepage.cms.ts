@@ -94,6 +94,8 @@ async function fetchHomepageInternal(): Promise<HomepageContentData> {
   };
 }
 
+const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 10;
+
 export class HomepageCmsService {
   /**
    * Cached getter for homepage content (Tagged cache: 'cms:homepage').
@@ -101,6 +103,6 @@ export class HomepageCmsService {
   static getHomepageContent = unstable_cache(
     fetchHomepageInternal,
     ['website_homepage_main'],
-    { revalidate: 3600, tags: ['cms:homepage'] }
+    { revalidate: CMS_REVALIDATE, tags: ['cms:homepage'] }
   );
 }

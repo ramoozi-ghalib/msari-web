@@ -97,8 +97,8 @@ export default async function AboutPage() {
                   <Users size={22} className="text-white" />
                 </div>
                 <div>
-                  <div className="font-black text-neutral-900 text-lg">+5000</div>
-                  <div className="text-sm text-neutral-500">عميل راضٍ</div>
+                  <div className="font-black text-neutral-900 text-lg">{data.story.satisfiedClientsCount?.split(' ')[0] || '+5000'}</div>
+                  <div className="text-sm text-neutral-500">{data.story.satisfiedClientsCount?.split(' ').slice(1).join(' ') || 'عميل راضٍ'}</div>
                 </div>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default async function AboutPage() {
       <section className="bg-[var(--brand-primary)] py-24 mb-24">
         <div className="container-msari">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">قيمنا</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">{data.values[0] ? 'قيمنا' : 'قيمنا'}</h2>
             <p className="text-white/70 text-lg max-w-xl mx-auto">المبادئ التي تحكم كيف نُقدم خدماتنا لكل مسافر</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -151,8 +151,8 @@ export default async function AboutPage() {
       <section className="container-msari mb-24">
         <div className="bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] rounded-3xl p-12 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-          <h2 className="text-3xl font-black text-white mb-4 relative z-10">مستعد لسفرتك القادمة؟</h2>
-          <p className="text-white/80 text-lg mb-8 relative z-10">احجز الآن واستمتع بأفضل تجربة سفر في اليمن</p>
+          <h2 className="text-3xl font-black text-white mb-4 relative z-10">{data.cta?.title || 'مستعد لسفرتك القادمة؟'}</h2>
+          <p className="text-white/80 text-lg mb-8 relative z-10">{data.cta?.subtitle || 'احجز الآن واستمتع بأفضل تجربة سفر في اليمن'}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <Link href="/hotels" className="btn btn-white">
               تصفح الفنادق

@@ -1,7 +1,4 @@
 import * as admin from 'firebase-admin';
-
-console.log('[BOOT-3] Executing src/lib/firebase-admin.ts -> Module Loaded');
-
 import * as fs from 'fs';
 
 if (!admin.apps.length) {
@@ -11,7 +8,7 @@ if (!admin.apps.length) {
     ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
     : undefined;
 
-  const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || 'D:\\projects\\msari_dashboard\\functions\\serviceAccountKey.json';
+  const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '';
 
   if (projectId && clientEmail && privateKey) {
     try {
@@ -31,7 +28,7 @@ if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
-      console.log('[firebase-admin] ✅ Successfully initialized Firebase Admin using serviceAccountKey.json');
+
     } catch (error) {
       console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK from key file:', error);
     }
