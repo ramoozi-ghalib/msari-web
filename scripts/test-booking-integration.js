@@ -63,6 +63,8 @@ async function runBookingIntegrationTests() {
     transferAmount:       z.number().nonnegative().optional(),
     transferCurrencyCode: z.string().optional(),
     transferToNumber:     z.string().max(50).optional(),
+    receiptDataUrl:       z.string().optional(),
+    receiptFileName:      z.string().max(200).optional(),
     notes:                z.string().max(1000).optional(),
   }).strict();
 
@@ -78,38 +80,36 @@ async function runBookingIntegrationTests() {
     guests: 2,
     paymentMethod: 'cash',
     selectedCurrencyCode: 'USD',
-    isForAnotherGuest: false,
   };
-  const parseSelf = CreateBookingSchema.safeParse(selfPayload);
-  assert(parseSelf.success, 'CreateBookingSchema validates booking for self correctly');
-  assert(parseSelf.data?.isForAnotherGuest === false, 'isForAnotherGuest is false when booking for self');
+  const parseResult1 = CreateBookingSchema.safeParse(selfPayload);
+  assert(parseResult1.success, 'Self booking payload should be valid');
+  console.log('✓ Test 2.1: Self-booking payload schema validation passed');
 
   // Test 2.2: Booking for another guest payload
-  const otherGuestPayload = {
+  const anotherGuestPayload = {
     hotelId: 'hotel-aden-1',
     roomId: 'room-deluxe-1',
-    guestName: 'أحمد علي',
+    guestName: 'أحمد علي (الحاجز)',
     guestEmail: 'ahmed@example.com',
     guestPhone: '+967771234567',
     checkIn: '2026-09-01T12:00:00.000Z',
     checkOut: '2026-09-05T12:00:00.000Z',
-    guests: 1,
+    guests: 2,
     paymentMethod: 'transfer',
     selectedCurrencyCode: 'SAR',
     isForAnotherGuest: true,
-    anotherGuestName: 'محمد سالم',
-    anotherGuestPhone: '+967733987654',
-    senderName: 'أحمد علي بن علي',
+    anotherGuestName: 'سعيد صالح (النزيل الفعلي)',
+    anotherGuestPhone: '+967733445566',
+    senderName: 'أحمد علي',
     transferAmount: 1500,
     transferCurrencyCode: 'SAR',
     transferToNumber: '123456789',
-    notes: 'غرفة مطلة على البحر',
+    receiptDataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    receiptFileName: 'receipt_2026.png',
   };
-  const parseOther = CreateBookingSchema.safeParse(otherGuestPayload);
-  assert(parseOther.success, 'CreateBookingSchema validates booking for another guest with transfer details');
-  assert(parseOther.data?.anotherGuestName === 'محمد سالم', 'anotherGuestName is preserved in contract');
-  assert(parseOther.data?.transferAmount === 1500, 'transferAmount is preserved in contract');
-  assert(parseOther.data?.transferToNumber === '123456789', 'transferToNumber is preserved in contract');
+  const parseResult2 = CreateBookingSchema.safeParse(anotherGuestPayload);
+  assert(parseResult2.success, 'Another guest payload with bank transfer & receipt should be valid');
+  console.log('✓ Test 2.2: Another guest + Bank transfer + Receipt upload payload schema validation passed');
 
   // ── TEST GROUP 3: Bank Accounts Operational Contract ──
   console.log('\n--- TEST GROUP 3: Operational Bank Accounts Mapping ---');

@@ -193,6 +193,8 @@ export default function BookingPage({
       transferAmount: paymentData.transferAmount,
       transferCurrencyCode: paymentData.transferCurrencyCode,
       transferToNumber: paymentData.transferToNumber,
+      receiptDataUrl: paymentData.receiptDataUrl,
+      receiptFileName: paymentData.receiptFileName,
       notes: guestData.requests || undefined,
     });
 

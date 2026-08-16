@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Building,
   MessageCircle,
@@ -10,6 +10,10 @@ import {
   Check,
   CreditCard,
   Banknote,
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  FileCheck,
 } from 'lucide-react';
 import type { BankAccount } from '@/types';
 
@@ -21,6 +25,8 @@ export interface PaymentSubmitData {
   transferAmount?: number;
   transferCurrencyCode?: string;
   transferToNumber?: string;
+  receiptDataUrl?: string;
+  receiptFileName?: string;
 }
 
 interface PaymentStepProps {
@@ -52,7 +58,7 @@ export default function PaymentStep({
   // Payment selection: bank ID string, or 'cash', or 'whatsapp'
   const firstBank = bankAccounts.length > 0 ? bankAccounts[0] : null;
   const [selectedMethod, setSelectedMethod] = useState<string>(
-    firstBank ? firstBank.id : 'whatsapp'
+    firstBank ? firstBank.id : 'cash'
   );
 
   // For bank transfer details
@@ -67,15 +73,58 @@ export default function PaymentStep({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [copiedAccount, setCopiedAccount] = useState<boolean>(false);
 
-  const activeAccount = availableCurrencies.find(
-    (a) => a.currencyCode.toLowerCase() === selectedCurrency.toLowerCase()
-  ) || availableCurrencies[0];
+  // Receipt image upload state (مطابق لتطبيق مساري)
+  const [receiptImage, setReceiptImage] = useState<string | null>(null);
+  const [receiptFileName, setReceiptFileName] = useState<string>('');
+  const [receiptFileSize, setReceiptFileSize] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const activeAccount =
+    availableCurrencies.find(
+      (a) => a.currencyCode.toLowerCase() === selectedCurrency.toLowerCase()
+    ) || availableCurrencies[0];
 
   const handleCopyAccount = () => {
     if (activeAccount?.accountNumber) {
       navigator.clipboard.writeText(activeAccount.accountNumber);
       setCopiedAccount(true);
       setTimeout(() => setCopiedAccount(false), 2000);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+      setValidationError('يرجى اختيار ملف صورة صالح (JPG, PNG, WEBP).');
+      return;
+    }
+
+    // Validate size (max 8MB)
+    if (file.size > 8 * 1024 * 1024) {
+      setValidationError('حجم الصورة كبير جداً. الحد الأقصى هو 8 ميغابايت.');
+      return;
+    }
+
+    setValidationError(null);
+    setReceiptFileName(file.name);
+    setReceiptFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setReceiptImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveReceipt = () => {
+    setReceiptImage(null);
+    setReceiptFileName('');
+    setReceiptFileSize('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -97,11 +146,13 @@ export default function PaymentStep({
 
       onConfirm({
         paymentMethod: 'transfer',
-        selectedCurrencyCode: selectedCurrency,
+        selectedCurrencyCode: activeAccount?.currencyCode || selectedCurrency,
         senderName: senderName.trim(),
         transferAmount: parsedAmount,
-        transferCurrencyCode: selectedCurrency,
+        transferCurrencyCode: activeAccount?.currencyCode || selectedCurrency,
         transferToNumber: activeAccount?.accountNumber || '',
+        receiptDataUrl: receiptImage || undefined,
+        receiptFileName: receiptFileName || undefined,
       });
       return;
     }
@@ -136,6 +187,13 @@ export default function PaymentStep({
       </div>
 
       <div className="space-y-4 mb-6">
+        {/* Section Title for Bank Accounts */}
+        {bankAccounts.length > 0 && (
+          <p className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+            الحسابات والمحافظ البنكية المعتمدة:
+          </p>
+        )}
+
         {/* Dynamic Operational Bank Accounts */}
         {bankAccounts.map((bank) => {
           const isSelected = selectedMethod === bank.id;
@@ -157,9 +215,7 @@ export default function PaymentStep({
               >
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 ${
-                    isSelected
-                      ? 'text-white'
-                      : 'text-neutral-700 bg-neutral-100'
+                    isSelected ? 'text-white' : 'text-neutral-700 bg-neutral-100'
                   }`}
                   style={
                     isSelected
@@ -216,7 +272,7 @@ export default function PaymentStep({
                         عملة التحويل *
                       </label>
                       <select
-                        value={selectedCurrency}
+                        value={activeAccount?.currencyCode || selectedCurrency}
                         onChange={(e) => setSelectedCurrency(e.target.value)}
                         className="w-full rounded-xl border border-neutral-300 px-3 py-2.5 text-sm font-bold text-neutral-800 bg-white outline-none focus:border-[#23096e]"
                       >
@@ -235,13 +291,16 @@ export default function PaymentStep({
                         رقم الحساب المحوّل إليه ({bank.nameAr})
                       </label>
                       <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-neutral-300 bg-white">
-                        <span className="font-mono font-black text-neutral-900 tracking-wider text-sm sm:text-base" dir="ltr">
+                        <span
+                          className="font-mono font-black text-neutral-900 tracking-wider text-sm sm:text-base"
+                          dir="ltr"
+                        >
                           {activeAccount?.accountNumber || 'غير متوفر'}
                         </span>
                         <button
                           type="button"
                           onClick={handleCopyAccount}
-                          className="flex items-center gap-1 text-xs font-bold text-[var(--brand-primary)] hover:underline"
+                          className="flex items-center gap-1 text-xs font-bold text-[var(--brand-primary)] hover:underline cursor-pointer"
                         >
                           {copiedAccount ? (
                             <>
@@ -290,14 +349,83 @@ export default function PaymentStep({
                     </div>
                   </div>
 
+                  {/* Receipt Upload Section (مطابق لتطبيق مساري) */}
+                  <div className="pt-2 border-t border-neutral-200/80">
+                    <label className="block text-xs font-bold text-neutral-700 mb-2">
+                      إرفاق إشعار / إيصال التحويل (اختياري لتأكيد الحجز فوراً)
+                    </label>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="receipt-upload-input"
+                    />
+
+                    {!receiptImage ? (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full border-2 border-dashed border-neutral-300 hover:border-[#23096e] rounded-xl p-4 flex flex-col items-center justify-center gap-1.5 bg-white transition-colors cursor-pointer text-center group"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-neutral-100 group-hover:bg-[#23096e]/10 text-neutral-500 group-hover:text-[#23096e] flex items-center justify-center transition-colors">
+                          <Upload size={18} />
+                        </div>
+                        <p className="text-xs font-bold text-neutral-700">
+                          اضغط لاختيار صورة إشعار التحويل
+                        </p>
+                        <p className="text-[10px] text-neutral-400">
+                          PNG, JPG, WEBP حتى 8 ميغابايت
+                        </p>
+                      </button>
+                    ) : (
+                      <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <img
+                            src={receiptImage}
+                            alt="Receipt Preview"
+                            className="w-12 h-12 rounded-lg object-cover border border-neutral-200 shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-neutral-900 truncate">
+                              {receiptFileName || 'إشعار التحويل'}
+                            </p>
+                            <p className="text-[10px] text-neutral-400">
+                              {receiptFileSize || 'صورة مرفقة'}
+                            </p>
+                            <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold mt-0.5">
+                              <FileCheck size={12} />
+                              جاهز للإرسال مع الحجز
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveReceipt}
+                          className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                          title="إزالة الإشعار"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   <p className="text-[11px] text-neutral-500 leading-relaxed pt-1">
-                    <span className="text-emerald-600 font-bold">ملاحظة:</span> بعد الضغط على تأكيد الحجز، يُرجى إرسال صورة إشعار التحويل عبر واتساب لمطابقتها وتأكيد حجزك فوراً.
+                    <span className="text-emerald-600 font-bold">ملاحظة:</span> سيتم تأكيد حجزك بعد التحقق من إشعار التحويل ومطابقة المبلغ المحول.
                   </p>
                 </div>
               )}
             </div>
           );
         })}
+
+        {/* Other Payment Methods Title */}
+        <p className="text-xs font-bold text-neutral-500 uppercase tracking-wider pt-2">
+          خيارات دفع أخرى:
+        </p>
 
         {/* Cash on Arrival (مطابق لتطبيق مساري) */}
         <button
@@ -322,7 +450,9 @@ export default function PaymentStep({
             <Banknote size={22} />
           </div>
           <div className="flex-1">
-            <p className="font-black text-neutral-900 text-sm sm:text-base">الدفع نقداً عند الوصول</p>
+            <p className="font-black text-neutral-900 text-sm sm:text-base">
+              الدفع نقداً عند الوصول
+            </p>
             <p className="text-xs text-neutral-400 mt-0.5">
               ادفع قيمة إقامتك نقداً عند وصولك إلى مكتب الاستقبال في الفندق.
             </p>
@@ -333,7 +463,10 @@ export default function PaymentStep({
             }`}
           >
             {selectedMethod === 'cash' && (
-              <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#23096e' }} />
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: '#23096e' }}
+              />
             )}
           </div>
         </button>
@@ -361,7 +494,9 @@ export default function PaymentStep({
             <MessageCircle size={22} />
           </div>
           <div className="flex-1">
-            <p className="font-black text-neutral-900 text-sm sm:text-base">طلب حجز وتنسيق عبر واتساب</p>
+            <p className="font-black text-neutral-900 text-sm sm:text-base">
+              طلب حجز وتنسيق عبر واتساب
+            </p>
             <p className="text-xs text-neutral-400 mt-0.5">
               نستلم طلبك وسيتواصل معك فريق خدمة العملاء فوراً لترتيب طريقة الدفع والتأكيد.
             </p>
@@ -372,7 +507,10 @@ export default function PaymentStep({
             }`}
           >
             {selectedMethod === 'whatsapp' && (
-              <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#23096e' }} />
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: '#23096e' }}
+              />
             )}
           </div>
         </button>
@@ -389,7 +527,9 @@ export default function PaymentStep({
       {(validationError || error) && (
         <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 mb-6 animate-in fade-in">
           <AlertCircle size={18} className="text-red-500 shrink-0 mt-0.5" />
-          <p className="text-xs sm:text-sm text-red-700 font-semibold">{validationError || error}</p>
+          <p className="text-xs sm:text-sm text-red-700 font-semibold">
+            {validationError || error}
+          </p>
         </div>
       )}
 
