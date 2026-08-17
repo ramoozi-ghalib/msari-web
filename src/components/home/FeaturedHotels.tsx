@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import HotelCard from '@/components/ui/HotelCard';
 import Heading from '@/components/ui/Heading';
 import type { Hotel } from '@/types';
@@ -9,48 +12,54 @@ interface FeaturedHotelsProps {
 }
 
 export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
+  const params = useParams();
+  const currentLocale = (params?.locale as string) || 'ar';
+  const hotelsPageHref = `/${currentLocale}/hotels`;
+
   return (
-    <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page">
+    <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page overflow-hidden">
       <div className="container-msari">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
+        
+        {/* ── Section Header: Title on Right, "عرض الكل" with Arrow on Left ── */}
+        <div className="flex items-center justify-between mb-6 sm:mb-8" style={{ direction: 'rtl' }}>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-2">
-              ⭐ الأكثر طلباً
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-1.5">
+              <Sparkles size={12} className="text-[#FF3B30]" />
+              <span>⭐ الأكثر طلباً</span>
             </div>
-            <Heading level={2} variant="brand" className="mb-1 text-2xl sm:text-3xl font-black">
+            <Heading level={2} variant="brand" className="mb-0.5 text-2xl sm:text-3xl font-black">
               فنادق مقترحة
             </Heading>
             <p className="text-[var(--text-secondary)] text-xs sm:text-base font-semibold">
               الأكثر طلباً والأعلى تقييماً في اليمن
             </p>
           </div>
+
+          {/* "عرض الكل" with clickable text and arrow leading to local hotels page */}
           <Link
-            href="/hotels"
-            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white font-black text-sm transition-all"
+            href={hotelsPageHref}
+            className="group inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl border border-[var(--brand-primary)]/30 sm:border-2 sm:border-[var(--brand-primary)] text-[var(--brand-primary)] bg-white/90 hover:bg-[var(--brand-primary)] hover:text-white font-black text-xs sm:text-sm shadow-sm transition-all active:scale-95 shrink-0"
           >
-            عرض جميع الفنادق
-            <ArrowLeft size={16} />
+            <span>عرض الكل</span>
+            <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-1" />
           </Link>
         </div>
 
-        {/* Hotels Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        {/* ── Responsive Container: Smooth Horizontal Carousel on Mobile / Grid on Desktop ── */}
+        <div 
+          className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-4 sm:gap-6 pb-3 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth touch-pan-x"
+          style={{ direction: 'rtl' }}
+        >
           {hotels.map((hotel) => (
-            <HotelCard key={hotel.id} hotel={hotel} />
+            <div 
+              key={hotel.id} 
+              className="w-[285px] min-[400px]:w-[310px] sm:w-auto flex-shrink-0 snap-start"
+            >
+              <HotelCard hotel={hotel} />
+            </div>
           ))}
         </div>
 
-        {/* Mobile CTA */}
-        <div className="text-center mt-6 sm:hidden">
-          <Link
-            href="/hotels"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--brand-primary)] text-white font-black text-xs shadow-md"
-          >
-            عرض جميع الفنادق
-            <ArrowLeft size={14} />
-          </Link>
-        </div>
       </div>
     </section>
   );
