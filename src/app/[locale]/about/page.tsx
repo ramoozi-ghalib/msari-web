@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   ShieldCheck, Zap, HeartHandshake, Star, 
-  MapPin, CheckCircle2, ArrowRight
+  MapPin, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { PagesCmsService } from '@/services/cms';
 
@@ -28,6 +28,7 @@ const VALUE_ICONS: Record<string, any> = {
 export default async function AboutPage() {
   const data = await PagesCmsService.getAboutPage();
 
+  const heroBadge = data?.hero?.badge || 'منصة السفر الأولى في اليمن';
   const heroTitle = data?.hero?.title || 'نعيد ابتكار تجربة السفر في اليمن';
   const heroSubtitle = data?.hero?.subtitle || 'منصة يمنية حديثة تجمع بين التكنولوجيا المتقدمة والضيافة اليمنية الأصيلة لتسهيل حجز الفنادق والتنقلات بأعلى معايير الراحة والأمان.';
 
@@ -48,29 +49,34 @@ export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-white text-neutral-900">
       
-      {/* ─── 1. Spacious Clean Header ─── */}
-      <section className="pt-32 pb-20 lg:pt-40 lg:pb-28 border-b border-neutral-100 bg-[#fafafc]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-bold mb-6">
-            <span>قصتنا ورؤيتنا</span>
+      {/* ─── 1. Elegant Brand Hero Header ─── */}
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 bg-gradient-to-br from-[#120336] via-[#23096e] to-[#3A1C8F] text-white overflow-hidden">
+        {/* Subtle Ambient Lighting */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_50%)] pointer-events-none" />
+        <div className="absolute -bottom-20 -start-20 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white/90 text-xs sm:text-sm font-bold mb-6 border border-white/15 backdrop-blur-md">
+            <Sparkles size={14} className="text-amber-300" />
+            <span>{heroBadge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-neutral-900 mb-6 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
             {heroTitle}
           </h1>
 
-          <p className="text-neutral-500 text-base sm:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/80 text-base sm:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
             {heroSubtitle}
           </p>
         </div>
       </section>
 
-      {/* ─── 2. Integrated Clean Metrics Bar (No Overlapping Margin) ─── */}
-      <section className="py-16 sm:py-20 border-b border-neutral-100">
+      {/* ─── 2. Integrated Clean Metrics Bar (Spacious & Separated) ─── */}
+      <section className="py-16 sm:py-20 border-b border-neutral-100 bg-[#fafafc]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             {statsList.map((s, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1.5">
                 <div className="text-3xl sm:text-5xl font-black text-[var(--brand-primary)] tracking-tight">
                   {s.value}
                 </div>

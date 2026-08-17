@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   Phone, Mail, MessageCircle, 
-  ChevronDown, ArrowUpRight, Send
+  ChevronDown, ArrowUpRight, Sparkles
 } from 'lucide-react';
 import type { WebsiteSettingsData } from '@/services/cms';
 
@@ -44,20 +44,30 @@ export default function ContactClient({ settings }: ContactClientProps) {
   return (
     <div className="min-h-screen bg-white text-neutral-900">
       
-      {/* ─── 1. Spacious Clean Header ─── */}
-      <section className="pt-32 pb-16 lg:pt-40 lg:pb-20 border-b border-neutral-100 bg-[#fafafc]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 mb-4 tracking-tight">
+      {/* ─── 1. Elegant Brand Hero Header ─── */}
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 bg-gradient-to-br from-[#120336] via-[#23096e] to-[#3A1C8F] text-white overflow-hidden">
+        {/* Subtle Ambient Lighting */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_50%)] pointer-events-none" />
+        <div className="absolute -bottom-20 -start-20 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white/90 text-xs sm:text-sm font-bold mb-5 border border-white/15 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>خدمة العملاء متواجدة لخدمتكم 24/7</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
             تواصل معنا
           </h1>
-          <p className="text-neutral-500 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+
+          <p className="text-white/80 text-base sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
             نسعد بالإجابة على استفساراتك وتقديم الدعم الكامل لرحلتك وحجوزاتك في أي وقت.
           </p>
         </div>
       </section>
 
       {/* ─── 2. Direct Contact Channels (3 Clean Cards) ─── */}
-      <section className="py-16 sm:py-20">
+      <section className="py-16 sm:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
@@ -116,7 +126,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
       </section>
 
       {/* ─── 3. Clean & Simple Message Form ─── */}
-      <section className="py-16 sm:py-20 bg-[#fafafc] border-y border-neutral-100">
+      <section className="py-16 sm:py-24 bg-[#fafafc] border-y border-neutral-100">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-3 tracking-tight">
