@@ -17,7 +17,7 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
   const hotelsPageHref = `/${currentLocale}/hotels`;
 
   return (
-    <section className="py-10 sm:py-14 bg-[#F4F2F8] surface-page overflow-hidden">
+    <section className="py-10 sm:py-14 bg-white border-t border-neutral-100/80 overflow-hidden w-full">
       <div className="container-msari">
         
         {/* ── Section Header: Title on Right, "عرض الكل" with Arrow on Left ── */}
@@ -35,25 +35,25 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
             </p>
           </div>
 
-          {/* "عرض الكل" with clickable text and arrow leading to local hotels page */}
+          {/* "عرض الكل" link to local hotels */}
           <Link
             href={hotelsPageHref}
-            className="group inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl border border-[var(--brand-primary)]/30 sm:border-2 sm:border-[var(--brand-primary)] text-[var(--brand-primary)] bg-white/90 hover:bg-[var(--brand-primary)] hover:text-white font-black text-xs sm:text-sm shadow-sm transition-all active:scale-95 shrink-0"
+            className="group inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl border border-[var(--brand-primary)]/30 sm:border-2 sm:border-[var(--brand-primary)] text-[var(--brand-primary)] bg-neutral-50 hover:bg-[var(--brand-primary)] hover:text-white font-black text-xs sm:text-sm shadow-sm transition-all active:scale-95 shrink-0"
           >
             <span>عرض الكل</span>
             <ArrowLeft size={15} className="transition-transform group-hover:-translate-x-1" />
           </Link>
         </div>
 
-        {/* ── Responsive Container: Smooth Horizontal Carousel on Mobile / Grid on Desktop ── */}
+        {/* ── Responsive Track: Smooth Horizontal Swiping with Full Vertical Scroll Freedom ── */}
         <div 
-          className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-4 sm:gap-6 pb-3 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth touch-pan-x"
+          className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-3.5 sm:gap-6 pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth overscroll-x-contain"
           style={{ direction: 'rtl' }}
         >
           {hotels.map((hotel) => (
             <div 
               key={hotel.id} 
-              className="w-[285px] min-[400px]:w-[310px] sm:w-auto flex-shrink-0 snap-start"
+              className="w-[260px] min-[390px]:w-[280px] sm:w-auto flex-shrink-0 snap-start"
             >
               <HotelCard hotel={hotel} />
             </div>
