@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { 
   Hotel, Plane, Car, Search, MapPin, Calendar, Users, 
-  Plus, Minus, X
+  Plus, Minus, X, Sparkles, Compass, ChevronDown, Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { HomepageContentData } from '@/services/cms';
@@ -17,6 +17,14 @@ const tabs = [
   { id: 'hotels', labelAr: 'فنادق', icon: Hotel },
   { id: 'flights', labelAr: 'طيران', icon: Plane },
   { id: 'cars', labelAr: 'سيارات', icon: Car },
+];
+
+const quickDestinations = [
+  { name: 'عدن', icon: '🌊' },
+  { name: 'صنعاء', icon: '🏛️' },
+  { name: 'المكلا', icon: '⛵' },
+  { name: 'سقطرى', icon: '🌴' },
+  { name: 'إب', icon: '🌿' },
 ];
 
 const yemenCities = [
@@ -42,10 +50,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   // Mobile: slide-up search sheet
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = (cityOverride?: string) => {
+    const targetCity = cityOverride !== undefined ? cityOverride : query;
     if (activeTab === 'hotels') {
       const searchParams = new URLSearchParams();
-      if (query.trim()) searchParams.set('city', query.trim());
+      if (targetCity.trim()) searchParams.set('city', targetCity.trim());
       if (checkIn) searchParams.set('checkIn', checkIn);
       if (checkOut) searchParams.set('checkOut', checkOut);
       searchParams.set('guests', String(guests));
@@ -90,11 +99,12 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden w-full bg-gradient-to-br from-[#0a0220] via-[#1a0654] to-[#2d1275] text-white">
+    <section className="relative overflow-hidden w-full bg-gradient-to-br from-[#08021a] via-[#150545] to-[#280e66] text-white">
       
-      {/* ── Royal Atmospheric Glows ── */}
-      <div className="absolute top-1/4 -start-20 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 -end-20 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* ── Ambient Radial Atmosphere ── */}
+      <div className="absolute top-1/4 -start-24 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 -end-24 w-[500px] h-[500px] bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-geo-pattern opacity-10 pointer-events-none" />
 
       {/* ── Content Container: Generous top padding (pt-32 to pt-44) preventing ANY header cutoff ── */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 lg:pt-44 pb-16 sm:pb-24 lg:pb-28 text-center flex flex-col items-center">
@@ -116,7 +126,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         </p>
 
         {/* ── 1. Service Selection Tabs (Positioned First) ── */}
-        <div className="flex items-center justify-center gap-2 mb-6" style={{ direction: 'rtl' }}>
+        <div className="flex items-center justify-center gap-2.5 mb-6" style={{ direction: 'rtl' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -126,9 +136,9 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-black transition-all shadow-sm',
+                  'flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300',
                   isActive
-                    ? 'bg-white text-[var(--brand-primary)] shadow-lg scale-105'
+                    ? 'bg-white text-[var(--brand-primary)] shadow-xl scale-105'
                     : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-md'
                 )}
               >
@@ -143,7 +153,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="hidden md:block w-full max-w-4xl mx-auto">
           {activeTab === 'hotels' ? (
             <div 
-              className="bg-white rounded-3xl p-3 sm:p-4 shadow-2xl border border-white/20 text-neutral-800"
+              className="bg-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-white/20 text-neutral-800"
               style={{ direction: 'rtl' }}
             >
               <div className="grid grid-cols-12 gap-2 items-center">
@@ -181,14 +191,14 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                         type="date"
                         value={checkIn}
                         onChange={(e) => setCheckIn(e.target.value)}
-                        className="bg-transparent outline-none cursor-pointer w-full"
+                        className="bg-transparent outline-none cursor-pointer w-full font-bold"
                       />
                       <span className="text-neutral-300">-</span>
                       <input
                         type="date"
                         value={checkOut}
                         onChange={(e) => setCheckOut(e.target.value)}
-                        className="bg-transparent outline-none cursor-pointer w-full"
+                        className="bg-transparent outline-none cursor-pointer w-full font-bold"
                       />
                     </div>
                   </div>
@@ -205,7 +215,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 w-full"
                   >
                     <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
-                    <span>{guests} نزلاء، {rooms} غرفة</span>
+                    <span className="truncate">{guests} ضيوف، {rooms} غرفة</span>
                   </button>
 
                   {showGuestsDropdown && (
@@ -273,8 +283,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 <div className="col-span-2">
                   <button
                     type="button"
-                    onClick={handleSearch}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                    onClick={() => handleSearch()}
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     <Search className="w-4 h-4" />
                     <span>بحث</span>
@@ -292,17 +302,36 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               </p>
               <button
                 type="button"
-                onClick={handleSearch}
+                onClick={() => handleSearch()}
                 className="px-8 py-3 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black rounded-2xl text-sm shadow-lg transition-all inline-flex items-center gap-2"
               >
                 <span>استعرض الخيارات المتاحة</span>
               </button>
             </div>
           )}
+
+          {/* ── Quick City Pills for Fast 1-Click Search ── */}
+          <div className="flex items-center justify-center gap-2 mt-4 text-xs font-bold text-white/80">
+            <span className="text-white/60">وجهات سريعة:</span>
+            {quickDestinations.map((dest) => (
+              <button
+                key={dest.name}
+                type="button"
+                onClick={() => {
+                  setQuery(dest.name);
+                  handleSearch(dest.name);
+                }}
+                className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition-all text-white inline-flex items-center gap-1 hover:scale-105"
+              >
+                <span>{dest.icon}</span>
+                <span>{dest.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ── 3. Luxury Search Bar (Mobile View) ── */}
-        <div className="md:hidden w-full max-w-md mx-auto">
+        <div className="md:hidden w-full max-w-md mx-auto space-y-3">
           <button
             type="button"
             onClick={() => setMobileSearchOpen(true)}
@@ -327,6 +356,23 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               بحث
             </div>
           </button>
+
+          {/* Quick Mobile Destination Chips */}
+          <div className="flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            {quickDestinations.map((dest) => (
+              <button
+                key={dest.name}
+                type="button"
+                onClick={() => {
+                  setQuery(dest.name);
+                  handleSearch(dest.name);
+                }}
+                className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-bold shrink-0 border border-white/10"
+              >
+                {dest.icon} {dest.name}
+              </button>
+            ))}
+          </div>
         </div>
 
       </div>
@@ -446,7 +492,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 {/* Submit */}
                 <button
                   type="button"
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                   className="w-full py-4 rounded-2xl bg-[#FF3B30] text-white font-black text-base shadow-xl mt-4"
                 >
                   استعراض الفنادق المتاحة
@@ -461,7 +507,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 </p>
                 <button
                   type="button"
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                   className="w-full py-3.5 bg-[#FF3B30] text-white font-bold rounded-2xl text-sm shadow-lg"
                 >
                   استعراض الخيارات

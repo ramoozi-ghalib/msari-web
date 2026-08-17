@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { 
   Rocket, Shield, ShieldCheck, Clock, Tag, Globe, 
-  Plug, Sparkles, CheckCircle2, Headphones, Building
+  Plug, Sparkles, CheckCircle2, Headphones, Building, ArrowLeft
 } from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
@@ -12,37 +12,37 @@ interface WhyMsariProps {
 const DEFAULT_FEATURES = [
   {
     title: 'دفع آمن',
-    desc: 'حجز موثوق بلا مفاجآت، مع خيارات دفع مرنة تناسبك',
+    desc: 'حجز موثوق مع خيارات دفع مرنة تناسبك',
     color: 'from-[#23096E] to-[#3A1C8F]',
     icon: ShieldCheck,
   },
   {
     title: 'دعم على مدار الساعة',
-    desc: 'فريقنا معك عبر واتساب في أي وقت تحتاجه',
+    desc: 'فريقنا معك للرد على استفساراتك على مدار الساعة',
     color: 'from-[#3A1C8F] to-[#23096E]',
     icon: Clock,
   },
   {
     title: 'أفضل الأسعار',
-    desc: 'عروض حصرية وأسعار تنافسية مضمونة دائماً',
+    desc: 'عروض حصرية وأسعار تنافسية',
     color: 'from-[#FF3B30] to-[#23096E]',
     icon: Tag,
   },
   {
     title: 'تغطية واسعة',
-    desc: '10 مدن يمنية وشراكات فنادق عالمية',
+    desc: '10 مدن يمنية، وشراكات فنادق',
     color: 'from-[#FF3B30] to-[#3A1C8F]',
     icon: Globe,
   },
   {
     title: 'محلي وعالمي',
-    desc: 'فنادق يمنية بخبرة محلية، وفنادق عالمية عبر أهم الشراكات',
+    desc: 'فنادق يمنية وعالمية، ومقارنة الأسعار والحجز',
     color: 'from-[#23096E] to-[#FF3B30]',
     icon: Sparkles,
   },
   {
     title: 'API للشركاء',
-    desc: 'نوفر API متكامل لبيانات الفنادق اليمنية لأي شريك تقني',
+    desc: 'نوفر API متكامل لأي شريك تقني يريد التكامل معنا',
     color: 'from-[#3A1C8F] to-[#23096E]',
     icon: Plug,
   },
@@ -68,7 +68,7 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
   const sectionTitle = whyMsari?.sectionTitleAr || 'المنصة التي تثق بها';
   const badge = whyMsari?.badgeAr || 'لماذا مساري';
   
-  // Resolve features strictly from CMS if present (using titleAr/title, descAr/desc)
+  // Resolve features directly from CMS (using titleAr/title, descAr/desc)
   const featuresList = (whyMsari?.features && whyMsari.features.length > 0)
     ? whyMsari.features.map((f: any, idx) => ({
         title: f.titleAr || f.title || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].title,
@@ -79,43 +79,44 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
     : DEFAULT_FEATURES;
 
   const partnerTitle = whyMsari?.partnerCta?.titleAr || 'هل أنت مزود فندق أو شريك تقني؟ انضم لشبكة مساري';
-  const partnerDesc = whyMsari?.partnerCta?.descriptionAr || 'انضم لشبكة مساري وتكامل مع منتجنا — سواء كنت صاحب فندق يمني أو مطور يريد الوصول لبيانات الفنادق عبر API موثوق.';
+  const partnerDesc = whyMsari?.partnerCta?.descriptionAr || 'انضم لشبكة مساري وضاعف حجوزاتك مع نظام إدارة متكامل وربط برمجي مباشر';
   const partnerBtnText = whyMsari?.partnerCta?.buttonTextAr || 'وثائق API ←';
   const partnerHref = whyMsari?.partnerCta?.href || '/developers';
 
   return (
-    <section className="py-16 sm:py-20 bg-white">
-      <div className="container-msari">
+    <section className="py-20 sm:py-28 bg-[#F4F2F8]/50 border-t border-neutral-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
-        <div className="text-center mb-14 group">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs sm:text-sm font-black mb-3 hover:scale-105 transition-transform duration-300">
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs sm:text-sm font-black mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
-            {badge}
+            <span>{badge}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E] mb-3 group-hover:text-[#3A1C8F] transition-colors duration-300">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--brand-primary)] tracking-tight mb-3">
             {sectionTitle}
           </h2>
-          <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold leading-relaxed group-hover:text-neutral-700 transition-colors duration-300">
-            بنيّنا مساري بكل تفاصيل المسافر اليمني وعرفنا احتياجاته — لتكون تجربة السفر أسهل وأوثق
+          <p className="text-neutral-600 text-sm sm:text-base font-semibold leading-relaxed">
+            بنينا مساري لتكون منصة الحجز الأكثر موثوقية وأماناً للمسافر في اليمن والعالم
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(featuresList.length, 6)} gap-4 sm:gap-6`}>
+        {/* ── Modern Trust Matrix Grid ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuresList.map((feature, idx) => {
             const Icon = feature.icon || Shield;
             return (
               <div
                 key={`${feature.title}-${idx}`}
-                className="why-card group p-4 sm:p-5 lg:p-5 rounded-2xl border border-neutral-200/80 bg-white cursor-pointer shadow-[0_1px_3px_rgba(23,15,46,0.06),0_1px_2px_rgba(23,15,46,0.05)] hover:shadow-[0_4px_10px_rgba(35,9,110,0.05),0_10px_26px_rgba(35,9,110,0.09)] transition-all duration-300"
+                className="group relative p-6 sm:p-7 rounded-3xl bg-white border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-start"
               >
-                <div className={`why-icon w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-4 lg:mb-5 shadow-md`}>
-                  <Icon size={24} className="w-5 h-5 lg:w-6 lg:h-6" />
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-5 shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon size={24} className="shrink-0" />
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-2 group-hover:text-[var(--brand-primary)] transition-colors duration-300">
+                <h3 className="text-lg font-black text-neutral-900 mb-2 group-hover:text-[var(--brand-primary)] transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed group-hover:text-neutral-700 transition-colors duration-300">
+                <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed font-medium">
                   {feature.desc}
                 </p>
               </div>
@@ -123,32 +124,42 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
           })}
         </div>
 
-        {/* Partner CTA */}
-        <div className="text-center mt-14 p-10 rounded-3xl bg-gradient-to-br from-[#23096E] to-[#FF3B30] text-white hover:shadow-2xl transition-all duration-500 group">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-            <Rocket size={26} strokeWidth={2} />
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-black mb-3 text-white group-hover:text-white/90 transition-colors duration-300">
-            {partnerTitle}
-          </h3>
-          <p className="text-white/85 mb-6 max-w-xl mx-auto font-medium text-base group-hover:text-white transition-colors duration-300">
-            {partnerDesc}
-          </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/add-hotel"
-              className="px-6 py-3 rounded-xl bg-white text-[#23096E] hover:bg-slate-100 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              أضف فندقك
-            </Link>
-            <Link
-              href={partnerHref}
-              className="px-6 py-3 rounded-xl bg-white/15 text-white hover:bg-white/25 border border-white/20 font-bold transition-all duration-300"
-            >
-              {partnerBtnText}
-            </Link>
+        {/* ── Luxury Partner Banner ── */}
+        <div className="mt-16 rounded-3xl bg-gradient-to-br from-[#0c0326] via-[#1a0654] to-[#2d1275] text-white p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 end-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 text-start">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-black mb-3 border border-white/15">
+                <Rocket size={13} className="text-[#FF3B30]" />
+                <span>للشركاء والمطورين</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-snug mb-3">
+                {partnerTitle}
+              </h3>
+              <p className="text-white/80 text-xs sm:text-sm font-medium leading-relaxed">
+                {partnerDesc}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <Link
+                href="/add-hotel"
+                className="px-7 py-3.5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2"
+              >
+                <span>أضف فندقك</span>
+                <ArrowLeft size={16} />
+              </Link>
+              <Link
+                href={partnerHref}
+                className="px-7 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm backdrop-blur-md transition-all"
+              >
+                {partnerBtnText}
+              </Link>
+            </div>
           </div>
         </div>
+
       </div>
     </section>
   );
