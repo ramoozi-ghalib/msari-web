@@ -31,11 +31,16 @@ export interface WebsiteSettingsData {
 }
 
 export interface HomepageFeatureItem {
-  title: string;
-  desc: string;
+  title?: string;
+  titleAr?: string;
+  titleEn?: string;
+  desc?: string;
+  descAr?: string;
+  descEn?: string;
   icon?: string;
   color?: string;
 }
+
 
 export interface HomepageContentData {
   hero: {

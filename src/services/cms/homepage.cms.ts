@@ -72,14 +72,23 @@ async function fetchHomepageInternal(): Promise<HomepageContentData> {
       sectionTitleAr: data.whyMsari?.sectionTitleAr || FALLBACK_HOMEPAGE.whyMsari.sectionTitleAr,
       badgeAr: data.whyMsari?.badgeAr || FALLBACK_HOMEPAGE.whyMsari.badgeAr,
       features: Array.isArray(data.whyMsari?.features) && data.whyMsari.features.length > 0
-        ? data.whyMsari.features
+        ? data.whyMsari.features.map((f: any) => ({
+            title: f.titleAr || f.title || '',
+            titleAr: f.titleAr || f.title || '',
+            titleEn: f.titleEn,
+            desc: f.descAr || f.desc || '',
+            descAr: f.descAr || f.desc || '',
+            descEn: f.descEn,
+            icon: f.icon,
+            color: f.color,
+          }))
         : FALLBACK_HOMEPAGE.whyMsari.features,
       partnerCta: {
         badgeAr: data.whyMsari?.partnerCta?.badgeAr || FALLBACK_HOMEPAGE.whyMsari.partnerCta.badgeAr,
         titleAr: data.whyMsari?.partnerCta?.titleAr || FALLBACK_HOMEPAGE.whyMsari.partnerCta.titleAr,
-        descriptionAr: data.whyMsari?.partnerCta?.descriptionAr || FALLBACK_HOMEPAGE.whyMsari.partnerCta.descriptionAr,
+        descriptionAr: data.whyMsari?.partnerCta?.descriptionAr || (data.whyMsari?.partnerCta as any)?.descAr || FALLBACK_HOMEPAGE.whyMsari.partnerCta.descriptionAr,
         buttonTextAr: data.whyMsari?.partnerCta?.buttonTextAr || FALLBACK_HOMEPAGE.whyMsari.partnerCta.buttonTextAr,
-        href: data.whyMsari?.partnerCta?.href || FALLBACK_HOMEPAGE.whyMsari.partnerCta.href,
+        href: data.whyMsari?.partnerCta?.href || (data.whyMsari?.partnerCta as any)?.buttonUrl || FALLBACK_HOMEPAGE.whyMsari.partnerCta.href,
       },
     },
     appDownload: {

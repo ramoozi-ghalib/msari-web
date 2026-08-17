@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { Rocket, Shield, Clock, Tag, Globe, Plug, Sparkles } from 'lucide-react';
+import { 
+  Rocket, Shield, ShieldCheck, Clock, Tag, Globe, 
+  Plug, Sparkles, CheckCircle2, Headphones, Building
+} from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
 interface WhyMsariProps {
@@ -11,7 +14,7 @@ const DEFAULT_FEATURES = [
     title: 'دفع آمن',
     desc: 'حجز موثوق بلا مفاجآت، مع خيارات دفع مرنة تناسبك',
     color: 'from-[#23096E] to-[#3A1C8F]',
-    icon: Shield,
+    icon: ShieldCheck,
   },
   {
     title: 'دعم على مدار الساعة',
@@ -45,15 +48,33 @@ const DEFAULT_FEATURES = [
   },
 ];
 
+function getWhyIcon(iconName?: string, idx: number = 0) {
+  const name = (iconName || '').toLowerCase();
+  if (name.includes('shieldcheck') || name.includes('check')) return ShieldCheck;
+  if (name.includes('shield') || name.includes('safe') || name.includes('أمان')) return Shield;
+  if (name.includes('clock') || name.includes('time') || name.includes('24') || name.includes('ساعة')) return Clock;
+  if (name.includes('tag') || name.includes('price') || name.includes('سعر') || name.includes('عرض')) return Tag;
+  if (name.includes('globe') || name.includes('world') || name.includes('مدن') || name.includes('تغطية')) return Globe;
+  if (name.includes('sparkle') || name.includes('star') || name.includes('محلي')) return Sparkles;
+  if (name.includes('plug') || name.includes('api') || name.includes('شريك')) return Plug;
+  if (name.includes('rocket') || name.includes('صاروخ')) return Rocket;
+  if (name.includes('headphone') || name.includes('support') || name.includes('دعم')) return Headphones;
+  if (name.includes('build') || name.includes('hotel') || name.includes('فندق')) return Building;
+
+  return DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
+}
+
 export default function WhyMsari({ whyMsari }: WhyMsariProps) {
   const sectionTitle = whyMsari?.sectionTitleAr || 'المنصة التي تثق بها';
   const badge = whyMsari?.badgeAr || 'لماذا مساري';
+  
+  // Resolve features strictly from CMS if present (using titleAr/title, descAr/desc)
   const featuresList = (whyMsari?.features && whyMsari.features.length > 0)
-    ? whyMsari.features.map((f, idx) => ({
-        title: f.title,
-        desc: f.desc,
+    ? whyMsari.features.map((f: any, idx) => ({
+        title: f.titleAr || f.title || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].title,
+        desc: f.descAr || f.desc || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].desc,
         color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
-        icon: DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon,
+        icon: getWhyIcon(f.icon, idx),
       }))
     : DEFAULT_FEATURES;
 
