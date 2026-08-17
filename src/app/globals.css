@@ -314,3 +314,118 @@ img {
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 0 24 16 40 20 24 24 20 40 16 24 0 20 16 16Z' fill='white' fill-opacity='0.05'/%3E%3C/svg%3E");
 }
+
+/* =================== LUXURY EDITORIAL ARTICLE TYPOGRAPHY =================== */
+.editorial-article-body {
+  color: #1f1e29;
+  font-size: 1.125rem;
+  line-height: 2.3;
+}
+
+.editorial-article-body h2 {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0A0912;
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f0edf7;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.editorial-article-body h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.editorial-article-body h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #23096e;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.editorial-article-body h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0A0912;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.editorial-article-body p {
+  margin-bottom: 1.85rem;
+  color: #2d2b38;
+  font-size: 1.125rem;
+  line-height: 2.3;
+  font-weight: 400;
+}
+
+.editorial-article-body ul,
+.editorial-article-body ol {
+  margin-top: 1.75rem;
+  margin-bottom: 2.25rem;
+  padding-inline-start: 1.75rem;
+}
+
+.editorial-article-body ul {
+  list-style-type: disc !important;
+}
+
+.editorial-article-body ol {
+  list-style-type: decimal !important;
+}
+
+.editorial-article-body li {
+  margin-bottom: 0.95rem;
+  color: #2d2b38;
+  font-size: 1.075rem;
+  line-height: 2.1;
+}
+
+.editorial-article-body li::marker {
+  color: #23096e;
+  font-size: 1.2em;
+}
+
+.editorial-article-body strong,
+.editorial-article-body b {
+  font-weight: 800;
+  color: #0A0912;
+}
+
+.editorial-article-body blockquote {
+  margin: 2.5rem 0;
+  padding: 1.5rem 2rem;
+  background: #f8f7fc;
+  border-inline-start: 4px solid #23096e;
+  border-radius: 1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a1824;
+  line-height: 2.2;
+}
+
+.editorial-article-body a {
+  color: #23096e;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.editorial-article-body a:hover {
+  opacity: 0.8;
+}
+
+.editorial-article-body img {
+  border-radius: 1.25rem;
+  margin: 2.5rem 0;
+  box-shadow: 0 10px 25px -5px rgba(35, 9, 110, 0.08);
+  width: 100%;
+}
+
