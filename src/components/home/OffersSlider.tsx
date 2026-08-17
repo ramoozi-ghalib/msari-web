@@ -118,10 +118,10 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
   if (!offers || offers.length === 0) return null;
 
   return (
-    <section className="pt-14 sm:pt-20 pb-8 sm:pb-12 bg-white overflow-hidden w-full">
+    <section className="pt-8 sm:pt-12 pb-8 sm:pb-12 bg-white overflow-hidden w-full">
       <div className="container-msari">
         
-        {/* Section Header with comfortable clearance from floating search card */}
+        {/* Section Header */}
         <div className="flex items-center justify-between mb-6 pb-2.5 border-b border-neutral-100">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-black mb-1.5">

@@ -81,8 +81,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   return (
     <div className="relative w-full">
       
-      {/* ── 1. Hero Atmospheric Header (+20% Higher & Spacious) ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[420px] sm:min-h-[500px] lg:min-h-[560px] pt-28 sm:pt-36 lg:pt-40 pb-24 sm:pb-32 lg:pb-36 flex flex-col items-center justify-center">
+      {/* ── 1. Hero Atmospheric Header (Spacious with room for 65% search card floating inside) ── */}
+      <section className="relative overflow-hidden w-full text-white min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] pt-24 sm:pt-36 lg:pt-40 pb-56 sm:pb-36 lg:pb-40 flex flex-col items-center justify-center">
         
         {/* Panoramic Luxury Resort Background */}
         <div 
@@ -102,14 +102,14 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
           {/* Top Badge: Elevated at the very top with clear breathing room */}
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 border border-white/20 shadow-md">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold mb-4 sm:mb-6 border border-white/20 shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse" />
             <span>منصة حجز الفنادق الأولى في اليمن</span>
           </div>
 
           {/* Hero Title: Strictly in ONE ROW with fluid scaling */}
           <h1 
-            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-3 sm:mb-4 max-w-full text-center"
+            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2.5 sm:mb-4 max-w-full text-center"
             style={{ fontSize: 'clamp(14px, 4.2vw, 42px)' }}
           >
             {renderHeroTitle(hero?.titleAr)}
@@ -126,10 +126,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         </div>
       </section>
 
-      {/* ── 2. Floating Overlapping Search Console (Half on Hero, Half on Page - Unified for Mobile & Desktop) ── */}
-      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-16 sm:-mt-20 lg:-mt-22">
+      {/* ── 2. Floating Overlapping Search Console (Exactly 65% on Hero, 35% on Offers Container) ── */}
+      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[195px] md:-mt-[98px] lg:-mt-[100px]">
         <div 
-          className="bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.18)] border border-neutral-100/90 text-neutral-800"
+          className="bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
           style={{ direction: 'rtl' }}
         >
           
