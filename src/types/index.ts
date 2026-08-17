@@ -198,7 +198,7 @@ export interface BlogPost {
   content: string;
   contentEn: string;
   coverImage: string;
-  authorName: string;
+  authorName?: string;
   authorAvatar?: string;
   category: string;
   categoryEn: string;

@@ -4,11 +4,9 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getBlogPostBySlug } from '@/actions/blog';
 import { 
-  ArrowRight, Calendar, Clock, User, Tag, 
-  Sparkles, BookOpen, Share2
+  ArrowRight, Calendar, Clock, Tag, 
+  Sparkles, BookOpen, Share2, Compass, Hotel, MessageCircle
 } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { sanitizeHtml, safeJsonLd } from '@/lib/sanitize';
 
 interface BlogDetailPageProps {
@@ -20,16 +18,18 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
-    return { title: 'المقال غير موجود | مساري' };
+    return { title: 'المقال غير موجود — مساري' };
   }
 
   return {
-    title: `${post.title} | مدونة مساري`,
+    title: `${post.title} — مدونة مساري`,
     description: post.excerpt,
+    alternates: { canonical: `https://msari.net/ar/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       images: [{ url: post.coverImage }],
+      url: `https://msari.net/ar/blog/${post.slug}`,
     },
   };
 }
@@ -43,7 +43,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
-  // JSON-LD Article Schema
+  // Structured Article Schema (Published by Msari Travel)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -51,63 +51,71 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     description: post.excerpt,
     image: post.coverImage,
     datePublished: post.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: post.authorName,
-    },
     publisher: {
       '@type': 'Organization',
       name: 'مساري (Msari Travel)',
       url: 'https://msari.net',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://msari.net/logo.png',
+      },
     },
   };
 
+  const formattedDate = new Date(post.publishedAt).toLocaleDateString('ar-YE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
-    <div className="min-h-screen bg-[var(--surface-page)] pb-20">
+    <div className="min-h-screen bg-white text-neutral-900 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
 
-      {/* ─── Ultra-Clear Article Header ─── */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800/80 py-8 sm:py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Back Navigation Button */}
+      {/* ─── 1. Spacious Editorial Header ─── */}
+      <header className="pt-32 pb-12 sm:pt-40 sm:pb-16 bg-[#fafafc] border-b border-neutral-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          
+          {/* Back to Blog Breadcrumb */}
           <Link
             href={`/${currentLocale}/blog`}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-opacity mb-8"
           >
-            <ArrowRight className="w-4 h-4" />
-            <span>العودة لجميع الأدلة والمقالات</span>
+            <ArrowRight size={16} />
+            <span>العودة إلى جميع مقالات المدونة</span>
           </Link>
 
-          {/* Category & Meta Pills */}
-          <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm font-semibold mb-4">
-            <Badge variant="primary" size="md">
+          {/* Meta Badges (Category, Read Time, Date - NO AUTHOR) */}
+          <div className="flex flex-wrap items-center gap-3.5 text-xs sm:text-sm text-neutral-500 font-semibold mb-6">
+            <span className="px-3 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-bold">
               {post.category}
-            </Badge>
-            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <Clock className="w-4 h-4 text-[var(--brand-primary)]" />
-              {post.readTimeMinutes} دقائق قراءة
             </span>
-            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <Calendar className="w-4 h-4 text-amber-500" />
-              {new Date(post.publishedAt).toLocaleDateString('ar-YE', { day: 'numeric', month: 'long', year: 'numeric' })}
+            <span className="flex items-center gap-1.5">
+              <Clock size={15} className="text-[var(--brand-primary)]" />
+              <span>{post.readTimeMinutes} دقائق قراءة</span>
+            </span>
+            <span className="text-neutral-300">•</span>
+            <span className="flex items-center gap-1.5">
+              <Calendar size={15} className="text-neutral-400" />
+              <span>{formattedDate}</span>
             </span>
           </div>
 
-          {/* Crystal Clear Title */}
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-neutral-900 leading-[1.3] tracking-tight">
             {post.title}
           </h1>
         </div>
       </header>
 
-      {/* ─── Main Article Content ─── */}
-      <main className="container mx-auto px-4 max-w-4xl pt-8 sm:pt-10">
+      {/* ─── 2. Main Article Body ─── */}
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14">
         
-        {/* Crystal Clear City Cover Image Banner */}
-        <div className="relative w-full h-[300px] sm:h-[450px] md:h-[500px] rounded-3xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 mb-10 bg-slate-200 dark:bg-slate-800">
+        {/* Featured Cover Image */}
+        <div className="relative w-full h-[320px] sm:h-[460px] md:h-[500px] rounded-3xl overflow-hidden shadow-lg border border-neutral-100 mb-12 bg-neutral-100">
           <Image
             src={post.coverImage}
             alt={post.title}
@@ -118,63 +126,93 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           />
         </div>
 
-        {/* Article Card Body */}
-        <article className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-12 shadow-md border border-slate-200/80 dark:border-slate-800/80">
-          
-          {/* Excerpt Lead Box */}
-          <div className="mb-10 p-6 sm:p-8 rounded-2xl bg-[var(--surface-page)] border-s-4 border-[var(--brand-primary)] text-slate-800 dark:text-slate-200 font-semibold text-base sm:text-lg leading-relaxed">
+        {/* Lead Excerpt Box (Airy and Distinct) */}
+        {post.excerpt && (
+          <div className="mb-12 p-6 sm:p-8 rounded-2xl bg-[#fafafc] border-s-4 border-[var(--brand-primary)] text-neutral-800 font-medium text-base sm:text-xl leading-[2] shadow-sm">
             {post.excerpt}
           </div>
+        )}
 
-          {/* Readable Typography */}
-          <div
-            className="prose prose-slate dark:prose-invert max-w-none 
-                       prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:font-black prose-h2:text-slate-900 dark:prose-h2:text-white prose-h2:mt-10 prose-h2:mb-6 prose-h2:border-b prose-h2:border-slate-100 dark:prose-h2:border-slate-800 prose-h2:pb-3
-                       prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:font-bold prose-h3:text-[var(--brand-primary)] dark:prose-h3:text-[var(--brand-secondary)] prose-h3:mt-8 prose-h3:mb-4
-                       prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-p:sm:text-lg prose-p:leading-8 prose-p:mb-6 prose-p:font-normal
-                       prose-ul:my-6 prose-ul:space-y-3 prose-ul:list-disc prose-ul:ps-6
-                       prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:text-base prose-li:sm:text-lg prose-li:leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
-          />
+        {/* ─── Editorial Article Content with Generous Typography ─── */}
+        <article
+          className="prose prose-neutral max-w-none 
+                     prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:font-black prose-h2:text-neutral-900 prose-h2:mt-14 prose-h2:mb-6 prose-h2:pt-8 prose-h2:border-t prose-h2:border-neutral-100 prose-h2:leading-snug
+                     prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:font-black prose-h3:text-[var(--brand-primary)] prose-h3:mt-10 prose-h3:mb-4 prose-h3:leading-snug
+                     prose-p:text-neutral-700 prose-p:text-base prose-p:sm:text-lg prose-p:leading-[2.2] prose-p:mb-8 prose-p:font-normal
+                     prose-ul:my-8 prose-ul:space-y-4 prose-ul:list-disc prose-ul:ps-6
+                     prose-li:text-neutral-700 prose-li:text-base prose-li:sm:text-lg prose-li:leading-[2.0]
+                     prose-strong:font-black prose-strong:text-neutral-900
+                     prose-a:text-[var(--brand-primary)] prose-a:font-bold prose-a:underline hover:prose-a:opacity-80"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
+        />
 
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-400 me-2 flex items-center gap-1">
-                <Tag className="w-3.5 h-3.5" />
-                الوسوم:
+        {/* Tags */}
+        {post.tags && post.tags.length > 0 && (
+          <div className="mt-14 pt-8 border-t border-neutral-100 flex flex-wrap items-center gap-2.5">
+            <span className="text-xs font-bold text-neutral-400 me-2 flex items-center gap-1">
+              <Tag size={14} />
+              <span>الكلمات المفتاحية:</span>
+            </span>
+            {post.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-3.5 py-1.5 bg-[#fafafc] text-neutral-700 text-xs font-semibold rounded-xl border border-neutral-200/70"
+              >
+                #{tag}
               </span>
-              {post.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg border border-slate-200/60 dark:border-slate-700/60"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          {/* ─── Author Info Box at Bottom of Article ─── */}
-          <div className="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 bg-slate-50 dark:bg-slate-800/40 p-6 rounded-2xl">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--brand-primary)] to-[var(--brand-secondary)] flex items-center justify-center text-white font-black text-xl shadow-md border-2 border-white dark:border-slate-700">
-                {post.authorName.slice(0, 1)}
-              </div>
-              <div>
-                <p className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-wider mb-0.5">بقلم الكاتب</p>
-                <h4 className="text-lg font-extrabold text-slate-900 dark:text-white">{post.authorName}</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">محرر وخبير أدلة السفر في منصة مساري</p>
-              </div>
-            </div>
+        {/* ─── 3. Travel Booking CTA Box (Replaces Author Box) ─── */}
+        <div className="mt-14 rounded-3xl bg-gradient-to-br from-[#120336] via-[#23096e] to-[#3A1C8F] text-white p-8 sm:p-10 shadow-xl space-y-6">
+          <div className="flex items-center gap-3 text-amber-300 text-sm font-bold">
+            <Compass size={20} />
+            <span>خطط لرحلتك القادمة مع مساري</span>
+          </div>
 
-            <Link href={`/${currentLocale}/blog`}>
-              <Button variant="primary" icon={<BookOpen className="w-4 h-4" />}>
-                استعرض كافة المقالات
-              </Button>
+          <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-snug">
+            هل تخطط لزيارة هذه الوجهة أو استكشاف الفنادق المتاحة؟
+          </h3>
+
+          <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-xl">
+            استعرض أوسع شبكة فنادق معتمدة في اليمن وخيارات الدفع المرنة بالريال اليمني، السعودي والدولار، مع تأكيد حجز فوري ومضمون.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <Link
+              href="/hotels"
+              className="px-6 py-3 rounded-xl bg-white text-[var(--brand-primary)] hover:bg-neutral-100 font-bold text-sm transition-all shadow-md inline-flex items-center gap-2"
+            >
+              <Hotel size={16} />
+              <span>تصفح الفنادق المتاحة</span>
+            </Link>
+
+            <Link
+              href="/contact"
+              className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all inline-flex items-center gap-2"
+            >
+              <MessageCircle size={16} />
+              <span>تواصل مع خدمة العملاء</span>
             </Link>
           </div>
-        </article>
+        </div>
+
+        {/* ─── 4. Navigation Footer ─── */}
+        <div className="mt-12 pt-8 border-t border-neutral-100 flex items-center justify-between">
+          <Link
+            href={`/${currentLocale}/blog`}
+            className="inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-all"
+          >
+            <ArrowRight size={16} />
+            <span>العودة إلى كافة المقالات والأدلة</span>
+          </Link>
+
+          <span className="text-xs text-neutral-400 font-medium">
+            منصة مساري لخدمات السفر والسياحة
+          </span>
+        </div>
+
       </main>
     </div>
   );
