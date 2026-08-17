@@ -63,7 +63,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     setMobileSearchOpen(false);
   };
 
-  const subtitle = hero?.subtitleAr || 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات بسهولة وأمان';
+  const subtitle = hero?.subtitleAr || 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات';
   
   // Real luxury hotel & resort photography
   const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
@@ -71,30 +71,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2000&auto=format&fit=crop';
 
   const renderHeroTitle = (title: string | undefined) => {
-    if (!title) {
-      return (
-        <>
-          اكتشف أجمل وجهات اليمن
-          <br />
-          مع <span className="text-[#FF3B30]">مساري</span>
-        </>
-      );
-    }
+    const rawTitle = title ? title.replace(/\n/g, ' ') : 'اكتشف أجمل وجهات اليمن مع مساري';
 
-    if (title.includes('مع مساري')) {
-      const parts = title.split('مع مساري');
-      return (
-        <>
-          {parts[0]}
-          <br />
-          مع <span className="text-[#FF3B30]">مساري</span>
-          {parts[1]}
-        </>
-      );
-    }
-
-    if (title.includes('مساري')) {
-      const parts = title.split('مساري');
+    if (rawTitle.includes('مساري')) {
+      const parts = rawTitle.split('مساري');
       return (
         <>
           {parts.map((part, i) => (
@@ -107,11 +87,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
       );
     }
 
-    return title;
+    return rawTitle;
   };
 
   return (
-    <section className="relative overflow-hidden w-full text-white min-h-[440px] sm:min-h-[500px] lg:min-h-[580px] flex items-center justify-center">
+    <section className="relative overflow-hidden w-full text-white min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
       
       {/* ── Real Panoramic Luxury Resort Background ── */}
       <div 
@@ -128,7 +108,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
       </div>
 
       {/* ── Content Container: Compact, Balanced & Clean Spacing ── */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-8 sm:pb-12 text-center flex flex-col items-center w-full">
+      <div className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-8 sm:pb-12 text-center flex flex-col items-center w-full">
         
         {/* Official Hero Badge */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-[11px] sm:text-xs font-bold mb-3 sm:mb-4 border border-white/15 shadow-sm">
@@ -136,13 +116,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           <span>منصة حجز الفنادق الأولى في اليمن</span>
         </div>
 
-        {/* Hero Title with Balanced Line Breaking */}
-        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-2 sm:mb-3 max-w-3xl">
+        {/* Hero Title: Strictly in ONE ROW on all screen sizes with weighted responsive size */}
+        <h1 className="text-[17px] min-[360px]:text-[19px] min-[390px]:text-[21px] sm:text-3xl md:text-4xl lg:text-[42px] font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2 sm:mb-2.5 max-w-full">
           {renderHeroTitle(hero?.titleAr)}
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-lg mx-auto leading-relaxed font-medium mb-5 sm:mb-6 px-2">
+        {/* Subtitle: Strictly in ONE ROW on all screen sizes */}
+        <p className="text-white/85 text-[10.5px] min-[360px]:text-[11.5px] min-[390px]:text-[12.5px] sm:text-sm md:text-base font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis mb-5 sm:mb-6 px-1">
           {subtitle}
         </p>
 
