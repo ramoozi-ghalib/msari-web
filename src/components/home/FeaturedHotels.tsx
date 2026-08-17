@@ -1,10 +1,12 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import HotelCard from '@/components/ui/HotelCard';
 import Heading from '@/components/ui/Heading';
+import { cn } from '@/lib/utils';
 import type { Hotel } from '@/types';
 
 interface FeaturedHotelsProps {
@@ -15,6 +17,31 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
   const params = useParams();
   const currentLocale = (params?.locale as string) || 'ar';
   const hotelsPageHref = `/${currentLocale}/hotels`;
+
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = () => {
+    if (!sliderRef.current) return;
+    const { scrollLeft, clientWidth } = sliderRef.current;
+    // In RTL, scrollLeft is typically negative or zero
+    const scrollPos = Math.abs(scrollLeft);
+    const cardWidth = 280 + 14; // Approximate card width + gap
+    const index = Math.round(scrollPos / cardWidth);
+    setActiveIndex(Math.min(Math.max(0, index), hotels.length - 1));
+  };
+
+  const scrollToHotel = (index: number) => {
+    if (!sliderRef.current) return;
+    const cardWidth = 280 + 14;
+    const targetScroll = index * cardWidth;
+    
+    sliderRef.current.scrollTo({
+      left: -targetScroll, // Negative for RTL
+      behavior: 'smooth',
+    });
+    setActiveIndex(index);
+  };
 
   return (
     <section className="py-10 sm:py-14 bg-white border-t border-neutral-100/80 overflow-hidden w-full">
@@ -45,8 +72,10 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
           </Link>
         </div>
 
-        {/* ── Responsive Track: Smooth Horizontal Swiping with Full Vertical Scroll Freedom ── */}
+        {/* ── Responsive Track: Smooth Horizontal Swiping on Mobile / Grid on Desktop ── */}
         <div 
+          ref={sliderRef}
+          onScroll={handleScroll}
           className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-3.5 sm:gap-6 pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth overscroll-x-contain"
           style={{ direction: 'rtl' }}
         >
@@ -59,6 +88,26 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
             </div>
           ))}
         </div>
+
+        {/* ── Pagination Dots Indicator (Mobile View in Center) ── */}
+        {hotels.length > 1 && (
+          <div className="flex sm:hidden items-center justify-center gap-1.5 mt-4">
+            {hotels.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => scrollToHotel(i)}
+                className={cn(
+                  'h-2 rounded-full transition-all duration-500',
+                  i === activeIndex
+                    ? 'w-6 bg-[var(--brand-primary)] shadow-md'
+                    : 'w-2 bg-neutral-300 hover:bg-[var(--brand-primary)]/50'
+                )}
+                aria-label={`الذهاب للفندق ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
       </div>
     </section>
