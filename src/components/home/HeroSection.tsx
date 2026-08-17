@@ -91,7 +91,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden w-full text-white min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
+    <section className="relative overflow-hidden w-full text-white min-h-[400px] sm:min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
       
       {/* ── Real Panoramic Luxury Resort Background ── */}
       <div 
@@ -107,27 +107,27 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         />
       </div>
 
-      {/* ── Content Container: Compact, Balanced & Clean Spacing ── */}
-      <div className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-8 sm:pb-12 text-center flex flex-col items-center w-full">
+      {/* ── Content Container ── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-7 sm:pb-12 text-center flex flex-col items-center w-full">
         
-        {/* Official Hero Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-[11px] sm:text-xs font-bold mb-3 sm:mb-4 border border-white/15 shadow-sm">
+        {/* Top Badge: Positioned prominently at the very top */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white/95 text-[10.5px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 border border-white/20 shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30] animate-pulse" />
           <span>منصة حجز الفنادق الأولى في اليمن</span>
         </div>
 
-        {/* Hero Title: Strictly in ONE ROW on all screen sizes with weighted responsive size */}
-        <h1 className="text-[17px] min-[360px]:text-[19px] min-[390px]:text-[21px] sm:text-3xl md:text-4xl lg:text-[42px] font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2 sm:mb-2.5 max-w-full">
+        {/* Hero Title: Refined font size for mobile, strictly in ONE ROW with perfect spacing */}
+        <h1 className="text-[14.5px] min-[360px]:text-[16px] min-[390px]:text-[17.5px] sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white whitespace-nowrap leading-tight tracking-tight mb-1.5 sm:mb-2 max-w-full">
           {renderHeroTitle(hero?.titleAr)}
         </h1>
 
-        {/* Subtitle: Strictly in ONE ROW on all screen sizes */}
-        <p className="text-white/85 text-[10.5px] min-[360px]:text-[11.5px] min-[390px]:text-[12.5px] sm:text-sm md:text-base font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis mb-5 sm:mb-6 px-1">
+        {/* Subtitle: Refined size on mobile, strictly in ONE ROW */}
+        <p className="text-white/85 text-[9.5px] min-[360px]:text-[10.5px] min-[390px]:text-[11.5px] sm:text-sm md:text-base font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis mb-4 sm:mb-5 px-1">
           {subtitle}
         </p>
 
         {/* ── 1. Service Selection Tabs (Positioned First) ── */}
-        <div className="flex items-center justify-center gap-2 mb-4 sm:mb-5" style={{ direction: 'rtl' }}>
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3.5 sm:mb-5" style={{ direction: 'rtl' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -137,13 +137,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-black transition-all duration-300',
+                  'flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-sm font-black transition-all duration-300',
                   isActive
                     ? 'bg-white text-[var(--brand-primary)] shadow-md scale-105'
                     : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-md'
                 )}
               >
-                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <Icon className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
                 <span>{tab.labelAr}</span>
               </button>
             );
@@ -330,12 +330,12 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           <button
             type="button"
             onClick={() => setMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-4 py-3 border border-white/40 active:scale-98 transition-transform"
+            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-4 py-2.5 border border-white/40 active:scale-98 transition-transform"
             style={{ direction: 'rtl' }}
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
-                <Search className="w-4 h-4 text-[#FF3B30]" />
+              <div className="w-7 h-7 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
+                <Search className="w-3.5 h-3.5 text-[#FF3B30]" />
               </div>
               <div className="text-start">
                 <div className="text-xs font-black text-neutral-900">
@@ -347,7 +347,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               </div>
             </div>
 
-            <div className="px-3 py-1.5 rounded-xl bg-[#FF3B30] text-white text-xs font-bold shadow-sm">
+            <div className="px-3 py-1 rounded-xl bg-[#FF3B30] text-white text-xs font-bold shadow-sm">
               بحث
             </div>
           </button>
