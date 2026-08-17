@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Offer } from '@/types';
 
@@ -121,7 +121,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
     <section className="py-12 sm:py-16 bg-white overflow-hidden w-full">
       <div className="container-msari">
         
-        {/* Section Header */}
+        {/* Section Header: Removed "عرض الكل" as requested */}
         <div className="flex items-center justify-between mb-8 pb-3 border-b border-neutral-100">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-black mb-2">
@@ -133,35 +133,25 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Arrow Navigation Controls — Desktop */}
-            {count > 1 && (
-              <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={prevSlide}
-                  className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
-                  aria-label="العرض السابق"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
-                  aria-label="العرض التالي"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-
-            <Link
-              href="/hotels"
-              className="inline-flex items-center gap-1 text-xs sm:text-sm font-black text-[var(--brand-primary)] hover:text-[var(--brand-accent)] transition-colors ps-2 whitespace-nowrap"
-            >
-              <span>عرض الكل</span>
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-          </div>
+          {/* Arrow Navigation Controls — Desktop */}
+          {count > 1 && (
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={prevSlide}
+                className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
+                aria-label="العرض السابق"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
+                aria-label="العرض التالي"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Smooth Responsive Carousel Track ── */}

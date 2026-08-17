@@ -214,9 +214,9 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
             </div>
           </div>
 
-          {/* Book Now Button */}
-          <span className="btn btn-primary btn-sm text-xs px-4 py-1.5 rounded-xl hover:shadow-lg transition-shadow duration-300 font-bold shrink-0">
-            احجز الآن
+          {/* Details Button ("عرض التفاصيل") */}
+          <span className="btn btn-primary btn-sm text-xs px-3.5 py-1.5 rounded-xl hover:shadow-lg transition-shadow duration-300 font-bold shrink-0">
+            عرض التفاصيل
           </span>
         </div>
       </div>

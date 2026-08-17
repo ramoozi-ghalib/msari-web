@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { 
   Hotel, Plane, Car, Search, MapPin, Calendar, Users, 
-  Plus, Minus, X, Sparkles, Compass, ChevronDown, Check
+  Plus, Minus, X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { HomepageContentData } from '@/services/cms';
@@ -69,6 +69,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   const subtitle = hero?.subtitleAr || 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات بسهولة وأمان';
+  
+  // Real panoramic luxury hotel & travel photography background
+  const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
+    ? hero.backgroundImageUrl
+    : 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2000&auto=format&fit=crop';
 
   const renderHeroTitle = (title: string | undefined) => {
     if (!title) {
@@ -99,34 +104,43 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden w-full bg-gradient-to-br from-[#08021a] via-[#150545] to-[#280e66] text-white">
+    <section className="relative overflow-hidden w-full text-white min-h-[460px] sm:min-h-[540px] lg:min-h-[640px] flex items-center justify-center">
       
-      {/* ── Ambient Radial Atmosphere ── */}
-      <div className="absolute top-1/4 -start-24 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 -end-24 w-[500px] h-[500px] bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute inset-0 bg-geo-pattern opacity-10 pointer-events-none" />
+      {/* ── Real Panoramic Travel & Hotel Image with Royal Color Grading ── */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
+        style={{ backgroundImage: `url('${bgImage}')` }}
+      >
+        {/* Deep Royal Atmospheric Multi-Stop Gradient for High Contrast & Brand Elegance */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(8,2,26,0.85) 0%, rgba(21,5,69,0.74) 40%, rgba(35,9,110,0.88) 85%, rgba(10,9,18,0.95) 100%)',
+          }}
+        />
+      </div>
 
-      {/* ── Content Container: Generous top padding (pt-32 to pt-44) preventing ANY header cutoff ── */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 lg:pt-44 pb-16 sm:pb-24 lg:pb-28 text-center flex flex-col items-center">
+      {/* ── Content Container: Generous top padding (pt-28 to pt-36) preventing ANY header cutoff ── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-36 pb-12 sm:pb-16 text-center flex flex-col items-center w-full">
         
         {/* Official Hero Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-xs sm:text-sm font-bold mb-5 sm:mb-6 border border-white/15 shadow-sm">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-xs sm:text-sm font-bold mb-4 sm:mb-5 border border-white/15 shadow-sm">
           <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse" />
           <span>منصة حجز الفنادق الأولى في اليمن</span>
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.3] sm:leading-[1.25] tracking-tight mb-4 sm:mb-6 max-w-4xl">
+        <h1 className="text-2xl min-[360px]:text-[26px] sm:text-4xl lg:text-5xl font-black text-white leading-snug sm:leading-tight tracking-tight mb-3 sm:mb-4 max-w-3xl">
           {renderHeroTitle(hero?.titleAr)}
         </h1>
 
         {/* Subtitle */}
-        <p className="text-white/80 text-xs sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-medium mb-8 sm:mb-10 px-2">
+        <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-xl mx-auto leading-relaxed font-medium mb-6 sm:mb-8 px-2">
           {subtitle}
         </p>
 
         {/* ── 1. Service Selection Tabs (Positioned First) ── */}
-        <div className="flex items-center justify-center gap-2.5 mb-6" style={{ direction: 'rtl' }}>
+        <div className="flex items-center justify-center gap-2 mb-5" style={{ direction: 'rtl' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -136,13 +150,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-black transition-all duration-300',
+                  'flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-black transition-all duration-300',
                   isActive
-                    ? 'bg-white text-[var(--brand-primary)] shadow-xl scale-105'
+                    ? 'bg-white text-[var(--brand-primary)] shadow-lg scale-105'
                     : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-md'
                 )}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span>{tab.labelAr}</span>
               </button>
             );
@@ -153,14 +167,14 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="hidden md:block w-full max-w-4xl mx-auto">
           {activeTab === 'hotels' ? (
             <div 
-              className="bg-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-white/20 text-neutral-800"
+              className="bg-white rounded-3xl p-3 sm:p-3.5 shadow-2xl border border-white/20 text-neutral-800"
               style={{ direction: 'rtl' }}
             >
               <div className="grid grid-cols-12 gap-2 items-center">
                 
                 {/* Destination */}
-                <div className="col-span-4 text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">الوجهة أو الفندق</label>
+                <div className="col-span-4 text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+                  <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الوجهة أو الفندق</label>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                     <input
@@ -179,11 +193,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   </div>
                 </div>
 
-                <div className="w-px h-10 bg-neutral-200" />
+                <div className="w-px h-8 bg-neutral-200" />
 
                 {/* Dates */}
-                <div className="col-span-4 text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">تاريخ الوصول والمغادرة</label>
+                <div className="col-span-4 text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+                  <label className="block text-[10px] font-black text-neutral-400 mb-0.5">تاريخ الوصول والمغادرة</label>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                     <div className="flex items-center gap-1.5 w-full text-xs font-bold text-neutral-700">
@@ -204,11 +218,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   </div>
                 </div>
 
-                <div className="w-px h-10 bg-neutral-200" />
+                <div className="w-px h-8 bg-neutral-200" />
 
                 {/* Guests & Rooms */}
-                <div className="col-span-2 relative text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">الضيوف والغرف</label>
+                <div className="col-span-2 relative text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+                  <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الضيوف والغرف</label>
                   <button
                     type="button"
                     onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
@@ -284,7 +298,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   <button
                     type="button"
                     onClick={() => handleSearch()}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95"
+                    className="w-full py-3 px-5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95"
                   >
                     <Search className="w-4 h-4" />
                     <span>بحث</span>
@@ -294,7 +308,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl p-6 shadow-2xl border border-white/20 text-neutral-800 text-center space-y-4">
+            <div className="bg-white rounded-3xl p-6 shadow-2xl border border-white/20 text-neutral-800 text-center space-y-3">
               <p className="text-sm font-bold text-neutral-600">
                 {activeTab === 'flights' 
                   ? '✈️ احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية بأفضل الأسعار المباشرة'
@@ -303,7 +317,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               <button
                 type="button"
                 onClick={() => handleSearch()}
-                className="px-8 py-3 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black rounded-2xl text-sm shadow-lg transition-all inline-flex items-center gap-2"
+                className="px-8 py-2.5 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black rounded-2xl text-sm shadow-lg transition-all inline-flex items-center gap-2"
               >
                 <span>استعرض الخيارات المتاحة</span>
               </button>
@@ -311,8 +325,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           )}
 
           {/* ── Quick City Pills for Fast 1-Click Search ── */}
-          <div className="flex items-center justify-center gap-2 mt-4 text-xs font-bold text-white/80">
-            <span className="text-white/60">وجهات سريعة:</span>
+          <div className="flex items-center justify-center gap-2 mt-3.5 text-xs font-bold text-white/85">
+            <span className="text-white/60 text-[11px]">وجهات سريعة:</span>
             {quickDestinations.map((dest) => (
               <button
                 key={dest.name}
@@ -321,7 +335,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   setQuery(dest.name);
                   handleSearch(dest.name);
                 }}
-                className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 transition-all text-white inline-flex items-center gap-1 hover:scale-105"
+                className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 transition-all text-white inline-flex items-center gap-1 hover:scale-105 text-xs"
               >
                 <span>{dest.icon}</span>
                 <span>{dest.name}</span>
@@ -330,35 +344,35 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* ── 3. Luxury Search Bar (Mobile View) ── */}
-        <div className="md:hidden w-full max-w-md mx-auto space-y-3">
+        {/* ── 3. Luxury Search Bar (Mobile View - Clean & De-cluttered) ── */}
+        <div className="md:hidden w-full max-w-md mx-auto space-y-2.5">
           <button
             type="button"
             onClick={() => setMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-5 py-4 border border-white/40"
+            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-4 py-3 border border-white/40"
             style={{ direction: 'rtl' }}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
-                <Search className="w-5 h-5 text-[#FF3B30]" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
+                <Search className="w-4 h-4 text-[#FF3B30]" />
               </div>
               <div className="text-start">
                 <div className="text-xs font-black text-neutral-900">
                   {query.trim() ? query : 'إلى أين ترغب بالسفر؟'}
                 </div>
                 <div className="text-[10px] text-neutral-400 font-semibold">
-                  {checkIn ? `وصول: ${checkIn}` : 'اختر الوجهة والتواريخ والضيوف'}
+                  {checkIn ? `وصول: ${checkIn}` : 'اختر الوجهة والتواريخ'}
                 </div>
               </div>
             </div>
 
-            <div className="px-3.5 py-1.5 rounded-xl bg-[#FF3B30] text-white text-xs font-bold shadow-sm">
+            <div className="px-3 py-1.5 rounded-xl bg-[#FF3B30] text-white text-xs font-bold shadow-sm">
               بحث
             </div>
           </button>
 
           {/* Quick Mobile Destination Chips */}
-          <div className="flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+          <div className="flex items-center justify-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             {quickDestinations.map((dest) => (
               <button
                 key={dest.name}
@@ -367,7 +381,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   setQuery(dest.name);
                   handleSearch(dest.name);
                 }}
-                className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-bold shrink-0 border border-white/10"
+                className="px-2.5 py-1 rounded-full bg-white/15 text-white text-[11px] font-bold shrink-0 border border-white/15"
               >
                 {dest.icon} {dest.name}
               </button>
@@ -384,16 +398,16 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           onClick={() => setMobileSearchOpen(false)}
         >
           <div
-            className="absolute bottom-0 inset-x-0 bg-white text-neutral-900 rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto"
+            className="absolute bottom-0 inset-x-0 bg-white text-neutral-900 rounded-t-3xl p-5 pb-8 max-h-[90vh] overflow-y-auto"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-neutral-100">
-              <h3 className="font-black text-lg text-neutral-900">ابحث عن رحلتك في اليمن</h3>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-100">
+              <h3 className="font-black text-base text-neutral-900">ابحث عن رحلتك في اليمن</h3>
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(false)}
-                className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200"
+                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200"
                 aria-label="إغلاق"
               >
                 <X className="w-4 h-4" />
@@ -401,7 +415,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             </div>
 
             {/* Mobile Tab Row */}
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-4">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -411,13 +425,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all',
+                      'flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all',
                       isActive
                         ? 'bg-[var(--brand-primary)] text-white shadow-sm'
                         : 'bg-neutral-100 text-neutral-600'
                     )}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     <span>{tab.labelAr}</span>
                   </button>
                 );
@@ -425,10 +439,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             </div>
 
             {activeTab === 'hotels' ? (
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 {/* City */}
-                <div className="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-100">
-                  <label className="block text-xs font-bold text-neutral-400 mb-1">المدينة أو الفندق</label>
+                <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
+                  <label className="block text-[11px] font-bold text-neutral-400 mb-1">المدينة أو الفندق</label>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[var(--brand-primary)]" />
                     <input
@@ -436,15 +450,15 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                       placeholder="مثال: عدن، صنعاء، المكلا"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      className="w-full bg-transparent text-sm font-bold text-neutral-900 outline-none"
+                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
                     />
                   </div>
                 </div>
 
                 {/* Dates */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-100">
-                    <label className="block text-xs font-bold text-neutral-400 mb-1">تاريخ الوصول</label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
+                    <label className="block text-[10px] font-bold text-neutral-400 mb-1">تاريخ الوصول</label>
                     <input
                       type="date"
                       value={checkIn}
@@ -453,8 +467,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     />
                   </div>
 
-                  <div className="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-100">
-                    <label className="block text-xs font-bold text-neutral-400 mb-1">تاريخ المغادرة</label>
+                  <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
+                    <label className="block text-[10px] font-bold text-neutral-400 mb-1">تاريخ المغادرة</label>
                     <input
                       type="date"
                       value={checkOut}
@@ -465,7 +479,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 </div>
 
                 {/* Guests */}
-                <div className="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-100 flex items-center justify-between">
+                <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-bold text-neutral-900">عدد الضيوف</div>
                     <div className="text-[10px] text-neutral-400">{guests} نزلاء، {rooms} غرفة</div>
@@ -474,15 +488,15 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     <button
                       type="button"
                       onClick={() => setGuests(Math.max(1, guests - 1))}
-                      className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center font-bold"
+                      className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-xs"
                     >
                       -
                     </button>
-                    <span className="text-sm font-black w-6 text-center">{guests}</span>
+                    <span className="text-xs font-black w-5 text-center">{guests}</span>
                     <button
                       type="button"
                       onClick={() => setGuests(guests + 1)}
-                      className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center font-bold"
+                      className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-xs"
                     >
                       +
                     </button>
@@ -493,14 +507,14 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 <button
                   type="button"
                   onClick={() => handleSearch()}
-                  className="w-full py-4 rounded-2xl bg-[#FF3B30] text-white font-black text-base shadow-xl mt-4"
+                  className="w-full py-3.5 rounded-2xl bg-[#FF3B30] text-white font-black text-sm shadow-xl mt-3"
                 >
                   استعراض الفنادق المتاحة
                 </button>
               </div>
             ) : (
-              <div className="py-6 text-center space-y-4">
-                <p className="text-sm font-semibold text-neutral-600">
+              <div className="py-5 text-center space-y-3">
+                <p className="text-xs font-semibold text-neutral-600">
                   {activeTab === 'flights'
                     ? 'احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية'
                     : 'خدمات تأجير السيارات والتوصيل بين المدن'}
@@ -508,7 +522,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 <button
                   type="button"
                   onClick={() => handleSearch()}
-                  className="w-full py-3.5 bg-[#FF3B30] text-white font-bold rounded-2xl text-sm shadow-lg"
+                  className="w-full py-3 bg-[#FF3B30] text-white font-bold rounded-2xl text-xs shadow-lg"
                 >
                   استعراض الخيارات
                 </button>
