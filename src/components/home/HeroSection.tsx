@@ -63,7 +63,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     setMobileSearchOpen(false);
   };
 
-  const subtitle = hero?.subtitleAr || 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات';
+  const rawSubtitle = hero?.subtitleAr ? hero.subtitleAr.replace(/\s+/g, ' ').trim() : 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات';
   
   // Real luxury hotel & resort photography
   const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
@@ -71,7 +71,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2000&auto=format&fit=crop';
 
   const renderHeroTitle = (title: string | undefined) => {
-    const rawTitle = title ? title.replace(/\n/g, ' ') : 'اكتشف أجمل وجهات اليمن مع مساري';
+    const rawTitle = title ? title.replace(/\s+/g, ' ').trim() : 'اكتشف أجمل وجهات اليمن مع مساري';
 
     if (rawTitle.includes('مساري')) {
       const parts = rawTitle.split('مساري');
@@ -91,7 +91,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden w-full text-white min-h-[400px] sm:min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
+    <section className="relative overflow-hidden w-full text-white min-h-[380px] sm:min-h-[460px] lg:min-h-[540px] flex items-center justify-center">
       
       {/* ── Real Panoramic Luxury Resort Background ── */}
       <div 
@@ -107,26 +107,32 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         />
       </div>
 
-      {/* ── Content Container ── */}
-      <div className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-7 sm:pb-12 text-center flex flex-col items-center w-full">
+      {/* ── Content Container: Generous top padding preventing any header collision ── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-2.5 sm:px-6 lg:px-8 pt-20 sm:pt-28 pb-6 sm:pb-10 text-center flex flex-col items-center w-full">
         
-        {/* Top Badge: Positioned prominently at the very top */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white/95 text-[10.5px] sm:text-xs font-bold mb-2.5 sm:mb-3.5 border border-white/20 shadow-sm">
+        {/* 1. Top Badge: Positioned at the very top of the Hero */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white/95 text-[10px] sm:text-xs font-bold mb-2 sm:mb-3 border border-white/20 shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30] animate-pulse" />
           <span>منصة حجز الفنادق الأولى في اليمن</span>
         </div>
 
-        {/* Hero Title: Refined font size for mobile, strictly in ONE ROW with perfect spacing */}
-        <h1 className="text-[14.5px] min-[360px]:text-[16px] min-[390px]:text-[17.5px] sm:text-3xl md:text-4xl lg:text-[40px] font-black text-white whitespace-nowrap leading-tight tracking-tight mb-1.5 sm:mb-2 max-w-full">
+        {/* 2. Hero Title: Clamped and guaranteed strictly in ONE ROW with zero line wrapping */}
+        <h1 
+          className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-1.5 sm:mb-2 max-w-full text-center"
+          style={{ fontSize: 'clamp(13px, 4.1vw, 42px)' }}
+        >
           {renderHeroTitle(hero?.titleAr)}
         </h1>
 
-        {/* Subtitle: Refined size on mobile, strictly in ONE ROW */}
-        <p className="text-white/85 text-[9.5px] min-[360px]:text-[10.5px] min-[390px]:text-[11.5px] sm:text-sm md:text-base font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis mb-4 sm:mb-5 px-1">
-          {subtitle}
+        {/* 3. Subtitle: Clamped and guaranteed strictly in ONE ROW */}
+        <p 
+          className="text-white/85 font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis mb-3.5 sm:mb-5 px-1 text-center"
+          style={{ fontSize: 'clamp(9.5px, 2.7vw, 16px)' }}
+        >
+          {rawSubtitle}
         </p>
 
-        {/* ── 1. Service Selection Tabs (Positioned First) ── */}
+        {/* ── 4. Service Selection Tabs (Positioned First) ── */}
         <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3.5 sm:mb-5" style={{ direction: 'rtl' }}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -137,7 +143,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-sm font-black transition-all duration-300',
+                  'flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-sm font-black transition-all duration-300',
                   isActive
                     ? 'bg-white text-[var(--brand-primary)] shadow-md scale-105'
                     : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-md'
@@ -150,7 +156,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           })}
         </div>
 
-        {/* ── 2. Luxury Search Console (Desktop & Tablet) ── */}
+        {/* ── 5. Luxury Search Console (Desktop & Tablet) ── */}
         <div className="hidden md:block w-full max-w-4xl mx-auto">
           {activeTab === 'hotels' ? (
             <div 
@@ -325,7 +331,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* ── 3. Luxury Search Bar (Mobile View - Perfectly Airy & Clean) ── */}
+        {/* ── 6. Luxury Search Bar (Mobile View - Clean & Compact) ── */}
         <div className="md:hidden w-full max-w-sm mx-auto">
           <button
             type="button"
@@ -333,7 +339,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-4 py-2.5 border border-white/40 active:scale-98 transition-transform"
             style={{ direction: 'rtl' }}
           >
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
                 <Search className="w-3.5 h-3.5 text-[#FF3B30]" />
               </div>
