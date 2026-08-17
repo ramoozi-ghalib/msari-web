@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Rocket, Shield, Clock, Tag, Globe, Plug, Sparkles } from 'lucide-react';
+import { ShieldCheck, Headphones, Tag, MapPin, Sparkles, Building, ArrowLeft } from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
 interface WhyMsariProps {
@@ -8,126 +8,105 @@ interface WhyMsariProps {
 
 const DEFAULT_FEATURES = [
   {
-    title: 'دفع آمن',
-    desc: 'حجز موثوق بلا مفاجآت، مع خيارات دفع مرنة تناسبك',
-    color: 'from-[#23096E] to-[#3A1C8F]',
-    icon: Shield,
+    title: 'تأكيد حجز فوري ومضمون',
+    desc: 'احصل على قسيمة حجزك الفندقي المعتمدة مباشرة دون انتظار أو تأخير وبأعلى معايير الموثوقية.',
+    icon: ShieldCheck,
+    badge: 'موثوقية 100%',
   },
   {
-    title: 'دعم على مدار الساعة',
-    desc: 'فريقنا معك عبر واتساب في أي وقت تحتاجه',
-    color: 'from-[#3A1C8F] to-[#23096E]',
-    icon: Clock,
+    title: 'دعم محلي على مدار 24 ساعة',
+    desc: 'فريق خدمة عملاء يمني متخصص متواجد على مدار الساعة عبر واتساب والاتصال لمساعدتك في أي استفسار.',
+    icon: Headphones,
+    badge: 'خدمة 24/7',
   },
   {
-    title: 'أفضل الأسعار',
-    desc: 'عروض حصرية وأسعار تنافسية مضمونة دائماً',
-    color: 'from-[#FF3B30] to-[#23096E]',
+    title: 'أفضل الأسعار بدون عمولات خفية',
+    desc: 'أسعار مباشرة وشفافة مع خيارات دفع مرنة بالريال اليمني والسعودي والدولار.',
     icon: Tag,
+    badge: 'سعر مضمون',
   },
   {
-    title: 'تغطية واسعة',
-    desc: '10 مدن يمنية وشراكات فنادق عالمية',
-    color: 'from-[#FF3B30] to-[#3A1C8F]',
-    icon: Globe,
-  },
-  {
-    title: 'محلي وعالمي',
-    desc: 'فنادق يمنية بخبرة محلية، وفنادق عالمية عبر أهم الشراكات',
-    color: 'from-[#23096E] to-[#FF3B30]',
-    icon: Sparkles,
-  },
-  {
-    title: 'API للشركاء',
-    desc: 'نوفر API متكامل لبيانات الفنادق اليمنية لأي شريك تقني',
-    color: 'from-[#3A1C8F] to-[#23096E]',
-    icon: Plug,
+    title: 'أوسع شبكة فنادق في اليمن',
+    desc: 'تغطية شاملة لأرقى الفنادق والمنتجعات والشاليهات في عدن، صنعاء، المكلا، إب وكافة المحافظات.',
+    icon: Building,
+    badge: 'تغطية كاملة',
   },
 ];
 
 export default function WhyMsari({ whyMsari }: WhyMsariProps) {
-  const sectionTitle = whyMsari?.sectionTitleAr || 'المنصة التي تثق بها';
-  const badge = whyMsari?.badgeAr || 'لماذا مساري';
-  const featuresList = (whyMsari?.features && whyMsari.features.length > 0)
-    ? whyMsari.features.map((f, idx) => ({
-        title: f.title,
-        desc: f.desc,
-        color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
-        icon: DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon,
-      }))
-    : DEFAULT_FEATURES;
-
-  const partnerTitle = whyMsari?.partnerCta?.titleAr || 'هل أنت مزود فندق أو شريك تقني؟ انضم لشبكة مساري';
-  const partnerDesc = whyMsari?.partnerCta?.descriptionAr || 'انضم لشبكة مساري وتكامل مع منتجنا — سواء كنت صاحب فندق يمني أو مطور يريد الوصول لبيانات الفنادق عبر API موثوق.';
-  const partnerBtnText = whyMsari?.partnerCta?.buttonTextAr || 'وثائق API ←';
-  const partnerHref = whyMsari?.partnerCta?.href || '/developers';
+  const sectionTitle = whyMsari?.sectionTitleAr || 'لماذا يختار المسافرون منصة مساري؟';
+  const badge = whyMsari?.badgeAr || 'مميزات مساري';
 
   return (
-    <section className="py-16 sm:py-20 bg-white">
-      <div className="container-msari">
-        {/* Header */}
-        <div className="text-center mb-14 group">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs sm:text-sm font-black mb-3 hover:scale-105 transition-transform duration-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8A93A]" />
-            {badge}
+    <section className="py-20 sm:py-28 bg-[#fafafc] border-t border-neutral-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs sm:text-sm font-black mb-4">
+            <Sparkles size={14} />
+            <span>{badge}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E] mb-3 group-hover:text-[#3A1C8F] transition-colors duration-300">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-neutral-900 leading-[1.25] tracking-tight mb-4">
             {sectionTitle}
           </h2>
-          <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold leading-relaxed group-hover:text-neutral-700 transition-colors duration-300">
-            بنيّنا مساري بكل تفاصيل المسافر اليمني وعرفنا احتياجاته — لتكون تجربة السفر أسهل وأوثق
+          <p className="text-neutral-500 text-sm sm:text-base lg:text-lg font-medium leading-relaxed">
+            صممنا مساري لتلبية كافة احتياجات المسافر اليمني وتوفير تجربة حجز عصرية، آمنة ومريحة تلغي عناء البحث التقليدي.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(featuresList.length, 6)} gap-4 sm:gap-6`}>
-          {featuresList.map((feature, idx) => {
-            const Icon = feature.icon || Shield;
+        {/* Features 4-Card Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {DEFAULT_FEATURES.map((feature, idx) => {
+            const Icon = feature.icon;
             return (
               <div
-                key={`${feature.title}-${idx}`}
-                className="why-card group p-4 sm:p-5 lg:p-5 rounded-2xl border border-neutral-200/80 bg-white cursor-pointer shadow-[0_1px_3px_rgba(23,15,46,0.06),0_1px_2px_rgba(23,15,46,0.05)] hover:shadow-[0_4px_10px_rgba(35,9,110,0.05),0_10px_26px_rgba(35,9,110,0.09)] transition-all duration-300"
+                key={idx}
+                className="bg-white rounded-3xl p-7 border border-neutral-200/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
               >
-                <div className={`why-icon w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-4 lg:mb-5 shadow-md`}>
-                  <Icon size={24} className="w-5 h-5 lg:w-6 lg:h-6" />
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shadow-inner">
+                      <Icon size={28} />
+                    </div>
+                    <span className="text-[11px] font-black text-[var(--brand-primary)] bg-[var(--brand-primary)]/5 px-3 py-1 rounded-full">
+                      {feature.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg sm:text-xl font-black text-neutral-900 mb-3 leading-snug">
+                    {feature.title}
+                  </h3>
+
+                  <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed font-medium">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-2 group-hover:text-[var(--brand-primary)] transition-colors duration-300">
-                  {feature.title}
-                </h3>
-                <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed group-hover:text-neutral-700 transition-colors duration-300">
-                  {feature.desc}
-                </p>
               </div>
             );
           })}
         </div>
 
-        {/* Partner CTA */}
-        <div className="text-center mt-14 p-10 rounded-3xl bg-gradient-to-br from-[#23096E] to-[#FF3B30] text-white hover:shadow-2xl transition-all duration-500 group">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/15 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
-            <Rocket size={26} strokeWidth={2} />
+        {/* Partner & Developer Banner Strip */}
+        <div className="mt-12 rounded-3xl bg-white p-6 sm:p-8 border border-neutral-200/60 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="text-start">
+            <h4 className="text-base sm:text-lg font-black text-neutral-900 mb-1">
+              هل أنت مالك فندق أو مزود خدمة سياحية؟
+            </h4>
+            <p className="text-neutral-500 text-xs sm:text-sm font-medium">
+              انضم إلى شبكة مساري وزد من نسبة إشغال فندقك عبر منصتنا وتكامل مع خدماتنا الرقمية.
+            </p>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-black mb-3 text-white group-hover:text-white/90 transition-colors duration-300">
-            {partnerTitle}
-          </h3>
-          <p className="text-white/85 mb-6 max-w-xl mx-auto font-medium text-base group-hover:text-white transition-colors duration-300">
-            {partnerDesc}
-          </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/add-hotel"
-              className="px-6 py-3 rounded-xl bg-white text-[#23096E] hover:bg-slate-100 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              أضف فندقك
-            </Link>
-            <Link
-              href={partnerHref}
-              className="px-6 py-3 rounded-xl bg-white/15 text-white hover:bg-white/25 border border-white/20 font-bold transition-all duration-300"
-            >
-              {partnerBtnText}
-            </Link>
-          </div>
+
+          <Link
+            href="/add-hotel"
+            className="px-6 py-3 rounded-xl bg-[var(--brand-primary)] hover:bg-[var(--brand-secondary)] text-white text-xs sm:text-sm font-black transition-colors shrink-0 shadow-md inline-flex items-center gap-2"
+          >
+            <span>سجل فندقك الآن</span>
+            <ArrowLeft size={16} />
+          </Link>
         </div>
+
       </div>
     </section>
   );
