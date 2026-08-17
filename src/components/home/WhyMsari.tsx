@@ -82,16 +82,16 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
   const partnerDesc = whyMsari?.partnerCta?.descriptionAr || 'انضم لشبكة مساري وضاعف حجوزاتك مع نظام إدارة متكامل وربط برمجي مباشر';
 
   return (
-    <section className="py-14 sm:py-24 bg-[#F4F2F8]/60 border-t border-neutral-100">
+    <section className="py-10 sm:py-14 bg-[#F4F2F8]/60 border-t border-neutral-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center mb-10 sm:mb-14 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-2.5">
+        <div className="text-center mb-8 sm:mb-10 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-2 sm:mb-2.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
             <span>{badge}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-[var(--brand-primary)] tracking-tight mb-2">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)] tracking-tight mb-1 sm:mb-2">
             {sectionTitle}
           </h2>
           <p className="text-neutral-600 text-xs sm:text-base font-semibold leading-relaxed">
@@ -106,15 +106,15 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
             return (
               <div
                 key={`${feature.title}-${idx}`}
-                className="group relative p-4 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-start"
+                className="group relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-start"
               >
-                <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-3 sm:mb-5 shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0`}>
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-2.5 sm:mb-4 shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0`}>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <h3 className="text-sm sm:text-lg font-black text-neutral-900 mb-1 sm:mb-2 group-hover:text-[var(--brand-primary)] transition-colors">
+                <h3 className="text-xs sm:text-base font-black text-neutral-900 mb-1 group-hover:text-[var(--brand-primary)] transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-neutral-500 text-[11px] sm:text-sm leading-relaxed font-medium">
+                <p className="text-neutral-500 text-[10px] sm:text-xs leading-relaxed font-medium">
                   {feature.desc}
                 </p>
               </div>
@@ -123,16 +123,16 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
         </div>
 
         {/* ── Luxury Interactive Partner Banner (Buttons Side-by-Side in 1 Row) ── */}
-        <div className="mt-10 sm:mt-16 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#0c0326] via-[#1a0654] to-[#2d1275] text-white p-6 sm:p-10 shadow-2xl relative overflow-hidden group hover:shadow-[0_20px_50px_rgba(35,9,110,0.3)] transition-all duration-500 border border-white/10">
+        <div className="mt-8 sm:mt-12 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#0c0326] via-[#1a0654] to-[#2d1275] text-white p-5 sm:p-8 shadow-2xl relative overflow-hidden group hover:shadow-[0_20px_50px_rgba(35,9,110,0.3)] transition-all duration-500 border border-white/10">
           <div className="absolute top-0 end-0 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
           
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 text-center lg:text-start">
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 text-center lg:text-start">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-black mb-2.5 border border-white/15">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-black mb-2 border border-white/15">
                 <Rocket size={13} className="text-[#FF3B30]" />
                 <span>للشركاء والمطورين</span>
               </div>
-              <h3 className="text-xl sm:text-3xl font-black text-white leading-snug mb-2">
+              <h3 className="text-lg sm:text-2xl font-black text-white leading-snug mb-1.5">
                 {partnerTitle}
               </h3>
               <p className="text-white/80 text-xs sm:text-sm font-medium leading-relaxed">
@@ -144,16 +144,16 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
             <div className="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto [&>*]:flex-1 sm:[&>*]:flex-initial shrink-0">
               <Link
                 href="/add-hotel"
-                className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all inline-flex items-center justify-center gap-1.5 active:scale-95"
+                className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all inline-flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <span>أضف فندقك</span>
-                <ArrowLeft size={15} />
+                <ArrowLeft size={14} />
               </Link>
               <Link
                 href="/developers"
-                className="px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all inline-flex items-center justify-center gap-1.5 active:scale-95"
+                className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all inline-flex items-center justify-center gap-1.5 active:scale-95"
               >
-                <Code size={15} />
+                <Code size={14} />
                 <span>وثائق API</span>
               </Link>
             </div>

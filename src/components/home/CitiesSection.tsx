@@ -73,27 +73,27 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
   const secondaryCities = featuredCities.slice(1);
 
   return (
-    <section className="py-20 sm:py-28 bg-white border-t border-neutral-100">
+    <section className="py-10 sm:py-14 bg-white border-t border-neutral-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-3">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-2 sm:mb-3">
               <Compass size={14} />
               <span>📍 استكشف اليمن</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-[var(--brand-primary)] tracking-tight mb-1">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)] tracking-tight mb-1">
               وجهات رائجة
             </h2>
-            <p className="text-[var(--text-secondary)] text-sm sm:text-base font-semibold">
+            <p className="text-[var(--text-secondary)] text-xs sm:text-base font-semibold">
               اكتشف أجمل مدن اليمن واحجز فندقك المفضل
             </p>
           </div>
 
           <Link
             href="/hotels"
-            className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-2xl border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white font-black text-sm transition-all shrink-0"
+            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)] hover:text-white font-black text-sm transition-all shrink-0"
           >
             <span>عرض الكل</span>
             <ArrowLeft size={16} />
@@ -101,12 +101,12 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
         </div>
 
         {/* ── Modern Bento Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
           
           {/* Main Large Hero Card (عدن - 7 cols) */}
           <Link
             href={`/ar/destinations/${mainFeatured.slug}`}
-            className="md:col-span-7 group relative rounded-3xl overflow-hidden min-h-[360px] sm:min-h-[460px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 bg-neutral-900"
+            className="md:col-span-7 group relative rounded-3xl overflow-hidden min-h-[300px] sm:min-h-[400px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-neutral-900"
           >
             <Image
               src={mainFeatured.image}
@@ -119,19 +119,19 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
             
             {/* Top Pill Badge */}
-            <div className="absolute top-5 start-5 z-10">
-              <span className="px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-[var(--brand-primary)] text-xs font-black shadow-md inline-flex items-center gap-1.5">
+            <div className="absolute top-4 start-4 z-10">
+              <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[var(--brand-primary)] text-xs font-black shadow-md inline-flex items-center gap-1.5">
                 <Sparkles size={13} className="text-[#FF3B30]" />
                 <span>الوجهة الأكثر طلباً</span>
               </span>
             </div>
 
             {/* Bottom Content */}
-            <div className="absolute bottom-0 inset-x-0 p-6 sm:p-8 text-start text-white">
-              <h3 className="font-black text-2xl sm:text-4xl text-white leading-tight mb-2 group-hover:text-[#FF3B30] transition-colors">
+            <div className="absolute bottom-0 inset-x-0 p-5 sm:p-7 text-start text-white">
+              <h3 className="font-black text-xl sm:text-3xl text-white leading-tight mb-1 group-hover:text-[#FF3B30] transition-colors">
                 {mainFeatured.name}
               </h3>
-              <p className="text-white/80 text-xs sm:text-sm font-medium mb-3">
+              <p className="text-white/80 text-xs sm:text-sm font-medium mb-2.5">
                 {mainFeatured.highlight}
               </p>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/15 backdrop-blur-md border border-white/20 text-xs font-bold text-white">
@@ -142,12 +142,12 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
           </Link>
 
           {/* Secondary 4-Card 2x2 Bento (5 cols) */}
-          <div className="md:col-span-5 grid grid-cols-2 gap-4 sm:gap-6">
+          <div className="md:col-span-5 grid grid-cols-2 gap-3 sm:gap-4">
             {secondaryCities.map((city) => (
               <Link
                 key={city.id}
                 href={`/ar/destinations/${city.slug}`}
-                className="group relative rounded-3xl overflow-hidden min-h-[175px] sm:min-h-[218px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 bg-neutral-900"
+                className="group relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[145px] sm:min-h-[190px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-neutral-900"
               >
                 <Image
                   src={city.image}
@@ -160,11 +160,11 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
                 {/* Bottom Content */}
-                <div className="absolute bottom-0 inset-x-0 p-4 text-start text-white">
-                  <h3 className="font-black text-base sm:text-lg text-white leading-tight mb-1 group-hover:text-[#FF3B30] transition-colors">
+                <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 text-start text-white">
+                  <h3 className="font-black text-sm sm:text-base text-white leading-tight mb-0.5 group-hover:text-[#FF3B30] transition-colors">
                     {city.name}
                   </h3>
-                  <div className="flex items-center gap-1 text-white/80 text-[11px] font-bold">
+                  <div className="flex items-center gap-1 text-white/80 text-[10px] sm:text-[11px] font-bold">
                     <Building2 size={11} className="text-[#FF3B30] shrink-0" />
                     <span>{city.hotelCount} فندق</span>
                   </div>

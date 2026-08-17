@@ -118,17 +118,17 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
   if (!offers || offers.length === 0) return null;
 
   return (
-    <section className="py-12 sm:py-16 bg-white overflow-hidden w-full">
+    <section className="py-8 sm:py-12 bg-white overflow-hidden w-full">
       <div className="container-msari">
         
-        {/* Section Header: Removed "عرض الكل" as requested */}
-        <div className="flex items-center justify-between mb-8 pb-3 border-b border-neutral-100">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-6 pb-2.5 border-b border-neutral-100">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-black mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--brand-accent)]/10 text-[var(--brand-accent)] text-xs font-black mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>🔥 أحدث العروض والخصومات</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)]">
+            <h2 className="text-2xl sm:text-3xl font-black text-[var(--brand-primary)]">
               العروض الحصرية
             </h2>
           </div>
@@ -138,17 +138,17 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
             <div className="hidden md:flex items-center gap-2">
               <button
                 onClick={prevSlide}
-                className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
+                className="w-9 h-9 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
                 aria-label="العرض السابق"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
               <button
                 onClick={nextSlide}
-                className="w-10 h-10 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
+                className="w-9 h-9 rounded-full bg-white text-[var(--brand-primary)] flex items-center justify-center border border-neutral-200 shadow-sm hover:bg-[var(--brand-primary)] hover:text-white transition-all active:scale-95"
                 aria-label="العرض التالي"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -156,7 +156,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
 
         {/* ── Smooth Responsive Carousel Track ── */}
         <div
-          className="relative w-full overflow-hidden py-2"
+          className="relative w-full overflow-hidden py-1"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onTouchStart={handleTouchStart}
@@ -182,7 +182,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
               >
                 <Link
                   href={offer.link || '/hotels'}
-                  className="group block relative rounded-3xl overflow-hidden shadow-md border border-neutral-200/80 aspect-[16/9] sm:aspect-[2.1/1] p-5 sm:p-7 bg-neutral-950 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                  className="group block relative rounded-3xl overflow-hidden shadow-md border border-neutral-200/80 aspect-[16/9] sm:aspect-[2.1/1] p-5 sm:p-7 bg-neutral-950 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                 >
                   {/* Banner Image */}
                   {offer.image ? (
@@ -207,8 +207,8 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent z-10" />
 
                   {/* Title Overlay */}
-                  <div className="absolute bottom-5 start-5 end-5 z-20 text-white">
-                    <h3 className="text-base sm:text-xl font-black leading-snug drop-shadow-md line-clamp-1 group-hover:text-[var(--brand-accent)] transition-colors">
+                  <div className="absolute bottom-4 sm:bottom-5 start-4 sm:start-5 end-4 sm:end-5 z-20 text-white">
+                    <h3 className="text-sm sm:text-lg font-black leading-snug drop-shadow-md line-clamp-1 group-hover:text-[var(--brand-accent)] transition-colors">
                       {offer.title}
                     </h3>
                   </div>
@@ -219,7 +219,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
 
           {/* Dots Indicator */}
           {count > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-6 sm:mt-8">
+            <div className="flex items-center justify-center gap-1.5 mt-5 sm:mt-6">
               {offers.map((_, i) => (
                 <button
                   key={i}
@@ -228,10 +228,10 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
                     setCurrentIndex(i + 2);
                   }}
                   className={cn(
-                    'h-2.5 rounded-full transition-all duration-500',
+                    'h-2 rounded-full transition-all duration-500',
                     i === realIndex
-                      ? 'w-8 bg-[var(--brand-primary)] shadow-md'
-                      : 'w-2.5 bg-neutral-300 hover:bg-[var(--brand-primary)]/50'
+                      ? 'w-6 bg-[var(--brand-primary)] shadow-md'
+                      : 'w-2 bg-neutral-300 hover:bg-[var(--brand-primary)]/50'
                   )}
                   aria-label={`الذهاب للعرض ${i + 1}`}
                 />
