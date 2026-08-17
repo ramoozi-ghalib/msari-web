@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Sparkles } from 'lucide-react';
@@ -23,8 +23,7 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
 
   const handleScroll = () => {
     if (!sliderRef.current) return;
-    const { scrollLeft, clientWidth } = sliderRef.current;
-    // In RTL, scrollLeft is typically negative or zero
+    const { scrollLeft } = sliderRef.current;
     const scrollPos = Math.abs(scrollLeft);
     const cardWidth = 280 + 14; // Approximate card width + gap
     const index = Math.round(scrollPos / cardWidth);
@@ -72,12 +71,12 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
           </Link>
         </div>
 
-        {/* ── Responsive Track: Smooth Horizontal Swiping on Mobile / Grid on Desktop ── */}
+        {/* ── Responsive Track: Completely Hidden Native Scrollbar with Smooth Momentum Swiping ── */}
         <div 
           ref={sliderRef}
           onScroll={handleScroll}
-          className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-3.5 sm:gap-6 pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth overscroll-x-contain"
-          style={{ direction: 'rtl' }}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex sm:grid overflow-x-auto sm:overflow-x-visible no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory gap-3.5 sm:gap-6 pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 scroll-smooth overscroll-x-contain"
         >
           {hotels.map((hotel) => (
             <div 
@@ -89,7 +88,7 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
           ))}
         </div>
 
-        {/* ── Pagination Dots Indicator (Mobile View in Center) ── */}
+        {/* ── Centered Pagination Dots Indicator (Mobile View) ── */}
         {hotels.length > 1 && (
           <div className="flex sm:hidden items-center justify-center gap-1.5 mt-4">
             {hotels.map((_, i) => (
