@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { 
-  Hotel, Plane, Car, Search, MapPin, Calendar, Users, 
-  Plus, Minus, X, Compass, ChevronDown, Check
-} from 'lucide-react';
+import { Hotel, Plane, Car, Search, MapPin, Calendar, Users, Plus, Minus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { HomepageContentData } from '@/services/cms';
 
@@ -19,10 +16,7 @@ const tabs = [
   { id: 'cars', labelAr: 'سيارات', icon: Car },
 ];
 
-const yemenCities = [
-  'صنعاء', 'عدن', 'المكلا', 'سيئون', 'إب', 'تعز', 
-  'الحديدة', 'مأرب', 'سقطرى', 'شبوة', 'ذمار'
-];
+const yemenCities = ['صنعاء', 'عدن', 'مأرب', 'المكلا', 'تعز', 'الحديدة', 'إب', 'ذمار', 'حضرموت', 'البيضاء'];
 
 export default function HeroSection({ hero }: HeroSectionProps) {
   const router = useRouter();
@@ -37,9 +31,9 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   // Interactive guests and rooms states
   const [guests, setGuests] = useState(2);
   const [rooms, setRooms] = useState(1);
-  const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  // Mobile: slide-up search sheet
+  // Mobile: fields live in a slide-up sheet instead of being stacked inline
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const handleSearch = () => {
@@ -59,15 +53,231 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     setMobileSearchOpen(false);
   };
 
-  const subtitle = hero?.subtitleAr || 'منصة يمنية رائدة لحجز الفنادق ورحلات الطيران وتأجير السيارات بأمان وسهولة';
+  const subtitle = hero?.subtitleAr || 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات بسهولة وأمان';
+  const customBg = hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg' ? hero.backgroundImageUrl : null;
+
+  const tabsRowEl = (
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3 lg:mb-4 max-w-full flex-wrap" style={{ direction: 'rtl' }}>
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all shrink-0',
+              isActive
+                ? 'bg-white text-[#2d0f64] shadow-md'
+                : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-sm'
+            )}
+          >
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+            <span>{tab.labelAr}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const sheetTabsRowEl = (
+    <div className="flex items-center gap-2 mb-4 max-w-full flex-wrap" style={{ direction: 'rtl' }}>
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all',
+              isActive
+                ? 'bg-[#23096E] text-white shadow-sm'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            )}
+          >
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+            <span>{tab.labelAr}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const searchFieldsEl = (
+    activeTab === 'hotels' ? (
+      <div className="flex flex-col lg:flex-row items-stretch gap-3 w-full">
+        {/* Field: City */}
+        <div className="flex-[2] min-w-0">
+          <label className="block text-[11px] font-bold text-gray-500 mb-1">المدينة أو الفندق</label>
+          <div className="flex items-center gap-2 rounded-xl px-3 h-11 hover:bg-gray-50 transition-colors">
+            <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+            <input
+              type="text"
+              placeholder="اختر المدينة أو الفندق"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none"
+              list="hero-cities"
+            />
+            <datalist id="hero-cities">
+              {yemenCities.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </div>
+        </div>
+
+        <div className="hidden lg:block w-px bg-gray-200 self-stretch my-1" />
+
+        {/* Field: Check-in */}
+        <div className="flex-[1.5] min-w-0">
+          <label className="block text-[11px] font-bold text-gray-500 mb-1">تاريخ الوصول</label>
+          <div className="flex items-center gap-2 rounded-xl px-3 h-11 hover:bg-gray-50 transition-colors">
+            <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+            <input
+              type="date"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="w-full bg-transparent text-xs text-gray-800 outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="hidden lg:block w-px bg-gray-200 self-stretch my-1" />
+
+        {/* Field: Check-out */}
+        <div className="flex-[1.5] min-w-0">
+          <label className="block text-[11px] font-bold text-gray-500 mb-1">تاريخ المغادرة</label>
+          <div className="flex items-center gap-2 rounded-xl px-3 h-11 hover:bg-gray-50 transition-colors">
+            <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+            <input
+              type="date"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className="w-full bg-transparent text-xs text-gray-800 outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="hidden lg:block w-px bg-gray-200 self-stretch my-1" />
+
+        {/* Field: Guests & Rooms */}
+        <div className="flex-[1.5] min-w-0 relative">
+          <label className="block text-[11px] font-bold text-gray-500 mb-1">الضيوف والغرف</label>
+          <button
+            type="button"
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="w-full flex items-center justify-between rounded-xl px-3 h-11 hover:bg-gray-50 transition-colors text-right"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Users className="w-4 h-4 text-gray-400 shrink-0" />
+              <span className="text-xs text-gray-800 truncate font-semibold">
+                {guests} ضيوف، {rooms} غرفة
+              </span>
+            </div>
+          </button>
+
+          {showDropdown && (
+            <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-50 animate-fade-in">
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <div>
+                  <p className="text-sm font-bold text-gray-800">البالغين</p>
+                  <p className="text-xs text-gray-400">12 سنة فأكثر</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setGuests(Math.max(1, guests - 1))}
+                    disabled={guests <= 1}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="text-sm font-bold text-gray-800 w-4 text-center">{guests}</span>
+                  <button
+                    type="button"
+                    onClick={() => setGuests(guests + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between py-2">
+                <div>
+                  <p className="text-sm font-bold text-gray-800">الغرف</p>
+                  <p className="text-xs text-gray-400">عدد الغرف</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRooms(Math.max(1, rooms - 1))}
+                    disabled={rooms <= 1}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="text-sm font-bold text-gray-800 w-4 text-center">{rooms}</span>
+                  <button
+                    type="button"
+                    onClick={() => setRooms(rooms + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowDropdown(false)}
+                className="w-full mt-3 py-2 bg-[#23096E] hover:bg-[#1a0654] text-white text-xs font-bold rounded-xl transition-colors"
+              >
+                تم
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Submit */}
+        <div className="flex items-end">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="w-full lg:w-auto h-11 px-7 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 shrink-0"
+          >
+            <Search className="w-4 h-4" />
+            <span>بحث</span>
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="py-4 text-center">
+        <p className="text-sm text-gray-600 mb-3">
+          {activeTab === 'flights' ? 'احجز رحلات الطيران بأفضل الأسعار' : 'خدمات تأجير السيارات مع أو بدون سائق'}
+        </p>
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="px-8 py-2.5 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black rounded-xl text-sm transition-all"
+        >
+          استعرض الخيارات
+        </button>
+      </div>
+    )
+  );
 
   const renderHeroTitle = (title: string | undefined) => {
     if (!title) {
       return (
         <>
           اكتشف أجمل وجهات
-          <br className="hidden sm:inline" />
-          {' '}اليمن مع <span className="text-[var(--brand-accent)]">مساري</span>
+          <br />
+          اليمن مع <span className="text-[#FF3B30]">مساري</span>
         </>
       );
     }
@@ -79,7 +289,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           {parts.map((part, i) => (
             <span key={i}>
               {part}
-              {i !== parts.length - 1 && <span className="text-[var(--brand-accent)]">مساري</span>}
+              {i !== parts.length - 1 && <span className="text-[#FF3B30]">مساري</span>}
             </span>
           ))}
         </>
@@ -90,389 +300,142 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden w-full bg-gradient-to-br from-[#0b0224] via-[#1a0654] to-[#2d1275] text-white">
-      
-      {/* ── Subtle Ambient Lighting ── */}
-      <div className="absolute top-1/4 -start-20 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 -end-20 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative overflow-hidden w-full max-w-full min-h-[38vh] sm:min-h-[50vh] lg:min-h-[92vh]">
+      {/* ── Background: Custom CMS photo or illustrated Sana'a skyline at dusk ── */}
+      {customBg ? (
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${customBg}')` }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(22,6,77,0.65) 0%, rgba(30,10,90,0.40) 35%, rgba(40,12,90,0.35) 65%, rgba(14,3,41,0.75) 100%)',
+            }}
+          />
+        </div>
+      ) : (
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ background: 'linear-gradient(180deg, #170a3d 0%, #4a2170 40%, #a85a52 82%, #c9793f 100%)' }}
+        >
+          <svg
+            className="absolute bottom-0 left-0 right-0 w-full pointer-events-none"
+            style={{ height: '14vh', minHeight: 75, maxHeight: 220 }}
+            viewBox="0 0 700 170"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <rect x="0" y="90" width="52" height="80" fill="#241040" /><rect x="14" y="66" width="24" height="24" fill="#241040" />
+            <rect x="14" y="106" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="30" y="106" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="14" y="128" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="30" y="128" width="7" height="10" fill="#F3D9A4" opacity=".6" />
+            <rect x="60" y="58" width="40" height="112" fill="#2c1450" /><rect x="72" y="34" width="16" height="24" fill="#2c1450" />
+            <rect x="68" y="76" width="7" height="10" fill="#F3D9A4" opacity=".65" /><rect x="84" y="76" width="7" height="10" fill="#F3D9A4" opacity=".65" /><rect x="68" y="98" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="84" y="98" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="68" y="120" width="7" height="10" fill="#F3D9A4" opacity=".55" /><rect x="84" y="120" width="7" height="10" fill="#F3D9A4" opacity=".55" />
+            <rect x="108" y="112" width="44" height="58" fill="#241040" />
+            <rect x="118" y="126" width="7" height="10" fill="#F3D9A4" opacity=".55" /><rect x="136" y="126" width="7" height="10" fill="#F3D9A4" opacity=".55" />
+            <rect x="160" y="128" width="30" height="42" fill="#2c1450" />
+            <rect x="168" y="140" width="6" height="9" fill="#F3D9A4" opacity=".5" />
+            <rect x="548" y="118" width="32" height="52" fill="#2c1450" />
+            <rect x="556" y="130" width="6" height="9" fill="#F3D9A4" opacity=".5" />
+            <rect x="586" y="96" width="46" height="74" fill="#241040" /><rect x="600" y="74" width="18" height="22" fill="#241040" />
+            <rect x="596" y="112" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="613" y="112" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="596" y="134" width="7" height="10" fill="#F3D9A4" opacity=".55" /><rect x="613" y="134" width="7" height="10" fill="#F3D9A4" opacity=".55" />
+            <rect x="638" y="62" width="38" height="108" fill="#2c1450" /><rect x="650" y="40" width="14" height="22" fill="#2c1450" />
+            <rect x="646" y="80" width="7" height="10" fill="#F3D9A4" opacity=".65" /><rect x="661" y="80" width="7" height="10" fill="#F3D9A4" opacity=".65" /><rect x="646" y="102" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="661" y="102" width="7" height="10" fill="#F3D9A4" opacity=".6" /><rect x="646" y="124" width="7" height="10" fill="#F3D9A4" opacity=".55" /><rect x="661" y="124" width="7" height="10" fill="#F3D9A4" opacity=".55" />
+            <rect x="680" y="126" width="20" height="44" fill="#241040" />
+          </svg>
+          <div
+            className="absolute -top-16 left-1/2 -translate-x-1/2 w-[420px] max-w-full h-[420px] rounded-full opacity-30 pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(232,169,58,.35), transparent 70%)' }}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(180deg, rgba(15,6,40,.5) 0%, rgba(15,6,40,.25) 45%, rgba(15,6,40,.6) 100%)' }}
+          />
+        </div>
+      )}
 
-      {/* ── Content Container: Generous top padding to prevent ANY header collision ── */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 lg:pt-44 pb-16 sm:pb-24 lg:pb-28 text-center flex flex-col items-center">
-        
-        {/* Verification / Trust Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white/90 text-xs sm:text-sm font-bold mb-5 sm:mb-6 border border-white/15 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>منصة السفر والضيافة الأولى في اليمن</span>
+      {/* ── Content: Generous mobile padding (pt-24) preventing ANY header collision ── */}
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-24 pb-6 sm:pt-28 sm:pb-10 lg:pt-36 lg:pb-20 min-h-[38vh] sm:min-h-[50vh] lg:min-h-[92vh] w-full max-w-full">
+        {/* Title Block */}
+        <div className="text-center mb-0 max-w-3xl mx-auto w-full px-2">
+          <span className="hidden lg:inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-bold mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
+            منصة حجز الفنادق الأولى في اليمن
+          </span>
+          <h1 className="font-extrabold text-center text-white drop-shadow-md mb-2 lg:mb-4 text-[20px] min-[360px]:text-[22px] min-[390px]:text-[24px] sm:text-4xl md:text-5xl lg:text-6xl leading-snug">
+            {renderHeroTitle(hero?.titleAr)}
+          </h1>
+          <p className="text-[#F4F2F8] text-xs sm:text-base md:text-lg max-w-[340px] sm:max-w-xl mx-auto leading-relaxed font-semibold px-2">
+            {subtitle === 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات بسهولة وأمان' ? (
+              <>
+                منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران
+                <br className="sm:hidden" />
+                وتأجير السيارات بسهولة وأمان
+              </>
+            ) : (
+              subtitle
+            )}
+          </p>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.3] sm:leading-[1.25] tracking-tight mb-4 sm:mb-6 max-w-4xl">
-          {renderHeroTitle(hero?.titleAr)}
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-white/80 text-xs sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-medium mb-8 sm:mb-10 px-2">
-          {subtitle}
-        </p>
-
-        {/* ── 1. Service Selection Tabs (Always First) ── */}
-        <div className="flex items-center justify-center gap-2 mb-6" style={{ direction: 'rtl' }}>
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-black transition-all shadow-sm',
-                  isActive
-                    ? 'bg-white text-[var(--brand-primary)] shadow-lg scale-105'
-                    : 'bg-white/15 text-white/85 hover:bg-white/25 backdrop-blur-md'
-                )}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{tab.labelAr}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── 2. Search Container (Desktop & Tablet) ── */}
-        <div className="hidden md:block w-full max-w-4xl mx-auto">
-          {activeTab === 'hotels' ? (
-            <div 
-              className="bg-white rounded-3xl p-3 sm:p-4 shadow-2xl border border-white/20 text-neutral-800"
-              style={{ direction: 'rtl' }}
-            >
-              <div className="grid grid-cols-12 gap-2 items-center">
-                
-                {/* Destination */}
-                <div className="col-span-4 text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">الوجهة أو الفندق</label>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
-                    <input
-                      type="text"
-                      placeholder="اختر المدينة أو الفندق"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="w-full bg-transparent text-sm font-bold text-neutral-900 placeholder-neutral-400 outline-none"
-                      list="hero-cities-desktop"
-                    />
-                    <datalist id="hero-cities-desktop">
-                      {yemenCities.map((c) => (
-                        <option key={c} value={c} />
-                      ))}
-                    </datalist>
-                  </div>
-                </div>
-
-                <div className="w-px h-10 bg-neutral-200" />
-
-                {/* Dates */}
-                <div className="col-span-4 text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">تاريخ الوصول والمغادرة</label>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
-                    <div className="flex items-center gap-1.5 w-full text-xs font-bold text-neutral-700">
-                      <input
-                        type="date"
-                        value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
-                        className="bg-transparent outline-none cursor-pointer w-full"
-                      />
-                      <span className="text-neutral-300">-</span>
-                      <input
-                        type="date"
-                        value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="bg-transparent outline-none cursor-pointer w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-px h-10 bg-neutral-200" />
-
-                {/* Guests & Rooms */}
-                <div className="col-span-2 relative text-start p-2.5 rounded-2xl hover:bg-neutral-50 transition-colors">
-                  <label className="block text-[11px] font-black text-neutral-400 mb-1">الضيوف والغرف</label>
-                  <button
-                    type="button"
-                    onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 w-full"
-                  >
-                    <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
-                    <span>{guests} نزلاء، {rooms} غرفة</span>
-                  </button>
-
-                  {showGuestsDropdown && (
-                    <div className="absolute top-full end-0 mt-3 w-64 bg-white rounded-2xl p-4 shadow-2xl border border-neutral-100 z-50 animate-fade-in text-neutral-900">
-                      <div className="flex items-center justify-between py-2 border-b border-neutral-100">
-                        <div>
-                          <div className="text-xs font-black">النزلاء البالغين</div>
-                          <div className="text-[10px] text-neutral-400">12 سنة فأكثر</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setGuests(Math.max(1, guests - 1))}
-                            className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
-                          >
-                            -
-                          </button>
-                          <span className="text-xs font-black w-4 text-center">{guests}</span>
-                          <button
-                            type="button"
-                            onClick={() => setGuests(guests + 1)}
-                            className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between py-2">
-                        <div>
-                          <div className="text-xs font-black">عدد الغرف</div>
-                          <div className="text-[10px] text-neutral-400">غرف الإقامة</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setRooms(Math.max(1, rooms - 1))}
-                            className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
-                          >
-                            -
-                          </button>
-                          <span className="text-xs font-black w-4 text-center">{rooms}</span>
-                          <button
-                            type="button"
-                            onClick={() => setRooms(rooms + 1)}
-                            className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowGuestsDropdown(false)}
-                        className="w-full mt-3 py-1.5 bg-[var(--brand-primary)] text-white text-xs font-bold rounded-xl"
-                      >
-                        تم
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Search Button */}
-                <div className="col-span-2">
-                  <button
-                    type="button"
-                    onClick={handleSearch}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-[var(--brand-accent)] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-                  >
-                    <Search className="w-4 h-4" />
-                    <span>ابحث</span>
-                  </button>
-                </div>
-
-              </div>
+        {/* ── Search Area ── */}
+        <div className="w-full max-w-[900px] mx-auto mt-4 sm:mt-6 lg:mt-8">
+          {/* Desktop / tablet: centered pill tabs + single-row search bar */}
+          <div className="hidden lg:block text-center w-full">
+            {tabsRowEl}
+            <div className="bg-white rounded-2xl p-3 shadow-2xl mx-auto max-w-[820px] w-full" style={{ direction: 'rtl' }}>
+              {searchFieldsEl}
             </div>
-          ) : (
-            <div className="bg-white rounded-3xl p-6 shadow-2xl border border-white/20 text-neutral-800 text-center space-y-4">
-              <p className="text-sm font-bold text-neutral-600">
-                {activeTab === 'flights' 
-                  ? '✈️ احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية بأفضل الأسعار المباشرة'
-                  : '🚗 خدمات تأجير السيارات الفاخرة والنقل بين المحافظات مع أو بدون سائق'}
-              </p>
-              <button
-                type="button"
-                onClick={handleSearch}
-                className="px-8 py-3 bg-[var(--brand-accent)] hover:bg-[#e02d23] text-white font-black rounded-2xl text-sm shadow-lg transition-all inline-flex items-center gap-2"
-              >
-                <span>استعرض الخيارات المتاحة</span>
-              </button>
-            </div>
-          )}
-        </div>
+          </div>
 
-        {/* ── 3. Search Bar (Mobile View) ── */}
-        <div className="md:hidden w-full max-w-md mx-auto">
+          {/* Mobile: single compact pill — opens slide-up search sheet */}
           <button
             type="button"
             onClick={() => setMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-xl px-5 py-4 border border-white/40"
+            className="lg:hidden w-full flex items-center gap-3 bg-white rounded-2xl shadow-2xl px-4 py-3 sm:px-5 sm:py-4"
             style={{ direction: 'rtl' }}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
-                <Search className="w-5 h-5" />
-              </div>
-              <div className="text-start">
-                <div className="text-xs font-black text-neutral-900">
-                  {query.trim() ? query : 'إلى أين ترغب بالسفر؟'}
-                </div>
-                <div className="text-[10px] text-neutral-400 font-semibold">
-                  {checkIn ? `وصول: ${checkIn}` : 'اختر الوجهة والتواريخ والضيوف'}
-                </div>
-              </div>
-            </div>
-
-            <div className="px-3 py-1 rounded-xl bg-[var(--brand-accent)] text-white text-xs font-bold">
-              بحث
-            </div>
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF3B30] shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-gray-500 truncate">
+              {query.trim() ? query : 'إلى وين تسافر؟'}
+            </span>
           </button>
-        </div>
 
+          {/* Mobile: tabs shown directly in the hero */}
+          <div className="lg:hidden mt-2.5 sm:mt-3.5 w-full">
+            {tabsRowEl}
+          </div>
+        </div>
       </div>
 
-      {/* ── Mobile Slide-up Search Sheet ── */}
+      {/* ── Mobile search sheet ── */}
       {mobileSearchOpen && (
         <div
-          className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in"
+          className="lg:hidden fixed inset-0 z-50 bg-black/50 animate-fade-in"
           onClick={() => setMobileSearchOpen(false)}
         >
           <div
-            className="absolute bottom-0 inset-x-0 bg-white text-neutral-900 rounded-t-3xl p-6 pb-10 max-h-[90vh] overflow-y-auto"
+            className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-5 pb-8 max-h-[88vh] overflow-y-auto"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-neutral-100">
-              <h3 className="font-black text-lg text-neutral-900">ابحث عن رحلتك في اليمن</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-black text-lg text-gray-900">ابحث عن رحلتك</h3>
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(false)}
-                className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200"
+                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
                 aria-label="إغلاق"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-
-            {/* Mobile Tab Row */}
-            <div className="flex items-center gap-2 mb-6">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      'flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all',
-                      isActive
-                        ? 'bg-[var(--brand-primary)] text-white shadow-sm'
-                        : 'bg-neutral-100 text-neutral-600'
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{tab.labelAr}</span>
-                  </button>
-                );
-              })}
+            {sheetTabsRowEl}
+            <div className="bg-white rounded-2xl pt-2">
+              {searchFieldsEl}
             </div>
-
-            {activeTab === 'hotels' ? (
-              <div className="space-y-4">
-                {/* City */}
-                <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
-                  <label className="block text-xs font-bold text-neutral-400 mb-1">المدينة أو الفندق</label>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[var(--brand-primary)]" />
-                    <input
-                      type="text"
-                      placeholder="مثال: عدن، صنعاء، المكلا"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="w-full bg-transparent text-sm font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
-                    <label className="block text-xs font-bold text-neutral-400 mb-1">تاريخ الوصول</label>
-                    <input
-                      type="date"
-                      value={checkIn}
-                      onChange={(e) => setCheckIn(e.target.value)}
-                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-
-                  <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100">
-                    <label className="block text-xs font-bold text-neutral-400 mb-1">تاريخ المغادرة</label>
-                    <input
-                      type="date"
-                      value={checkOut}
-                      onChange={(e) => setCheckOut(e.target.value)}
-                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Guests */}
-                <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100 flex items-center justify-between">
-                  <div>
-                    <div className="text-xs font-bold text-neutral-900">عدد الضيوف</div>
-                    <div className="text-[10px] text-neutral-400">{guests} نزلاء، {rooms} غرفة</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setGuests(Math.max(1, guests - 1))}
-                      className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="text-sm font-black w-6 text-center">{guests}</span>
-                    <button
-                      type="button"
-                      onClick={() => setGuests(guests + 1)}
-                      className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className="w-full py-4 rounded-2xl bg-[var(--brand-accent)] text-white font-black text-base shadow-xl mt-4"
-                >
-                  استعراض الفنادق المتاحة
-                </button>
-              </div>
-            ) : (
-              <div className="py-6 text-center space-y-4">
-                <p className="text-sm font-semibold text-neutral-600">
-                  {activeTab === 'flights'
-                    ? 'احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية'
-                    : 'خدمات تأجير السيارات والتوصيل بين المدن'}
-                </p>
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className="w-full py-3.5 bg-[var(--brand-accent)] text-white font-bold rounded-2xl text-sm shadow-lg"
-                >
-                  استعراض الخيارات
-                </button>
-              </div>
-            )}
-
           </div>
         </div>
       )}
-
     </section>
   );
 }
