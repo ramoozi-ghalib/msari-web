@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   Menu, X, Globe, ChevronDown, Hotel, Plane, Car,
-  User, Phone, Home, LogOut, BookOpen, UserPlus
+  User, Phone, Home, LogOut, BookOpen, Sparkles, ArrowLeft
 } from 'lucide-react';
-// Auth context removed for backend migration - using mock state
 import { cn } from '@/lib/utils';
 import { whatsappLink } from '@/lib/site-config';
+import { useSession, signOut } from 'next-auth/react';
+
 const navLinks = [
   { href: '/', labelAr: 'الرئيسية', labelEn: 'Home', icon: Home },
   { href: '/hotels', labelAr: 'فنادق محلية', labelEn: 'Local Hotels', icon: Hotel },
@@ -25,8 +26,6 @@ const currencies = [
   { code: 'YER_NEW', symbol: 'ر.ي.ج', label: 'ريال يمني جديد' },
   { code: 'YER_OLD', symbol: 'ر.ي.ق', label: 'ريال يمني قديم' },
 ];
-
-import { useSession, signOut } from 'next-auth/react';
 
 export default function Header() {
   const pathname = usePathname();
@@ -44,11 +43,8 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const isHome = pathname === '/' || pathname === '/ar' || pathname === '/en';
-  const isTransparentHeader = isHome || pathname.includes('/destinations');
-
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 15);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -61,7 +57,6 @@ export default function Header() {
   }, []);
 
   const changeCurrency = (code: string) => {
-    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `currency=${code}; path=/; max-age=31536000; SameSite=Lax`;
     setCurrency(code);
     setCurrencyOpen(false);
@@ -73,228 +68,302 @@ export default function Header() {
     document.documentElement.lang = lang;
   }, [lang]);
 
-  const headerClass = cn(
-    'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b',
-    isTransparentHeader && !scrolled
-      ? 'bg-[#160549]/75 backdrop-blur-md border-white/10 text-white shadow-sm'
-      : 'bg-white shadow-md border-neutral-100'
-  );
-
-  const textClass = isTransparentHeader && !scrolled ? 'text-white' : 'text-neutral-700';
-  const logoTextClass = isTransparentHeader && !scrolled ? 'text-white' : 'text-[--brand-primary]';
-
   return (
-    <header className={headerClass}>
-      <div className="container-msari px-4 sm:px-6">
-        <div className="flex items-center justify-between h-[72px] w-full">
+    <>
+      <header
+        className={cn(
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b',
+          scrolled
+            ? 'bg-[#10032c]/95 backdrop-blur-lg border-white/15 text-white shadow-xl py-2'
+            : 'bg-[#150549]/80 backdrop-blur-md border-white/10 text-white shadow-sm py-3 sm:py-3.5'
+        )}
+        style={{ direction: 'rtl' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-12 sm:h-14 w-full">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <div className="relative w-11 h-11 transition-transform group-hover:scale-110 group-hover:rotate-3 rounded-sm overflow-hidden duration-300">
-              <Image 
-                src="/images/logo-dark.png"
-                alt="مساري Msari Logo"
-                sizes="(max-width: 768px) 44px, 44px"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className={cn('text-2xl font-black tracking-tight leading-none mb-1 transition-colors duration-300 group-hover:opacity-90', logoTextClass)}>مساري</span>
-              <span className={cn('text-[11px] font-black uppercase tracking-[0.2em] leading-none opacity-80 transition-all duration-300 group-hover:tracking-[0.25em]', textClass)}>
-                Msari
-              </span>
-            </div>
-          </Link>
+            {/* ── Right: Logo ── */}
+            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 transition-transform group-hover:scale-105 rounded-xl overflow-hidden shadow-sm">
+                <Image 
+                  src="/images/logo-dark.png"
+                  alt="مساري Msari Logo"
+                  sizes="40px"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="flex flex-col text-start">
+                <span className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30]">
+                  مساري
+                </span>
+                <span className="text-[9.5px] font-black uppercase tracking-[0.2em] leading-none text-white/70">
+                  Msari
+                </span>
+              </div>
+            </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-extrabold transition-all duration-300 whitespace-nowrap',
-                  pathname === link.href
-                    ? 'bg-[#23096E] text-white shadow-md shadow-[#23096E]/20 hover:scale-105'
-                    : isTransparentHeader && !scrolled
-                      ? 'text-white hover:bg-white/15 hover:text-white'
-                      : 'text-neutral-700 hover:bg-[#23096E]/10 hover:text-[#23096E] hover:scale-105'
-                )}
-              >
-                <link.icon size={15} />
-                {lang === 'ar' ? link.labelAr : link.labelEn}
-              </Link>
-            ))}
-          </nav>
+            {/* ── Center: Desktop Nav ── */}
+            <nav className="hidden lg:flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all whitespace-nowrap',
+                      isActive
+                        ? 'bg-white text-[#23096E] shadow-sm'
+                        : 'text-white/85 hover:text-white hover:bg-white/10'
+                    )}
+                  >
+                    <Icon size={14} className={isActive ? 'text-[#FF3B30]' : 'text-white/70'} />
+                    <span>{lang === 'ar' ? link.labelAr : link.labelEn}</span>
+                  </Link>
+                );
+              })}
+            </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {/* Currency */}
-            <div className="relative">
-              <button
-                onClick={() => setCurrencyOpen(!currencyOpen)}
-                className={cn(
-                  'flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold sm:font-semibold transition-all hover:scale-105',
-                  isTransparentHeader && !scrolled
-                    ? 'text-white hover:bg-white/15'
-                    : 'text-neutral-600 hover:bg-neutral-100'
-                )}
-              >
-                <span>{currency}</span>
-                <ChevronDown size={14} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
-              </button>
-              {currencyOpen && (
-                <div className="absolute top-full mt-1 end-0 bg-white rounded-xl shadow-xl border border-neutral-100 py-1 min-w-[160px] z-50 animate-scale-in">
-                  {currencies.map((c) => (
-                    <button
-                      key={c.code}
-                      onClick={() => changeCurrency(c.code)}
-                      className={cn(
-                        'w-full text-start px-4 py-2 text-sm transition-all hover:bg-neutral-50 hover:scale-[1.02]',
-                        currency === c.code ? 'font-bold text-[#23096E]' : 'text-neutral-700'
-                      )}
-                    >
-                      <span className="font-bold me-2 text-[#FF3B30]">{c.symbol}</span>
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Language toggle */}
-            <button
-              onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-              className={cn(
-                'flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all hidden sm:flex hover:scale-105',
-                isTransparentHeader && !scrolled
-                  ? 'text-white hover:bg-white/15'
-                  : 'text-neutral-600 hover:bg-neutral-100'
-              )}
-            >
-              <Globe size={15} />
-              {lang === 'ar' ? 'EN' : 'عر'}
-            </button>
-
-            {/* User Menu / Login */}
-            {isAuthenticated && user ? (
-              <div className="relative" ref={userMenuRef}>
+            {/* ── Left: Actions (Currency, Auth, WhatsApp, Mobile Menu) ── */}
+            <div className="flex items-center gap-2">
+              
+              {/* Currency Selector Pill */}
+              <div className="relative">
                 <button
-                  onClick={() => setUserMenuOpen(o => !o)}
-                  className={cn(
-                    'hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105',
-                    isTransparentHeader && !scrolled
-                      ? 'bg-white/20 text-white hover:bg-white/30 border border-white/30'
-                      : 'bg-[#23096E]/10 text-[#23096E] hover:bg-[#23096E]/20'
-                  )}
+                  onClick={() => setCurrencyOpen(!currencyOpen)}
+                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md transition-all active:scale-95"
                 >
-                  <div className="w-6 h-6 bg-[#23096E] text-white rounded-full flex items-center justify-center text-xs font-black">
-                    {user.name.charAt(0)}
-                  </div>
-                  <span className="max-w-[80px] truncate">{user.name.split(' ')[0]}</span>
-                  <ChevronDown size={13} className={cn('transition-transform', userMenuOpen && 'rotate-180')} />
+                  <span>{currency}</span>
+                  <ChevronDown size={13} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
                 </button>
-                {userMenuOpen && (
-                  <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-xl border border-neutral-100 py-2 min-w-[180px] z-50">
-                    <div className="px-4 py-2 border-b border-neutral-50 mb-1">
-                      <div className="text-xs font-black text-neutral-900 truncate">{user.name}</div>
-                      <div className="text-xs text-neutral-400 truncate">{user.email}</div>
-                    </div>
-                    {[
-                      { href: '/account/profile', icon: User, label: 'الملف الشخصي' },
-                      { href: '/account/bookings', icon: BookOpen, label: 'حجوزاتي' },
-                    ].map(item => (
-                      <Link key={item.href} href={item.href} onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 font-medium">
-                        <item.icon size={15} className="text-[#23096e]" />{item.label}
-                      </Link>
-                    ))}
-                    <div className="border-t border-neutral-50 mt-1 pt-1">
-                      <button onClick={() => { logout(); setUserMenuOpen(false); router.push('/'); }}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 w-full font-medium">
-                        <LogOut size={15} />تسجيل الخروج
+                {currencyOpen && (
+                  <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-1.5 min-w-[170px] z-50 animate-scale-in text-neutral-900">
+                    {currencies.map((c) => (
+                      <button
+                        key={c.code}
+                        onClick={() => changeCurrency(c.code)}
+                        className={cn(
+                          'w-full text-start px-3.5 py-2 text-xs transition-all hover:bg-neutral-50 flex items-center justify-between',
+                          currency === c.code ? 'font-black text-[#23096E] bg-neutral-50' : 'text-neutral-700'
+                        )}
+                      >
+                        <span>{c.label}</span>
+                        <span className="font-black text-[#FF3B30]">{c.symbol}</span>
                       </button>
-                    </div>
+                    ))}
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition-all hover:scale-105 bg-[#FF3B30] text-white hover:bg-[#e02d23] shadow-md shadow-[#FF3B30]/20"
-              >
-                <User size={15} />
-                {lang === 'ar' ? 'تسجيل الدخول' : 'Login'}
-              </Link>
-            )}
 
-            {/* WhatsApp */}
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-all hidden sm:flex items-center justify-center shadow-md hover:shadow-xl hover:scale-110"
-              title="WhatsApp"
-            >
-              <Phone size={16} />
-            </a>
-
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className={cn(
-                'lg:hidden p-2 rounded-lg transition-all hover:scale-110',
-                isTransparentHeader && !scrolled ? 'text-white hover:bg-white/15' : 'text-neutral-700 hover:bg-neutral-100'
-              )}
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="lg:hidden bg-white border-t border-neutral-100 shadow-xl animate-fade-in">
-          <div className="container-msari py-4 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02]',
-                  pathname === link.href
-                    ? 'bg-[--brand-primary] text-white'
-                    : 'text-neutral-700 hover:bg-neutral-50'
-                )}
-              >
-                <link.icon size={18} />
-                {lang === 'ar' ? link.labelAr : link.labelEn}
-              </Link>
-            ))}
-            <div className="pt-3 border-t border-neutral-100 flex items-center gap-3">
+              {/* Language Toggle (Desktop) */}
               <button
                 onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-neutral-200 text-neutral-600 text-sm font-semibold hover:bg-neutral-50 hover:scale-[1.02] transition-all"
+                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md transition-all"
               >
-                <Globe size={16} />
-                {lang === 'ar' ? 'English' : 'العربية'}
+                <Globe size={13} />
+                <span>{lang === 'ar' ? 'EN' : 'عر'}</span>
               </button>
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[--brand-primary] text-white text-sm font-semibold hover:shadow-lg hover:scale-[1.02] transition-all"
+
+              {/* User Menu / Login (Desktop) */}
+              {isAuthenticated && user ? (
+                <div className="relative hidden md:block" ref={userMenuRef}>
+                  <button
+                    onClick={() => setUserMenuOpen(o => !o)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all"
+                  >
+                    <div className="w-5 h-5 bg-[#FF3B30] text-white rounded-full flex items-center justify-center text-[10px] font-black">
+                      {user.name.charAt(0)}
+                    </div>
+                    <span className="max-w-[70px] truncate">{user.name.split(' ')[0]}</span>
+                    <ChevronDown size={12} className={cn('transition-transform', userMenuOpen && 'rotate-180')} />
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-2 min-w-[180px] z-50 text-neutral-900">
+                      <div className="px-4 py-2 border-b border-neutral-100 mb-1">
+                        <div className="text-xs font-black text-neutral-900 truncate">{user.name}</div>
+                        <div className="text-[10px] text-neutral-400 truncate">{user.email}</div>
+                      </div>
+                      {[
+                        { href: '/account/profile', icon: User, label: 'الملف الشخصي' },
+                        { href: '/account/bookings', icon: BookOpen, label: 'حجوزاتي' },
+                      ].map(item => (
+                        <Link key={item.href} href={item.href} onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50 font-bold">
+                          <item.icon size={14} className="text-[#23096E]" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                      <div className="border-t border-neutral-100 mt-1 pt-1">
+                        <button onClick={() => { logout(); setUserMenuOpen(false); router.push('/'); }}
+                          className="flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-red-50 w-full font-bold">
+                          <LogOut size={14} />
+                          <span>تسجيل الخروج</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden md:flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-[#FF3B30] text-white hover:bg-[#e02d23] shadow-md transition-all hover:scale-105 active:scale-95"
+                >
+                  <User size={13} />
+                  <span>{lang === 'ar' ? 'تسجيل الدخول' : 'Login'}</span>
+                </Link>
+              )}
+
+              {/* WhatsApp (Desktop) */}
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex w-8 h-8 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 items-center justify-center shadow-md hover:scale-105 transition-all"
+                title="WhatsApp"
               >
-                <User size={16} />
-                {lang === 'ar' ? 'دخول' : 'Login'}
-              </Link>
+                <Phone size={14} />
+              </a>
+
+              {/* ── Mobile Hamburger Button: Glass Pill ── */}
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="lg:hidden w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                aria-label="فتح القائمة"
+              >
+                <Menu size={18} />
+              </button>
+
             </div>
           </div>
         </div>
+      </header>
+
+      {/* ── Mobile Slide-out Drawer Menu (Royal Design) ── */}
+      {mobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm animate-fade-in" 
+          onClick={() => setMobileOpen(false)}
+        >
+          <div
+            className="absolute top-0 end-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#0c0326] via-[#1a0654] to-[#23096E] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
+            style={{ direction: 'rtl' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div>
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/15 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF3B30] to-[#23096E] text-white flex items-center justify-center font-black text-sm shadow-md">
+                    م
+                  </div>
+                  <div>
+                    <div className="font-black text-base leading-none">مساري للسياحة</div>
+                    <div className="text-[9px] text-white/70 font-semibold">بوابتك لحجوزات اليمن</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white border border-white/15"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="space-y-2">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        'flex items-center justify-between p-3 rounded-2xl transition-all font-black text-xs border',
+                        isActive
+                          ? 'bg-white text-[#23096E] border-white shadow-md'
+                          : 'bg-white/5 hover:bg-white/15 border-white/10 text-white/90'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon size={16} className={isActive ? 'text-[#FF3B30]' : 'text-[#FF3B30]'} />
+                        <span>{lang === 'ar' ? link.labelAr : link.labelEn}</span>
+                      </div>
+                      <ArrowLeft size={13} className={isActive ? 'text-[#23096E]' : 'text-white/50'} />
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Language & Partner CTA */}
+              <div className="mt-4 pt-4 border-t border-white/15 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90"
+                >
+                  <span className="flex items-center gap-2">
+                    <Globe size={14} className="text-[#FF3B30]" />
+                    <span>اللغة / Language</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-black">{lang === 'ar' ? 'English' : 'العربية'}</span>
+                </button>
+
+                <Link
+                  href="/add-hotel"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles size={14} className="text-amber-400" />
+                    <span>أضف فندقك في مساري</span>
+                  </span>
+                  <ArrowLeft size={13} className="text-white/50" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Bottom Actions: Login & WhatsApp */}
+            <div className="pt-4 border-t border-white/15 space-y-2.5">
+              {isAuthenticated && user ? (
+                <button
+                  onClick={() => { logout(); setMobileOpen(false); }}
+                  className="w-full py-2.5 rounded-xl bg-red-500/20 text-red-300 hover:bg-red-500/30 text-xs font-bold border border-red-500/30 flex items-center justify-center gap-2"
+                >
+                  <LogOut size={14} />
+                  <span>تسجيل الخروج ({user.name.split(' ')[0]})</span>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-[#FF3B30] text-white text-xs font-black flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
+                >
+                  <User size={14} />
+                  <span>تسجيل الدخول / إنشاء حساب</span>
+                </Link>
+              )}
+
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md"
+              >
+                <Phone size={14} />
+                <span>دعم العملاء عبر واتساب</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
       )}
-    </header>
+    </>
   );
 }
