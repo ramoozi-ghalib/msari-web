@@ -315,10 +315,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 <Building2 className="w-5 h-5 text-[var(--brand-primary)] shrink-0" />
                 <input
                   type="text"
-                  placeholder="ابحث عن فنادق في عدن، صنعاء، المكلا..."
+                  placeholder="المدينة، الفندق"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="w-full bg-transparent text-xs font-black text-neutral-900 placeholder-neutral-400 outline-none"
+                  className="w-full bg-transparent text-xs font-semibold text-neutral-800 placeholder:text-neutral-400 placeholder:font-normal outline-none"
                 />
               </div>
             </div>

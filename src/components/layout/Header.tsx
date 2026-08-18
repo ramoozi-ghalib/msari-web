@@ -70,43 +70,38 @@ export default function Header() {
 
   return (
     <>
-      {/* ── Top Header with Official Vibrant Msari Brand Gradient ── */}
+      {/* ── Transparent Top Header (Seamless with Hero, blurred gradient on scroll) ── */}
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/15 text-white',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
           scrolled
-            ? 'bg-gradient-to-r from-[#1D065C]/95 via-[#23096E]/95 to-[#331185]/95 backdrop-blur-xl shadow-2xl py-2'
-            : 'bg-gradient-to-r from-[#23096E]/90 via-[#2C0F7C]/85 to-[#3A1C8F]/90 backdrop-blur-md shadow-lg py-2.5 sm:py-3.5'
+            ? 'bg-gradient-to-r from-[#1D065C]/95 via-[#23096E]/95 to-[#331185]/95 backdrop-blur-xl border-b border-white/15 shadow-2xl py-2'
+            : 'bg-transparent border-b border-transparent py-3.5 sm:py-4'
         )}
         style={{ direction: 'rtl' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12 sm:h-14 w-full">
 
-            {/* ── Right: Logo ── */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="relative w-9 h-9 sm:w-10 sm:h-10 transition-transform group-hover:scale-105 rounded-xl overflow-hidden shadow-md bg-white/10 p-1 border border-white/20">
+            {/* ── Right: Transparent Clean Logo + 'مساري' Only (No MSARI) ── */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className="relative w-8 h-8 sm:w-9 sm:h-9 transition-transform group-hover:scale-105">
                 <Image 
-                  src="/images/logo-dark.png"
-                  alt="مساري Msari Logo"
-                  sizes="40px"
+                  src="/images/logo-icon.png"
+                  alt="شعار مساري"
+                  sizes="36px"
                   fill
-                  className="object-contain"
+                  className="object-contain drop-shadow-md"
                   priority
                 />
               </div>
-              <div className="flex flex-col text-start">
-                <span className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30]">
-                  مساري
-                </span>
-                <span className="text-[9.5px] font-black uppercase tracking-[0.2em] leading-none text-white/80">
-                  Msari
-                </span>
-              </div>
+              <span className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30] drop-shadow-md">
+                مساري
+              </span>
             </Link>
 
             {/* ── Center: Desktop Nav ── */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
+            <nav className="hidden lg:flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const Icon = link.icon;
@@ -223,7 +218,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                className="lg:hidden w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 border border-white/20 text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
                 aria-label="فتح القائمة"
               >
                 <Menu size={18} />
@@ -234,7 +229,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ── Mobile Slide-out Drawer Menu (Official Msari Gradient & Red Icons Only) ── */}
+      {/* ── Mobile Slide-out Drawer Menu ── */}
       {mobileOpen && (
         <div 
           className="lg:hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm animate-fade-in" 
@@ -246,22 +241,19 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Drawer Header: Logo Only */}
+              {/* Drawer Header: Transparent Logo + 'مساري' Only */}
               <div className="flex items-center justify-between pb-4 border-b border-white/15 mb-5">
-                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5">
-                  <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-white/10 p-1 border border-white/20 shadow-md">
+                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
+                  <div className="relative w-8 h-8">
                     <Image 
-                      src="/images/logo-dark.png"
-                      alt="Msari Logo"
-                      sizes="36px"
+                      src="/images/logo-icon.png"
+                      alt="شعار مساري"
+                      sizes="32px"
                       fill
                       className="object-contain"
                     />
                   </div>
-                  <div className="flex flex-col text-start">
-                    <span className="text-xl font-black text-white leading-none">مساري</span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">Msari</span>
-                  </div>
+                  <span className="text-xl font-black text-white leading-none">مساري</span>
                 </Link>
                 <button
                   type="button"
@@ -299,7 +291,7 @@ export default function Header() {
                 })}
               </div>
 
-              {/* Extra Pages: تطبيق مساري، من نحن، اتصل بنا (Unified Red Icons Only) */}
+              {/* Extra Pages: تطبيق مساري، من نحن، اتصل بنا */}
               <div className="mt-3.5 pt-3.5 border-t border-white/15 space-y-1.5">
                 {drawerExtraLinks.map((extra) => {
                   const Icon = extra.icon;
