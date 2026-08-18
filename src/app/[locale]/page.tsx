@@ -5,6 +5,7 @@ import CitiesSection from '@/components/home/CitiesSection';
 import FeaturedHotels from '@/components/home/FeaturedHotels';
 import WhyMsari from '@/components/home/WhyMsari';
 import AppDownloadSection from '@/components/home/AppDownloadSection';
+import SocialFollowSection from '@/components/home/SocialFollowSection';
 import { getLocalHotels } from '@/actions/hotels';
 import { getActiveOffers } from '@/actions/offers';
 import { getActiveCities } from '@/actions/cities';
@@ -50,6 +51,7 @@ export default async function HomePage() {
       <CitiesSection cities={cities} />
       <WhyMsari whyMsari={homepageContent.whyMsari} />
       <AppDownloadSection appDownload={appDownloadFixed} />
+      <SocialFollowSection />
     </>
   );
 }
