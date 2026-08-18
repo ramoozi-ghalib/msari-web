@@ -70,73 +70,83 @@ export default function Header() {
 
   return (
     <>
-      {/* ── Top Header with Ultra-Luxury Glassmorphism ── */}
+      {/* ── Official Royal Purple Header ── */}
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
-          scrolled
-            ? 'bg-gradient-to-r from-[#1D065C]/95 via-[#23096E]/95 to-[#331185]/95 backdrop-blur-2xl border-b border-white/20 shadow-2xl py-2'
-            : 'bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] py-2.5 sm:py-3.5'
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/10 text-white bg-gradient-to-r from-[#23096E]/95 via-[#2C0F7C]/90 to-[#3A1C8F]/95 backdrop-blur-md shadow-lg',
+          scrolled ? 'py-2 sm:py-2.5' : 'py-2.5 sm:py-3.5'
         )}
         style={{ direction: 'rtl' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12 sm:h-14 w-full">
+          <div className="relative flex items-center justify-between h-12 sm:h-14 w-full">
 
-            {/* ── Right: Balanced Logo + 'مساري' ── */}
-            <Link href="/" className="flex items-center gap-1.5 shrink-0 group">
-              <div className="relative w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-105 shrink-0">
-                <Image 
-                  src="/images/logo-icon.png"
-                  alt="شعار مساري"
-                  sizes="28px"
-                  fill
-                  className="object-contain drop-shadow-sm"
-                  priority
-                />
-              </div>
-              <span className="text-lg sm:text-xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30] drop-shadow-sm">
-                مساري
-              </span>
-            </Link>
+            {/* ── Right: Mobile Hamburger / Desktop Nav ── */}
+            <div className="flex items-center gap-3">
+              {/* Mobile Hamburger: Square with subtle rounded corners */}
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="lg:hidden w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center backdrop-blur-md shadow-md active:scale-95 transition-all"
+                aria-label="فتح القائمة"
+              >
+                <Menu size={20} />
+              </button>
 
-            {/* ── Center: Desktop Nav (Frosted Glass Capsule) ── */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-sm">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all whitespace-nowrap',
-                      isActive
-                        ? 'bg-white text-[#23096E] shadow-sm'
-                        : 'text-white/90 hover:text-white hover:bg-white/15'
-                    )}
-                  >
-                    <Icon size={14} className={isActive ? 'text-[#FF3B30]' : 'text-white/70'} />
-                    <span>{link.labelAr}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-sm">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black transition-all whitespace-nowrap',
+                        isActive
+                          ? 'bg-white text-[#23096E] shadow-sm'
+                          : 'text-white/90 hover:text-white hover:bg-white/15'
+                      )}
+                    >
+                      <Icon size={14} className={isActive ? 'text-[#FF3B30]' : 'text-white/70'} />
+                      <span>{link.labelAr}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
 
-            {/* ── Left: Actions ── */}
+            {/* ── Center: Prominent Clean Logo Icon ONLY (No Text) ── */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+              <Link href="/" className="transition-transform hover:scale-105 active:scale-95">
+                <div className="relative w-9 h-9 sm:w-11 sm:h-11">
+                  <Image 
+                    src="/images/logo-icon.png"
+                    alt="شعار مساري"
+                    sizes="44px"
+                    fill
+                    className="object-contain drop-shadow-md"
+                    priority
+                  />
+                </div>
+              </Link>
+            </div>
+
+            {/* ── Left: Currency Selector & Desktop Actions ── */}
             <div className="flex items-center gap-2">
               
-              {/* Currency Selector */}
+              {/* Currency Selector: Square / Rectangular with subtle rounded corners */}
               <div className="relative">
                 <button
                   onClick={() => setCurrencyOpen(!currencyOpen)}
-                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/25 text-white backdrop-blur-md transition-all active:scale-95 shadow-sm"
+                  className="h-10 px-3 rounded-xl text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/20 text-white backdrop-blur-md transition-all active:scale-95 shadow-md flex items-center gap-1.5"
                 >
                   <span>{currency}</span>
                   <ChevronDown size={13} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
                 </button>
                 {currencyOpen && (
-                  <div className="absolute top-full mt-2 end-0 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 py-1.5 min-w-[170px] z-50 animate-scale-in text-neutral-900">
+                  <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-1.5 min-w-[170px] z-50 animate-scale-in text-neutral-900">
                     {currencies.map((c) => (
                       <button
                         key={c.code}
@@ -159,7 +169,7 @@ export default function Header() {
                 <div className="relative hidden md:block" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(o => !o)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold backdrop-blur-md transition-all"
+                    className="h-10 px-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all flex items-center gap-2"
                   >
                     <div className="w-5 h-5 bg-[#FF3B30] text-white rounded-full flex items-center justify-center text-[10px] font-black">
                       {user.name.charAt(0)}
@@ -168,7 +178,7 @@ export default function Header() {
                     <ChevronDown size={12} className={cn('transition-transform', userMenuOpen && 'rotate-180')} />
                   </button>
                   {userMenuOpen && (
-                    <div className="absolute top-full mt-2 end-0 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 py-2 min-w-[180px] z-50 text-neutral-900">
+                    <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-2 min-w-[180px] z-50 text-neutral-900">
                       <div className="px-4 py-2 border-b border-neutral-100 mb-1">
                         <div className="text-xs font-black text-neutral-900 truncate">{user.name}</div>
                         <div className="text-[10px] text-neutral-400 truncate">{user.email}</div>
@@ -196,7 +206,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden md:flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-[#FF3B30] text-white hover:bg-[#e02d23] shadow-md transition-all hover:scale-105 active:scale-95"
+                  className="hidden md:flex items-center gap-1.5 h-10 px-4 rounded-xl text-xs font-black bg-[#FF3B30] text-white hover:bg-[#e02d23] shadow-md transition-all hover:scale-105 active:scale-95"
                 >
                   <User size={13} />
                   <span>تسجيل الدخول</span>
@@ -208,21 +218,11 @@ export default function Header() {
                 href={whatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:flex w-8 h-8 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 items-center justify-center shadow-md hover:scale-105 transition-all"
+                className="hidden sm:flex w-10 h-10 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 items-center justify-center shadow-md hover:scale-105 transition-all"
                 title="WhatsApp"
               >
-                <Phone size={14} />
+                <Phone size={16} />
               </a>
-
-              {/* Mobile Hamburger Button */}
-              <button
-                type="button"
-                onClick={() => setMobileOpen(true)}
-                className="lg:hidden w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center backdrop-blur-md transition-all active:scale-95 shadow-sm"
-                aria-label="فتح القائمة"
-              >
-                <Menu size={18} />
-              </button>
 
             </div>
           </div>
@@ -241,26 +241,26 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Drawer Header: Balanced Logo + 'مساري' */}
+              {/* Drawer Header: Centered Logo + Close Button */}
               <div className="flex items-center justify-between pb-4 border-b border-white/15 mb-5">
-                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5">
-                  <div className="relative w-6 h-6 shrink-0">
+                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
+                  <div className="relative w-8 h-8 shrink-0">
                     <Image 
                       src="/images/logo-icon.png"
                       alt="شعار مساري"
-                      sizes="24px"
+                      sizes="32px"
                       fill
                       className="object-contain"
                     />
                   </div>
-                  <span className="text-lg font-black text-white leading-none">مساري</span>
+                  <span className="text-xl font-black text-white leading-none">مساري</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white border border-white/15"
+                  className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white border border-white/20 shadow-sm"
                 >
-                  <X size={16} />
+                  <X size={18} />
                 </button>
               </div>
 
