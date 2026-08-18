@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { 
   Smartphone, MapPin, Search, Bell, SlidersHorizontal, Check, Sparkles
 } from 'lucide-react';
@@ -19,12 +19,32 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerMove = (clientX: number, clientY: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    // Normalize from -1 to +1, then scale up for a strong, fluid 3D tilt response
+    const nx = (clientX - rect.left) / rect.width - 0.5;
+    const ny = (clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x: nx * 24, y: ny * -20 });
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -12;
-    setMousePos({ x, y });
+    setIsHovered(true);
+    handlePointerMove(e.clientX, e.clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      setIsHovered(true);
+      handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleReset = () => {
+    setIsHovered(false);
+    setMousePos({ x: 0, y: 0 });
   };
 
   return (
@@ -97,39 +117,44 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
 
           </div>
 
-          {/* ── 2. TRUE 3D DUAL HARDWARE FLAGSHIPS (Solid Ground Base with Direct Bottom Contact Shadows) ── */}
+          {/* ── 2. TRUE 3D DUAL HARDWARE FLAGSHIPS (High Dynamic Physics & Accurate Ground Contact Shadows) ── */}
           <div 
-            className="lg:col-span-6 flex items-center justify-center pt-2 sm:pt-4 lg:pt-0"
+            ref={containerRef}
+            className="lg:col-span-6 flex items-center justify-center pt-4 lg:pt-0 cursor-grab active:cursor-grabbing select-none"
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => { setIsHovered(false); setMousePos({ x: 0, y: 0 }); }}
+            onMouseLeave={handleReset}
+            onTouchStart={() => setIsHovered(true)}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleReset}
           >
-            {/* Grounding Stage Container */}
+            {/* Grounding Stage */}
             <div className="relative w-full flex flex-col items-center justify-end">
               
-              {/* Studio Flat Floor Horizon Surface Line */}
-              <div className="w-[90%] max-w-[460px] h-[1px] bg-gradient-to-r from-transparent via-neutral-300 to-transparent absolute bottom-6 z-0" />
+              {/* Studio Flat Floor Line */}
+              <div className="w-[85%] max-w-[440px] h-[1px] bg-gradient-to-r from-transparent via-neutral-300/80 to-transparent absolute bottom-6 z-0" />
               
               <div 
                 className="relative w-full flex items-end justify-center gap-4 xs:gap-6 sm:gap-8 lg:gap-10 pb-6 pt-4"
                 style={{
-                  perspective: '1500px',
+                  perspective: '1200px',
                   transformStyle: 'preserve-3d',
                 }}
               >
                 
-                {/* ── 1. SAMSUNG GALAXY S24 ULTRA (Left Phone with Dedicated Bottom Contact Shadow) ── */}
-                <div className="relative group/s24 shrink-0">
+                {/* ── 1. SAMSUNG GALAXY S24 ULTRA ── */}
+                <div className="relative group/s24 shrink-0 flex flex-col items-center">
                   
-                  {/* Direct Solid Bottom Contact Shadow under S24 Ultra */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[90%] h-3.5 bg-black/60 rounded-full blur-[4px] transform scale-y-40 pointer-events-none z-0" />
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[110%] h-6 bg-black/25 rounded-full blur-md transform scale-y-30 pointer-events-none z-0" />
+                  {/* S24 Ultra Realistic Multi-Layered Ground Contact Shadow */}
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-[85%] h-2.5 bg-neutral-950/85 rounded-full blur-[2px] transform scale-y-40 pointer-events-none z-0" />
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[105%] h-5 bg-neutral-900/35 rounded-full blur-[5px] transform scale-y-30 pointer-events-none z-0" />
+                  <div className="absolute -bottom-4.5 left-1/2 -translate-x-1/2 w-[130%] h-8 bg-neutral-800/15 rounded-full blur-md transform scale-y-25 pointer-events-none z-0" />
 
-                  {/* S24 Ultra Hardware Body */}
+                  {/* S24 Ultra Hardware Body with Dynamic Tilt */}
                   <div 
-                    className="relative w-[145px] xs:w-[165px] sm:w-[200px] lg:w-[220px] h-[310px] xs:h-[350px] sm:h-[420px] lg:h-[460px] rounded-none bg-gradient-to-b from-[#2E2822] via-[#1A1612] to-[#0A0806] p-[2.5px] sm:p-[3px] border-[1.5px] sm:border-[2px] border-[#9E9382] shadow-sm transition-transform duration-300 ease-out z-10"
+                    className="relative w-[145px] xs:w-[165px] sm:w-[200px] lg:w-[220px] h-[310px] xs:h-[350px] sm:h-[420px] lg:h-[460px] rounded-none bg-gradient-to-b from-[#2E2822] via-[#1A1612] to-[#0A0806] p-[2.5px] sm:p-[3px] border-[1.5px] sm:border-[2px] border-[#9E9382] shadow-sm transition-transform duration-200 ease-out z-10"
                     style={{
-                      transform: `rotateY(${isHovered ? -12 + mousePos.x * 0.3 : -10}deg) rotateX(${isHovered ? 3 + mousePos.y * 0.3 : 3}deg) rotateZ(-1deg)`,
+                      transform: `rotateY(${isHovered ? -12 + mousePos.x * 0.85 : -10}deg) rotateX(${isHovered ? 4 + mousePos.y * 0.75 : 4}deg) rotateZ(-1deg) translateZ(${isHovered ? 15 : 0}px)`,
                       transformStyle: 'preserve-3d',
                     }}
                   >
@@ -140,8 +165,13 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                     {/* S24 Ultra AMOLED Screen */}
                     <div className="w-full h-full bg-[#0C051B] text-white rounded-none overflow-hidden relative flex flex-col justify-between border border-white/10 select-none">
                       
-                      {/* Glass Reflection */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
+                      {/* Dynamic Glass Specular Reflection */}
+                      <div 
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200"
+                        style={{
+                          transform: `translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px)`,
+                        }}
+                      />
 
                       {/* Top Status Bar & Centered Punch-Hole Camera */}
                       <div className="relative pt-1 px-2 sm:px-3 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 z-20">
@@ -210,18 +240,19 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                   </div>
                 </div>
 
-                {/* ── 2. IPHONE 16/17 PRO (Right Phone with Dedicated Bottom Contact Shadow) ── */}
-                <div className="relative group/iphone shrink-0">
+                {/* ── 2. IPHONE 16/17 PRO ── */}
+                <div className="relative group/iphone shrink-0 flex flex-col items-center">
                   
-                  {/* Direct Solid Bottom Contact Shadow under iPhone */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[90%] h-3.5 bg-black/60 rounded-full blur-[4px] transform scale-y-40 pointer-events-none z-0" />
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[110%] h-6 bg-black/25 rounded-full blur-md transform scale-y-30 pointer-events-none z-0" />
+                  {/* iPhone Realistic Multi-Layered Ground Contact Shadow */}
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-[85%] h-2.5 bg-neutral-950/85 rounded-full blur-[2px] transform scale-y-40 pointer-events-none z-0" />
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[105%] h-5 bg-neutral-900/35 rounded-full blur-[5px] transform scale-y-30 pointer-events-none z-0" />
+                  <div className="absolute -bottom-4.5 left-1/2 -translate-x-1/2 w-[130%] h-8 bg-neutral-800/15 rounded-full blur-md transform scale-y-25 pointer-events-none z-0" />
 
-                  {/* iPhone Hardware Body */}
+                  {/* iPhone Hardware Body with Dynamic Tilt */}
                   <div 
-                    className="relative w-[145px] xs:w-[165px] sm:w-[200px] lg:w-[220px] h-[315px] xs:h-[355px] sm:h-[425px] lg:h-[465px] rounded-[30px] sm:rounded-[38px] lg:rounded-[42px] bg-gradient-to-b from-[#3D352E] via-[#1E1914] to-[#0A0806] p-[2.5px] sm:p-[3.5px] border-[2px] sm:border-[2.5px] border-[#C8BEB0] shadow-sm transition-transform duration-300 ease-out z-20"
+                    className="relative w-[145px] xs:w-[165px] sm:w-[200px] lg:w-[220px] h-[315px] xs:h-[355px] sm:h-[425px] lg:h-[465px] rounded-[30px] sm:rounded-[38px] lg:rounded-[42px] bg-gradient-to-b from-[#3D352E] via-[#1E1914] to-[#0A0806] p-[2.5px] sm:p-[3.5px] border-[2px] sm:border-[2.5px] border-[#C8BEB0] shadow-sm transition-transform duration-200 ease-out z-20"
                     style={{
-                      transform: `rotateY(${isHovered ? 12 + mousePos.x * 0.3 : 10}deg) rotateX(${isHovered ? 3 + mousePos.y * 0.3 : 3}deg) rotateZ(1deg)`,
+                      transform: `rotateY(${isHovered ? 12 + mousePos.x * 0.85 : 10}deg) rotateX(${isHovered ? 4 + mousePos.y * 0.75 : 4}deg) rotateZ(1deg) translateZ(${isHovered ? 25 : 10}px)`,
                       transformStyle: 'preserve-3d',
                     }}
                   >
@@ -233,6 +264,14 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                     {/* iPhone Super Retina XDR OLED Screen */}
                     <div className="w-full h-full bg-[#110528] text-white rounded-[26px] sm:rounded-[34px] lg:rounded-[38px] overflow-hidden relative flex flex-col justify-between border border-white/10 select-none">
                       
+                      {/* Dynamic Glass Specular Reflection */}
+                      <div 
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200"
+                        style={{
+                          transform: `translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px)`,
+                        }}
+                      />
+
                       {/* Dynamic Island Header */}
                       <div className="pt-1.5 px-2.5 sm:px-3.5 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 relative z-20">
                         <span>9:41</span>
