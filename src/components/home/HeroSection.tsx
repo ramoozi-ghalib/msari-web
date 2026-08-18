@@ -63,45 +63,47 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     }
   };
 
+  // Ultra-Luxury 5-Star Hotel & Grand Resort Photography
   const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
     ? hero.backgroundImageUrl
-    : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2000&auto=format&fit=crop';
+    : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop';
 
   return (
     <div className="relative w-full">
       
-      {/* ── 1. Hero Atmospheric Section (Spacious, Clean & Breathable) ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[340px] sm:min-h-[390px] lg:min-h-[440px] pt-24 sm:pt-28 lg:pt-32 pb-28 sm:pb-28 lg:pb-32 flex flex-col items-center justify-center">
+      {/* ── 1. Grand Atmospheric Hero Section ── */}
+      <section className="relative overflow-hidden w-full text-white min-h-[420px] sm:min-h-[520px] lg:min-h-[580px] pt-28 sm:pt-36 lg:pt-40 pb-36 sm:pb-44 lg:pb-48 flex flex-col items-center justify-center">
         
-        {/* Panoramic Background */}
+        {/* Panoramic 5-Star Luxury Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
           style={{ backgroundImage: `url('${bgImage}')` }}
         >
+          {/* Royal Ambient Gradient Overlay */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, rgba(10,3,32,0.80) 0%, rgba(35,9,110,0.70) 50%, rgba(35,9,110,0.92) 100%)',
+              background: 'linear-gradient(180deg, rgba(8,2,26,0.78) 0%, rgba(25,6,77,0.65) 45%, rgba(35,9,110,0.92) 100%)',
             }}
           />
         </div>
 
-        {/* Content Container: Clean 2-Line Headline */}
+        {/* Content Container: Spacious 2-Line Headline with Generous Spacing */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
-          <div className="text-center space-y-1.5 sm:space-y-2 mb-1">
+          <div className="text-center space-y-3.5 sm:space-y-5 mb-2">
             {/* Line 1: حجزك أسهل... مع مساري (Red accent) */}
             <h1 
-              className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-lg"
-              style={{ fontSize: 'clamp(20px, 5.5vw, 44px)' }}
+              className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
+              style={{ fontSize: 'clamp(20px, 5.5vw, 48px)' }}
             >
               حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
             </h1>
 
             {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
             <p 
-              className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-md"
-              style={{ fontSize: 'clamp(12px, 3.4vw, 22px)' }}
+              className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
+              style={{ fontSize: 'clamp(12.5px, 3.4vw, 24px)' }}
             >
               احجز فندقك في اليمن بأفضل سعر
             </p>
@@ -110,8 +112,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         </div>
       </section>
 
-      {/* ── 2. Floating Search Console ── */}
-      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-20 sm:-mt-18 lg:-mt-20">
+      {/* ── 2. Floating Search Console (Mobile: 30% on Hero / 70% outside) ── */}
+      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[85px] sm:-mt-20 lg:-mt-22">
         
         {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Tabs ── */}
         <div 
@@ -293,7 +295,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card ── */}
+        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (30% on Hero / 70% outside) ── */}
         <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
           
           {/* Top Notch Tab: "فنادق" */}
