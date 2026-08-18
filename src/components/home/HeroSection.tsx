@@ -63,37 +63,15 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     }
   };
 
-  const subtitleText = 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران بسهولة وأمان';
-  
   const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
     ? hero.backgroundImageUrl
     : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2000&auto=format&fit=crop';
 
-  const renderHeroTitle = (title: string | undefined) => {
-    const rawTitle = title ? title.replace(/\s+/g, ' ').trim() : 'اكتشف أجمل وجهات اليمن مع مساري';
-
-    if (rawTitle.includes('مساري')) {
-      const parts = rawTitle.split('مساري');
-      return (
-        <>
-          {parts.map((part, i) => (
-            <span key={i}>
-              {part}
-              {i !== parts.length - 1 && <span className="text-[#FF3B30]">مساري</span>}
-            </span>
-          ))}
-        </>
-      );
-    }
-
-    return rawTitle;
-  };
-
   return (
     <div className="relative w-full">
       
-      {/* ── 1. Hero Atmospheric Section ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[380px] sm:min-h-[440px] lg:min-h-[490px] pt-24 sm:pt-28 lg:pt-32 pb-32 sm:pb-28 lg:pb-32 flex flex-col items-center justify-center">
+      {/* ── 1. Hero Atmospheric Section (Spacious, Clean & Breathable) ── */}
+      <section className="relative overflow-hidden w-full text-white min-h-[340px] sm:min-h-[390px] lg:min-h-[440px] pt-24 sm:pt-28 lg:pt-32 pb-28 sm:pb-28 lg:pb-32 flex flex-col items-center justify-center">
         
         {/* Panoramic Background */}
         <div 
@@ -103,41 +81,37 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, rgba(10,3,32,0.82) 0%, rgba(35,9,110,0.75) 50%, rgba(35,9,110,0.94) 100%)',
+              background: 'linear-gradient(180deg, rgba(10,3,32,0.80) 0%, rgba(35,9,110,0.70) 50%, rgba(35,9,110,0.92) 100%)',
             }}
           />
         </div>
 
-        {/* Content Container */}
+        {/* Content Container: Clean 2-Line Headline */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
-          {/* Top Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[10.5px] sm:text-xs font-bold mb-3 sm:mb-4 border border-white/20 shadow-md">
-            <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse" />
-            <span>منصة حجز الفنادق الأولى في اليمن</span>
+          <div className="text-center space-y-1.5 sm:space-y-2 mb-1">
+            {/* Line 1: حجزك أسهل... مع مساري (Red accent) */}
+            <h1 
+              className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-lg"
+              style={{ fontSize: 'clamp(20px, 5.5vw, 44px)' }}
+            >
+              حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
+            </h1>
+
+            {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
+            <p 
+              className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-md"
+              style={{ fontSize: 'clamp(12px, 3.4vw, 22px)' }}
+            >
+              احجز فندقك في اليمن بأفضل سعر
+            </p>
           </div>
-
-          {/* Hero Title: Strictly in ONE ROW */}
-          <h1 
-            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2 sm:mb-2.5 max-w-full text-center drop-shadow-md"
-            style={{ fontSize: 'clamp(15px, 4.6vw, 44px)' }}
-          >
-            {renderHeroTitle(hero?.titleAr)}
-          </h1>
-
-          {/* Subtitle: Strictly in ONE ROW */}
-          <p 
-            className="text-white/90 font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis px-1 text-center drop-shadow-sm"
-            style={{ fontSize: 'clamp(10px, 2.7vw, 16px)' }}
-          >
-            {subtitleText}
-          </p>
 
         </div>
       </section>
 
       {/* ── 2. Floating Search Console ── */}
-      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-24 sm:-mt-20 lg:-mt-22">
+      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-20 sm:-mt-18 lg:-mt-20">
         
         {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Tabs ── */}
         <div 
@@ -319,7 +293,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (Direct, Seamless & High-Converting) ── */}
+        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card ── */}
         <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
           
           {/* Top Notch Tab: "فنادق" */}
