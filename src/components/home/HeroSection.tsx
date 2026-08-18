@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { 
-  Hotel, Plane, Car, Search, MapPin, Calendar, Users, X
+  Hotel, Plane, Car, Search, MapPin, Calendar, Users, Building2, ChevronDown, BedDouble
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { HomepageContentData } from '@/services/cms';
@@ -12,7 +12,7 @@ interface HeroSectionProps {
   hero?: HomepageContentData['hero'];
 }
 
-const tabs = [
+const desktopTabs = [
   { id: 'hotels', labelAr: 'فنادق', icon: Hotel },
   { id: 'flights', labelAr: 'طيران', icon: Plane },
   { id: 'cars', labelAr: 'سيارات', icon: Car },
@@ -42,10 +42,9 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   // Interactive guests and rooms states
   const [guests, setGuests] = useState(2);
   const [rooms, setRooms] = useState(1);
+  const [childrenCount, setChildrenCount] = useState(0);
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
-
-  // Mobile Slide-up Search Sheet State
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [showMobileGuestsModal, setShowMobileGuestsModal] = useState(false);
 
   const handleSearch = () => {
     if (activeTab === 'hotels') {
@@ -55,13 +54,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
       if (checkOut) searchParams.set('checkOut', checkOut);
       searchParams.set('guests', String(guests));
       searchParams.set('rooms', String(rooms));
+      if (childrenCount > 0) searchParams.set('children', String(childrenCount));
       router.push(`/${currentLocale}/hotels?${searchParams.toString()}`);
     } else if (activeTab === 'flights') {
       router.push(`/${currentLocale}/flights`);
     } else {
       router.push(`/${currentLocale}/cars`);
     }
-    setMobileSearchOpen(false);
   };
 
   const subtitleText = 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران بسهولة وأمان';
@@ -93,8 +92,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   return (
     <div className="relative w-full">
       
-      {/* ── 1. Hero Atmospheric Header ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[390px] sm:min-h-[440px] lg:min-h-[490px] pt-24 sm:pt-28 lg:pt-32 pb-24 sm:pb-28 lg:pb-32 flex flex-col items-center justify-center">
+      {/* ── 1. Hero Atmospheric Section ── */}
+      <section className="relative overflow-hidden w-full text-white min-h-[380px] sm:min-h-[440px] lg:min-h-[490px] pt-24 sm:pt-28 lg:pt-32 pb-32 sm:pb-28 lg:pb-32 flex flex-col items-center justify-center">
         
         {/* Panoramic Background */}
         <div 
@@ -113,15 +112,15 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
           {/* Top Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[10.5px] sm:text-xs font-bold mb-3.5 sm:mb-5 border border-white/20 shadow-md">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[10.5px] sm:text-xs font-bold mb-3 sm:mb-4 border border-white/20 shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse" />
             <span>منصة حجز الفنادق الأولى في اليمن</span>
           </div>
 
           {/* Hero Title: Strictly in ONE ROW */}
           <h1 
-            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2.5 sm:mb-3 max-w-full text-center drop-shadow-md"
-            style={{ fontSize: 'clamp(15.5px, 4.6vw, 44px)' }}
+            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2 sm:mb-2.5 max-w-full text-center drop-shadow-md"
+            style={{ fontSize: 'clamp(15px, 4.6vw, 44px)' }}
           >
             {renderHeroTitle(hero?.titleAr)}
           </h1>
@@ -138,16 +137,16 @@ export default function HeroSection({ hero }: HeroSectionProps) {
       </section>
 
       {/* ── 2. Floating Search Console ── */}
-      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-16 sm:-mt-20 lg:-mt-22">
+      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-24 sm:-mt-20 lg:-mt-22">
         
-        {/* Desktop & Tablet: Full Luxury Search Console */}
+        {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Tabs ── */}
         <div 
           className="hidden md:block bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
           style={{ direction: 'rtl' }}
         >
-          {/* Top Row: Square-Proportioned Service Tabs with Slight Rounded Corners */}
+          {/* Desktop Tabs */}
           <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-neutral-100">
-            {tabs.map((tab) => {
+            {desktopTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -190,7 +189,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
               <div className="w-px h-8 bg-neutral-200" />
 
-              {/* Dates with Default Today & Tomorrow */}
+              {/* Dates */}
               <div className="col-span-4 text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
                 <label className="block text-[10px] font-black text-neutral-400 mb-0.5">تاريخ الوصول والمغادرة</label>
                 <div className="flex items-center gap-2">
@@ -288,7 +287,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 )}
               </div>
 
-              {/* Search Button: Named "بحث" */}
+              {/* Search Button */}
               <div className="col-span-2">
                 <button
                   type="button"
@@ -320,206 +319,187 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── Mobile View: Square-Proportioned Tabs & Compact Search Pill ── */}
-        <div className="md:hidden w-full max-w-sm mx-auto space-y-2.5">
+        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (Direct, Seamless & High-Converting) ── */}
+        <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
           
-          {/* Mobile Square Service Tab Buttons (Active = Brand Red #FF3B30) */}
-          <div className="flex items-center justify-center gap-3" style={{ direction: 'rtl' }}>
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'w-20 h-16 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 shadow-sm',
-                    isActive
-                      ? 'bg-[#FF3B30] text-white shadow-md shadow-[#FF3B30]/35 scale-105 font-black border border-transparent'
-                      : 'bg-white text-neutral-700 border border-neutral-200 hover:bg-neutral-50 font-bold'
-                  )}
-                >
-                  <Icon className="w-5 h-5 shrink-0" />
-                  <span className="text-[11px] leading-none">{tab.labelAr}</span>
-                </button>
-              );
-            })}
+          {/* Top Notch Tab: "فنادق" */}
+          <div className="flex justify-start">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-t-2xl bg-white text-neutral-900 font-black text-xs shadow-[-5px_-5px_15px_rgba(0,0,0,0.06)] border-t border-x border-neutral-100">
+              <BedDouble className="w-4 h-4 text-[var(--brand-primary)]" />
+              <span>فنادق</span>
+            </div>
           </div>
 
-          {/* Compact Pill Trigger */}
-          <button
-            type="button"
-            onClick={() => setMobileSearchOpen(true)}
-            className="w-full flex items-center justify-between bg-white text-neutral-800 rounded-2xl shadow-[0_15px_35px_-10px_rgba(35,9,110,0.20)] px-4 py-2.5 border border-neutral-200/80 active:scale-98 transition-transform"
-            style={{ direction: 'rtl' }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center">
-                <Search className="w-4 h-4 text-[#FF3B30]" />
-              </div>
-              <div className="text-start">
-                <div className="text-xs font-black text-neutral-900">
-                  {query.trim() ? query : 'إلى أين ترغب بالسفر؟'}
-                </div>
-                <div className="text-[10px] text-neutral-400 font-semibold">
-                  {checkIn ? `وصول: ${checkIn}` : 'اختر الوجهة والتواريخ'}
-                </div>
+          {/* Card Body with Direct Inputs */}
+          <div className="bg-white rounded-3xl rounded-tr-none p-4 shadow-[0_20px_50px_-10px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800 space-y-3">
+            
+            {/* Field 1: Destination / Hotel Name */}
+            <div className="rounded-2xl border border-neutral-200/90 p-3 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all">
+              <div className="flex items-center gap-2.5">
+                <Building2 className="w-5 h-5 text-[var(--brand-primary)] shrink-0" />
+                <input
+                  type="text"
+                  placeholder="ابحث عن فنادق في عدن، صنعاء، المكلا..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full bg-transparent text-xs font-black text-neutral-900 placeholder-neutral-400 outline-none"
+                />
               </div>
             </div>
 
-            <div className="px-3.5 py-1.5 rounded-xl bg-[#FF3B30] text-white text-xs font-black shadow-md">
-              بحث
+            {/* Row 2: Check-in & Check-out Dates (Side by Side) */}
+            <div className="grid grid-cols-2 gap-2.5">
+              
+              {/* Check-In Date */}
+              <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
+                <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد الوصول</label>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="w-full bg-transparent text-xs font-black text-neutral-900 outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Check-Out Date */}
+              <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
+                <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد المغادرة</label>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="w-full bg-transparent text-xs font-black text-neutral-900 outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+
             </div>
-          </button>
+
+            {/* Field 3: Guests & Rooms Selector */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMobileGuestsModal(!showMobileGuestsModal)}
+                className="w-full rounded-2xl border border-neutral-200/90 p-3 bg-neutral-50/50 hover:bg-neutral-50 flex items-center justify-between text-start transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
+                  <span className="text-xs font-black text-neutral-900">
+                    {rooms} غرفة, {guests} بالغين{childrenCount > 0 ? `, ${childrenCount} أطفال` : ', 0 طفل'}
+                  </span>
+                </div>
+                <ChevronDown size={14} className={cn('text-neutral-400 transition-transform', showMobileGuestsModal && 'rotate-180')} />
+              </button>
+
+              {/* Mobile Guest Counter Dropdown */}
+              {showMobileGuestsModal && (
+                <div className="mt-2 p-3 bg-white rounded-2xl border border-neutral-200 shadow-xl space-y-2.5 animate-scale-in text-neutral-900">
+                  {/* Adults */}
+                  <div className="flex items-center justify-between py-1 border-b border-neutral-100">
+                    <div>
+                      <div className="text-xs font-black">البالغين</div>
+                      <div className="text-[9.5px] text-neutral-400">12 سنة فأكثر</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setGuests(Math.max(1, guests - 1))}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        -
+                      </button>
+                      <span className="text-xs font-black w-4 text-center">{guests}</span>
+                      <button
+                        type="button"
+                        onClick={() => setGuests(guests + 1)}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Children */}
+                  <div className="flex items-center justify-between py-1 border-b border-neutral-100">
+                    <div>
+                      <div className="text-xs font-black">الأطفال</div>
+                      <div className="text-[9.5px] text-neutral-400">أقل من 12 سنة</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        -
+                      </button>
+                      <span className="text-xs font-black w-4 text-center">{childrenCount}</span>
+                      <button
+                        type="button"
+                        onClick={() => setChildrenCount(childrenCount + 1)}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rooms */}
+                  <div className="flex items-center justify-between py-1">
+                    <div>
+                      <div className="text-xs font-black">الغرف</div>
+                      <div className="text-[9.5px] text-neutral-400">عدد الغرف</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setRooms(Math.max(1, rooms - 1))}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        -
+                      </button>
+                      <span className="text-xs font-black w-4 text-center">{rooms}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRooms(rooms + 1)}
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileGuestsModal(false)}
+                    className="w-full py-1.5 bg-[var(--brand-primary)] text-white text-xs font-bold rounded-xl shadow-sm"
+                  >
+                    تم
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Big Prominent Full-Width Search CTA Button */}
+            <button
+              type="button"
+              onClick={() => handleSearch()}
+              className="w-full py-3.5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-xl shadow-[#FF3B30]/30 transition-all active:scale-98 flex items-center justify-center gap-2"
+            >
+              <Search className="w-4 h-4" />
+              <span>بحث</span>
+            </button>
+
+          </div>
 
         </div>
 
       </div>
-
-      {/* ── Mobile Compact Slide-up Search Sheet ── */}
-      {mobileSearchOpen && (
-        <div
-          className="md:hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm animate-fade-in"
-          onClick={() => setMobileSearchOpen(false)}
-        >
-          <div
-            className="absolute bottom-0 inset-x-0 bg-white text-neutral-900 rounded-t-3xl p-4 pb-6 max-h-[85vh] overflow-y-auto shadow-2xl"
-            style={{ direction: 'rtl' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Sheet Handle & Close */}
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-neutral-100">
-              <div className="w-12 h-1.5 bg-neutral-300 rounded-full mx-auto" />
-              <button
-                type="button"
-                onClick={() => setMobileSearchOpen(false)}
-                className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200"
-                aria-label="إغلاق"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Service Tabs inside Sheet: Square-Style */}
-            <div className="flex items-center justify-center gap-2.5 mb-3.5">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      'flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs font-black transition-all',
-                      isActive
-                        ? 'bg-[#FF3B30] text-white shadow-md shadow-[#FF3B30]/30'
-                        : 'bg-neutral-100 text-neutral-700'
-                    )}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{tab.labelAr}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {activeTab === 'hotels' ? (
-              <div className="space-y-2.5">
-                {/* City / Hotel Free Input */}
-                <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-                  <label className="block text-[10.5px] font-bold text-neutral-400 mb-0.5">المدينة أو اسم الفندق</label>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[var(--brand-primary)]" />
-                    <input
-                      type="text"
-                      placeholder="اكتب اسم المدينة، الفندق، أو الوجهة"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Dates: Default Today & Tomorrow */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-                    <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">تاريخ الوصول</label>
-                    <input
-                      type="date"
-                      value={checkIn}
-                      onChange={(e) => setCheckIn(e.target.value)}
-                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-
-                  <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-                    <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">تاريخ المغادرة</label>
-                    <input
-                      type="date"
-                      value={checkOut}
-                      onChange={(e) => setCheckOut(e.target.value)}
-                      className="w-full bg-transparent text-xs font-bold text-neutral-900 outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Guests */}
-                <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100 flex items-center justify-between">
-                  <div>
-                    <div className="text-xs font-bold text-neutral-900">عدد الضيوف</div>
-                    <div className="text-[10px] text-neutral-400">{guests} نزلاء، {rooms} غرفة</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setGuests(Math.max(1, guests - 1))}
-                      className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-xs"
-                    >
-                      -
-                    </button>
-                    <span className="text-xs font-black w-4 text-center">{guests}</span>
-                    <button
-                      type="button"
-                      onClick={() => setGuests(guests + 1)}
-                      className="w-7 h-7 rounded-full bg-white shadow-sm flex items-center justify-center font-bold text-xs"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                {/* Submit: Named "بحث" */}
-                <button
-                  type="button"
-                  onClick={() => handleSearch()}
-                  className="w-full py-3 rounded-xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-lg mt-2 active:scale-95 transition-transform flex items-center justify-center gap-2"
-                >
-                  <Search size={16} />
-                  <span>بحث</span>
-                </button>
-              </div>
-            ) : (
-              <div className="py-4 text-center space-y-2.5">
-                <p className="text-xs font-semibold text-neutral-600">
-                  {activeTab === 'flights'
-                    ? 'احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية'
-                    : 'خدمات تأجير السيارات والتوصيل بين المدن'}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => handleSearch()}
-                  className="w-full py-2.5 bg-[#FF3B30] text-white font-bold rounded-xl text-xs shadow-md"
-                >
-                  بحث
-                </button>
-              </div>
-            )}
-
-          </div>
-        </div>
-      )}
 
     </div>
   );
