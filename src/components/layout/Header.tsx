@@ -70,17 +70,19 @@ export default function Header() {
 
   return (
     <>
-      {/* ── Official Royal Purple Header ── */}
+      {/* ── Transparent Top Header (Seamlessly floats over Hero, blurs on scroll) ── */}
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/10 text-white bg-gradient-to-r from-[#23096E]/95 via-[#2C0F7C]/90 to-[#3A1C8F]/95 backdrop-blur-md shadow-lg',
-          scrolled ? 'py-2 sm:py-2.5' : 'py-2.5 sm:py-3.5'
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
+          scrolled
+            ? 'bg-[#1D065C]/90 backdrop-blur-xl border-b border-white/10 shadow-2xl py-2 sm:py-2.5'
+            : 'bg-transparent border-b border-transparent py-3 sm:py-4'
         )}
         style={{ direction: 'rtl' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* ── 1. DESKTOP VIEW (Classic standard luxury layout) ── */}
+          {/* ── 1. DESKTOP VIEW (Classic Full Standard Layout) ── */}
           <div className="hidden lg:flex items-center justify-between h-14 w-full">
             
             {/* Right: Logo + 'مساري' */}
@@ -101,7 +103,7 @@ export default function Header() {
             </Link>
 
             {/* Center: Navigation Links */}
-            <nav className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-sm">
+            <nav className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-sm">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const Icon = link.icon;
@@ -218,40 +220,40 @@ export default function Header() {
 
           </div>
 
-          {/* ── 2. MOBILE VIEW (Custom Layout: Right=Square Menu, Center=Logo Icon Only, Left=Square Currency) ── */}
-          <div className="lg:hidden relative flex items-center justify-between h-12 w-full">
+          {/* ── 2. MOBILE VIEW (Custom Layout: Right=Square Menu, Center=Large Logo Icon Only, Left=Square Currency) ── */}
+          <div className="lg:hidden relative flex items-center justify-between h-14 w-full">
             
-            {/* Right: Square Menu Button with light subtle rounded corners */}
+            {/* Right: Pure Square Menu Button */}
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="w-10 h-10 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center backdrop-blur-md shadow-sm active:scale-95 transition-all shrink-0"
+              className="w-11 h-11 rounded-md bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center backdrop-blur-md shadow-md active:scale-95 transition-all shrink-0"
               aria-label="فتح القائمة"
             >
-              <Menu size={20} />
+              <Menu size={22} />
             </button>
 
-            {/* Center: Clean Logo Icon ONLY (No Text) */}
+            {/* Center: Increased Large Logo Icon ONLY (No Text) */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
               <Link href="/" className="transition-transform active:scale-95">
-                <div className="relative w-9 h-9">
+                <div className="relative w-11 h-11">
                   <Image 
                     src="/images/logo-icon.png"
                     alt="شعار مساري"
-                    sizes="36px"
+                    sizes="48px"
                     fill
-                    className="object-contain drop-shadow-md"
+                    className="object-contain drop-shadow-lg"
                     priority
                   />
                 </div>
               </Link>
             </div>
 
-            {/* Left: Square Currency Button with light subtle rounded corners */}
+            {/* Left: Pure Square Currency Button */}
             <div className="relative shrink-0">
               <button
                 onClick={() => setCurrencyOpen(!currencyOpen)}
-                className="w-10 h-10 rounded-lg text-xs font-black bg-white/15 hover:bg-white/25 border border-white/20 text-white backdrop-blur-md transition-all active:scale-95 shadow-sm flex items-center justify-center"
+                className="w-11 h-11 rounded-md text-xs font-black bg-white/15 hover:bg-white/25 border border-white/25 text-white backdrop-blur-md transition-all active:scale-95 shadow-md flex items-center justify-center"
               >
                 <span>{currency}</span>
               </button>
@@ -279,14 +281,14 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ── Mobile Slide-out Drawer Menu ── */}
+      {/* ── Mobile Slide-out Drawer Menu (Opens Strictly from the RIGHT side) ── */}
       {mobileOpen && (
         <div 
           className="lg:hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm animate-fade-in" 
           onClick={() => setMobileOpen(false)}
         >
           <div
-            className="absolute top-0 end-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#23096E] via-[#2A0E78] to-[#3A1C8F] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
+            className="absolute top-0 right-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#23096E] via-[#2A0E78] to-[#3A1C8F] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -308,7 +310,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="w-9 h-9 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center text-white border border-white/20 shadow-sm"
+                  className="w-9 h-9 rounded-md bg-white/15 hover:bg-white/25 flex items-center justify-center text-white border border-white/20 shadow-sm"
                 >
                   <X size={18} />
                 </button>
