@@ -53,9 +53,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     setMobileSearchOpen(false);
   };
 
-  const rawSubtitle = hero?.subtitleAr 
-    ? hero.subtitleAr.replace(/\s+/g, ' ').trim() 
-    : 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران وتأجير السيارات';
+  // Subtitle without car rental
+  const subtitleText = 'منصة يمنية متخصصة لحجز الفنادق ورحلات الطيران بسهولة وأمان';
   
   // Real luxury hotel & resort photography
   const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
@@ -85,8 +84,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   return (
     <div className="relative w-full">
       
-      {/* ── 1. Hero Atmospheric Header (Taller, Spacious, Breathable) ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[440px] sm:min-h-[500px] lg:min-h-[560px] pt-28 sm:pt-36 lg:pt-40 pb-28 sm:pb-36 lg:pb-40 flex flex-col items-center justify-center">
+      {/* ── 1. Hero Atmospheric Header (Balanced Height -10%) ── */}
+      <section className="relative overflow-hidden w-full text-white min-h-[390px] sm:min-h-[450px] lg:min-h-[500px] pt-24 sm:pt-30 lg:pt-34 pb-24 sm:pb-30 lg:pb-34 flex flex-col items-center justify-center">
         
         {/* Panoramic Luxury Resort Background */}
         <div 
@@ -105,41 +104,41 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         {/* Content Container: Spacious, Breathable Typography */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
-          {/* Top Badge: Elevated at the very top with clear breathing room */}
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold mb-4 sm:mb-6 border border-white/20 shadow-md">
+          {/* Top Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-[10.5px] sm:text-xs font-bold mb-3.5 sm:mb-5 border border-white/20 shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-pulse" />
             <span>منصة حجز الفنادق الأولى في اليمن</span>
           </div>
 
-          {/* Hero Title: Strictly in ONE ROW with fluid scaling */}
+          {/* Hero Title: Slightly increased size, strictly in ONE ROW with fluid scaling */}
           <h1 
-            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2.5 sm:mb-3.5 max-w-full text-center"
-            style={{ fontSize: 'clamp(14px, 4.2vw, 42px)' }}
+            className="font-black text-white whitespace-nowrap leading-tight tracking-tight mb-2.5 sm:mb-3 max-w-full text-center drop-shadow-md"
+            style={{ fontSize: 'clamp(15.5px, 4.6vw, 44px)' }}
           >
             {renderHeroTitle(hero?.titleAr)}
           </h1>
 
-          {/* Subtitle: Strictly in ONE ROW */}
+          {/* Subtitle: Strictly in ONE ROW (without cars mention) */}
           <p 
-            className="text-white/85 font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis px-1 text-center"
+            className="text-white/90 font-medium whitespace-nowrap leading-tight max-w-full overflow-hidden text-ellipsis px-1 text-center drop-shadow-sm"
             style={{ fontSize: 'clamp(10px, 2.7vw, 16px)' }}
           >
-            {rawSubtitle}
+            {subtitleText}
           </p>
 
         </div>
       </section>
 
-      {/* ── 2. Floating Overlapping Search Console (65% on Hero, 35% on Page) ── */}
+      {/* ── 2. Floating Overlapping Search Console ── */}
       <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-16 sm:-mt-20 lg:-mt-22">
         
-        {/* Desktop & Tablet: Full 12-Column Luxury Search Console */}
+        {/* Desktop & Tablet: Full Luxury Search Console */}
         <div 
           className="hidden md:block bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
           style={{ direction: 'rtl' }}
         >
-          {/* Top Row: Service Tabs */}
-          <div className="flex items-center gap-2 mb-3.5 pb-3 border-b border-neutral-100">
+          {/* Top Row: Larger Rounded Rectangle Service Tabs (Active Tab = Brand Red) */}
+          <div className="flex items-center gap-2.5 mb-4 pb-3.5 border-b border-neutral-100">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -149,13 +148,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all',
+                    'flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition-all duration-300',
                     isActive
-                      ? 'bg-[var(--brand-primary)] text-white shadow-md'
-                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                      ? 'bg-[#FF3B30] text-white shadow-lg shadow-[#FF3B30]/30 scale-105'
+                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 border border-neutral-200/50'
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span>{tab.labelAr}</span>
                 </button>
               );
@@ -313,10 +312,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── Mobile View: Compact Luxury Floating Pill (Airy, Sleek & Non-Crowded) ── */}
-        <div className="md:hidden w-full max-w-sm mx-auto space-y-2">
+        {/* ── Mobile View: Larger Rounded Rectangle Tabs & Compact Floating Pill ── */}
+        <div className="md:hidden w-full max-w-sm mx-auto space-y-2.5">
           
-          {/* Mobile Service Tabs */}
+          {/* Mobile Larger Rounded-Rectangle Service Tabs (Active Tab = Brand Red) */}
           <div className="flex items-center justify-center gap-2" style={{ direction: 'rtl' }}>
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -327,10 +326,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm',
+                    'flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-black transition-all duration-300 shadow-sm',
                     isActive
-                      ? 'bg-[var(--brand-primary)] text-white shadow-md scale-105'
-                      : 'bg-white text-neutral-700 border border-neutral-200/80 hover:bg-neutral-50'
+                      ? 'bg-[#FF3B30] text-white shadow-md shadow-[#FF3B30]/30 scale-105'
+                      : 'bg-white/95 text-neutral-700 border border-neutral-200/80 hover:bg-white'
                   )}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -348,7 +347,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             style={{ direction: 'rtl' }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center">
                 <Search className="w-4 h-4 text-[#FF3B30]" />
               </div>
               <div className="text-start">
@@ -370,7 +369,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
       </div>
 
-      {/* ── Mobile Slide-up Bottom Search Sheet (Luxury Booking Experience) ── */}
+      {/* ── Mobile Slide-up Bottom Search Sheet (Without Redundant Titles) ── */}
       {mobileSearchOpen && (
         <div
           className="md:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in"
@@ -381,13 +380,9 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Sheet Handle & Header */}
-            <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mb-4" />
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-100">
-              <div>
-                <h3 className="font-black text-base text-neutral-900">ابحث عن رحلتك في اليمن</h3>
-                <p className="text-[10px] text-neutral-400 font-semibold">أفضل خيارات الإقامة والنقل المتاحة</p>
-              </div>
+            {/* Sheet Handle & Close Row Only (Titles Removed as Requested) */}
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+              <div className="w-12 h-1.5 bg-neutral-300 rounded-full mx-auto" />
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(false)}
@@ -398,7 +393,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               </button>
             </div>
 
-            {/* Service Tabs inside Sheet */}
+            {/* Service Tabs inside Sheet (Active Tab = Brand Red) */}
             <div className="flex items-center gap-2 mb-4">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -409,10 +404,10 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all',
+                      'flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl transition-all',
                       isActive
-                        ? 'bg-[var(--brand-primary)] text-white shadow-sm'
-                        : 'bg-neutral-100 text-neutral-600'
+                        ? 'bg-[#FF3B30] text-white shadow-md shadow-[#FF3B30]/30'
+                        : 'bg-neutral-100 text-neutral-700'
                     )}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -462,7 +457,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                   </div>
                 </div>
 
-                {/* Guests & Rooms */}
+                {/* Guests */}
                 <div className="bg-neutral-50 p-3 rounded-2xl border border-neutral-100 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-bold text-neutral-900">عدد الضيوف</div>

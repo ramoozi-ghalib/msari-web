@@ -5,8 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Menu, X, Globe, ChevronDown, Hotel, Plane, Car,
-  User, Phone, Home, LogOut, BookOpen, Sparkles, ArrowLeft
+  Menu, X, ChevronDown, Hotel, Plane, Car,
+  User, Phone, Home, LogOut, BookOpen, Smartphone, Info, Headphones, ArrowLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { whatsappLink } from '@/lib/site-config';
@@ -15,9 +15,15 @@ import { useSession, signOut } from 'next-auth/react';
 const navLinks = [
   { href: '/', labelAr: 'الرئيسية', labelEn: 'Home', icon: Home },
   { href: '/hotels', labelAr: 'فنادق محلية', labelEn: 'Local Hotels', icon: Hotel },
-  { href: '/hotels/international', labelAr: 'فنادق عالمية', labelEn: 'Global Hotels', icon: Globe },
+  { href: '/hotels/international', labelAr: 'فنادق عالمية', labelEn: 'Global Hotels', icon: Hotel },
   { href: '/flights', labelAr: 'رحلات طيران', labelEn: 'Flights', icon: Plane },
   { href: '/cars', labelAr: 'خدمة السيارات', labelEn: 'Car Services', icon: Car },
+];
+
+const drawerExtraLinks = [
+  { href: '/app', labelAr: 'تطبيق مساري', icon: Smartphone },
+  { href: '/about', labelAr: 'من نحن', icon: Info },
+  { href: '/contact', labelAr: 'اتصل بنا', icon: Headphones },
 ];
 
 const currencies = [
@@ -37,7 +43,6 @@ export default function Header() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
   const [currency, setCurrency] = useState('USD');
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -63,19 +68,15 @@ export default function Header() {
     router.refresh();
   };
 
-  useEffect(() => {
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
-  }, [lang]);
-
   return (
     <>
+      {/* ── Top Header with Artistic Luxury Royal Gradient ── */}
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/10 text-white',
           scrolled
-            ? 'bg-[#10032c]/95 backdrop-blur-lg border-white/15 text-white shadow-xl py-2'
-            : 'bg-[#150549]/80 backdrop-blur-md border-white/10 text-white shadow-sm py-3 sm:py-3.5'
+            ? 'bg-gradient-to-r from-[#0a0220]/95 via-[#18054b]/95 to-[#240864]/95 backdrop-blur-xl shadow-2xl py-2'
+            : 'bg-gradient-to-r from-[#0c0326]/90 via-[#1c0656]/85 to-[#2b086e]/90 backdrop-blur-md shadow-lg py-2.5 sm:py-3.5'
         )}
         style={{ direction: 'rtl' }}
       >
@@ -84,7 +85,7 @@ export default function Header() {
 
             {/* ── Right: Logo ── */}
             <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="relative w-9 h-9 sm:w-10 sm:h-10 transition-transform group-hover:scale-105 rounded-xl overflow-hidden shadow-sm">
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 transition-transform group-hover:scale-105 rounded-xl overflow-hidden shadow-md bg-white/5 p-1 border border-white/10">
                 <Image 
                   src="/images/logo-dark.png"
                   alt="مساري Msari Logo"
@@ -98,7 +99,7 @@ export default function Header() {
                 <span className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30]">
                   مساري
                 </span>
-                <span className="text-[9.5px] font-black uppercase tracking-[0.2em] leading-none text-white/70">
+                <span className="text-[9.5px] font-black uppercase tracking-[0.2em] leading-none text-white/75">
                   Msari
                 </span>
               </div>
@@ -121,7 +122,7 @@ export default function Header() {
                     )}
                   >
                     <Icon size={14} className={isActive ? 'text-[#FF3B30]' : 'text-white/70'} />
-                    <span>{lang === 'ar' ? link.labelAr : link.labelEn}</span>
+                    <span>{link.labelAr}</span>
                   </Link>
                 );
               })}
@@ -134,7 +135,7 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setCurrencyOpen(!currencyOpen)}
-                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md transition-all active:scale-95"
+                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md transition-all active:scale-95 shadow-sm"
                 >
                   <span>{currency}</span>
                   <ChevronDown size={13} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
@@ -157,15 +158,6 @@ export default function Header() {
                   </div>
                 )}
               </div>
-
-              {/* Language Toggle (Desktop) */}
-              <button
-                onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white backdrop-blur-md transition-all"
-              >
-                <Globe size={13} />
-                <span>{lang === 'ar' ? 'EN' : 'عر'}</span>
-              </button>
 
               {/* User Menu / Login (Desktop) */}
               {isAuthenticated && user ? (
@@ -212,7 +204,7 @@ export default function Header() {
                   className="hidden md:flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-[#FF3B30] text-white hover:bg-[#e02d23] shadow-md transition-all hover:scale-105 active:scale-95"
                 >
                   <User size={13} />
-                  <span>{lang === 'ar' ? 'تسجيل الدخول' : 'Login'}</span>
+                  <span>تسجيل الدخول</span>
                 </Link>
               )}
 
@@ -227,7 +219,7 @@ export default function Header() {
                 <Phone size={14} />
               </a>
 
-              {/* ── Mobile Hamburger Button: Glass Pill ── */}
+              {/* ── Mobile Hamburger Button ── */}
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
@@ -242,29 +234,35 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ── Mobile Slide-out Drawer Menu (Royal Design) ── */}
+      {/* ── Mobile Slide-out Drawer Menu ── */}
       {mobileOpen && (
         <div 
           className="lg:hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm animate-fade-in" 
           onClick={() => setMobileOpen(false)}
         >
           <div
-            className="absolute top-0 end-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#0c0326] via-[#1a0654] to-[#23096E] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
+            className="absolute top-0 end-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#0a0220] via-[#160548] to-[#23096E] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Drawer Header */}
+              {/* Drawer Header: Logo Only */}
               <div className="flex items-center justify-between pb-4 border-b border-white/15 mb-5">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF3B30] to-[#23096E] text-white flex items-center justify-center font-black text-sm shadow-md">
-                    م
+                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5">
+                  <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-white/10 p-1 border border-white/15 shadow-md">
+                    <Image 
+                      src="/images/logo-dark.png"
+                      alt="Msari Logo"
+                      sizes="36px"
+                      fill
+                      className="object-contain"
+                    />
                   </div>
-                  <div>
-                    <div className="font-black text-base leading-none">مساري للسياحة</div>
-                    <div className="text-[9px] text-white/70 font-semibold">بوابتك لحجوزات اليمن</div>
+                  <div className="flex flex-col text-start">
+                    <span className="text-xl font-black text-white leading-none">مساري</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/70">Msari</span>
                   </div>
-                </div>
+                </Link>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
@@ -274,8 +272,8 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Navigation Links */}
-              <div className="space-y-2">
+              {/* Primary Services Links */}
+              <div className="space-y-1.5">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = pathname === link.href;
@@ -285,15 +283,15 @@ export default function Header() {
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        'flex items-center justify-between p-3 rounded-2xl transition-all font-black text-xs border',
+                        'flex items-center justify-between p-2.5 rounded-xl transition-all font-black text-xs border',
                         isActive
                           ? 'bg-white text-[#23096E] border-white shadow-md'
                           : 'bg-white/5 hover:bg-white/15 border-white/10 text-white/90'
                       )}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Icon size={16} className={isActive ? 'text-[#FF3B30]' : 'text-[#FF3B30]'} />
-                        <span>{lang === 'ar' ? link.labelAr : link.labelEn}</span>
+                        <Icon size={15} className="text-[#FF3B30]" />
+                        <span>{link.labelAr}</span>
                       </div>
                       <ArrowLeft size={13} className={isActive ? 'text-[#23096E]' : 'text-white/50'} />
                     </Link>
@@ -301,27 +299,42 @@ export default function Header() {
                 })}
               </div>
 
-              {/* Language & Partner CTA */}
-              <div className="mt-4 pt-4 border-t border-white/15 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90"
-                >
-                  <span className="flex items-center gap-2">
-                    <Globe size={14} className="text-[#FF3B30]" />
-                    <span>اللغة / Language</span>
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-white/15 text-[10px] font-black">{lang === 'ar' ? 'English' : 'العربية'}</span>
-                </button>
+              {/* Extra Pages: تطبيق مساري، من نحن، اتصل بنا */}
+              <div className="mt-3.5 pt-3.5 border-t border-white/15 space-y-1.5">
+                {drawerExtraLinks.map((extra) => {
+                  const Icon = extra.icon;
+                  const isActive = pathname === extra.href;
+                  return (
+                    <Link
+                      key={extra.href}
+                      href={extra.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        'flex items-center justify-between p-2.5 rounded-xl transition-all font-bold text-xs border',
+                        isActive
+                          ? 'bg-white text-[#23096E] border-white shadow-md'
+                          : 'bg-white/5 hover:bg-white/15 border-white/10 text-white/80'
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon size={15} className="text-amber-400" />
+                        <span>{extra.labelAr}</span>
+                      </div>
+                      <ArrowLeft size={13} className="text-white/40" />
+                    </Link>
+                  );
+                })}
+              </div>
 
+              {/* Partner CTA Link */}
+              <div className="mt-3.5 pt-3.5 border-t border-white/15">
                 <Link
                   href="/add-hotel"
                   onClick={() => setMobileOpen(false)}
-                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/90"
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-xs font-bold text-white/90"
                 >
                   <span className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-amber-400" />
+                    <span className="w-2 h-2 rounded-full bg-[#FF3B30]" />
                     <span>أضف فندقك في مساري</span>
                   </span>
                   <ArrowLeft size={13} className="text-white/50" />
@@ -330,7 +343,7 @@ export default function Header() {
             </div>
 
             {/* Bottom Actions: Login & WhatsApp */}
-            <div className="pt-4 border-t border-white/15 space-y-2.5">
+            <div className="pt-4 border-t border-white/15 space-y-2">
               {isAuthenticated && user ? (
                 <button
                   onClick={() => { logout(); setMobileOpen(false); }}
