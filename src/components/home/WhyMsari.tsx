@@ -132,12 +132,9 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
                 <Rocket size={13} className="text-[#FF3B30]" />
                 <span>للشركاء والمطورين</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-black text-white leading-snug mb-1.5">
+              <h3 className="text-lg sm:text-2xl font-black text-white leading-snug">
                 {partnerTitle}
               </h3>
-              <p className="text-white/80 text-xs sm:text-sm font-medium leading-relaxed">
-                {partnerDesc}
-              </p>
             </div>
 
             {/* Buttons in One Row (Mobile & Desktop) */}
