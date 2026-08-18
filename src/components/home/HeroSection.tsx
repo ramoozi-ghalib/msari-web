@@ -112,16 +112,16 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         </div>
       </section>
 
-      {/* ── 2. Floating Search Console (Mobile: 50% on Hero / 50% outside) ── */}
+      {/* ── 2. Floating Glassmorphism Search Console (Mobile: 50% on Hero / 50% outside) ── */}
       <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[140px] sm:-mt-20 lg:-mt-22">
         
-        {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Tabs ── */}
+        {/* ── DESKTOP VIEW: Full 12-Column Luxury Frosted Glass Search Console ── */}
         <div 
-          className="hidden md:block bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
+          className="hidden md:block bg-white/90 backdrop-blur-2xl rounded-3xl p-4 sm:p-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border border-white/60 text-neutral-800"
           style={{ direction: 'rtl' }}
         >
           {/* Desktop Tabs */}
-          <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-neutral-100">
+          <div className="flex items-center gap-3 mb-4 pb-3.5 border-b border-neutral-200/50">
             {desktopTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -134,7 +134,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                     'flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200',
                     isActive
                       ? 'bg-[#FF3B30] text-white shadow-lg shadow-[#FF3B30]/30 scale-105'
-                      : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 border border-neutral-200/60'
+                      : 'bg-white/70 backdrop-blur-md text-neutral-700 hover:bg-white border border-white/60'
                   )}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -149,16 +149,16 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             <div className="grid grid-cols-12 gap-2 items-center">
               
               {/* Destination */}
-              <div className="col-span-4 text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+              <div className="col-span-4 text-start p-2 rounded-2xl bg-white/70 hover:bg-white border border-white/60 backdrop-blur-md transition-all">
                 <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الوجهة أو الفندق</label>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                   <input
                     type="text"
-                    placeholder="المدينة، الفندق، أو الوجهة"
+                    placeholder="المدينة، الفندق"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full bg-transparent text-sm font-bold text-neutral-900 placeholder-neutral-400 outline-none"
+                    className="w-full bg-transparent text-sm font-bold text-neutral-900 placeholder:text-neutral-400 placeholder:font-normal outline-none"
                   />
                 </div>
               </div>
@@ -166,7 +166,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               <div className="w-px h-8 bg-neutral-200" />
 
               {/* Dates */}
-              <div className="col-span-4 text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+              <div className="col-span-4 text-start p-2 rounded-2xl bg-white/70 hover:bg-white border border-white/60 backdrop-blur-md transition-all">
                 <label className="block text-[10px] font-black text-neutral-400 mb-0.5">تاريخ الوصول والمغادرة</label>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
@@ -191,7 +191,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               <div className="w-px h-8 bg-neutral-200" />
 
               {/* Guests & Rooms */}
-              <div className="col-span-2 relative text-start p-2 rounded-2xl hover:bg-neutral-50 transition-colors">
+              <div className="col-span-2 relative text-start p-2 rounded-2xl bg-white/70 hover:bg-white border border-white/60 backdrop-blur-md transition-all">
                 <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الضيوف والغرف</label>
                 <button
                   type="button"
@@ -203,7 +203,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                 </button>
 
                 {showGuestsDropdown && (
-                  <div className="absolute top-full end-0 mt-3 w-64 bg-white rounded-2xl p-4 shadow-2xl border border-neutral-100 z-50 animate-fade-in text-neutral-900">
+                  <div className="absolute top-full end-0 mt-3 w-64 bg-white/95 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl border border-white/80 z-50 animate-fade-in text-neutral-900">
                     <div className="flex items-center justify-between py-2 border-b border-neutral-100">
                       <div>
                         <div className="text-xs font-black">النزلاء البالغين</div>
@@ -295,22 +295,22 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (50% on Hero / 50% outside) ── */}
+        {/* ── MOBILE VIEW: Notched Frosted Glass Hotel Search Card ── */}
         <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
           
-          {/* Top Notch Tab: "فنادق" */}
+          {/* Top Notch Tab: "فنادق" (Frosted Glass Notch) */}
           <div className="flex justify-start">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-t-2xl bg-white text-neutral-900 font-black text-xs shadow-[-5px_-5px_15px_rgba(0,0,0,0.06)] border-t border-x border-neutral-100">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-t-2xl bg-white/92 backdrop-blur-2xl text-neutral-900 font-black text-xs shadow-[-5px_-5px_20px_rgba(0,0,0,0.08)] border-t border-x border-white/60">
               <BedDouble className="w-4 h-4 text-[var(--brand-primary)]" />
               <span>فنادق</span>
             </div>
           </div>
 
-          {/* Card Body with Direct Inputs */}
-          <div className="bg-white rounded-3xl rounded-tr-none p-4 shadow-[0_20px_50px_-10px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800 space-y-3">
+          {/* Card Body with Frosted Glassmorphism */}
+          <div className="bg-white/92 backdrop-blur-2xl rounded-3xl rounded-tr-none p-4 shadow-[0_25px_60px_-10px_rgba(0,0,0,0.3)] border border-white/60 text-neutral-800 space-y-3">
             
             {/* Field 1: Destination / Hotel Name */}
-            <div className="rounded-2xl border border-neutral-200/90 p-3 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all">
+            <div className="rounded-2xl border border-neutral-200/60 p-3 bg-white/80 hover:bg-white focus-within:border-[var(--brand-primary)] focus-within:bg-white backdrop-blur-md transition-all shadow-sm">
               <div className="flex items-center gap-2.5">
                 <Building2 className="w-5 h-5 text-[var(--brand-primary)] shrink-0" />
                 <input
@@ -327,7 +327,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             <div className="grid grid-cols-2 gap-2.5">
               
               {/* Check-In Date */}
-              <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
+              <div className="relative rounded-2xl border border-neutral-200/60 p-2.5 bg-white/80 hover:bg-white focus-within:border-[var(--brand-primary)] focus-within:bg-white backdrop-blur-md transition-all shadow-sm text-start">
                 <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد الوصول</label>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
@@ -341,7 +341,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               </div>
 
               {/* Check-Out Date */}
-              <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/50 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
+              <div className="relative rounded-2xl border border-neutral-200/60 p-2.5 bg-white/80 hover:bg-white focus-within:border-[var(--brand-primary)] focus-within:bg-white backdrop-blur-md transition-all shadow-sm text-start">
                 <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد المغادرة</label>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
@@ -361,7 +361,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
               <button
                 type="button"
                 onClick={() => setShowMobileGuestsModal(!showMobileGuestsModal)}
-                className="w-full rounded-2xl border border-neutral-200/90 p-3 bg-neutral-50/50 hover:bg-neutral-50 flex items-center justify-between text-start transition-all"
+                className="w-full rounded-2xl border border-neutral-200/60 p-3 bg-white/80 hover:bg-white backdrop-blur-md flex items-center justify-between text-start transition-all shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
                   <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
@@ -374,7 +374,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
               {/* Mobile Guest Counter Dropdown */}
               {showMobileGuestsModal && (
-                <div className="mt-2 p-3 bg-white rounded-2xl border border-neutral-200 shadow-xl space-y-2.5 animate-scale-in text-neutral-900">
+                <div className="mt-2 p-3 bg-white/95 backdrop-blur-2xl rounded-2xl border border-white/80 shadow-2xl space-y-2.5 animate-scale-in text-neutral-900">
                   {/* Adults */}
                   <div className="flex items-center justify-between py-1 border-b border-neutral-100">
                     <div>
@@ -393,7 +393,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                       <button
                         type="button"
                         onClick={() => setGuests(guests + 1)}
-                        className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
                       >
                         +
                       </button>
@@ -465,7 +465,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             <button
               type="button"
               onClick={() => handleSearch()}
-              className="w-full py-3.5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-xl shadow-[#FF3B30]/30 transition-all active:scale-98 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-xl shadow-[#FF3B30]/35 transition-all active:scale-98 flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4" />
               <span>بحث</span>

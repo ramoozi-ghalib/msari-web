@@ -70,38 +70,38 @@ export default function Header() {
 
   return (
     <>
-      {/* ── Transparent Top Header (Seamless with Hero, blurred gradient on scroll) ── */}
+      {/* ── Top Header with Ultra-Luxury Glassmorphism ── */}
       <header
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
           scrolled
-            ? 'bg-gradient-to-r from-[#1D065C]/95 via-[#23096E]/95 to-[#331185]/95 backdrop-blur-xl border-b border-white/15 shadow-2xl py-2'
-            : 'bg-transparent border-b border-transparent py-3.5 sm:py-4'
+            ? 'bg-gradient-to-r from-[#1D065C]/95 via-[#23096E]/95 to-[#331185]/95 backdrop-blur-2xl border-b border-white/20 shadow-2xl py-2'
+            : 'bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] py-2.5 sm:py-3.5'
         )}
         style={{ direction: 'rtl' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12 sm:h-14 w-full">
 
-            {/* ── Right: Transparent Clean Logo + 'مساري' Only (No MSARI) ── */}
-            <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <div className="relative w-8 h-8 sm:w-9 sm:h-9 transition-transform group-hover:scale-105">
+            {/* ── Right: Balanced Logo + 'مساري' ── */}
+            <Link href="/" className="flex items-center gap-1.5 shrink-0 group">
+              <div className="relative w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-105 shrink-0">
                 <Image 
                   src="/images/logo-icon.png"
                   alt="شعار مساري"
-                  sizes="36px"
+                  sizes="28px"
                   fill
-                  className="object-contain drop-shadow-md"
+                  className="object-contain drop-shadow-sm"
                   priority
                 />
               </div>
-              <span className="text-xl sm:text-2xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30] drop-shadow-md">
+              <span className="text-lg sm:text-xl font-black tracking-tight leading-none text-white transition-colors group-hover:text-[#FF3B30] drop-shadow-sm">
                 مساري
               </span>
             </Link>
 
-            {/* ── Center: Desktop Nav ── */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15">
+            {/* ── Center: Desktop Nav (Frosted Glass Capsule) ── */}
+            <nav className="hidden lg:flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-sm">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const Icon = link.icon;
@@ -130,13 +130,13 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setCurrencyOpen(!currencyOpen)}
-                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/20 text-white backdrop-blur-md transition-all active:scale-95 shadow-sm"
+                  className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold bg-white/15 hover:bg-white/25 border border-white/25 text-white backdrop-blur-md transition-all active:scale-95 shadow-sm"
                 >
                   <span>{currency}</span>
                   <ChevronDown size={13} className={cn('transition-transform', currencyOpen && 'rotate-180')} />
                 </button>
                 {currencyOpen && (
-                  <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-1.5 min-w-[170px] z-50 animate-scale-in text-neutral-900">
+                  <div className="absolute top-full mt-2 end-0 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 py-1.5 min-w-[170px] z-50 animate-scale-in text-neutral-900">
                     {currencies.map((c) => (
                       <button
                         key={c.code}
@@ -159,7 +159,7 @@ export default function Header() {
                 <div className="relative hidden md:block" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(o => !o)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold backdrop-blur-md transition-all"
                   >
                     <div className="w-5 h-5 bg-[#FF3B30] text-white rounded-full flex items-center justify-center text-[10px] font-black">
                       {user.name.charAt(0)}
@@ -168,7 +168,7 @@ export default function Header() {
                     <ChevronDown size={12} className={cn('transition-transform', userMenuOpen && 'rotate-180')} />
                   </button>
                   {userMenuOpen && (
-                    <div className="absolute top-full mt-2 end-0 bg-white rounded-2xl shadow-2xl border border-neutral-100 py-2 min-w-[180px] z-50 text-neutral-900">
+                    <div className="absolute top-full mt-2 end-0 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 py-2 min-w-[180px] z-50 text-neutral-900">
                       <div className="px-4 py-2 border-b border-neutral-100 mb-1">
                         <div className="text-xs font-black text-neutral-900 truncate">{user.name}</div>
                         <div className="text-[10px] text-neutral-400 truncate">{user.email}</div>
@@ -218,7 +218,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden w-9 h-9 rounded-full bg-black/20 hover:bg-black/30 border border-white/20 text-white flex items-center justify-center transition-all active:scale-95 shadow-sm"
+                className="lg:hidden w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center backdrop-blur-md transition-all active:scale-95 shadow-sm"
                 aria-label="فتح القائمة"
               >
                 <Menu size={18} />
@@ -241,19 +241,19 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Drawer Header: Transparent Logo + 'مساري' Only */}
+              {/* Drawer Header: Balanced Logo + 'مساري' */}
               <div className="flex items-center justify-between pb-4 border-b border-white/15 mb-5">
-                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
-                  <div className="relative w-8 h-8">
+                <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5">
+                  <div className="relative w-6 h-6 shrink-0">
                     <Image 
                       src="/images/logo-icon.png"
                       alt="شعار مساري"
-                      sizes="32px"
+                      sizes="24px"
                       fill
                       className="object-contain"
                     />
                   </div>
-                  <span className="text-xl font-black text-white leading-none">مساري</span>
+                  <span className="text-lg font-black text-white leading-none">مساري</span>
                 </Link>
                 <button
                   type="button"
@@ -291,7 +291,7 @@ export default function Header() {
                 })}
               </div>
 
-              {/* Extra Pages: تطبيق مساري، من نحن، اتصل بنا */}
+              {/* Extra Pages */}
               <div className="mt-3.5 pt-3.5 border-t border-white/15 space-y-1.5">
                 {drawerExtraLinks.map((extra) => {
                   const Icon = extra.icon;
