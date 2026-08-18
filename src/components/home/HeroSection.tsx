@@ -72,7 +72,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     <div className="relative w-full">
       
       {/* ── 1. Grand Atmospheric Hero Section ── */}
-      <section className="relative overflow-hidden w-full text-white min-h-[420px] sm:min-h-[520px] lg:min-h-[580px] pt-28 sm:pt-36 lg:pt-40 pb-36 sm:pb-44 lg:pb-48 flex flex-col items-center justify-center">
+      <section className="relative overflow-hidden w-full text-white min-h-[360px] sm:min-h-[500px] lg:min-h-[560px] pt-24 sm:pt-36 lg:pt-40 pb-36 sm:pb-44 lg:pb-48 flex flex-col items-center justify-center">
         
         {/* Panoramic 5-Star Luxury Background */}
         <div 
@@ -88,11 +88,11 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           />
         </div>
 
-        {/* Content Container: Spacious 2-Line Headline with Generous Spacing */}
+        {/* Content Container: Clean 2-Line Headline */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
-          <div className="text-center space-y-3.5 sm:space-y-5 mb-2">
-            {/* Line 1: حجزك أسهل... مع مساري (Red accent) */}
+          <div className="text-center space-y-2.5 sm:space-y-4 mb-2">
+            {/* Line 1: حجزك أسهل... مع مساري */}
             <h1 
               className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
               style={{ fontSize: 'clamp(20px, 5.5vw, 48px)' }}
@@ -103,7 +103,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
             <p 
               className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
-              style={{ fontSize: 'clamp(12.5px, 3.4vw, 24px)' }}
+              style={{ fontSize: 'clamp(12px, 3.4vw, 24px)' }}
             >
               احجز فندقك في اليمن بأفضل سعر
             </p>
@@ -112,8 +112,8 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         </div>
       </section>
 
-      {/* ── 2. Floating Search Console (Mobile: 30% on Hero / 70% outside) ── */}
-      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[85px] sm:-mt-20 lg:-mt-22">
+      {/* ── 2. Floating Search Console (Mobile: 50% on Hero / 50% outside) ── */}
+      <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[140px] sm:-mt-20 lg:-mt-22">
         
         {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Tabs ── */}
         <div 
@@ -295,7 +295,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
         </div>
 
-        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (30% on Hero / 70% outside) ── */}
+        {/* ── MOBILE VIEW: Notched Dedicated Hotel Search Card (50% on Hero / 50% outside) ── */}
         <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
           
           {/* Top Notch Tab: "فنادق" */}
@@ -393,7 +393,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
                       <button
                         type="button"
                         onClick={() => setGuests(guests + 1)}
-                        className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
+                        className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs font-bold hover:bg-neutral-200"
                       >
                         +
                       </button>
