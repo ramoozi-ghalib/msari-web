@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { 
-  Smartphone, MapPin, Search, Bell, SlidersHorizontal, Check, Sparkles
+  Smartphone, MapPin, Search, Bell, Check, Sparkles
 } from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
@@ -12,8 +12,8 @@ interface AppDownloadSectionProps {
 
 export default function AppDownloadSection({ appDownload }: AppDownloadSectionProps) {
   const badge = appDownload?.badgeAr || 'تطبيق مساري للهواتف الذكية';
-  const title = 'حمّل تطبيق مساري الآن';
-  const subtitle = 'احجز فنادقك وتنقلاتك من أي مكان وفي أي وقت بسهولة وأمان';
+  const title = appDownload?.titleAr || 'حمّل تطبيق مساري الآن';
+  const subtitle = appDownload?.subtitleAr || 'احجز فنادقك وتنقلاتك من أي مكان وفي أي وقت بسهولة وأمان';
   const playStore = appDownload?.playStoreUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
   const appStore = appDownload?.appStoreUrl || 'https://apps.apple.com';
 
