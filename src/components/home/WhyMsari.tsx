@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { 
   Rocket, CreditCard, Headset, BadgePercent, MapPinned, Globe2, 
-  Code2, Shield, Clock, Tag, Globe, Sparkles, Building, ArrowLeft,
-  Building2, PlaneTakeoff, ShieldCheck, LockKeyhole, PhoneCall
+  Code2, ArrowLeft, Building2, PlaneTakeoff
 } from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
@@ -49,27 +48,36 @@ const DEFAULT_FEATURES = [
   },
 ];
 
-function getWhyIcon(iconName?: string, idx: number = 0) {
+function getWhyIcon(iconName?: string, title?: string, idx: number = 0) {
   const name = (iconName || '').toLowerCase();
-  
-  if (name.includes('card') || name.includes('دفع') || name.includes('shield') || name.includes('safe') || name.includes('أمان') || idx === 0) {
+  const t = (title || '').toLowerCase();
+
+  if (idx === 0 || t.includes('دفع') || t.includes('آمن')) {
     return CreditCard;
   }
-  if (name.includes('headset') || name.includes('headphone') || name.includes('support') || name.includes('دعم') || name.includes('clock') || name.includes('24') || name.includes('ساعة') || idx === 1) {
+  if (idx === 1 || t.includes('دعم') || t.includes('ساعة') || t.includes('استفسار')) {
     return Headset;
   }
-  if (name.includes('percent') || name.includes('badge') || name.includes('tag') || name.includes('price') || name.includes('سعر') || name.includes('عرض') || idx === 2) {
+  if (idx === 2 || t.includes('سعر') || t.includes('أسعار') || t.includes('عرض') || t.includes('عروض')) {
     return BadgePercent;
   }
-  if (name.includes('map') || name.includes('pin') || name.includes('مدن') || name.includes('تغطية') || idx === 3) {
+  if (idx === 3 || t.includes('تغطية') || t.includes('مدن') || t.includes('يمنية')) {
     return MapPinned;
   }
-  if (name.includes('globe') || name.includes('world') || name.includes('عالمي') || name.includes('محلي') || name.includes('sparkle') || idx === 4) {
+  if (idx === 4 || t.includes('محلي') || t.includes('عالمي') || t.includes('فنادق')) {
     return Globe2;
   }
-  if (name.includes('code') || name.includes('api') || name.includes('plug') || name.includes('شريك') || name.includes('مطور') || idx === 5) {
+  if (idx === 5 || t.includes('api') || t.includes('شريك') || t.includes('مطور') || t.includes('شركاء')) {
     return Code2;
   }
+
+  // Fallback icon name match
+  if (name.includes('card') || name.includes('credit')) return CreditCard;
+  if (name.includes('headset') || name.includes('headphone') || name.includes('support')) return Headset;
+  if (name.includes('percent') || name.includes('badge') || name.includes('tag')) return BadgePercent;
+  if (name.includes('map') || name.includes('pin') || name.includes('location')) return MapPinned;
+  if (name.includes('globe') || name.includes('world')) return Globe2;
+  if (name.includes('code') || name.includes('api') || name.includes('plug')) return Code2;
 
   return DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
 }
@@ -80,12 +88,15 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
   
   // Resolve features directly from CMS (using titleAr/title, descAr/desc)
   const featuresList = (whyMsari?.features && whyMsari.features.length > 0)
-    ? whyMsari.features.map((f: any, idx) => ({
-        title: f.titleAr || f.title || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].title,
-        desc: f.descAr || f.desc || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].desc,
-        color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
-        icon: getWhyIcon(f.icon, idx),
-      }))
+    ? whyMsari.features.map((f: any, idx: number) => {
+        const itemTitle = f.titleAr || f.title || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].title;
+        return {
+          title: itemTitle,
+          desc: f.descAr || f.desc || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].desc,
+          color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
+          icon: getWhyIcon(f.icon, itemTitle, idx),
+        };
+      })
     : DEFAULT_FEATURES;
 
   const partnerTitle = whyMsari?.partnerCta?.titleAr || 'هل أنت مزود فندق أو شريك تقني؟ انضم لشبكة مساري';
