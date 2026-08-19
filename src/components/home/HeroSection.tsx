@@ -92,28 +92,20 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
           <div className="text-center space-y-2.5 sm:space-y-4 mb-2">
-            {/* Line 1: Main Title */}
+            {/* Line 1: حجزك أسهل... مع مساري */}
             <h1 
               className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
               style={{ fontSize: 'clamp(20px, 5.5vw, 48px)' }}
             >
-              {(hero?.titleAr || 'حجزك أسهل... مع مساري').includes('مع مساري') ? (
-                <>
-                  {(hero?.titleAr || 'حجزك أسهل... مع مساري').split('مع مساري')[0]}
-                  <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
-                  {(hero?.titleAr || 'حجزك أسهل... مع مساري').split('مع مساري')[1] || ''}
-                </>
-              ) : (
-                hero?.titleAr || 'حجزك أسهل... مع مساري'
-              )}
+              حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
             </h1>
 
-            {/* Line 2: Subtitle */}
+            {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
             <p 
               className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
               style={{ fontSize: 'clamp(12px, 3.4vw, 24px)' }}
             >
-              {hero?.subtitleAr || 'احجز فندقك في اليمن بأفضل سعر'}
+              احجز فندقك في اليمن بأفضل سعر
             </p>
           </div>
 
