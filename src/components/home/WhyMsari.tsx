@@ -51,16 +51,25 @@ const DEFAULT_FEATURES = [
 
 function getWhyIcon(iconName?: string, idx: number = 0) {
   const name = (iconName || '').toLowerCase();
-  if (name.includes('credit') || name.includes('card') || name.includes('دفع') || name.includes('مال')) return CreditCard;
-  if (name.includes('headset') || name.includes('headphone') || name.includes('support') || name.includes('دعم') || name.includes('ساعة')) return Headset;
-  if (name.includes('percent') || name.includes('badge') || name.includes('price') || name.includes('سعر') || name.includes('عرض')) return BadgePercent;
-  if (name.includes('map') || name.includes('pin') || name.includes('مدن') || name.includes('تغطية')) return MapPinned;
-  if (name.includes('globe') || name.includes('world') || name.includes('عالمي') || name.includes('محلي')) return Globe2;
-  if (name.includes('code') || name.includes('api') || name.includes('شريك') || name.includes('مطور')) return Code2;
-  if (name.includes('shieldcheck') || name.includes('check')) return ShieldCheck;
-  if (name.includes('shield') || name.includes('safe') || name.includes('أمان')) return LockKeyhole;
-  if (name.includes('plane') || name.includes('طيران')) return PlaneTakeoff;
-  if (name.includes('build') || name.includes('hotel') || name.includes('فندق')) return Building2;
+  
+  if (name.includes('card') || name.includes('دفع') || name.includes('shield') || name.includes('safe') || name.includes('أمان') || idx === 0) {
+    return CreditCard;
+  }
+  if (name.includes('headset') || name.includes('headphone') || name.includes('support') || name.includes('دعم') || name.includes('clock') || name.includes('24') || name.includes('ساعة') || idx === 1) {
+    return Headset;
+  }
+  if (name.includes('percent') || name.includes('badge') || name.includes('tag') || name.includes('price') || name.includes('سعر') || name.includes('عرض') || idx === 2) {
+    return BadgePercent;
+  }
+  if (name.includes('map') || name.includes('pin') || name.includes('مدن') || name.includes('تغطية') || idx === 3) {
+    return MapPinned;
+  }
+  if (name.includes('globe') || name.includes('world') || name.includes('عالمي') || name.includes('محلي') || name.includes('sparkle') || idx === 4) {
+    return Globe2;
+  }
+  if (name.includes('code') || name.includes('api') || name.includes('plug') || name.includes('شريك') || name.includes('مطور') || idx === 5) {
+    return Code2;
+  }
 
   return DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
 }
