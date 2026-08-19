@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { 
-  Rocket, Shield, ShieldCheck, Clock, Tag, Globe, 
-  Plug, Sparkles, Headphones, Building, ArrowLeft, Code
+  Rocket, CreditCard, Headset, BadgePercent, MapPinned, Globe2, 
+  Code2, Shield, Clock, Tag, Globe, Sparkles, Building, ArrowLeft,
+  Building2, PlaneTakeoff, ShieldCheck, LockKeyhole, PhoneCall
 } from 'lucide-react';
 import type { HomepageContentData } from '@/services/cms';
 
@@ -14,52 +15,52 @@ const DEFAULT_FEATURES = [
     title: 'دفع آمن',
     desc: 'حجز موثوق مع خيارات دفع مرنة تناسبك',
     color: 'from-[#23096E] to-[#3A1C8F]',
-    icon: ShieldCheck,
+    icon: CreditCard,
   },
   {
     title: 'دعم على مدار الساعة',
     desc: 'فريقنا معك للرد على استفساراتك على مدار الساعة',
     color: 'from-[#3A1C8F] to-[#23096E]',
-    icon: Clock,
+    icon: Headset,
   },
   {
     title: 'أفضل الأسعار',
     desc: 'عروض حصرية وأسعار تنافسية',
     color: 'from-[#FF3B30] to-[#23096E]',
-    icon: Tag,
+    icon: BadgePercent,
   },
   {
     title: 'تغطية واسعة',
     desc: '10 مدن يمنية، وشراكات فنادق',
     color: 'from-[#FF3B30] to-[#3A1C8F]',
-    icon: Globe,
+    icon: MapPinned,
   },
   {
     title: 'محلي وعالمي',
     desc: 'فنادق يمنية وعالمية، ومقارنة الأسعار والحجز',
     color: 'from-[#23096E] to-[#FF3B30]',
-    icon: Sparkles,
+    icon: Globe2,
   },
   {
     title: 'API للشركاء',
     desc: 'نوفر API متكامل لأي شريك تقني يريد التكامل معنا',
     color: 'from-[#3A1C8F] to-[#23096E]',
-    icon: Plug,
+    icon: Code2,
   },
 ];
 
 function getWhyIcon(iconName?: string, idx: number = 0) {
   const name = (iconName || '').toLowerCase();
+  if (name.includes('credit') || name.includes('card') || name.includes('دفع') || name.includes('مال')) return CreditCard;
+  if (name.includes('headset') || name.includes('headphone') || name.includes('support') || name.includes('دعم') || name.includes('ساعة')) return Headset;
+  if (name.includes('percent') || name.includes('badge') || name.includes('price') || name.includes('سعر') || name.includes('عرض')) return BadgePercent;
+  if (name.includes('map') || name.includes('pin') || name.includes('مدن') || name.includes('تغطية')) return MapPinned;
+  if (name.includes('globe') || name.includes('world') || name.includes('عالمي') || name.includes('محلي')) return Globe2;
+  if (name.includes('code') || name.includes('api') || name.includes('شريك') || name.includes('مطور')) return Code2;
   if (name.includes('shieldcheck') || name.includes('check')) return ShieldCheck;
-  if (name.includes('shield') || name.includes('safe') || name.includes('أمان')) return Shield;
-  if (name.includes('clock') || name.includes('time') || name.includes('24') || name.includes('ساعة')) return Clock;
-  if (name.includes('tag') || name.includes('price') || name.includes('سعر') || name.includes('عرض')) return Tag;
-  if (name.includes('globe') || name.includes('world') || name.includes('مدن') || name.includes('تغطية')) return Globe;
-  if (name.includes('sparkle') || name.includes('star') || name.includes('محلي')) return Sparkles;
-  if (name.includes('plug') || name.includes('api') || name.includes('شريك')) return Plug;
-  if (name.includes('rocket') || name.includes('صاروخ')) return Rocket;
-  if (name.includes('headphone') || name.includes('support') || name.includes('دعم')) return Headphones;
-  if (name.includes('build') || name.includes('hotel') || name.includes('فندق')) return Building;
+  if (name.includes('shield') || name.includes('safe') || name.includes('أمان')) return LockKeyhole;
+  if (name.includes('plane') || name.includes('طيران')) return PlaneTakeoff;
+  if (name.includes('build') || name.includes('hotel') || name.includes('فندق')) return Building2;
 
   return DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon;
 }
@@ -79,7 +80,6 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
     : DEFAULT_FEATURES;
 
   const partnerTitle = whyMsari?.partnerCta?.titleAr || 'هل أنت مزود فندق أو شريك تقني؟ انضم لشبكة مساري';
-  const partnerDesc = whyMsari?.partnerCta?.descriptionAr || 'انضم لشبكة مساري وضاعف حجوزاتك مع نظام إدارة متكامل وربط برمجي مباشر';
 
   return (
     <section className="py-10 sm:py-14 bg-[#F4F2F8]/60 border-t border-neutral-100">
@@ -102,14 +102,14 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
         {/* ── 2-Column Mobile Grid / 3-Column Desktop Grid ── */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {featuresList.map((feature, idx) => {
-            const Icon = feature.icon || Shield;
+            const Icon = feature.icon || CreditCard;
             return (
               <div
                 key={`${feature.title}-${idx}`}
                 className="group relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-start"
               >
-                <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-2.5 sm:mb-4 shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0`}>
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-2.5 sm:mb-4 shadow-md border border-white/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shrink-0`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <h3 className="text-xs sm:text-base font-black text-neutral-900 mb-1 group-hover:text-[var(--brand-primary)] transition-colors">
                   {feature.title}
@@ -150,7 +150,7 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
                 href="/developers"
                 className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs sm:text-sm backdrop-blur-md transition-all inline-flex items-center justify-center gap-1.5 active:scale-95"
               >
-                <Code size={14} />
+                <Code2 size={14} />
                 <span>وثائق API</span>
               </Link>
             </div>
