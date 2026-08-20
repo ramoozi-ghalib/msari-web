@@ -7,7 +7,7 @@ import HotelsPagination from '@/components/hotels/HotelsPagination';
 import HotelsSearchBar from '@/components/hotels/HotelsSearchBar';
 import { getLocalHotels } from '@/actions/hotels';
 import { getActiveCities } from '@/actions/cities';
-import { SearchX, ChevronLeft, Building2 } from 'lucide-react';
+import { SearchX, ChevronLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'فنادق اليمن - حجز جميع الفنادق في اليمن بأفضل سعر | مساري',
@@ -59,7 +59,7 @@ export default async function HotelsPage(props: {
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       
       {/* ── 1. Compact Luxury Mini-Hero ── */}
-      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-30 pb-20 sm:pb-24 overflow-hidden">
+      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-14 sm:pb-16 overflow-hidden">
         {/* Ambient background lighting texture */}
         <div 
           className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
@@ -92,8 +92,8 @@ export default async function HotelsPage(props: {
         </div>
       </div>
 
-      {/* ── 2. Floating Search Bar Overlap (50% on Hero / 50% below Hero) ── */}
-      <div className="container-msari -mt-10 sm:-mt-12 relative z-30 mb-8">
+      {/* ── 2. Floating Search Bar Overlap (30% on Hero / 70% below Hero) ── */}
+      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8">
         <HotelsSearchBar cities={cities} />
       </div>
 
@@ -117,20 +117,8 @@ export default async function HotelsPage(props: {
           {/* Left Main Content: Results & Grid */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Top Bar: Results Header & Sort */}
-            <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs border border-neutral-200/80 mb-5 flex flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Building2 size={16} className="text-[#23096E] shrink-0" />
-                <span className="text-xs sm:text-sm font-bold text-neutral-800">
-                  {selectedCity ? `فنادق ${selectedCity} المتاحة` : 'جميع الفنادق المتاحة'}
-                </span>
-                {searchQuery && (
-                  <span className="hidden sm:inline-block text-xs text-neutral-400 font-normal">
-                    (بحث: "{searchQuery}")
-                  </span>
-                )}
-              </div>
-
+            {/* Top Bar: Sort Control Only (Left Aligned) */}
+            <div className="flex items-center justify-end mb-4 sm:mb-5">
               <SortSelectClient currentSort={sortBy} />
             </div>
 

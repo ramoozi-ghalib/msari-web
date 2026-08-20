@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowUpDown } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 export default function SortSelectClient({ currentSort }: { currentSort: string }) {
   const router = useRouter();
@@ -20,11 +20,11 @@ export default function SortSelectClient({ currentSort }: { currentSort: string 
   };
 
   return (
-    <div className="flex items-center gap-2 w-full sm:w-auto">
-      <div className="relative flex items-center w-full sm:w-auto">
-        <ArrowUpDown size={14} className="absolute start-3 text-[#23096E] pointer-events-none" />
+    <div className="relative inline-flex items-center">
+      <div className="flex items-center gap-2.5 bg-white rounded-2xl px-4 py-2.5 shadow-xs border border-neutral-200/80 hover:border-[#23096E]/30 transition-all">
+        <SlidersHorizontal size={15} className="text-[#23096E] shrink-0" />
         <select 
-          className="w-full sm:w-auto h-9 ps-8 pe-4 rounded-xl bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/80 text-xs font-bold text-neutral-800 outline-none focus:ring-2 focus:ring-[#23096E]/20 focus:border-[#23096E] cursor-pointer transition-all appearance-none"
+          className="bg-transparent text-xs font-bold text-neutral-800 outline-none cursor-pointer pe-4 appearance-none"
           value={currentSort}
           onChange={handleSortChange}
         >
@@ -32,6 +32,7 @@ export default function SortSelectClient({ currentSort }: { currentSort: string 
           <option value="price_asc">السعر (الأقل أولاً)</option>
           <option value="price_desc">السعر (الأعلى أولاً)</option>
         </select>
+        <ChevronDown size={13} className="text-neutral-400 -ms-3 pointer-events-none shrink-0" />
       </div>
     </div>
   );
