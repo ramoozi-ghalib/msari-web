@@ -61,8 +61,8 @@ export default async function HotelsPage(props: {
            the bottom edge of the purple gradient. The wrapper itself does NOT
            have overflow-hidden, only the purple background div does. */}
       <div className="relative">
-        {/* Purple Hero Background */}
-        <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-16 sm:pb-20 overflow-hidden">
+        {/* Purple Hero Background — large pb creates purple space for search bar overlap */}
+        <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-36 sm:pb-28 overflow-hidden">
           {/* Ambient background lighting texture */}
           <div 
             className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
@@ -95,10 +95,9 @@ export default async function HotelsPage(props: {
           </div>
         </div>
 
-        {/* Floating Search Bar — positioned to overlap 30% on hero.
-            -mt-[30px] on desktop pulls the search bar up so ~30% sits
-            on the purple hero and ~70% sits on the light background below. */}
-        <div className="container-msari relative z-30 -mt-[30px]">
+        {/* Floating Search Bar — -mt-[120px] on mobile pulls ~30% of stacked
+            search bar into purple. -mt-[28px] on md+ pulls ~30% of single-row bar. */}
+        <div className="container-msari relative z-30 -mt-[120px] md:-mt-[28px]">
           <HotelsSearchBar cities={cities} />
         </div>
       </div>
