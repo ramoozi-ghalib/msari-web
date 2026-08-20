@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, MapPin, Star, Filter } from 'lucide-react';
+import { Search, MapPin, Filter, X, RotateCcw, SlidersHorizontal, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { City } from '@/types';
 
@@ -18,13 +18,12 @@ export default function HotelFilters({ cities }: HotelFiltersProps) {
   // Local state for debouncing and immediate UI updates
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedCity, setSelectedCity] = useState(searchParams.get('city') || '');
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    Number(searchParams.get('minPrice')) || 0,
-    Number(searchParams.get('maxPrice')) || 5000
-  ]);
-  const [selectedRatings, setSelectedRatings] = useState<number[]>(
-    searchParams.get('ratings')?.split(',').map(Number).filter(Boolean) || []
-  );
+
+  // Active filters count
+  const activeFiltersCount = [
+    Boolean(searchQuery),
+    Boolean(selectedCity),
+  ].filter(Boolean).length;
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -33,147 +32,178 @@ export default function HotelFilters({ cities }: HotelFiltersProps) {
       if (searchQuery) params.set('q', searchQuery); else params.delete('q');
       if (selectedCity) params.set('city', selectedCity); else params.delete('city');
       
-      // Only set price if changed from default wide range
-      if (priceRange[0] > 0) params.set('minPrice', priceRange[0].toString()); else params.delete('minPrice');
-      if (priceRange[1] < 5000) params.set('maxPrice', priceRange[1].toString()); else params.delete('maxPrice');
-      
-      if (selectedRatings.length > 0) params.set('ratings', selectedRatings.join(',')); else params.delete('ratings');
-      
+      // Reset page on filter change
+      params.delete('page');
+
       router.push(`?${params.toString()}`, { scroll: false });
     }, 400);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, selectedCity, priceRange, selectedRatings, router, searchParams]);
+  }, [searchQuery, selectedCity, router, searchParams]);
 
-  const toggleRating = (rating: number) => {
-    setSelectedRatings(prev => 
-      prev.includes(rating) ? prev.filter(r => r !== rating) : [...prev, rating]
-    );
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedCity('');
+    router.push(window.location.pathname, { scroll: false });
   };
+
+  const filterContent = (
+    <div className="space-y-5">
+      {/* Search by Hotel Name */}
+      <div>
+        <label className="block text-xs font-black text-neutral-700 mb-2">بحث باسم الفندق</label>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="اكتب اسم الفندق..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 ps-9 pe-3 rounded-xl bg-neutral-50 border border-neutral-200/80 text-xs font-bold text-neutral-800 placeholder:text-neutral-400 focus:bg-white focus:ring-2 focus:ring-[#23096E]/20 focus:border-[#23096E] outline-none transition-all"
+          />
+          <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+        </div>
+      </div>
+
+      {/* City Filter */}
+      <div>
+        <label className="block text-xs font-black text-neutral-700 mb-2">المدينة / الوجهة</label>
+        <div className="space-y-1.5 max-h-64 overflow-y-auto no-scrollbar pe-1">
+          <button
+            type="button"
+            onClick={() => setSelectedCity('')}
+            className={cn(
+              "w-full text-start px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between",
+              selectedCity === '' 
+                ? "bg-[#23096E] text-white shadow-sm" 
+                : "hover:bg-neutral-100 text-neutral-700 bg-neutral-50/80"
+            )}
+          >
+            <span>جميع المدن</span>
+            {selectedCity === '' && <Check size={14} className="text-white" />}
+          </button>
+          {cities.map((city) => (
+            <button
+              key={city.id}
+              type="button"
+              onClick={() => setSelectedCity(city.name)}
+              className={cn(
+                "w-full text-start px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between",
+                selectedCity === city.name 
+                  ? "bg-[#23096E] text-white shadow-sm" 
+                  : "hover:bg-neutral-100 text-neutral-700 bg-neutral-50/80"
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <MapPin size={13} className={selectedCity === city.name ? "text-white" : "text-[#23096E]"} />
+                <span>{city.name}</span>
+              </div>
+              {selectedCity === city.name && <Check size={14} className="text-white" />}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="w-full lg:hidden flex items-center justify-center gap-2 btn btn-outline mb-4 bg-white"
-      >
-        <Filter size={18} />
-        {isMobileOpen ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}
-      </button>
-
-      <div className={cn(
-        "bg-white rounded-2xl shadow-sm border border-[--neutral-100] p-6 sticky top-24",
-        !isMobileOpen && "hidden lg:block"
-      )}>
-        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <Filter size={20} className="text-[--brand-primary]" />
-          تصفية النتائج
-        </h3>
-
-        {/* Text Search */}
-        <div className="mb-6 relative">
-          <label className="block text-sm font-bold text-neutral-700 mb-2">بحث بالاسم</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="اسم الفندق..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-msari ps-10"
-            />
-            <Search size={18} className="absolute start-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+      {/* ── Desktop Filter Sidebar ── */}
+      <div className="hidden lg:block bg-white rounded-2xl p-5 shadow-xs border border-neutral-200/80 sticky top-28">
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-neutral-100">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal size={17} className="text-[#23096E]" />
+            <h3 className="text-sm font-black text-neutral-900">تصفية الفنادق</h3>
           </div>
-        </div>
-
-        {/* City Filter */}
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-neutral-700 mb-2">المدينة / الواجهة</label>
-          <div className="space-y-2">
+          {activeFiltersCount > 0 && (
             <button
-              onClick={() => setSelectedCity('')}
-              className={cn(
-                "w-full text-start px-3 py-2 rounded-lg text-sm transition-colors",
-                selectedCity === '' ? "bg-[--brand-primary]/10 text-[--brand-primary] font-bold" : "hover:bg-neutral-50 text-neutral-600"
-              )}
+              type="button"
+              onClick={handleResetFilters}
+              className="flex items-center gap-1 text-[11px] font-bold text-[#FF3B30] hover:text-[#d32f2f] transition-colors"
             >
-              جميع المدن
+              <RotateCcw size={12} />
+              <span>إعادة ضبط</span>
             </button>
-            {cities.map((city) => (
-              <button
-                key={city.id}
-                onClick={() => setSelectedCity(city.name)}
-                className={cn(
-                  "w-full text-start px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between",
-                  selectedCity === city.name ? "bg-[--brand-primary]/10 text-[--brand-primary] font-bold" : "hover:bg-neutral-50 text-neutral-600"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <MapPin size={14} className={selectedCity === city.name ? "text-[--brand-primary]" : "text-neutral-400"} />
-                  {city.name}
-                </div>
-                <span className="text-xs bg-neutral-100 px-2 py-0.5 rounded-full text-neutral-500">
-                  {city.hotelCount}
-                </span>
-              </button>
-            ))}
-          </div>
+          )}
         </div>
-
-        {/* Price Range */}
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-neutral-700 mb-2">نطاق السعر (بالدولار)</label>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1">
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => setPriceRange([Number(e.target.value) || 0, priceRange[1]])}
-                className="input-msari p-2 text-center text-sm"
-                min={0}
-              />
-            </div>
-            <span className="text-neutral-400">-</span>
-            <div className="flex-1">
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value) || 0])}
-                className="input-msari p-2 text-center text-sm"
-                min={10}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Rating Filter */}
-        <div>
-          <label className="block text-sm font-bold text-neutral-700 mb-3">تصنيف النجوم</label>
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <label key={rating} className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative flex items-center">
-                  <input
-                    type="checkbox"
-                    className="peer sr-only"
-                    checked={selectedRatings.includes(rating)}
-                    onChange={() => toggleRating(rating)}
-                  />
-                  <div className="w-5 h-5 border-2 border-neutral-300 rounded peer-checked:bg-[--brand-primary] peer-checked:border-[--brand-primary] transition-colors flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-amber-500">
-                  {Array(rating).fill(0).map((_, i) => (
-                    <Star key={i} size={14} fill="currentColor" />
-                  ))}
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
+        {filterContent}
       </div>
+
+      {/* ── Mobile Sticky Floating Action Pill ── */}
+      <div className="lg:hidden fixed bottom-6 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+        <button
+          type="button"
+          onClick={() => setIsMobileOpen(true)}
+          className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#23096E] text-white font-bold text-xs shadow-[0_10px_25px_-5px_rgba(35,9,110,0.45)] hover:bg-[#3A1C8F] active:scale-95 transition-all duration-200"
+        >
+          <Filter size={14} />
+          <span>تصفية الفنادق</span>
+          {activeFiltersCount > 0 && (
+            <span className="w-5 h-5 rounded-full bg-[#FF3B30] text-white text-[10px] font-black flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* ── Mobile Bottom Sheet Drawer ── */}
+      {isMobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          {/* Backdrop Blur */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-fade-in"
+            onClick={() => setIsMobileOpen(false)}
+          />
+
+          {/* Drawer Container */}
+          <div 
+            className="relative z-10 bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl animate-slide-up"
+            style={{ direction: 'rtl' }}
+          >
+            {/* Drawer Handle */}
+            <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mt-3 mb-1 shrink-0" />
+
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-100 shrink-0">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal size={18} className="text-[#23096E]" />
+                <h3 className="text-sm font-black text-neutral-900">تصفية الفنادق</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(false)}
+                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Drawer Scrollable Body */}
+            <div className="p-5 overflow-y-auto flex-1">
+              {filterContent}
+            </div>
+
+            {/* Drawer Footer with Actions */}
+            <div className="p-4 border-t border-neutral-100 bg-neutral-50/80 flex items-center gap-3 shrink-0">
+              {activeFiltersCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="px-4 py-2.5 rounded-xl border border-neutral-200 text-neutral-700 text-xs font-bold hover:bg-white transition-colors"
+                >
+                  إعادة ضبط
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(false)}
+                className="flex-1 py-2.5 bg-[#23096E] hover:bg-[#3A1C8F] text-white rounded-xl text-xs font-black shadow-md shadow-[#23096E]/20 transition-all text-center"
+              >
+                عرض الفنادق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

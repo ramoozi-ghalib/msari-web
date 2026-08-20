@@ -10,7 +10,6 @@ import {
 import { cn } from '@/lib/utils';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
-import { Badge } from '@/components/ui/Badge';
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -26,52 +25,52 @@ function getAmenityIcon(iconKey?: string, name?: any) {
   const t = `${key} ${label}`;
 
   if (t.includes('wifi') || t.includes('internet') || t.includes('إنترنت') || t.includes('انترنت') || t.includes('واي')) {
-    return <Wifi size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Wifi size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('park') || t.includes('car') || t.includes('موقف') || t.includes('سيار') || t.includes('مركب')) {
-    return <Car size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Car size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('room_service') || t.includes('room service') || t.includes('bell') || t.includes('خدمة الغرف') || t.includes('خدمة غرف') || t.includes('غرفة')) {
-    return <Bell size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Bell size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('pool') || t.includes('swim') || t.includes('wave') || t.includes('مسبح') || t.includes('سباحة')) {
-    return <Waves size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Waves size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('restaur') || t.includes('food') || t.includes('utensil') || t.includes('مطعم') || t.includes('طعام') || t.includes('أكل')) {
-    return <Coffee size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Coffee size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('grocery') || t.includes('shop') || t.includes('بقالة') || t.includes('سوبرماركت') || t.includes('محل')) {
-    return <ShoppingCart size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <ShoppingCart size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('laundry') || t.includes('wash') || t.includes('shirt') || t.includes('مغسلة') || t.includes('كوي') || t.includes('تنظيف')) {
-    return <Shirt size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Shirt size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('elevator') || t.includes('lift') || t.includes('مصعد')) {
-    return <ArrowUpDown size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <ArrowUpDown size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('meeting') || t.includes('conference') || t.includes('presentation') || t.includes('قاعة') || t.includes('قاعات') || t.includes('تدريب')) {
-    return <Presentation size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Presentation size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('majlis') || t.includes('terrace') || t.includes('rooftop') || t.includes('طيرمانات') || t.includes('طيرمانة') || t.includes('مجلس')) {
-    return <Home size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Home size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('location') || t.includes('center') || t.includes('وسط المدينة') || t.includes('موقع') || t.includes('خريطة')) {
-    return <MapPin size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <MapPin size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('cafe') || t.includes('coffee') || t.includes('كافيه') || t.includes('مقهى') || t.includes('شاي') || t.includes('cafeteria') || t.includes('كافتيريا')) {
-    return <Coffee size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Coffee size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('secur') || t.includes('guard') || t.includes('shield') || t.includes('أمان') || t.includes('حراسة') || t.includes('حماية')) {
-    return <Shield size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Shield size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('tv') || t.includes('television') || t.includes('تلفاز') || t.includes('تلفزيون') || t.includes('شاشة')) {
-    return <Tv size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Tv size={12} className="text-[#23096E] shrink-0" />;
   }
   if (t.includes('gym') || t.includes('fitness') || t.includes('sport') || t.includes('جيم') || t.includes('رياضة') || t.includes('لياقة') || t.includes('dumbbell')) {
-    return <Dumbbell size={12} className="text-[var(--brand-primary)] shrink-0" />;
+    return <Dumbbell size={12} className="text-[#23096E] shrink-0" />;
   }
 
-  return <Check size={11} className="text-[var(--brand-primary)] shrink-0" />;
+  return <Check size={11} className="text-[#23096E] shrink-0" />;
 }
 
 export default function HotelCard({ hotel, className }: HotelCardProps) {
@@ -104,121 +103,110 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
     ? hotel.priceFrom
     : (roomPrices.length > 0 ? Math.min(...roomPrices) : 35);
 
-  const finalPrice = hotel.discount
-    ? Math.round(basePrice * (1 - hotel.discount.percentage / 100))
-    : basePrice;
-
-  const starsCount = Math.min(Math.max(Number(hotel.stars) || 5, 1), 5);
+  const starsCount = Math.min(Math.max(Number(hotel.stars) || 0, 0), 5);
 
   return (
     <Link 
       href={cardHref} 
       className={cn(
-        'card group block bg-white rounded-2xl overflow-hidden border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[var(--brand-primary)]/30 transition-all duration-300 ease-out',
+        'group block bg-white rounded-2xl overflow-hidden border border-neutral-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#23096E]/30 transition-all duration-300 ease-out flex flex-col justify-between',
         className
       )}
     >
-      {/* ── Compact Sleek Image ── */}
-      <div className="relative aspect-[16/9.5] bg-neutral-200 overflow-hidden">
-        {hotel.thumbnail && hotel.thumbnail.startsWith('http') ? (
-          <Image
-            src={hotel.thumbnail}
-            alt={hotel.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-secondary)]/20" />
-        )}
+      <div>
+        {/* ── Hotel Image ── */}
+        <div className="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
+          {hotel.thumbnail && hotel.thumbnail.startsWith('http') ? (
+            <Image
+              src={hotel.thumbnail}
+              alt={hotel.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#23096E]/10 to-[#FF3B30]/10 flex items-center justify-center">
+              <span className="text-xs font-bold text-neutral-400">مساري</span>
+            </div>
+          )}
 
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Subtle bottom shadow overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Discount Badge */}
-        {hotel.discount && (
-          <div className="absolute top-2.5 start-2.5 z-10">
-            <Badge variant="accent" size="sm" className="text-[10px] py-0.5 px-2">
-              🏷️ {hotel.discount.percentage}%
-            </Badge>
+          {/* Wishlist Button */}
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); }}
+            className="absolute top-2.5 end-2.5 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+            aria-label="إضافة للمفضلة"
+          >
+            <Heart size={15} className="text-neutral-400 hover:text-[#FF3B30] transition-colors" />
+          </button>
+        </div>
+
+        {/* ── Hotel Details ── */}
+        <div className="p-3.5 sm:p-4">
+          {/* Hotel Name and Stars in Same Row */}
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <h3 className="font-bold text-neutral-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#23096E] transition-colors">
+              {hotel.name}
+            </h3>
+
+            {/* Stars Rating Badge */}
+            {starsCount > 0 && (
+              <div className="flex items-center gap-0.5 shrink-0" title={`${starsCount} نجوم`}>
+                {Array.from({ length: starsCount }).map((_, i) => (
+                  <Star key={i} size={12} className="fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Wishlist */}
-        <button
-          type="button"
-          onClick={(e) => { e.preventDefault(); }}
-          className="absolute top-2.5 end-2.5 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-        >
-          <Heart size={14} className="text-neutral-400 hover:text-[var(--brand-accent)] transition-colors duration-300" />
-        </button>
+          {/* Address / Location */}
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 mb-3">
+            <MapPin size={13} className="shrink-0 text-[#23096E]" />
+            <span className="truncate">{hotel.address || hotel.city}</span>
+          </div>
+
+          {/* Amenities Chips */}
+          {topAmenities.length > 0 && (
+            <div className="flex items-center gap-1.5 mb-2 overflow-x-auto no-scrollbar py-0.5">
+              {topAmenities.map((amenity: any, idx: number) => {
+                const amenityName = typeof amenity?.name === 'string'
+                  ? amenity.name
+                  : (typeof amenity?.name === 'object' && amenity?.name !== null ? (amenity.name.ar || amenity.name.en || '') : '');
+                return (
+                  <div
+                    key={`${amenity.id || amenityName || 'amenity'}-${idx}`}
+                    className="w-7 h-7 rounded-lg bg-neutral-50 border border-neutral-200/70 flex items-center justify-center shrink-0 hover:bg-neutral-100 transition-colors"
+                    title={amenityName}
+                  >
+                    {getAmenityIcon(amenity.iconKey || amenity.icon, amenity.name)}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* ── Compact Content ── */}
-      <div className="p-3 sm:p-3.5">
-        {/* Name and Stars Row */}
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <h3 className="font-bold text-[var(--text-primary)] text-xs sm:text-sm leading-snug line-clamp-1 group-hover:text-[var(--brand-primary)] transition-colors duration-300">
-            {hotel.name}
-          </h3>
-          
-          {/* Star Rating on Left */}
-          <div className="flex items-center gap-0.5 shrink-0" title={`${starsCount} نجوم`}>
-            {Array.from({ length: starsCount }).map((_, i) => (
-              <Star key={i} size={11} className="fill-amber-400 text-amber-400" />
-            ))}
+      {/* ── Footer: Price (Official Red) & Action Button ("عرض التفاصيل") ── */}
+      <div className="p-3.5 sm:p-4 pt-2.5 border-t border-neutral-100 flex items-center justify-between mt-auto">
+        {/* Price in official red */}
+        <div className="flex flex-col">
+          <span className="text-[10px] text-neutral-400 font-bold leading-none mb-0.5">تبدأ من</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-base sm:text-lg font-black text-[#FF3B30]">
+              {formatPrice(basePrice)}
+            </span>
+            <span className="text-[10px] text-neutral-500 font-medium">/ ليلة</span>
           </div>
         </div>
 
-        {/* Address */}
-        <div className="flex items-center gap-1 text-[11px] text-neutral-500 mb-2 group-hover:text-neutral-600 transition-colors duration-300">
-          <MapPin size={11} className="shrink-0 text-[var(--brand-primary)]" />
-          <span className="truncate">{hotel.address}</span>
-        </div>
-
-        {/* Amenities: Compact Icon Chips */}
-        {topAmenities.length > 0 && (
-          <div className="flex items-center gap-1 mb-2.5 overflow-x-auto no-scrollbar py-0.5">
-            {topAmenities.map((amenity: any, idx: number) => {
-              const amenityName = typeof amenity?.name === 'string'
-                ? amenity.name
-                : (typeof amenity?.name === 'object' && amenity?.name !== null ? (amenity.name.ar || amenity.name.en || '') : '');
-              return (
-                <div
-                  key={`${amenity.id || amenityName || 'amenity'}-${idx}`}
-                  className="w-6 h-6 rounded-md bg-neutral-100/90 border border-neutral-200/50 flex items-center justify-center shrink-0 hover:bg-neutral-200/70 transition-colors"
-                  title={amenityName}
-                >
-                  {getAmenityIcon(amenity.iconKey || amenity.icon, amenity.name)}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Action Button & Price Section */}
-        <div className="flex items-center justify-between pt-2.5 border-t border-neutral-100 group-hover:border-neutral-200 transition-colors duration-300">
-          {/* Price */}
-          <div className="flex flex-col">
-            <span className="text-[9px] text-neutral-400 font-semibold leading-none mb-0.5">تبدأ من</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-sm sm:text-base font-black text-[var(--brand-accent)]">
-                {formatPrice(finalPrice)}
-              </span>
-              {hotel.discount && (
-                <span className="text-[10px] text-neutral-400 line-through">
-                  {formatPrice(basePrice)}
-                </span>
-              )}
-              <span className="text-[9px] text-neutral-400 font-medium">/ ليلة</span>
-            </div>
-          </div>
-
-          {/* Details Button ("عرض التفاصيل") - Sleek & Compact */}
-          <span className="inline-flex items-center justify-center bg-[var(--brand-primary)] text-white text-[10.5px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg hover:bg-[var(--brand-secondary)] transition-colors font-bold shadow-sm shrink-0">
-            عرض التفاصيل
-          </span>
-        </div>
+        {/* Action Button */}
+        <span className="inline-flex items-center justify-center bg-[#23096E] text-white text-xs px-3.5 py-1.5 rounded-xl group-hover:bg-[#3A1C8F] transition-all font-bold shadow-sm shadow-[#23096E]/15 shrink-0">
+          عرض التفاصيل
+        </span>
       </div>
     </Link>
   );
