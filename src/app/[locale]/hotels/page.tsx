@@ -32,7 +32,6 @@ export default async function HotelsPage(props: {
 }) {
   const params = await props.searchParams;
 
-  // استخراج params وتحويلها للأنواع الصحيحة
   const selectedCity    = typeof params.city     === 'string' ? params.city          : undefined;
   const searchQuery     = typeof params.q        === 'string' ? params.q.trim()      : undefined;
   const sortBy          = typeof params.sort === 'string'
@@ -41,7 +40,6 @@ export default async function HotelsPage(props: {
   const page            = typeof params.page === 'string' ? Math.max(1, Number(params.page)) : 1;
   const bookingError    = typeof params.bookingError === 'string' ? params.bookingError : '';
 
-  // جلب البيانات من قاعدة البيانات مباشرة
   const [{ data: hotels, total, pageSize }, cities] = await Promise.all([
     getLocalHotels({
       city:     selectedCity,
@@ -58,46 +56,49 @@ export default async function HotelsPage(props: {
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       
-      {/* ── 1. Compact Luxury Mini-Hero ── */}
-      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-14 sm:pb-16 overflow-hidden">
-        {/* Ambient background lighting texture */}
-        <div 
-          className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')" }}
-        />
-        <div className="absolute -top-24 -end-24 w-96 h-96 bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -start-24 w-96 h-96 bg-[#23096E]/30 rounded-full blur-3xl pointer-events-none" />
+      {/* ── 1. Hero + Floating Search Bar ── */}
+      <div className="relative w-full">
+        {/* Purple Hero Section: pb-32 on mobile and pb-16 on desktop to create the 50% split */}
+        <section className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-32 sm:pb-16 overflow-hidden">
+          {/* Ambient background lighting texture */}
+          <div 
+            className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')" }}
+          />
+          <div className="absolute -top-24 -end-24 w-96 h-96 bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -start-24 w-96 h-96 bg-[#23096E]/30 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="container-msari relative z-10">
-          {/* Breadcrumbs - Far Right in RTL */}
-          <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-3">
-            <Link href="/" className="hover:text-white transition-colors">الرئيسية</Link>
-            <ChevronLeft size={12} className="text-white/40" />
-            <span className="text-white font-bold">فنادق اليمن</span>
-            {selectedCity && (
-              <>
-                <ChevronLeft size={12} className="text-white/40" />
-                <span className="text-[#FF3B30] font-bold">{selectedCity}</span>
-              </>
-            )}
-          </nav>
+          <div className="container-msari relative z-10">
+            {/* Breadcrumbs */}
+            <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-2.5">
+              <Link href="/" className="hover:text-white transition-colors">الرئيسية</Link>
+              <ChevronLeft size={12} className="text-white/40" />
+              <span className="text-white font-bold">فنادق اليمن</span>
+              {selectedCity && (
+                <>
+                  <ChevronLeft size={12} className="text-white/40" />
+                  <span className="text-[#FF3B30] font-bold">{selectedCity}</span>
+                </>
+              )}
+            </nav>
 
-          {/* Title & Subtitle */}
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
-            فنادق اليمن
-          </h1>
-          <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">
-            احجز فندقك المناسب بأفضل الأسعار
-          </p>
+            {/* Title & Subtitle */}
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1.5">
+              فنادق اليمن
+            </h1>
+            <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">
+              احجز فندقك المناسب بأفضل الأسعار
+            </p>
+          </div>
+        </section>
+
+        {/* Floating Search Bar (50% on purple hero / 50% on white page) */}
+        <div className="container-msari relative z-30 -mt-[140px] sm:-mt-[36px] mb-6 sm:mb-8">
+          <HotelsSearchBar cities={cities} />
         </div>
       </div>
 
-      {/* ── 2. Floating Search Bar Overlap (30% on Hero / 70% below Hero) ── */}
-      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8">
-        <HotelsSearchBar cities={cities} />
-      </div>
-
-      {/* ── 3. Main Body: Filters & Hotels Grid ── */}
+      {/* ── 2. Main Body: Filters & Hotels Grid ── */}
       <div className="container-msari">
         {bookingError && (
           <div role="alert" className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium">
@@ -107,8 +108,8 @@ export default async function HotelsPage(props: {
 
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 items-start">
           
-          {/* Right Sidebar: Filters */}
-          <aside className="w-full lg:w-72 xl:w-80 shrink-0">
+          {/* Right Sidebar: Filters (Desktop Only) */}
+          <aside className="hidden lg:block w-72 xl:w-80 shrink-0">
             <Suspense fallback={<div className="h-96 bg-white animate-pulse rounded-2xl shadow-sm border border-neutral-100" />}>
               <HotelFilters cities={cities} />
             </Suspense>
@@ -117,8 +118,15 @@ export default async function HotelsPage(props: {
           {/* Left Main Content: Results & Grid */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Top Bar: Sort Control Only (Left Aligned) */}
-            <div className="flex items-center justify-end mb-4 sm:mb-5">
+            {/* Top Bar: Mobile Filter Button (Right) + Sort Control (Left) */}
+            <div className="flex items-center justify-between mb-5">
+              {/* Mobile Filter Button */}
+              <div className="lg:hidden">
+                <HotelFilters cities={cities} mobileOnly />
+              </div>
+              {/* Desktop Empty Spacer to keep sort button on the left */}
+              <div className="hidden lg:block" />
+
               <SortSelectClient currentSort={sortBy} />
             </div>
 
