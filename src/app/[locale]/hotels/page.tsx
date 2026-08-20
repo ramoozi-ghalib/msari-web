@@ -59,7 +59,7 @@ export default async function HotelsPage(props: {
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       
       {/* ── 1. Compact Luxury Mini-Hero ── */}
-      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-14 sm:pb-16 overflow-hidden">
+      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-12 sm:pb-14 overflow-hidden">
         {/* Ambient background lighting texture */}
         <div 
           className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
@@ -92,13 +92,13 @@ export default async function HotelsPage(props: {
         </div>
       </div>
 
-      {/* ── 2. Floating Search Bar Overlap (30% on Hero / 70% below Hero) ── */}
-      <div className="container-msari -mt-24 md:-mt-9 relative z-30 mb-8 sm:mb-10">
+      {/* ── 2. Floating Search Bar Overlap (Exactly 30% on Hero / 70% below Hero) ── */}
+      <div className="container-msari -mt-[110px] md:-mt-[78px] relative z-30 mb-10 md:mb-12">
         <HotelsSearchBar cities={cities} />
       </div>
 
-      {/* ── 3. Main Body: Filters & Hotels Grid ── */}
-      <div className="container-msari pt-1 sm:pt-2">
+      {/* ── 3. Main Body: Filters & Hotels Grid (Generous Top Spacing to prevent collision) ── */}
+      <div className="container-msari pt-4 sm:pt-6">
         {bookingError && (
           <div role="alert" className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium">
             {bookingError}
@@ -118,7 +118,7 @@ export default async function HotelsPage(props: {
           <main className="flex-1 w-full min-w-0">
             
             {/* Top Bar: Sort Control Only (Left Aligned in RTL) */}
-            <div className="flex items-center justify-end mb-4 sm:mb-5">
+            <div className="flex items-center justify-end mb-6">
               <SortSelectClient currentSort={sortBy} />
             </div>
 
