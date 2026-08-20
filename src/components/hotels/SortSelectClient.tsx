@@ -14,22 +14,26 @@ export default function SortSelectClient({ currentSort }: { currentSort: string 
     } else {
       params.delete('sort');
     }
+    // Reset page on sort change
+    params.delete('page');
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
   return (
-    <div className="flex items-center gap-3 w-full sm:w-auto">
-      <ArrowUpDown size={18} className="text-neutral-400" />
-      <select 
-        className="input-msari py-2 outline-none border-none bg-neutral-50"
-        value={currentSort}
-        onChange={handleSortChange}
-      >
-        <option value="recommended">الأعلى توصية</option>
-        <option value="price_asc">السعر (الأقل أولاً)</option>
-        <option value="price_desc">السعر (الأعلى أولاً)</option>
-        <option value="rating">تقييم النزلاء</option>
-      </select>
+    <div className="flex items-center gap-2 w-full sm:w-auto">
+      <div className="relative flex items-center w-full sm:w-auto">
+        <ArrowUpDown size={14} className="absolute start-3 text-[#23096E] pointer-events-none" />
+        <select 
+          className="w-full sm:w-auto h-9 ps-8 pe-4 rounded-xl bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/80 text-xs font-bold text-neutral-800 outline-none focus:ring-2 focus:ring-[#23096E]/20 focus:border-[#23096E] cursor-pointer transition-all appearance-none"
+          value={currentSort}
+          onChange={handleSortChange}
+        >
+          <option value="recommended">الأعلى توصية</option>
+          <option value="price_asc">السعر (الأقل أولاً)</option>
+          <option value="price_desc">السعر (الأعلى أولاً)</option>
+          <option value="rating">تصنيف النجوم</option>
+        </select>
+      </div>
     </div>
   );
 }

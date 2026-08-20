@@ -4,12 +4,13 @@ import HotelFilters from '@/components/hotels/HotelFilters';
 import HotelCard from '@/components/ui/HotelCard';
 import SortSelectClient from '@/components/hotels/SortSelectClient';
 import HotelsPagination from '@/components/hotels/HotelsPagination';
+import HotelsSearchBar from '@/components/hotels/HotelsSearchBar';
 import { getLocalHotels } from '@/actions/hotels';
 import { getActiveCities } from '@/actions/cities';
-import { SearchX } from 'lucide-react';
+import { SearchX, ChevronLeft, Building2 } from 'lucide-react';
 
 export const metadata = {
-  title: 'فنادق يمنية - حجز جميع الفنادق في اليمن',
+  title: 'فنادق اليمن - حجز جميع الفنادق في اليمن بأفضل سعر | مساري',
   description: 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية (عدن، صنعاء، تعز، المكلا، إب، الحديدة) بأسعار حصرية وخيارات تناسب جميع الميزانيات.',
   alternates: {
     canonical: 'https://msari.net/ar/hotels',
@@ -20,17 +21,12 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'فنادق يمنية - حجز جميع الفنادق في اليمن | مساري',
+    title: 'فنادق اليمن - حجز جميع الفنادق في اليمن | مساري',
     description: 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية بأسعار حصرية وخيارات تناسب جميع الميزانيات.',
     url: 'https://msari.net/ar/hotels',
   },
 };
 
-/**
- * [FIX C-2] صفحة الفنادق تمرر searchParams مباشرة إلى getLocalHotels.
- * كل الفلترة والترتيب والـ pagination يحدثان في Prisma (DB) لا في JavaScript.
- * السابق: getAll() ثم .filter() + .sort() على كل البيانات في الذاكرة.
- */
 export default async function HotelsPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
@@ -50,13 +46,13 @@ export default async function HotelsPage(props: {
   const page            = typeof params.page === 'string' ? Math.max(1, Number(params.page)) : 1;
   const bookingError    = typeof params.bookingError === 'string' ? params.bookingError : '';
 
-  // [FIX C-2] جلب البيانات المُفلترة من DB مباشرة — لا JavaScript filtering
+  // جلب البيانات من قاعدة البيانات مباشرة
   const [{ data: hotels, total, pageSize }, cities] = await Promise.all([
     getLocalHotels({
       city:     selectedCity,
       q:        searchQuery,
       minPrice: minPrice ?? 0,
-      maxPrice: maxPrice ?? 5000,
+      maxPrice: maxPrice ?? 1000,
       ratings:  selectedRatings,
       sort:     sortBy,
       page,
@@ -68,76 +64,105 @@ export default async function HotelsPage(props: {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="bg-[#F4F2F8] min-h-screen pb-16">
-      {/* Page Header with Single-Line Description Text in Msari Primary Brand Color (#23096E) */}
-      <div className="bg-white border-b border-neutral-200/80 pt-28 pb-10 shadow-sm relative overflow-hidden">
-        <div className="container-msari relative z-10">
-          <h1 
-            className="text-3xl md:text-5xl font-black mb-3 leading-tight tracking-tight animate-fade-in-up" 
-            style={{ color: '#23096E' }}
-          >
-            فنادق يمنية
+    <div className="bg-[#F8F9FC] min-h-screen pb-20">
+      
+      {/* ── 1. Compact Luxury Mini-Hero ── */}
+      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-14 sm:pb-16 overflow-hidden">
+        {/* Ambient background lighting texture */}
+        <div 
+          className="absolute inset-0 opacity-15 bg-cover bg-center mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')" }}
+        />
+        <div className="absolute -top-24 -end-24 w-96 h-96 bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -start-24 w-96 h-96 bg-[#23096E]/30 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container-msari relative z-10 text-center">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center justify-center gap-1.5 text-xs text-white/70 font-medium mb-3">
+            <Link href="/" className="hover:text-white transition-colors">الرئيسية</Link>
+            <ChevronLeft size={12} className="text-white/40" />
+            <span className="text-white font-bold">فنادق اليمن</span>
+            {selectedCity && (
+              <>
+                <ChevronLeft size={12} className="text-white/40" />
+                <span className="text-[#FF3B30] font-bold">{selectedCity}</span>
+              </>
+            )}
+          </nav>
+
+          {/* Title & Subtitle */}
+          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
+            فنادق اليمن
           </h1>
-          <p 
-            className="font-extrabold text-base sm:text-lg leading-relaxed whitespace-nowrap overflow-x-auto no-scrollbar max-w-full animate-fade-in-up delay-100" 
-            style={{ color: '#23096E' }}
-          >
-            اكتشف أفضل الفنادق في جميع المدن اليمنية بأسعار حصرية وخيارات تناسب جميع الميزانيات.
+          <p className="text-xs sm:text-sm text-white/85 font-medium max-w-xl mx-auto">
+            احجز فندقك في جميع المدن اليمنية بأفضل الأسعار وضمان مساري
           </p>
         </div>
       </div>
 
-      <div className="container-msari mt-8">
+      {/* ── 2. Floating Search Bar Overlap ── */}
+      <div className="container-msari -mt-7 sm:-mt-8 relative z-30 mb-8">
+        <HotelsSearchBar cities={cities} />
+      </div>
+
+      {/* ── 3. Main Body: Filters & Hotels Grid ── */}
+      <div className="container-msari">
         {bookingError && (
-          <div role="alert" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium">
+          <div role="alert" className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium">
             {bookingError}
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 items-start">
           
-          <div className="w-full lg:w-1/4 shrink-0">
+          {/* Right Sidebar: Filters */}
+          <aside className="w-full lg:w-72 xl:w-80 shrink-0">
             <Suspense fallback={<div className="h-96 bg-white animate-pulse rounded-2xl shadow-sm border border-neutral-100" />}>
-              <HotelFilters cities={cities} />
+              <HotelFilters cities={cities} totalHotels={total} />
             </Suspense>
-          </div>
+          </aside>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* Top Bar */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-neutral-200/80 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <span className="text-sm font-bold text-neutral-600">
-                  تم العثور على <span className="font-extrabold text-[#23096E]">{total}</span> فندق
+          {/* Left Main Content: Results & Grid */}
+          <main className="flex-1 w-full min-w-0">
+            
+            {/* Top Bar: Results Count & Sort */}
+            <div className="bg-white rounded-2xl p-3.5 sm:p-4 shadow-xs border border-neutral-200/80 mb-5 flex flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Building2 size={16} className="text-[#23096E] shrink-0" />
+                <span className="text-xs sm:text-sm font-bold text-neutral-700">
+                  تم العثور على <span className="font-black text-[#23096E]">{total}</span> فندق
                 </span>
                 {(selectedCity || searchQuery) && (
-                  <span className="text-xs text-neutral-500 ms-2">
+                  <span className="hidden sm:inline-block text-xs text-neutral-400 font-normal">
                     ({[selectedCity, searchQuery && `بحث: "${searchQuery}"`].filter(Boolean).join(' - ')})
                   </span>
                 )}
               </div>
+
               <SortSelectClient currentSort={sortBy} />
             </div>
 
             {/* Hotels Grid */}
             {hotels.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {hotels.map((hotel) => (
                   <HotelCard key={hotel.id} hotel={hotel} />
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-neutral-200/80 my-8">
-                <SearchX size={48} className="mx-auto text-neutral-300 mb-4" />
-                <h3 className="text-lg font-bold text-neutral-800 mb-2">لا توجد فنادق تطابق خيارات الفلترة</h3>
-                <p className="text-neutral-500 text-sm max-w-md mx-auto mb-6">
-                  جرب تغيير خيارات الفلترة أو البحث في مدينة أخرى للعثور على الفنادق المتاحة.
+              <div className="bg-white rounded-2xl p-12 text-center shadow-xs border border-neutral-200/80 my-4">
+                <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4 text-neutral-400">
+                  <SearchX size={32} />
+                </div>
+                <h3 className="text-base font-black text-neutral-800 mb-1.5">لا توجد فنادق تطابق خيارات البحث</h3>
+                <p className="text-neutral-500 text-xs sm:text-sm max-w-md mx-auto mb-6">
+                  جرب تغيير نطاق السعر أو اختيار مدينة أخرى للعثور على الفنادق المتاحة.
                 </p>
                 <Link
                   href="/hotels"
-                  className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-[#23096E] text-white font-bold text-sm hover:bg-[#3A1C8F] transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-[#23096E] text-white font-bold text-xs hover:bg-[#3A1C8F] transition-colors shadow-sm"
                 >
-                  إعادة ضبط الفلاتر
+                  إعادة ضبط جميع الفلاتر
                 </Link>
               </div>
             )}
@@ -146,9 +171,11 @@ export default async function HotelsPage(props: {
             {totalPages > 1 && (
               <HotelsPagination currentPage={page} totalPages={totalPages} />
             )}
-          </div>
+          </main>
+
         </div>
       </div>
+
     </div>
   );
 }
