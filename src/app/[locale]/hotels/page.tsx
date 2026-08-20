@@ -93,12 +93,12 @@ export default async function HotelsPage(props: {
       </div>
 
       {/* ── 2. Floating Search Bar Overlap (30% on Hero / 70% below Hero) ── */}
-      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8">
+      <div className="container-msari -mt-24 md:-mt-9 relative z-30 mb-8 sm:mb-10">
         <HotelsSearchBar cities={cities} />
       </div>
 
       {/* ── 3. Main Body: Filters & Hotels Grid ── */}
-      <div className="container-msari">
+      <div className="container-msari pt-1 sm:pt-2">
         {bookingError && (
           <div role="alert" className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium">
             {bookingError}
@@ -117,7 +117,7 @@ export default async function HotelsPage(props: {
           {/* Left Main Content: Results & Grid */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Top Bar: Sort Control Only (Left Aligned) */}
+            {/* Top Bar: Sort Control Only (Left Aligned in RTL) */}
             <div className="flex items-center justify-end mb-4 sm:mb-5">
               <SortSelectClient currentSort={sortBy} />
             </div>
