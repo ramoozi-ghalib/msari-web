@@ -8,10 +8,9 @@ import type { City } from '@/types';
 
 interface HotelFiltersProps {
   cities: City[];
-  mobileOnly?: boolean;
 }
 
-export default function HotelFilters({ cities, mobileOnly }: HotelFiltersProps) {
+export default function HotelFilters({ cities }: HotelFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -106,10 +105,49 @@ export default function HotelFilters({ cities, mobileOnly }: HotelFiltersProps) 
     </div>
   );
 
-  const bottomSheet = (
+  return (
     <>
+      {/* ── Desktop Filter Sidebar ── */}
+      <div className="hidden lg:block bg-white rounded-2xl p-5 shadow-xs border border-neutral-200/80 sticky top-28">
+        <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-neutral-100">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal size={17} className="text-[#23096E]" />
+            <h3 className="text-sm font-black text-neutral-900">تصفية الفنادق</h3>
+          </div>
+          {activeFiltersCount > 0 && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="flex items-center gap-1 text-[11px] font-bold text-[#FF3B30] hover:text-[#d32f2f] transition-colors"
+            >
+              <RotateCcw size={12} />
+              <span>إعادة ضبط</span>
+            </button>
+          )}
+        </div>
+        {filterContent}
+      </div>
+
+      {/* ── Mobile Sticky Floating Action Pill ── */}
+      <div className="lg:hidden fixed bottom-6 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+        <button
+          type="button"
+          onClick={() => setIsMobileOpen(true)}
+          className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#23096E] text-white font-bold text-xs shadow-[0_10px_25px_-5px_rgba(35,9,110,0.45)] hover:bg-[#3A1C8F] active:scale-95 transition-all duration-200"
+        >
+          <Filter size={14} />
+          <span>تصفية الفنادق</span>
+          {activeFiltersCount > 0 && (
+            <span className="w-5 h-5 rounded-full bg-[#FF3B30] text-white text-[10px] font-black flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* ── Mobile Bottom Sheet Drawer ── */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
           {/* Backdrop Blur */}
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-fade-in"
@@ -167,50 +205,5 @@ export default function HotelFilters({ cities, mobileOnly }: HotelFiltersProps) 
         </div>
       )}
     </>
-  );
-
-  // Mobile-only inline button
-  if (mobileOnly) {
-    return (
-      <>
-        <button
-          type="button"
-          onClick={() => setIsMobileOpen(true)}
-          className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 shadow-xs border border-neutral-200/80 hover:border-[#23096E]/30 transition-all text-xs font-bold text-neutral-800"
-        >
-          <Filter size={15} className="text-[#23096E] shrink-0" />
-          <span>تصفية الفنادق</span>
-          {activeFiltersCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-[#FF3B30] text-white text-[10px] font-black flex items-center justify-center ms-0.5">
-              {activeFiltersCount}
-            </span>
-          )}
-        </button>
-        {bottomSheet}
-      </>
-    );
-  }
-
-  // Desktop sidebar
-  return (
-    <div className="bg-white rounded-2xl p-5 shadow-xs border border-neutral-200/80 sticky top-28">
-      <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-neutral-100">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={17} className="text-[#23096E]" />
-          <h3 className="text-sm font-black text-neutral-900">تصفية الفنادق</h3>
-        </div>
-        {activeFiltersCount > 0 && (
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="flex items-center gap-1 text-[11px] font-bold text-[#FF3B30] hover:text-[#d32f2f] transition-colors"
-          >
-            <RotateCcw size={12} />
-            <span>إعادة ضبط</span>
-          </button>
-        )}
-      </div>
-      {filterContent}
-    </div>
   );
 }
