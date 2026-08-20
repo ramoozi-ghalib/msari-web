@@ -44,16 +44,15 @@ export default function HotelsPagination({ currentPage, totalPages }: HotelsPagi
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8" dir="rtl">
+    <div className="flex items-center justify-center gap-2" dir="ltr">
       {/* السابق */}
       <button
-        type="button"
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage === 1}
-        className="w-9 h-9 flex items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-600 hover:bg-[#23096E] hover:text-white hover:border-[#23096E] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+        className="w-9 h-9 flex items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 hover:bg-[#23096e] hover:text-white hover:border-[#23096e] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="الصفحة السابقة"
       >
-        <ChevronRight size={16} />
+        <ChevronLeft size={16} />
       </button>
 
       {/* أرقام الصفحات */}
@@ -65,12 +64,11 @@ export default function HotelsPagination({ currentPage, totalPages }: HotelsPagi
         ) : (
           <button
             key={pg}
-            type="button"
             onClick={() => goToPage(pg as number)}
-            className={`w-9 h-9 rounded-xl text-xs font-bold transition-all duration-200 ${
+            className={`w-9 h-9 rounded-xl text-sm font-bold transition-all duration-200 ${
               pg === currentPage
-                ? 'bg-[#23096E] text-white shadow-md shadow-[#23096E]/20 scale-105'
-                : 'border border-neutral-200 bg-white text-neutral-700 hover:bg-[#23096E]/10 hover:border-[#23096E]/30'
+                ? 'bg-[#23096e] text-white shadow-md shadow-[#23096e]/20'
+                : 'border border-neutral-200 text-neutral-600 hover:bg-[#23096e]/10 hover:border-[#23096e]/30'
             }`}
           >
             {pg}
@@ -80,13 +78,12 @@ export default function HotelsPagination({ currentPage, totalPages }: HotelsPagi
 
       {/* التالي */}
       <button
-        type="button"
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="w-9 h-9 flex items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-600 hover:bg-[#23096E] hover:text-white hover:border-[#23096E] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+        className="w-9 h-9 flex items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 hover:bg-[#23096e] hover:text-white hover:border-[#23096e] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="الصفحة التالية"
       >
-        <ChevronLeft size={16} />
+        <ChevronRight size={16} />
       </button>
     </div>
   );
