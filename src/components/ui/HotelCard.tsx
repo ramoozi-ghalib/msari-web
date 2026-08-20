@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams, useParams } from 'next/navigation';
 import { 
   MapPin, Wifi, Coffee, Car, Waves, Heart, Shield, Tv, Dumbbell, Bell, Check,
-  ShoppingCart, Shirt, ArrowUpDown, Presentation, Home
+  ShoppingCart, Shirt, ArrowUpDown, Presentation, Home, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Hotel } from '@/types';
@@ -103,6 +103,8 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
     ? hotel.priceFrom
     : (roomPrices.length > 0 ? Math.min(...roomPrices) : 35);
 
+  const starsCount = Math.min(Math.max(Number(hotel.stars) || 0, 0), 5);
+
   return (
     <Link 
       href={cardHref} 
@@ -144,10 +146,21 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
 
         {/* ── Hotel Details ── */}
         <div className="p-3.5 sm:p-4">
-          {/* Hotel Name */}
-          <h3 className="font-bold text-neutral-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#23096E] transition-colors mb-1.5">
-            {hotel.name}
-          </h3>
+          {/* Hotel Name and Stars in Same Row */}
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <h3 className="font-bold text-neutral-900 text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-[#23096E] transition-colors">
+              {hotel.name}
+            </h3>
+
+            {/* Stars Rating Badge */}
+            {starsCount > 0 && (
+              <div className="flex items-center gap-0.5 shrink-0" title={`${starsCount} نجوم`}>
+                {Array.from({ length: starsCount }).map((_, i) => (
+                  <Star key={i} size={12} className="fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Address / Location */}
           <div className="flex items-center gap-1.5 text-xs text-neutral-500 mb-3">
@@ -177,13 +190,13 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
         </div>
       </div>
 
-      {/* ── Footer: Price & Action Button ── */}
+      {/* ── Footer: Price (Official Red) & Action Button ("عرض التفاصيل") ── */}
       <div className="p-3.5 sm:p-4 pt-2.5 border-t border-neutral-100 flex items-center justify-between mt-auto">
-        {/* Price */}
+        {/* Price in official red */}
         <div className="flex flex-col">
           <span className="text-[10px] text-neutral-400 font-bold leading-none mb-0.5">تبدأ من</span>
           <div className="flex items-baseline gap-1">
-            <span className="text-base sm:text-lg font-black text-[#23096E]">
+            <span className="text-base sm:text-lg font-black text-[#FF3B30]">
               {formatPrice(basePrice)}
             </span>
             <span className="text-[10px] text-neutral-500 font-medium">/ ليلة</span>

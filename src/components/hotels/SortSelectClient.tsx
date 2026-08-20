@@ -28,10 +28,9 @@ export default function SortSelectClient({ currentSort }: { currentSort: string 
           value={currentSort}
           onChange={handleSortChange}
         >
-          <option value="recommended">الأعلى توصية</option>
+          <option value="recommended">افتراضي</option>
           <option value="price_asc">السعر (الأقل أولاً)</option>
           <option value="price_desc">السعر (الأعلى أولاً)</option>
-          <option value="rating">تصنيف النجوم</option>
         </select>
       </div>
     </div>

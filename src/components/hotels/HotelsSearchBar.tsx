@@ -82,10 +82,10 @@ export default function HotelsSearchBar({ cities }: HotelsSearchBarProps) {
   return (
     <div className="w-full relative z-30">
       <div 
-        className="bg-white/95 backdrop-blur-md rounded-2xl p-2 sm:p-2.5 shadow-[0_12px_36px_-10px_rgba(35,9,110,0.18)] border border-neutral-200/90 text-neutral-800"
+        className="bg-white rounded-2xl p-2.5 sm:p-3 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
         style={{ direction: 'rtl' }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
           
           {/* 1. Destination / City */}
           <div className="md:col-span-4 relative text-start p-2 sm:p-2.5 rounded-xl bg-neutral-50/90 hover:bg-white focus-within:bg-white focus-within:ring-2 focus-within:ring-[#23096E]/20 border border-neutral-200/80 transition-all">
@@ -144,11 +144,6 @@ export default function HotelsSearchBar({ cities }: HotelsSearchBarProps) {
                       <MapPin className="w-3.5 h-3.5 text-[#23096E]" />
                       <span>{city.name}</span>
                     </div>
-                    {city.hotelCount > 0 && (
-                      <span className="text-[10px] bg-neutral-100 px-2 py-0.5 rounded-full text-neutral-500 font-medium">
-                        {city.hotelCount} فندق
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
@@ -260,7 +255,7 @@ export default function HotelsSearchBar({ cities }: HotelsSearchBarProps) {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full h-10 md:h-11 bg-[#FF3B30] hover:bg-[#e03429] text-white font-black rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-[#FF3B30]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-11 bg-[#FF3B30] hover:bg-[#e03429] text-white font-black rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-[#FF3B30]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Search className="w-4 h-4 shrink-0" />
               <span>بحث</span>
