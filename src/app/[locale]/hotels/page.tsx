@@ -56,13 +56,10 @@ export default async function HotelsPage(props: {
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       
-      {/* ── 1. Hero + Floating Search Bar inside one wrapper ──
-           The search bar is INSIDE the hero wrapper so it visually overlaps
-           the bottom edge of the purple gradient. The wrapper itself does NOT
-           have overflow-hidden, only the purple background div does. */}
-      <div className="relative">
-        {/* Purple Hero Background — large pb creates purple space for search bar overlap */}
-        <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-36 sm:pb-28 overflow-hidden">
+      {/* ── 1. Hero + Floating Search Bar ── */}
+      <div className="relative w-full">
+        {/* Purple Hero Section: compact pb-8 (32px) so search bar overlaps bottom edge */}
+        <section className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-8 sm:pb-9 overflow-hidden">
           {/* Ambient background lighting texture */}
           <div 
             className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
@@ -73,7 +70,7 @@ export default async function HotelsPage(props: {
 
           <div className="container-msari relative z-10">
             {/* Breadcrumbs */}
-            <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-3">
+            <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-2.5">
               <Link href="/" className="hover:text-white transition-colors">الرئيسية</Link>
               <ChevronLeft size={12} className="text-white/40" />
               <span className="text-white font-bold">فنادق اليمن</span>
@@ -86,24 +83,23 @@ export default async function HotelsPage(props: {
             </nav>
 
             {/* Title & Subtitle */}
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1.5">
               فنادق اليمن
             </h1>
             <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">
               احجز فندقك المناسب بأفضل الأسعار
             </p>
           </div>
-        </div>
+        </section>
 
-        {/* Floating Search Bar — -mt-[120px] on mobile pulls ~30% of stacked
-            search bar into purple. -mt-[28px] on md+ pulls ~30% of single-row bar. */}
-        <div className="container-msari relative z-30 -mt-[120px] md:-mt-[28px]">
+        {/* Floating Search Bar:
+            On Mobile: -mt-[105px] pulls the card 75px (30%) above the purple bottom edge, leaving 175px (70%) below.
+            On Desktop (md+): -mt-[52px] pulls the bar 20px (30%) above the purple bottom edge, leaving 44px (70%) below.
+        */}
+        <div className="container-msari relative z-30 -mt-[105px] md:-mt-[52px] mb-8 md:mb-10">
           <HotelsSearchBar cities={cities} />
         </div>
       </div>
-
-      {/* Spacer between search bar and main content */}
-      <div className="h-8 sm:h-10" />
 
       {/* ── 2. Main Body: Filters & Hotels Grid ── */}
       <div className="container-msari">
@@ -125,13 +121,13 @@ export default async function HotelsPage(props: {
           {/* Left Main Content: Results & Grid */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Top Bar: Filter button (mobile) + Sort Control */}
+            {/* Top Bar: Mobile Filter Button (Right) + Sort Control (Left) */}
             <div className="flex items-center justify-between mb-6">
-              {/* Mobile Filter Button — right side in RTL */}
+              {/* Mobile Filter Button */}
               <div className="lg:hidden">
                 <HotelFilters cities={cities} mobileOnly />
               </div>
-              {/* Empty spacer on desktop where mobile filter button would be */}
+              {/* Desktop Empty Spacer to keep sort button aligned left */}
               <div className="hidden lg:block" />
 
               <SortSelectClient currentSort={sortBy} />
