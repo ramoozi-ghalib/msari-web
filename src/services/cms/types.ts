@@ -74,9 +74,26 @@ export interface HomepageContentData {
     titleAr: string;
     subtitleAr: string;
     mockupImageUrl?: string;
+    samsungScreenImageUrl?: string;
+    iphoneScreenImageUrl?: string;
     qrImageUrl?: string;
     playStoreUrl: string;
     appStoreUrl: string;
+  };
+  socialFollow?: {
+    isVisible?: boolean;
+    titleAr?: string;
+    subtitleAr?: string;
+    whatsappUrl?: string;
+    facebookUrl?: string;
+    instagramUrl?: string;
+    tiktokUrl?: string;
+    xUrl?: string;
+    telegramUrl?: string;
+  };
+  seo?: {
+    metaTitleAr?: string;
+    metaDescAr?: string;
   };
   updatedAt?: string | null;
 }

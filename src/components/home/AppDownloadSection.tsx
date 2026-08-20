@@ -167,74 +167,86 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                       
                       {/* Dynamic Glass Specular Reflection */}
                       <div 
-                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200"
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200 z-30"
                         style={{
                           transform: `translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px)`,
                         }}
                       />
 
-                      {/* Top Status Bar & Centered Punch-Hole Camera */}
-                      <div className="relative pt-1 px-2 sm:px-3 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 z-20">
-                        <span>11:35</span>
-                        {/* S24 Ultra Punch Hole */}
-                        <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-black border border-neutral-800 shadow-inner flex items-center justify-center">
-                          <div className="w-0.8 h-0.8 rounded-full bg-[#111119]" />
+                      {appDownload?.samsungScreenImageUrl ? (
+                        <div className="relative w-full h-full">
+                          <img 
+                            src={appDownload.samsungScreenImageUrl} 
+                            alt="Samsung App Screen" 
+                            className="w-full h-full object-cover" 
+                          />
                         </div>
-                        <div className="flex items-center gap-0.5 sm:gap-1 text-[6px] sm:text-[7.5px]">
-                          <span>5G</span>
-                          <span>93%</span>
-                        </div>
-                      </div>
-
-                      {/* App Screen Content: Msari Hotel Search */}
-                      <div className="px-2 sm:px-3 pt-1 space-y-1.5 sm:space-y-2 relative z-10 flex-1 overflow-hidden text-start">
-                        
-                        {/* App Logo & Search */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1 sm:gap-1.5">
-                            <div className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 rounded bg-[#FF3B30] text-white flex items-center justify-center font-black text-[7px] sm:text-[8.5px] shadow-sm">
-                              م
+                      ) : (
+                        <>
+                          {/* Top Status Bar & Centered Punch-Hole Camera */}
+                          <div className="relative pt-1 px-2 sm:px-3 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 z-20">
+                            <span>11:35</span>
+                            {/* S24 Ultra Punch Hole */}
+                            <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-black border border-neutral-800 shadow-inner flex items-center justify-center">
+                              <div className="w-0.8 h-0.8 rounded-full bg-[#111119]" />
                             </div>
-                            <span className="text-[10px] sm:text-xs font-black text-white">مساري</span>
+                            <div className="flex items-center gap-0.5 sm:gap-1 text-[6px] sm:text-[7.5px]">
+                              <span>5G</span>
+                              <span>93%</span>
+                            </div>
                           </div>
-                          <span className="text-[6.5px] sm:text-[7.5px] font-bold text-[#FF3B30] bg-[#FF3B30]/15 px-1.5 py-0.2 rounded-full">اليمن</span>
-                        </div>
 
-                        {/* Search Field */}
-                        <div className="p-1 sm:p-1.5 rounded-lg bg-white/10 border border-white/15 flex items-center gap-1 text-[7px] sm:text-[8px] text-white/90 shadow-sm backdrop-blur-md">
-                          <Search size={8} className="text-[#FF3B30]" />
-                          <span className="truncate">ابحث عن مدينة أو فندق...</span>
-                        </div>
+                          {/* App Screen Content: Msari Hotel Search */}
+                          <div className="px-2 sm:px-3 pt-1 space-y-1.5 sm:space-y-2 relative z-10 flex-1 overflow-hidden text-start">
+                            
+                            {/* App Logo & Search */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1 sm:gap-1.5">
+                                <div className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 rounded bg-[#FF3B30] text-white flex items-center justify-center font-black text-[7px] sm:text-[8.5px] shadow-sm">
+                                  م
+                                </div>
+                                <span className="text-[10px] sm:text-xs font-black text-white">مساري</span>
+                              </div>
+                              <span className="text-[6.5px] sm:text-[7.5px] font-bold text-[#FF3B30] bg-[#FF3B30]/15 px-1.5 py-0.2 rounded-full">اليمن</span>
+                            </div>
 
-                        {/* Service Tabs */}
-                        <div className="flex items-center gap-1 text-[6.5px] sm:text-[7.5px] font-bold">
-                          <div className="flex-1 py-0.5 sm:py-1 rounded bg-[#FF3B30] text-white text-center shadow-sm">فنادق</div>
-                          <div className="flex-1 py-0.5 sm:py-1 rounded bg-white/10 text-white/70 text-center">رحلات</div>
-                          <div className="flex-1 py-0.5 sm:py-1 rounded bg-white/10 text-white/70 text-center">سيارات</div>
-                        </div>
+                            {/* Search Field */}
+                            <div className="p-1 sm:p-1.5 rounded-lg bg-white/10 border border-white/15 flex items-center gap-1 text-[7px] sm:text-[8px] text-white/90 shadow-sm backdrop-blur-md">
+                              <Search size={8} className="text-[#FF3B30]" />
+                              <span className="truncate">ابحث عن مدينة أو فندق...</span>
+                            </div>
 
-                        {/* Hotel Card 1 */}
-                        <div className="p-1.5 sm:p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 sm:space-y-1 backdrop-blur-sm">
-                          <div className="flex items-center justify-between text-[7px] sm:text-[7.5px] font-black text-white">
-                            <span className="truncate">فندق القصر - عدن</span>
-                            <span className="text-amber-400">★ 4.9</span>
+                            {/* Service Tabs */}
+                            <div className="flex items-center gap-1 text-[6.5px] sm:text-[7.5px] font-bold">
+                              <div className="flex-1 py-0.5 sm:py-1 rounded bg-[#FF3B30] text-white text-center shadow-sm">فنادق</div>
+                              <div className="flex-1 py-0.5 sm:py-1 rounded bg-white/10 text-white/70 text-center">رحلات</div>
+                              <div className="flex-1 py-0.5 sm:py-1 rounded bg-white/10 text-white/70 text-center">سيارات</div>
+                            </div>
+
+                            {/* Hotel Card 1 */}
+                            <div className="p-1.5 sm:p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 sm:space-y-1 backdrop-blur-sm">
+                              <div className="flex items-center justify-between text-[7px] sm:text-[7.5px] font-black text-white">
+                                <span className="truncate">فندق القصر - عدن</span>
+                                <span className="text-amber-400">★ 4.9</span>
+                              </div>
+                              <div className="text-[6px] sm:text-[6.5px] text-white/60 flex items-center gap-1">
+                                <MapPin size={6} />
+                                <span>الحسوة، عدن</span>
+                              </div>
+                              <div className="flex items-center justify-between pt-0.5 border-t border-white/10">
+                                <span className="text-[7px] sm:text-[7.5px] font-black text-emerald-400">$85/ليلة</span>
+                                <span className="px-1.5 py-0.2 rounded bg-[#FF3B30] text-white text-[6px] sm:text-[6.5px] font-black">احجز</span>
+                              </div>
+                            </div>
+
                           </div>
-                          <div className="text-[6px] sm:text-[6.5px] text-white/60 flex items-center gap-1">
-                            <MapPin size={6} />
-                            <span>الحسوة، عدن</span>
-                          </div>
-                          <div className="flex items-center justify-between pt-0.5 border-t border-white/10">
-                            <span className="text-[7px] sm:text-[7.5px] font-black text-emerald-400">$85/ليلة</span>
-                            <span className="px-1.5 py-0.2 rounded bg-[#FF3B30] text-white text-[6px] sm:text-[6.5px] font-black">احجز</span>
-                          </div>
-                        </div>
 
-                      </div>
-
-                      {/* S24 Ultra Android Bottom Nav Gesture Bar */}
-                      <div className="pb-1 text-center">
-                        <div className="w-10 sm:w-14 h-0.8 bg-white/40 rounded-full mx-auto" />
-                      </div>
+                          {/* S24 Ultra Android Bottom Nav Gesture Bar */}
+                          <div className="pb-1 text-center">
+                            <div className="w-10 sm:w-14 h-0.8 bg-white/40 rounded-full mx-auto" />
+                          </div>
+                        </>
+                      )}
 
                     </div>
                   </div>
@@ -266,78 +278,90 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                       
                       {/* Dynamic Glass Specular Reflection */}
                       <div 
-                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200"
+                        className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transition-transform duration-200 z-30"
                         style={{
                           transform: `translateX(${mousePos.x * 2}px) translateY(${mousePos.y * 2}px)`,
                         }}
                       />
 
-                      {/* Dynamic Island Header */}
-                      <div className="pt-1.5 px-2.5 sm:px-3.5 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 relative z-20">
-                        <span>9:41</span>
-                        {/* Dynamic Island Pill */}
-                        <div className="w-11 sm:w-14 h-3 sm:h-3.5 bg-black rounded-full mx-auto flex items-center justify-between px-1.5 shadow-inner border border-neutral-900">
-                          <div className="w-1 h-1 rounded-full bg-[#FF3B30] animate-pulse" />
-                          <div className="w-1 h-1 rounded-full bg-[#1A1A26]" />
+                      {appDownload?.iphoneScreenImageUrl ? (
+                        <div className="relative w-full h-full rounded-[26px] sm:rounded-[34px] lg:rounded-[38px] overflow-hidden">
+                          <img 
+                            src={appDownload.iphoneScreenImageUrl} 
+                            alt="iPhone App Screen" 
+                            className="w-full h-full object-cover" 
+                          />
                         </div>
-                        <div className="flex items-center gap-0.5">
-                          <div className="w-2.5 h-1.5 border border-white/70 rounded-xs p-0.5">
-                            <div className="w-full h-full bg-white rounded-2xs" />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* App Screen Content: Msari Booking Details */}
-                      <div className="px-2 sm:px-3 pt-0.5 sm:pt-1 space-y-1.5 sm:space-y-2 relative z-10 flex-1 overflow-hidden text-start">
-                        
-                        {/* Top App Header */}
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-[8px] sm:text-[9.5px] font-black text-white">مرحباً بك في مساري</div>
-                            <div className="text-[6px] sm:text-[7px] text-white/70 font-semibold truncate">احجز إقامتك بأفضل سعر</div>
-                          </div>
-                          <div className="w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
-                            <Bell size={8} className="text-white" />
-                          </div>
-                        </div>
-
-                        {/* Highlighted Destination Card */}
-                        <div className="p-1.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#2C0F7C] to-[#160549] border border-white/20 space-y-0.5 sm:space-y-1 shadow-lg">
-                          <div className="flex items-center justify-between text-[6.5px] sm:text-[7.5px]">
-                            <span className="font-black text-amber-300">عرض حصري</span>
-                            <span className="px-1.5 py-0.2 rounded-full bg-[#FF3B30] text-[5.5px] sm:text-[6px] font-black">خصم 25%</span>
-                          </div>
-                          <div className="text-[7.5px] sm:text-[8.5px] font-black text-white truncate">فندق كورال عدن</div>
-                          <div className="text-[5.5px] sm:text-[6.5px] text-white/70 truncate">مطلة على البحر + إفطار</div>
-                          <div className="flex items-center justify-between pt-0.5">
-                            <div>
-                              <span className="text-[7.5px] sm:text-[8.5px] font-black text-white">$95</span>
-                              <span className="text-[5.5px] sm:text-[6.5px] text-white/50 line-through mr-0.5">$120</span>
+                      ) : (
+                        <>
+                          {/* Dynamic Island Header */}
+                          <div className="pt-1.5 px-2.5 sm:px-3.5 flex items-center justify-between text-[6.5px] sm:text-[8px] font-bold text-neutral-300 relative z-20">
+                            <span>9:41</span>
+                            {/* Dynamic Island Pill */}
+                            <div className="w-11 sm:w-14 h-3 sm:h-3.5 bg-black rounded-full mx-auto flex items-center justify-between px-1.5 shadow-inner border border-neutral-900">
+                              <div className="w-1 h-1 rounded-full bg-[#FF3B30] animate-pulse" />
+                              <div className="w-1 h-1 rounded-full bg-[#1A1A26]" />
                             </div>
-                            <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded bg-[#FF3B30] text-white text-[6px] sm:text-[7px] font-black shadow-md">
-                              تأكيد
-                            </span>
+                            <div className="flex items-center gap-0.5">
+                              <div className="w-2.5 h-1.5 border border-white/70 rounded-xs p-0.5">
+                                <div className="w-full h-full bg-white rounded-2xs" />
+                              </div>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Quick Features Row */}
-                        <div className="grid grid-cols-2 gap-1 text-[5.5px] sm:text-[6.5px] font-bold text-white/80">
-                          <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-0.5">
-                            <Check size={6.5} className="text-emerald-400" />
-                            <span>إلغاء مجاني</span>
+                          {/* App Screen Content: Msari Booking Details */}
+                          <div className="px-2 sm:px-3 pt-0.5 sm:pt-1 space-y-1.5 sm:space-y-2 relative z-10 flex-1 overflow-hidden text-start">
+                            
+                            {/* Top App Header */}
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-[8px] sm:text-[9.5px] font-black text-white">مرحباً بك في مساري</div>
+                                <div className="text-[6px] sm:text-[7px] text-white/70 font-semibold truncate">احجز إقامتك بأفضل سعر</div>
+                              </div>
+                              <div className="w-4.5 h-4.5 sm:w-5.5 sm:h-5.5 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
+                                <Bell size={8} className="text-white" />
+                              </div>
+                            </div>
+
+                            {/* Highlighted Destination Card */}
+                            <div className="p-1.5 sm:p-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#2C0F7C] to-[#160549] border border-white/20 space-y-0.5 sm:space-y-1 shadow-lg">
+                              <div className="flex items-center justify-between text-[6.5px] sm:text-[7.5px]">
+                                <span className="font-black text-amber-300">عرض حصري</span>
+                                <span className="px-1.5 py-0.2 rounded-full bg-[#FF3B30] text-[5.5px] sm:text-[6px] font-black">خصم 25%</span>
+                              </div>
+                              <div className="text-[7.5px] sm:text-[8.5px] font-black text-white truncate">فندق كورال عدن</div>
+                              <div className="text-[5.5px] sm:text-[6.5px] text-white/70 truncate">مطلة على البحر + إفطار</div>
+                              <div className="flex items-center justify-between pt-0.5">
+                                <div>
+                                  <span className="text-[7.5px] sm:text-[8.5px] font-black text-white">$95</span>
+                                  <span className="text-[5.5px] sm:text-[6.5px] text-white/50 line-through mr-0.5">$120</span>
+                                </div>
+                                <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded bg-[#FF3B30] text-white text-[6px] sm:text-[7px] font-black shadow-md">
+                                  تأكيد
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Quick Features Row */}
+                            <div className="grid grid-cols-2 gap-1 text-[5.5px] sm:text-[6.5px] font-bold text-white/80">
+                              <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-0.5">
+                                <Check size={6.5} className="text-emerald-400" />
+                                <span>إلغاء مجاني</span>
+                              </div>
+                              <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-0.5">
+                                <Sparkles size={6.5} className="text-amber-400" />
+                                <span>دفع بالوصول</span>
+                              </div>
+                            </div>
+
                           </div>
-                          <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex items-center gap-0.5">
-                            <Sparkles size={6.5} className="text-amber-400" />
-                            <span>دفع بالوصول</span>
+
+                          {/* iPhone iOS Home Indicator Bar */}
+                          <div className="pb-1 text-center">
+                            <div className="w-12 sm:w-16 h-0.8 bg-white/60 rounded-full mx-auto shadow-sm" />
                           </div>
-                        </div>
-
-                      </div>
-
-                      {/* iPhone iOS Home Indicator Bar */}
-                      <div className="pb-1 text-center">
-                        <div className="w-12 sm:w-16 h-0.8 bg-white/60 rounded-full mx-auto shadow-sm" />
-                      </div>
+                        </>
+                      )}
 
                     </div>
                   </div>

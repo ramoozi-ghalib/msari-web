@@ -51,7 +51,7 @@ export default async function HomePage() {
       <CitiesSection cities={cities} />
       <WhyMsari whyMsari={homepageContent.whyMsari} />
       <AppDownloadSection appDownload={appDownloadFixed} />
-      <SocialFollowSection />
+      <SocialFollowSection socialFollow={homepageContent.socialFollow} />
     </>
   );
 }

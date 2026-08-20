@@ -1,6 +1,7 @@
 'use client';
 
 import { whatsappLink } from '@/lib/site-config';
+import type { HomepageContentData } from '@/services/cms';
 
 interface SocialLink {
   name: string;
@@ -12,12 +13,23 @@ interface SocialLink {
   borderAccent: string;
 }
 
-export default function SocialFollowSection() {
+interface SocialFollowSectionProps {
+  socialFollow?: HomepageContentData['socialFollow'];
+}
+
+export default function SocialFollowSection({ socialFollow }: SocialFollowSectionProps) {
+  if (socialFollow?.isVisible === false) {
+    return null;
+  }
+
+  const title = socialFollow?.titleAr || 'صفحاتنا على وسائل التواصل الاجتماعي';
+  const subtitle = socialFollow?.subtitleAr || 'تابع مساري وابقَ على اطلاع بأحدث العروض والوجهات السياحية';
+
   const socialLinks: SocialLink[] = [
     {
       name: 'WhatsApp',
       nameAr: 'واتساب',
-      href: whatsappLink(),
+      href: socialFollow?.whatsappUrl || whatsappLink(),
       bgGradient: 'from-[#25D366] to-[#128C7E]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(37,211,102,0.4)]',
       borderAccent: 'border-emerald-400/30',
@@ -30,7 +42,7 @@ export default function SocialFollowSection() {
     {
       name: 'Facebook',
       nameAr: 'فيسبوك',
-      href: 'https://facebook.com/msariapp',
+      href: socialFollow?.facebookUrl || 'https://facebook.com/msariapp',
       bgGradient: 'from-[#1877F2] to-[#0D5BC6]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(24,119,242,0.4)]',
       borderAccent: 'border-blue-400/30',
@@ -43,7 +55,7 @@ export default function SocialFollowSection() {
     {
       name: 'Instagram',
       nameAr: 'انستقرام',
-      href: 'https://instagram.com/msariapp',
+      href: socialFollow?.instagramUrl || 'https://instagram.com/msariapp',
       bgGradient: 'from-[#833ab4] via-[#fd1d1d] to-[#fcb045]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(253,29,29,0.4)]',
       borderAccent: 'border-pink-400/30',
@@ -56,7 +68,7 @@ export default function SocialFollowSection() {
     {
       name: 'TikTok',
       nameAr: 'تيك توك',
-      href: 'https://tiktok.com/@msariapp',
+      href: socialFollow?.tiktokUrl || 'https://tiktok.com/@msariapp',
       bgGradient: 'from-[#010101] via-[#111111] to-[#010101]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(0,0,0,0.5)]',
       borderAccent: 'border-cyan-400/30',
@@ -69,7 +81,7 @@ export default function SocialFollowSection() {
     {
       name: 'X',
       nameAr: 'إكس',
-      href: 'https://x.com/msariapp',
+      href: socialFollow?.xUrl || 'https://x.com/msariapp',
       bgGradient: 'from-[#000000] via-[#14171A] to-[#000000]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(0,0,0,0.5)]',
       borderAccent: 'border-white/20',
@@ -82,7 +94,7 @@ export default function SocialFollowSection() {
     {
       name: 'Telegram',
       nameAr: 'تليجرام',
-      href: 'https://t.me/msariapp',
+      href: socialFollow?.telegramUrl || 'https://t.me/msariapp',
       bgGradient: 'from-[#2AABEE] to-[#229ED9]',
       hoverShadow: 'hover:shadow-[0_12px_25px_rgba(42,171,238,0.4)]',
       borderAccent: 'border-sky-400/30',
@@ -101,10 +113,10 @@ export default function SocialFollowSection() {
         {/* Section Header */}
         <div className="text-center mb-5 sm:mb-8 max-w-xl mx-auto" style={{ direction: 'rtl' }}>
           <h3 className="text-base sm:text-xl font-black text-[var(--brand-primary)] tracking-tight mb-1">
-            صفحاتنا على وسائل التواصل الاجتماعي
+            {title}
           </h3>
           <p className="text-neutral-500 text-[11px] sm:text-sm font-medium">
-            تابع مساري وابقَ على اطلاع بأحدث العروض والوجهات السياحية
+            {subtitle}
           </p>
         </div>
 
