@@ -93,7 +93,7 @@ export default async function HotelsPage(props: {
       </div>
 
       {/* ── 2. Search Bar Container ── */}
-      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8 lg:mb-12">
+      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8 lg:mb-16">
         <HotelsSearchBar cities={cities} />
       </div>
 
