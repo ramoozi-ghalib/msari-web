@@ -58,8 +58,8 @@ export default async function HotelsPage(props: {
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
       
-      {/* ── 1. Compact Luxury Mini-Hero ── */}
-      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-24 sm:pt-28 pb-14 sm:pb-16 overflow-hidden">
+      {/* ── 1. Compact Sleek Mini-Hero ── */}
+      <div className="relative bg-gradient-to-b from-[#100330] via-[#1A0654] to-[#23096E] text-white pt-20 sm:pt-24 pb-6 sm:pb-7 overflow-hidden">
         {/* Ambient background lighting texture */}
         <div 
           className="absolute inset-0 opacity-20 bg-cover bg-center mix-blend-overlay pointer-events-none"
@@ -70,7 +70,7 @@ export default async function HotelsPage(props: {
 
         <div className="container-msari relative z-10">
           {/* Breadcrumbs - Far Right in RTL */}
-          <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-3">
+          <nav className="flex items-center justify-start gap-1.5 text-xs text-white/70 font-medium mb-2">
             <Link href="/" className="hover:text-white transition-colors">الرئيسية</Link>
             <ChevronLeft size={12} className="text-white/40" />
             <span className="text-white font-bold">فنادق اليمن</span>
@@ -83,7 +83,7 @@ export default async function HotelsPage(props: {
           </nav>
 
           {/* Title & Subtitle */}
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight mb-1.5">
             فنادق اليمن
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">
@@ -92,8 +92,8 @@ export default async function HotelsPage(props: {
         </div>
       </div>
 
-      {/* ── 2. Floating Search Bar Overlap (30% on Hero / 70% below Hero) ── */}
-      <div className="container-msari -mt-20 md:-mt-8 relative z-30 mb-6 sm:mb-8">
+      {/* ── 2. Search Bar Container ── */}
+      <div className="container-msari relative z-30 -mt-3 sm:-mt-4 mb-6 sm:mb-8">
         <HotelsSearchBar cities={cities} />
       </div>
 
