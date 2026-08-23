@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHotelBySlug } from '@/actions/hotels';
+import { getHotelBySlug, getLocalHotels } from '@/actions/hotels';
 import { safeJsonLd } from '@/lib/sanitize';
 import HotelDetailClient from './HotelDetailClient';
 
@@ -56,6 +56,17 @@ export default async function HotelDetailPage(props: Props) {
     notFound();
   }
 
+  // Fetch up to 3 nearby hotels in the same city
+  let nearbyHotels: any[] = [];
+  try {
+    const nearbyRes = await getLocalHotels({ city: hotel.city, pageSize: 6 });
+    nearbyHotels = (nearbyRes.data || [])
+      .filter(h => h.id !== hotel.id && h.slug !== hotel.slug)
+      .slice(0, 3);
+  } catch {
+    // Graceful fallback
+  }
+
   const hotelSchema = {
     '@context': 'https://schema.org',
     '@type': 'Hotel',
@@ -96,7 +107,7 @@ export default async function HotelDetailPage(props: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
-      <HotelDetailClient hotel={hotel!} />
+      <HotelDetailClient hotel={hotel!} nearbyHotels={nearbyHotels} />
     </>
   );
 }

@@ -6,13 +6,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useParams } from 'next/navigation';
 import {
-  MapPin, Star, Share2, Users, Check, ArrowRight,
-  ChevronLeft, ChevronRight as ChevronR, Clock, X,
+  MapPin, Star, Share2, Users, Check, X,
+  ChevronLeft, ChevronRight as ChevronR,
   Shield, BedDouble, ExternalLink, Maximize2, CheckCircle2,
-  LogIn
+  Navigation
 } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
+import HotelCard from '@/components/ui/HotelCard';
 
 const toIconRecord = LucideIcons as unknown as Record<string, ComponentType<{ size?: number; className?: string; style?: CSSProperties; color?: string }>>;
 
@@ -67,9 +68,10 @@ const FALLBACK_AMENITIES = [
 
 interface Props {
   hotel: Hotel;
+  nearbyHotels?: Hotel[];
 }
 
-export default function HotelDetailClient({ hotel }: Props) {
+export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   const searchParams = useSearchParams();
   const { locale } = useParams();
   const currentLocale = (locale as string) || 'ar';
@@ -138,7 +140,6 @@ export default function HotelDetailClient({ hotel }: Props) {
   };
 
   const googleMapsUrl = hotel.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel.name} ${hotel.address || ''} ${hotel.city} اليمن`)}`;
-  const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(`${hotel.name} ${hotel.address || ''} ${hotel.city} Yemen`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
@@ -151,7 +152,7 @@ export default function HotelDetailClient({ hotel }: Props) {
         </div>
       )}
 
-      {/* ─── 1. FULL-WIDTH IMAGE SLIDER (ORIGINAL POSITION) ─── */}
+      {/* ─── 1. FULL-WIDTH IMAGE SLIDER ─── */}
       <div className="relative w-full aspect-[16/10] sm:aspect-[16/8] max-h-[560px] overflow-hidden group bg-neutral-900">
         {slides.map((s, i) => (
           <div
@@ -311,7 +312,7 @@ export default function HotelDetailClient({ hotel }: Props) {
           )}
         </div>
 
-        {/* ─── 4. AVAILABLE ROOMS SECTION (CLEAN HORIZONTAL CARDS) ─── */}
+        {/* ─── 4. AVAILABLE ROOMS SECTION ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
           <h2 className="text-lg font-black text-neutral-900 mb-4">الغرف المتاحة</h2>
 
@@ -368,18 +369,19 @@ export default function HotelDetailClient({ hotel }: Props) {
                       </div>
                     </div>
 
-                    {/* Price & Action Button */}
+                    {/* Price in official red (#FF3B30) & Square rounded button */}
                     <div className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-3">
                       <div>
-                        <span className="text-[10px] text-neutral-400 block">السعر / ليلة</span>
-                        <span className="text-xl sm:text-2xl font-black text-[#23096e]">
+                        <span className="text-[10px] text-neutral-400 block font-medium">السعر / ليلة</span>
+                        <span className="text-xl sm:text-2xl font-black text-[#FF3B30]">
                           {formatPrice(room.pricePerNight)}
                         </span>
                       </div>
 
+                      {/* Square button with rounded borders (matching official theme) */}
                       <Link
                         href={roomHref(room.id)}
-                        className="inline-flex items-center justify-center text-sm font-black px-6 py-2.5 rounded-xl text-white bg-[#23096e] hover:bg-[#1a0654] transition-colors"
+                        className="h-10 px-5 rounded-lg bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
                       >
                         عرض الغرفة
                       </Link>
@@ -396,59 +398,23 @@ export default function HotelDetailClient({ hotel }: Props) {
           )}
         </div>
 
-        {/* ─── 5. HOTEL POLICIES ─── */}
+        {/* ─── 5. HOTEL POLICIES (FROM DATABASE) ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
-          <h2 className="text-lg font-black text-neutral-900 mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-            {[
-              { icon: <Clock size={16} />, label: 'وقت تسجيل الدخول', value: 'من الساعة 2:00 م', color: '#23096e' },
-              { icon: <LogIn size={16} />, label: 'وقت المغادرة', value: 'قبل الساعة 12:00 م', color: '#d97706' },
-            ].map(item => (
-              <div key={item.label} className="flex items-center gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${item.color}14`, color: item.color }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="text-xs text-neutral-500">{item.label}</p>
-                  <p className="font-bold text-sm text-neutral-900 mt-0.5">{item.value}</p>
-                </div>
-              </div>
-            ))}
+          <div className="p-4 bg-neutral-50/80 rounded-xl border border-neutral-100">
+            <p className="text-sm text-neutral-700 leading-7 whitespace-pre-line">
+              {currentLocale === 'ar' 
+                ? (hotel.policyAr || hotel.policyEn || 'تطبق الشروط والأحكام العامة المعتمدة للفندق عند تسجيل الوصول والإقامة.')
+                : (hotel.policyEn || hotel.policyAr || 'Standard hotel terms and policies apply upon check-in and stay.')}
+            </p>
           </div>
-
-          <div className="space-y-3">
-            {[
-              { icon: <X size={14} />, label: 'سياسة الإلغاء', text: 'الإلغاء المجاني متاح قبل 48 ساعة من الوصول. بعد ذلك تُحتسب رسوم ليلة كاملة.', color: '#ef4444' },
-              { icon: <Users size={14} />, label: 'سياسة الأطفال', text: 'الأطفال دون 12 سنة مجانيون عند استخدام الأسرّة الموجودة. السرير الإضافي بتكلفة إضافية.', color: '#0284c7' },
-              { icon: <Check size={14} />, label: 'تعليمات الوصول', text: 'يُرجى تقديم بطاقة الهوية أو جواز السفر عند تسجيل الوصول.', color: '#16a34a' },
-            ].map(item => (
-              <div key={item.label} className="flex gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${item.color}14`, color: item.color }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-neutral-900">{item.label}</p>
-                  <p className="text-sm text-neutral-500 leading-6 mt-0.5">{item.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {(hotel.policyAr || hotel.policyEn) && (
-            <div className="mt-5 p-5 bg-indigo-50/30 rounded-xl border border-indigo-100/50">
-              <h3 className="font-bold text-sm text-neutral-900 mb-2">تعليمات وسياسات إضافية للفندق:</h3>
-              <p className="text-sm text-neutral-600 leading-7 whitespace-pre-line">
-                {currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr)}
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* ─── 6. REAL INTERACTIVE MAP SECTION ─── */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100">
+        {/* ─── 6. MAP CARD WITH CLICKABLE STATIC MAP VISUAL ─── */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-8">
           <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
             <h2 className="text-lg font-black text-neutral-900 flex items-center gap-2">
               <MapPin size={18} className="text-[#23096e]" />
@@ -465,20 +431,72 @@ export default function HotelDetailClient({ hotel }: Props) {
             </a>
           </div>
 
-          {/* Embedded Real Google Maps Iframe */}
-          <div className="w-full h-72 sm:h-96 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100">
-            <iframe
-              title={`موقع ${hotel.name}`}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              loading="lazy"
-              allowFullScreen
-              referrerPolicy="no-referrer-when-downgrade"
-              src={mapEmbedUrl}
-            />
-          </div>
+          {/* Clickable Map Display Card */}
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-neutral-200 block relative group cursor-pointer shadow-inner"
+            style={{
+              backgroundImage: `radial-gradient(circle at 50% 50%, rgba(35, 9, 110, 0.06) 0%, rgba(35, 9, 110, 0.12) 100%), linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, #f8fafc 1px)`,
+              backgroundSize: '100% 100%, 32px 32px, 32px 32px'
+            }}
+          >
+            {/* Map Roads & Geography Stylized Graphic */}
+            <div className="absolute inset-0 opacity-40 pointer-events-none">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <path d="M-50,120 Q150,80 350,140 T750,100 T1150,130" stroke="#cbd5e1" strokeWidth="8" fill="none" />
+                <path d="M100,-50 Q160,180 200,380 T260,580" stroke="#cbd5e1" strokeWidth="6" fill="none" />
+                <path d="M400,-50 Q360,180 380,380 T420,580" stroke="#cbd5e1" strokeWidth="10" fill="none" />
+                <path d="M-50,220 Q250,260 550,200 T1150,240" stroke="#cbd5e1" strokeWidth="6" fill="none" />
+              </svg>
+            </div>
+
+            {/* Center Map Pin with Pulse */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full bg-[#FF3B30]/15 animate-ping absolute inset-0" />
+                <div className="w-16 h-16 rounded-2xl bg-[#23096E] text-white shadow-xl flex items-center justify-center relative transition-transform duration-300 group-hover:scale-110">
+                  <MapPin size={30} className="text-[#FF3B30]" />
+                </div>
+              </div>
+
+              <div className="bg-white/95 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-lg border border-neutral-200/80 text-center max-w-sm">
+                <p className="font-black text-sm text-neutral-900">{hotel.name}</p>
+                <p className="text-xs text-neutral-500 mt-0.5">{hotel.address || `${hotel.city}، اليمن`}</p>
+              </div>
+
+              <span className="inline-flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl bg-[#23096E] text-white shadow-md transition-transform duration-200 group-hover:scale-105">
+                <Navigation size={13} />
+                افتح في خرائط Google
+              </span>
+            </div>
+          </a>
         </div>
+
+        {/* ─── 7. NEARBY HOTELS SECTION ─── */}
+        {nearbyHotels && nearbyHotels.length > 0 && (
+          <div className="mt-10">
+            <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+              <div>
+                <h2 className="text-lg sm:text-xl font-black text-neutral-900">الفنادق القريبة</h2>
+                <p className="text-xs text-neutral-500 mt-0.5">فنادق أخرى مميزة في {hotel.city || 'نفس المنطقة'}</p>
+              </div>
+              <Link
+                href={`/${currentLocale}/hotels?city=${encodeURIComponent(hotel.city)}`}
+                className="text-xs font-bold text-[#23096e] hover:underline"
+              >
+                عرض كل فنادق {hotel.city}
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {nearbyHotels.map(nearby => (
+                <HotelCard key={nearby.id} hotel={nearby} />
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
 
