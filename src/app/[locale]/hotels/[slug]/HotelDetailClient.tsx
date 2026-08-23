@@ -9,7 +9,7 @@ import {
   MapPin, Star, Share2, Users, Check, X,
   ChevronLeft, ChevronRight as ChevronR,
   Shield, BedDouble, ExternalLink, Maximize2, CheckCircle2,
-  Navigation
+  Navigation, Clock, LogIn
 } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
@@ -65,54 +65,6 @@ const FALLBACK_AMENITIES = [
   { name: 'مصعد',              icon: 'ArrowUpDown',     color: '#0284c7' },
   { name: 'حراسة أمنية',       icon: 'ShieldCheck',    color: '#059669' },
 ];
-
-/**
- * Formats hotel policy texts cleanly:
- * - Separates check-in & check-out into clear independent lines
- * - Line breaks sentences that end in a dot (.)
- * - Preserves natural sentences without injecting artificial symbols
- */
-function formatHotelPolicies(rawText?: string): string[] {
-  if (!rawText || !rawText.trim()) {
-    return [
-      '• تسجيل الوصول: من الساعة 12:00 ظهراً.',
-      '• تسجيل المغادرة: حتى الساعة 12:00 ظهراً.',
-      'تطبق الشروط والأحكام العامة المعتمدة للفندق عند تسجيل الوصول والإقامة.'
-    ];
-  }
-
-  // 1. Separate check-in and check-out to their own lines
-  let text = rawText
-    .replace(/([،,;])\s*(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '.\n$2')
-    .replace(/(تسجيل الوصول|وقت الوصول|Check-in|Checkin)/gi, '\n$1')
-    .replace(/(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '\n$1');
-
-  const rawParagraphs = text.split(/\r?\n/).map(p => p.trim()).filter(Boolean);
-  const result: string[] = [];
-
-  for (const para of rawParagraphs) {
-    // Split sentences ending with a dot (.)
-    const sentences = para.split(/(?<=\.)\s+/).map(s => s.trim()).filter(Boolean);
-    for (let s of sentences) {
-      s = s.replace(/^[-*–]\s*/, '').trim();
-
-      // Ensure Check-in and Check-out lines have a clean bullet
-      if (
-        s.startsWith('تسجيل الوصول') ||
-        s.startsWith('وقت الوصول') ||
-        s.startsWith('تسجيل المغادرة') ||
-        s.startsWith('وقت المغادرة')
-      ) {
-        if (!s.startsWith('•')) {
-          s = `• ${s}`;
-        }
-      }
-      result.push(s);
-    }
-  }
-
-  return result.length > 0 ? result : [rawText];
-}
 
 interface Props {
   hotel: Hotel;
@@ -188,9 +140,6 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   };
 
   const googleMapsUrl = hotel.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel.name} ${hotel.address || ''} ${hotel.city} اليمن`)}`;
-  
-  const rawPolicy = currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr);
-  const policyLines = formatHotelPolicies(rawPolicy);
 
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
@@ -449,19 +398,55 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           )}
         </div>
 
-        {/* ─── 5. HOTEL POLICIES WITH CLEAN LINE BREAKS ─── */}
+        {/* ─── 5. HOTEL POLICIES (RESTORED NATURAL STRUCTURED LAYOUT) ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
-          <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-black text-neutral-900 mb-5 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="p-5 bg-neutral-50/80 rounded-xl border border-neutral-100 space-y-2.5">
-            {policyLines.map((line, idx) => (
-              <p key={idx} className="text-sm text-neutral-700 leading-relaxed font-normal">
-                {line}
-              </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            {[
+              { icon: <Clock size={16} />, label: 'وقت تسجيل الدخول', value: 'من الساعة 2:00 م', color: '#23096e' },
+              { icon: <LogIn size={16} />, label: 'وقت المغادرة', value: 'قبل الساعة 12:00 م', color: '#d97706' },
+            ].map(item => (
+              <div key={item.label} className="flex items-center gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${item.color}14`, color: item.color }}>
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500">{item.label}</p>
+                  <p className="font-bold text-sm text-neutral-900 mt-0.5">{item.value}</p>
+                </div>
+              </div>
             ))}
           </div>
+
+          <div className="space-y-3">
+            {[
+              { icon: <X size={14} />, label: 'سياسة الإلغاء', text: 'الإلغاء المجاني متاح قبل 48 ساعة من الوصول. بعد ذلك تُحتسب رسوم ليلة كاملة.', color: '#ef4444' },
+              { icon: <Users size={14} />, label: 'سياسة الأطفال', text: 'الأطفال دون 12 سنة مجانيون عند استخدام الأسرّة الموجودة. السرير الإضافي بتكلفة إضافية.', color: '#0284c7' },
+              { icon: <Check size={14} />, label: 'تعليمات الوصول', text: 'يُرجى تقديم بطاقة الهوية أو جواز السفر عند تسجيل الوصول.', color: '#16a34a' },
+            ].map(item => (
+              <div key={item.label} className="flex gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${item.color}14`, color: item.color }}>
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-neutral-900">{item.label}</p>
+                  <p className="text-sm text-neutral-500 leading-6 mt-0.5">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {(hotel.policyAr || hotel.policyEn) && (
+            <div className="mt-5 p-5 bg-indigo-50/30 rounded-xl border border-indigo-100/50">
+              <h3 className="font-bold text-sm text-neutral-900 mb-2">تعليمات وسياسات إضافية للفندق:</h3>
+              <p className="text-sm text-neutral-600 leading-7 whitespace-pre-line">
+                {currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr)}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* ─── 6. MAP CARD WITH CLICKABLE STATIC MAP VISUAL ─── */}
@@ -525,7 +510,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           </a>
         </div>
 
-        {/* ─── 7. NEARBY HOTELS SECTION (CLOSEST 3 HOTELS BY DISTANCE) ─── */}
+        {/* ─── 7. NEARBY HOTELS SECTION (MOBILE HORIZONTAL SLIDER, DESKTOP GRID) ─── */}
         {nearbyHotels && nearbyHotels.length > 0 && (
           <div className="mt-10">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
@@ -538,9 +523,12 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Side-by-side horizontal cards scroll on mobile, responsive grid on desktop */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
               {nearbyHotels.map(nearby => (
-                <HotelCard key={nearby.id} hotel={nearby} />
+                <div key={nearby.id} className="min-w-[285px] max-w-[320px] sm:min-w-0 sm:max-w-none snap-start shrink-0 sm:shrink">
+                  <HotelCard hotel={nearby} />
+                </div>
               ))}
             </div>
           </div>
