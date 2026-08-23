@@ -68,14 +68,16 @@ export default function Header() {
     router.refresh();
   };
 
+  const isSolidHeader = scrolled || pathname.includes('/rooms/') || pathname.includes('/booking') || pathname.includes('/checkout');
+
   return (
     <>
-      {/* ── Transparent Top Header (Seamlessly floats over Hero, blurs on scroll) ── */}
+      {/* ── Top Header (Solid on light pages like rooms, transparent on hero, blurs on scroll) ── */}
       <header
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
-          scrolled
-            ? 'bg-[#1D065C]/90 backdrop-blur-xl border-b border-white/10 shadow-2xl py-2 sm:py-2.5'
+          isSolidHeader
+            ? 'bg-[#1D065C]/95 backdrop-blur-xl border-b border-white/10 shadow-lg py-2 sm:py-2.5'
             : 'bg-transparent border-b border-transparent py-3 sm:py-4'
         )}
         style={{ direction: 'rtl' }}

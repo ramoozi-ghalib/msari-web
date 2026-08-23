@@ -137,8 +137,8 @@ export default function RoomDetailClient({ hotel, room }: Props) {
   };
 
   return (
-    <div className="bg-[#F8F9FC] min-h-screen pb-20 pt-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-[#F8F9FC] min-h-screen pb-20 pt-20 sm:pt-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
         {bookingError && (
           <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3 text-sm font-medium mb-6">
