@@ -9,7 +9,7 @@ import {
   MapPin, Star, Share2, Users, Check, X,
   ChevronLeft, ChevronRight as ChevronR,
   Shield, BedDouble, ExternalLink, Maximize2, CheckCircle2,
-  Navigation, Clock, LogIn
+  Navigation
 } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
@@ -398,55 +398,57 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           )}
         </div>
 
-        {/* ─── 5. HOTEL POLICIES (RESTORED NATURAL STRUCTURED LAYOUT) ─── */}
+        {/* ─── 5. HOTEL POLICIES ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
           <h2 className="text-lg font-black text-neutral-900 mb-5 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-            {[
-              { icon: <Clock size={16} />, label: 'وقت تسجيل الدخول', value: 'من الساعة 2:00 م', color: '#23096e' },
-              { icon: <LogIn size={16} />, label: 'وقت المغادرة', value: 'قبل الساعة 12:00 م', color: '#d97706' },
-            ].map(item => (
-              <div key={item.label} className="flex items-center gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${item.color}14`, color: item.color }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="text-xs text-neutral-500">{item.label}</p>
-                  <p className="font-bold text-sm text-neutral-900 mt-0.5">{item.value}</p>
-                </div>
+          <div className="space-y-4">
+            {/* Check-in / Check-out full rows */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-neutral-100">
+              <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-100">
+                <span className="text-xs text-neutral-500 block mb-1 font-medium">وقت تسجيل الدخول</span>
+                <span className="font-bold text-sm text-neutral-900">من الساعة 2:00 م</span>
               </div>
-            ))}
-          </div>
-
-          <div className="space-y-3">
-            {[
-              { icon: <X size={14} />, label: 'سياسة الإلغاء', text: 'الإلغاء المجاني متاح قبل 48 ساعة من الوصول. بعد ذلك تُحتسب رسوم ليلة كاملة.', color: '#ef4444' },
-              { icon: <Users size={14} />, label: 'سياسة الأطفال', text: 'الأطفال دون 12 سنة مجانيون عند استخدام الأسرّة الموجودة. السرير الإضافي بتكلفة إضافية.', color: '#0284c7' },
-              { icon: <Check size={14} />, label: 'تعليمات الوصول', text: 'يُرجى تقديم بطاقة الهوية أو جواز السفر عند تسجيل الوصول.', color: '#16a34a' },
-            ].map(item => (
-              <div key={item.label} className="flex gap-3 p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${item.color}14`, color: item.color }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-neutral-900">{item.label}</p>
-                  <p className="text-sm text-neutral-500 leading-6 mt-0.5">{item.text}</p>
-                </div>
+              <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-100">
+                <span className="text-xs text-neutral-500 block mb-1 font-medium">وقت المغادرة</span>
+                <span className="font-bold text-sm text-neutral-900">قبل الساعة 12:00 م</span>
               </div>
-            ))}
-          </div>
-
-          {(hotel.policyAr || hotel.policyEn) && (
-            <div className="mt-5 p-5 bg-indigo-50/30 rounded-xl border border-indigo-100/50">
-              <h3 className="font-bold text-sm text-neutral-900 mb-2">تعليمات وسياسات إضافية للفندق:</h3>
-              <p className="text-sm text-neutral-600 leading-7 whitespace-pre-line">
-                {currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr)}
-              </p>
             </div>
-          )}
+
+            {/* Standard Policies full rows without icon boxes */}
+            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-100 space-y-3">
+              <div>
+                <span className="font-bold text-sm text-neutral-900 block mb-0.5">سياسة الإلغاء:</span>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  الإلغاء المجاني متاح قبل 48 ساعة من موعد الوصول. بعد ذلك تُحتسب رسوم ليلة كاملة.
+                </p>
+              </div>
+              <div className="pt-2.5 border-t border-neutral-200/60">
+                <span className="font-bold text-sm text-neutral-900 block mb-0.5">سياسة الأطفال:</span>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  الأطفال دون 12 سنة مجانيون عند استخدام الأسرّة الموجودة. السرير الإضافي بتكلفة إضافية.
+                </p>
+              </div>
+              <div className="pt-2.5 border-t border-neutral-200/60">
+                <span className="font-bold text-sm text-neutral-900 block mb-0.5">تعليمات الوصول:</span>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  يُرجى تقديم بطاقة الهوية الوطنية أو جواز السفر ساري المفعول عند تسجيل الوصول.
+                </p>
+              </div>
+            </div>
+
+            {/* Custom Hotel Policies from DB */}
+            {(hotel.policyAr || hotel.policyEn) && (
+              <div className="p-4 bg-indigo-50/40 rounded-xl border border-indigo-100/60">
+                <span className="font-bold text-sm text-neutral-900 block mb-1">تعليمات وسياسات إضافية للفندق:</span>
+                <p className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
+                  {currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr)}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ─── 6. MAP CARD WITH CLICKABLE STATIC MAP VISUAL ─── */}
