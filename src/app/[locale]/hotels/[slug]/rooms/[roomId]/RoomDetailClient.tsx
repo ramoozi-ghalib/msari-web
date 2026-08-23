@@ -1,111 +1,68 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ComponentType, type CSSProperties } from 'react';
+import * as LucideIcons from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useParams } from 'next/navigation';
 import {
-  Wifi, Utensils, Car, Waves,
   Calendar, Users, Check, ArrowRight, BedDouble,
   ChevronLeft, ChevronRight as ChevronR, Clock,
-  Sofa, Wind, Tv, Shield, Shirt, Coffee,
-  ShoppingBag, Bell, ArrowUpDown, Key, Dumbbell,
-  Bath, Eye, Maximize2, DoorOpen, Lock, Sparkles
+  Bath, Maximize2, DoorOpen
 } from 'lucide-react';
 import type { Hotel, Room } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
 
-/* ─── Slide placeholder backgrounds ─── */
+const toIconRecord = LucideIcons as unknown as Record<string, ComponentType<{ size?: number; className?: string; style?: CSSProperties; color?: string }>>;
+
+/* ─── Dynamic Lucide icon mapping ─── */
+const ICON_MAPPING: Record<string, string> = {
+  grocery: 'ShoppingBag',
+  cafe: 'Coffee',
+  security: 'Shield',
+  room_service: 'Bell',
+  parking: 'Car',
+  laundry: 'Shirt',
+  wifi: 'Wifi',
+  internet: 'Wifi',
+  elevator: 'ArrowUpDown',
+  majlis_terrace: 'Sofa',
+  tv: 'Tv',
+  smart_tv: 'Tv',
+  pool: 'Waves',
+  restaurant: 'UtensilsCrossed',
+  reception: 'Key',
+  gym: 'Dumbbell',
+  air_conditioning: 'Wind',
+  ac: 'Wind',
+  wind: 'Wind',
+  fridge: 'Coffee',
+  mini_fridge: 'Coffee',
+  wardrobe: 'Shirt',
+  city_view: 'Eye',
+  hair_dryer: 'Wind',
+  electric_kettle: 'Coffee',
+  bathtub: 'Bath',
+  bath: 'Bath',
+  bathroom: 'Bath',
+  safe: 'ShieldCheck',
+  iron: 'Shirt',
+};
+
+const DynIcon = ({ name, size = 15 }: { name: string; size?: number }) => {
+  const mappedName = ICON_MAPPING[name?.toLowerCase()] || name || 'Check';
+  const pascal = mappedName
+    .replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())
+    .replace(/^([a-z])/, (_, c: string) => c.toUpperCase());
+  const Icon = toIconRecord[pascal] ?? toIconRecord[mappedName] ?? toIconRecord[name] ?? LucideIcons.Check;
+  return <Icon size={size} />;
+};
+
+/* ─── Default fallback slides ─── */
 const FALLBACK_SLIDES = [
-  { bg: 'linear-gradient(135deg,#23096e,#3A1C8F)', isImage: false },
-  { bg: 'linear-gradient(135deg,#1a0654,#23096e)', isImage: false },
-  { bg: 'linear-gradient(135deg,#2d1580,#3A1C8F)', isImage: false },
+  'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop'
 ];
-
-/* ─── Arabic names mapping for common amenity keys ─── */
-const AMENITY_AR_NAMES: Record<string, string> = {
-  internet: 'إنترنت / واي فاي',
-  wifi: 'واي فاي مجاني',
-  air_conditioning: 'تكييف هواء',
-  ac: 'تكييف هواء',
-  wind: 'تكييف هواء',
-  smart_tv: 'شاشة تلفزيون ذكية',
-  tv: 'شاشة تلفاز',
-  fridge: 'ثلاجة ميني بار',
-  mini_fridge: 'ثلاجة صغيرة',
-  dining_table: 'طاولة طعام',
-  wardrobe: 'خزانة ملابس',
-  city_view: 'إطلالة على المدينة',
-  hair_dryer: 'مجفف شعر',
-  electric_kettle: 'غلاية شاي وقهوة',
-  bathtub: 'حوض استحمام',
-  bath: 'حمام خاص',
-  bathroom: 'حمام خاص متكامل',
-  pool: 'مسبح',
-  utensils: 'أدوات مطبخ ومائدة',
-  restaurant: 'مطعم',
-  parking: 'موقف سيارات',
-  waves: 'إطلالة بحرية',
-  sofa: 'جلسة / أريكة مريحة',
-  grocery: 'بقالة / سوبرماركت',
-  cafe: 'مقهى',
-  security: 'حراسة وأمان 24/7',
-  room_service: 'خدمة الغرف',
-  laundry: 'خدمة غسيل وكي الملابس',
-  elevator: 'مصعد',
-  majlis_terrace: 'جلسة خارجية / تراس',
-  gym: 'نادي رياضي',
-  reception: 'استقبال 24 ساعة',
-  balcony: 'شرفة خاصة',
-  safe: 'صندوق أمانات',
-  iron: 'مكواة ملابس',
-  soundproofing: 'عزل صوتي',
-};
-
-const AMENITY_CFG: Record<string, { icon: React.ReactNode; color: string }> = {
-  internet:         { icon: <Wifi size={16}/>,         color: '#23096e' },
-  wifi:             { icon: <Wifi size={16}/>,         color: '#23096e' },
-  air_conditioning: { icon: <Wind size={16}/>,         color: '#0ea5e9' },
-  ac:               { icon: <Wind size={16}/>,         color: '#0ea5e9' },
-  wind:             { icon: <Wind size={16}/>,         color: '#0ea5e9' },
-  smart_tv:         { icon: <Tv size={16}/>,           color: '#8b5cf6' },
-  tv:               { icon: <Tv size={16}/>,           color: '#8b5cf6' },
-  fridge:           { icon: <Coffee size={16}/>,       color: '#b45309' },
-  mini_fridge:      { icon: <Coffee size={16}/>,       color: '#b45309' },
-  dining_table:     { icon: <Utensils size={16}/>,     color: '#d97706' },
-  wardrobe:         { icon: <Shirt size={16}/>,        color: '#4f46e5' },
-  city_view:        { icon: <Eye size={16}/>,          color: '#0284c7' },
-  hair_dryer:       { icon: <Wind size={16}/>,         color: '#ec4899' },
-  electric_kettle:  { icon: <Coffee size={16}/>,       color: '#d97706' },
-  bathtub:          { icon: <Bath size={16}/>,         color: '#06b6d4' },
-  bath:             { icon: <Bath size={16}/>,         color: '#06b6d4' },
-  bathroom:         { icon: <Bath size={16}/>,         color: '#06b6d4' },
-  pool:             { icon: <Waves size={16}/>,        color: '#0284c7' },
-  utensils:         { icon: <Utensils size={16}/>,     color: '#d97706' },
-  restaurant:       { icon: <Utensils size={16}/>,     color: '#d97706' },
-  parking:          { icon: <Car size={16}/>,          color: '#16a34a' },
-  waves:            { icon: <Waves size={16}/>,        color: '#0284c7' },
-  sofa:             { icon: <Sofa size={16}/>,         color: '#f59e0b' },
-  grocery:          { icon: <ShoppingBag size={16}/>,  color: '#e11d48' },
-  cafe:             { icon: <Coffee size={16}/>,        color: '#b45309' },
-  security:         { icon: <Shield size={16}/>,       color: '#059669' },
-  room_service:     { icon: <Bell size={16}/>,         color: '#6d28d9' },
-  laundry:          { icon: <Shirt size={16}/>,        color: '#4f46e5' },
-  elevator:         { icon: <ArrowUpDown size={16}/>,  color: '#0891b2' },
-  majlis_terrace:   { icon: <Sofa size={16}/>,         color: '#b45309' },
-  gym:              { icon: <Dumbbell size={16}/>,     color: '#db2777' },
-  reception:        { icon: <Key size={16}/>,          color: '#475569' },
-  safe:             { icon: <Lock size={16}/>,         color: '#059669' },
-};
-
-function getAmenityArabicName(amenity: { name: string; icon?: string }): string {
-  // If the amenity name already contains Arabic letters, use it
-  if (/[\u0600-\u06FF]/.test(amenity.name)) {
-    return amenity.name;
-  }
-  const key = (amenity.icon || amenity.name || '').toLowerCase().trim();
-  return AMENITY_AR_NAMES[key] || amenity.name;
-}
 
 interface Props {
   hotel: Hotel;
@@ -115,14 +72,14 @@ interface Props {
 export default function RoomDetailClient({ hotel, room }: Props) {
   const searchParams = useSearchParams();
   const { locale } = useParams();
-  const currentLocale = locale || 'ar';
+  const currentLocale = (locale as string) || 'ar';
 
   const checkInParam = searchParams.get('checkIn') || '';
   const checkOutParam = searchParams.get('checkOut') || '';
   const guestsParam = Number(searchParams.get('guests'));
   const bookingError = searchParams.get('bookingError') || '';
 
-  const [slide, setSlide]     = useState(0);
+  const [slide, setSlide] = useState(0);
   const [checkIn, setCheckIn] = useState(checkInParam);
   const [checkOut, setCheckOut] = useState(checkOutParam);
   const [guests, setGuests] = useState(() => {
@@ -134,13 +91,14 @@ export default function RoomDetailClient({ hotel, room }: Props) {
   const cityParam = searchParams.get('city') || hotel.city;
   const { formatPrice } = useCurrency();
 
-  const slides = room.images?.length ? room.images.map(src => ({ bg: `url(${src})`, isImage: true })) : FALLBACK_SLIDES;
+  const validImages = room.images?.filter(img => typeof img === 'string' && img.startsWith('http')) || [];
+  const slides = validImages.length ? validImages : (hotel.images?.filter(img => typeof img === 'string' && img.startsWith('http')) || FALLBACK_SLIDES);
   const total = slides.length;
   const go = useCallback((n: number) => setSlide((n + total) % total), [total]);
 
   useEffect(() => {
     if (total <= 1) return;
-    const t = setInterval(() => go(slide + 1), 5000);
+    const t = setInterval(() => go(slide + 1), 5500);
     return () => clearInterval(t);
   }, [slide, go, total]);
 
@@ -157,7 +115,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
 
   const hotelBackHref = () => {
     const params = new URLSearchParams();
-    params.set('city', cityParam);
+    if (cityParam) params.set('city', cityParam);
     if (checkIn) params.set('checkIn', checkIn);
     if (checkOut) params.set('checkOut', checkOut);
     params.set('guests', String(guests));
@@ -167,7 +125,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
   const bookingHref = () => {
     if (!hasRequiredBookingData) return '#';
     const params = new URLSearchParams();
-    params.set('city', cityParam);
+    if (cityParam) params.set('city', cityParam);
     params.set('hotel', hotel.slug);
     params.set('hotelId', hotel.id);
     params.set('room', room.id);
@@ -189,7 +147,10 @@ export default function RoomDetailClient({ hotel, room }: Props) {
         )}
 
         {/* Back Link */}
-        <Link href={hotelBackHref()} className="inline-flex items-center gap-2 text-sm font-bold text-[#23096e] hover:text-[#3A1C8F] transition-colors mb-6 bg-white px-4 py-2 rounded-full shadow-sm border border-neutral-100">
+        <Link
+          href={hotelBackHref()}
+          className="inline-flex items-center gap-2 text-sm font-bold text-[#23096e] hover:text-[#1a0654] transition-colors mb-6 bg-white px-4 py-2 rounded-full shadow-sm border border-neutral-100"
+        >
           <ArrowRight size={16} /> العودة لفندق {hotel.name}
         </Link>
 
@@ -202,39 +163,34 @@ export default function RoomDetailClient({ hotel, room }: Props) {
             {/* 1. GALLERY (TOP) */}
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
               <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[460px] bg-neutral-900 group">
-                {slides.map((s, i) => (
+                {slides.map((src, i) => (
                   <div
                     key={i}
                     className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
                     style={{ opacity: i === slide ? 1 : 0 }}
                   >
-                    {s.isImage ? (
-                      <Image
-                        src={s.bg.replace('url(', '').replace(')', '')}
-                        alt={`${room.name} - ${i + 1}`}
-                        fill
-                        className="object-contain sm:object-cover"
-                        sizes="(max-width: 1024px) 100vw, 60vw"
-                        priority={i === 0}
-                      />
-                    ) : (
-                      <div className="w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg"
-                        style={{ background: s.bg }}>
-                        <BedDouble size={36} className="text-white/80" />
-                      </div>
-                    )}
+                    <Image
+                      src={src}
+                      alt={`${room.name} - ${i + 1}`}
+                      fill
+                      className="object-contain sm:object-cover"
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      priority={i === 0}
+                    />
                   </div>
                 ))}
 
                 {total > 1 && (
                   <>
-                    <button onClick={() => go(slide - 1)}
+                    <button
+                      onClick={() => go(slide - 1)}
                       className="absolute start-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
                       title="السابق"
                     >
                       <ChevronR size={20} />
                     </button>
-                    <button onClick={() => go(slide + 1)}
+                    <button
+                      onClick={() => go(slide + 1)}
                       className="absolute end-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
                       title="التالي"
                     >
@@ -247,8 +203,11 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                     <div className="absolute bottom-4 inset-x-0 z-20 flex justify-center">
                       <div className="flex gap-1.5">
                         {slides.map((_, i) => (
-                          <button key={i} onClick={() => go(i)}
-                            className={`rounded-full transition-all duration-300 ${i === slide ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white/70'}`} />
+                          <button
+                            key={i}
+                            onClick={() => go(i)}
+                            className={`rounded-full transition-all duration-300 ${i === slide ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40 hover:bg-white/70'}`}
+                          />
                         ))}
                       </div>
                     </div>
@@ -271,11 +230,11 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                 </div>
               </div>
 
-              {/* Description (الوصف) */}
+              {/* Description: "الوصف" */}
               <div className="pt-5">
                 <h2 className="text-base sm:text-lg font-black text-neutral-900 mb-2">الوصف</h2>
                 <p className="text-neutral-600 leading-7 text-sm whitespace-pre-line">
-                  {room.description || `استمتع بإقامة مريحة في ${room.name} مع كافة وسائل الراحة والخدمات المتميزة.`}
+                  {room.description || `استمتع بإقامة مريحة في ${room.name} بفندق ${hotel.name} مع أرقى الخدمات ومستوى راحة متكامل.`}
                 </p>
               </div>
 
@@ -353,22 +312,19 @@ export default function RoomDetailClient({ hotel, room }: Props) {
               </div>
             </div>
 
-            {/* 3. AMENITIES (تجهيزات ومرافق) */}
+            {/* 3. AMENITIES: "تجهيزات ومرافق" (API DATA) */}
             {room.amenities && room.amenities.length > 0 && (
               <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
                 <h2 className="text-base sm:text-lg font-black text-neutral-900 mb-4">تجهيزات ومرافق</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {room.amenities.map((a, idx) => {
-                    const iconKey = (a.icon || a.name || '').toLowerCase();
-                    const cfg = AMENITY_CFG[iconKey] ?? { icon: <Check size={16}/>, color: '#23096e' };
-                    const arabicName = getAmenityArabicName(a);
+                    const iconName = a.icon || a.name || 'Check';
                     return (
                       <div key={a.id || idx} className="flex items-center gap-2.5 p-3 rounded-xl border border-neutral-100 bg-neutral-50">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm"
-                          style={{ backgroundColor: `${cfg.color}14`, color: cfg.color }}>
-                          {cfg.icon}
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm bg-[#23096E]/10 text-[#23096E]">
+                          <DynIcon name={iconName} size={15} />
                         </div>
-                        <span className="font-bold text-xs text-neutral-800 truncate">{arabicName}</span>
+                        <span className="font-bold text-xs text-neutral-800 truncate">{a.name}</span>
                       </div>
                     );
                   })}
@@ -404,7 +360,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                 <div className="grid grid-cols-2 gap-2">
                   {/* Check In */}
                   <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2.5 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#23096e]/10 text-[#23096e]">
                       <Calendar size={13} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -421,7 +377,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
 
                   {/* Check Out */}
                   <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2.5 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#23096e]/10 text-[#23096e]">
                       <Clock size={13} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -440,7 +396,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                 {/* Guests Counter */}
                 <div className="flex items-center justify-between rounded-xl border border-neutral-200 px-3.5 py-2.5 bg-white shadow-sm">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#23096e]/10 text-[#23096e]">
                       <Users size={14} />
                     </div>
                     <div>
@@ -449,13 +405,17 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <button onClick={() => setGuests(g=>Math.max(1,g-1))}
-                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none">
+                    <button
+                      onClick={() => setGuests(g => Math.max(1, g - 1))}
+                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none"
+                    >
                       −
                     </button>
                     <span className="w-5 text-center text-xs font-black">{guests}</span>
-                    <button onClick={() => setGuests(g=>Math.min(room.capacity || 2,g+1))}
-                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none disabled:opacity-30">
+                    <button
+                      onClick={() => setGuests(g => Math.min(room.capacity || 2, g + 1))}
+                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none disabled:opacity-30"
+                    >
                       +
                     </button>
                   </div>
@@ -465,7 +425,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
               {/* Price Calculation */}
               <div className="px-6 py-4 space-y-2.5 border-b border-neutral-100 text-sm">
                 <div className="flex justify-between text-neutral-500 text-xs">
-                  <span>{formatPrice(priceToPay)} × {nights} {nights===1?'ليلة':'ليالٍ'}</span>
+                  <span>{formatPrice(priceToPay)} × {nights} {nights === 1 ? 'ليلة' : 'ليالٍ'}</span>
                   <span className="font-bold text-neutral-800">{formatPrice(priceToPay * nights)}</span>
                 </div>
                 {hotel.discount && (
@@ -502,7 +462,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                 </Link>
                 
                 <div className="mt-4 space-y-2">
-                  {['إلغاء مجاني قبل 24 ساعة', 'دفع عند الوصول أو تحويل بنكي', 'تأكيد فوري للحجز'].map(f=>(
+                  {['إلغاء مجاني قبل 24 ساعة', 'دفع عند الوصول أو تحويل بنكي', 'تأكيد فوري للحجز'].map(f => (
                     <div key={f} className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
                       <Check size={13} className="text-green-500 shrink-0" />
                       {f}
