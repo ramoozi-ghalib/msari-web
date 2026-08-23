@@ -400,54 +400,16 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
 
         {/* ─── 5. HOTEL POLICIES ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
-          <h2 className="text-lg font-black text-neutral-900 mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="space-y-4">
-            {/* Check-in / Check-out full rows */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-neutral-100">
-              <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-100">
-                <span className="text-xs text-neutral-500 block mb-1 font-medium">وقت تسجيل الدخول</span>
-                <span className="font-bold text-sm text-neutral-900">من الساعة 2:00 م</span>
-              </div>
-              <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-100">
-                <span className="text-xs text-neutral-500 block mb-1 font-medium">وقت المغادرة</span>
-                <span className="font-bold text-sm text-neutral-900">قبل الساعة 12:00 م</span>
-              </div>
-            </div>
-
-            {/* Standard Policies full rows without icon boxes */}
-            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-100 space-y-3">
-              <div>
-                <span className="font-bold text-sm text-neutral-900 block mb-0.5">سياسة الإلغاء:</span>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  الإلغاء المجاني متاح قبل 48 ساعة من موعد الوصول. بعد ذلك تُحتسب رسوم ليلة كاملة.
-                </p>
-              </div>
-              <div className="pt-2.5 border-t border-neutral-200/60">
-                <span className="font-bold text-sm text-neutral-900 block mb-0.5">سياسة الأطفال:</span>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  الأطفال دون 12 سنة مجانيون عند استخدام الأسرّة الموجودة. السرير الإضافي بتكلفة إضافية.
-                </p>
-              </div>
-              <div className="pt-2.5 border-t border-neutral-200/60">
-                <span className="font-bold text-sm text-neutral-900 block mb-0.5">تعليمات الوصول:</span>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  يُرجى تقديم بطاقة الهوية الوطنية أو جواز السفر ساري المفعول عند تسجيل الوصول.
-                </p>
-              </div>
-            </div>
-
-            {/* Custom Hotel Policies from DB */}
-            {(hotel.policyAr || hotel.policyEn) && (
-              <div className="p-4 bg-indigo-50/40 rounded-xl border border-indigo-100/60">
-                <span className="font-bold text-sm text-neutral-900 block mb-1">تعليمات وسياسات إضافية للفندق:</span>
-                <p className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
-                  {currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr)}
-                </p>
-              </div>
-            )}
+          <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-100">
+            <p className="text-sm text-neutral-700 leading-relaxed whitespace-pre-line">
+              {currentLocale === 'ar'
+                ? (hotel.policyAr || hotel.policyEn || 'تطبق الشروط والأحكام والسياسات العامة للفندق عند تسجيل الوصول والإقامة.')
+                : (hotel.policyEn || hotel.policyAr || 'General hotel terms, conditions, and policies apply upon check-in and stay.')}
+            </p>
           </div>
         </div>
 
