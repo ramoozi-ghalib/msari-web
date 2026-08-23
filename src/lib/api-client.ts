@@ -177,6 +177,8 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
   const addressAr = typeof api.address === 'object' && api.address !== null ? (api.address.ar || api.address.en || '') : String(api.address || '');
   const addressEn = typeof api.address === 'object' && api.address !== null ? (api.address.en || api.address.ar || '') : String(api.address || '');
 
+  const coords = extractCoordinates(api);
+
   return {
     id: api.id,
     name: nameAr,
@@ -191,6 +193,8 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
     address: addressAr 
       ? normalizeAddress(addressAr, cityName)
       : normalizeAddress(addressEn, cityNameEn, ','),
+    lat: coords.lat,
+    lng: coords.lng,
     stars: Math.max(1, Math.min(5, api.stars)) as 1 | 2 | 3 | 4 | 5,
     rating: 4.5, // Fallback rating since API does not return a rating
     reviewCount: 12, // Fallback count
@@ -213,6 +217,38 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
     createdAt: api.createdAt,
     updatedAt: api.updatedAt,
   };
+}
+
+function extractCoordinates(data: any): { lat?: number; lng?: number } {
+  if (typeof data?.lat === 'number' && typeof data?.lng === 'number' && !isNaN(data.lat) && !isNaN(data.lng)) {
+    return { lat: data.lat, lng: data.lng };
+  }
+  if (typeof data?.latitude === 'number' && typeof data?.longitude === 'number') {
+    return { lat: data.latitude, lng: data.longitude };
+  }
+  if (data?.location && typeof data.location.latitude === 'number' && typeof data.location.longitude === 'number') {
+    return { lat: data.location.latitude, lng: data.location.longitude };
+  }
+  if (data?.location && typeof data.location._latitude === 'number' && typeof data.location._longitude === 'number') {
+    return { lat: data.location._latitude, lng: data.location._longitude };
+  }
+  if (data?.coordinates && typeof data.coordinates.lat === 'number' && typeof data.coordinates.lng === 'number') {
+    return { lat: data.coordinates.lat, lng: data.coordinates.lng };
+  }
+
+  const url = data?.mapLink || data?.mapUrl || '';
+  if (typeof url === 'string' && url) {
+    const matchAt = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (matchAt) {
+      return { lat: parseFloat(matchAt[1]), lng: parseFloat(matchAt[2]) };
+    }
+    const matchQ = url.match(/[?&](?:q|query|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (matchQ) {
+      return { lat: parseFloat(matchQ[1]), lng: parseFloat(matchQ[2]) };
+    }
+  }
+
+  return {};
 }
 
 // ─── API Client ───────────────────────────────────────────────────────────────

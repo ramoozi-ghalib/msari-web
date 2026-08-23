@@ -49,8 +49,8 @@ export async function generateMetadata(props: Props) {
   };
 }
 
-function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371;
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -63,6 +63,38 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
   return R * c;
 }
 
+function getProximityDistance(baseHotel: Hotel, target: Hotel): number {
+  // 1. Precise GPS Distance if coordinates exist
+  if (
+    typeof baseHotel.lat === 'number' &&
+    typeof baseHotel.lng === 'number' &&
+    typeof target.lat === 'number' &&
+    typeof target.lng === 'number'
+  ) {
+    return calculateDistanceKm(baseHotel.lat, baseHotel.lng, target.lat, target.lng);
+  }
+
+  // 2. Address / District keyword similarity matching
+  let proximityScore = 30; // base score for same city
+  if (baseHotel.address && target.address) {
+    const cleanWords = (text: string) =>
+      text
+        .toLowerCase()
+        .replace(/[,،.-]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !['شارع', 'اليمن', 'فندق', 'مدينة', 'حي', 'منطقة'].includes(w));
+
+    const baseWords = cleanWords(baseHotel.address);
+    const targetWords = cleanWords(target.address);
+    const common = baseWords.filter(w => targetWords.includes(w));
+    if (common.length > 0) {
+      proximityScore -= Math.min(25, common.length * 8);
+    }
+  }
+
+  return proximityScore;
+}
+
 export default async function HotelDetailPage(props: Props) {
   const { slug } = await props.params;
   const hotel = await getHotelBySlug(slug);
@@ -71,22 +103,18 @@ export default async function HotelDetailPage(props: Props) {
     notFound();
   }
 
-  // Fetch nearest hotels in the same city/region (excluding current hotel)
+  // Fetch true nearest 3 hotels by distance in the same city/region
   let nearbyHotels: Hotel[] = [];
   try {
-    const nearbyRes = await getLocalHotels({ city: hotel.city, pageSize: 20 });
+    const nearbyRes = await getLocalHotels({ city: hotel.city, pageSize: 50 });
     const candidates = (nearbyRes.data || []).filter(h => h.id !== hotel.id && h.slug !== hotel.slug);
 
-    if (hotel.lat && hotel.lng) {
-      candidates.sort((a, b) => {
-        if (a.lat && a.lng && b.lat && b.lng) {
-          const distA = calculateDistanceKm(hotel.lat!, hotel.lng!, a.lat, a.lng);
-          const distB = calculateDistanceKm(hotel.lat!, hotel.lng!, b.lat, b.lng);
-          return distA - distB;
-        }
-        return 0;
-      });
-    }
+    // Sort strictly by proximity distance to current hotel
+    candidates.sort((a, b) => {
+      const distA = getProximityDistance(hotel, a);
+      const distB = getProximityDistance(hotel, b);
+      return distA - distB;
+    });
 
     nearbyHotels = candidates.slice(0, 3);
   } catch {

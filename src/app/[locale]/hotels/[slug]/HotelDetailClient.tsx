@@ -67,38 +67,47 @@ const FALLBACK_AMENITIES = [
 ];
 
 /**
- * Parses policy text into discrete bullet points:
- * - Breaks sentences on dots (.)
- * - Separates check-in / check-out into individual lines
+ * Formats hotel policy texts cleanly:
+ * - Separates check-in & check-out into clear independent lines
+ * - Line breaks sentences that end in a dot (.)
+ * - Preserves natural sentences without injecting artificial symbols
  */
-function parsePolicyLines(rawText?: string): string[] {
+function formatHotelPolicies(rawText?: string): string[] {
   if (!rawText || !rawText.trim()) {
     return [
-      'تسجيل الوصول: من الساعة 02:00 ظهراً.',
-      'تسجيل المغادرة: حتى الساعة 12:00 ظهراً.',
+      '• تسجيل الوصول: من الساعة 12:00 ظهراً.',
+      '• تسجيل المغادرة: حتى الساعة 12:00 ظهراً.',
       'تطبق الشروط والأحكام العامة المعتمدة للفندق عند تسجيل الوصول والإقامة.'
     ];
   }
 
-  const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  // 1. Separate check-in and check-out to their own lines
+  let text = rawText
+    .replace(/([،,;])\s*(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '.\n$2')
+    .replace(/(تسجيل الوصول|وقت الوصول|Check-in|Checkin)/gi, '\n$1')
+    .replace(/(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '\n$1');
+
+  const rawParagraphs = text.split(/\r?\n/).map(p => p.trim()).filter(Boolean);
   const result: string[] = [];
 
-  for (const line of rawLines) {
-    // Separate inline check-in and check-out mentions
-    const normalized = line
-      .replace(/([،,;])\s*(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '.\n$2')
-      .replace(/(تسجيل الوصول|وقت الوصول|Check-in|Checkin)/gi, '\n$1');
+  for (const para of rawParagraphs) {
+    // Split sentences ending with a dot (.)
+    const sentences = para.split(/(?<=\.)\s+/).map(s => s.trim()).filter(Boolean);
+    for (let s of sentences) {
+      s = s.replace(/^[-*–]\s*/, '').trim();
 
-    const subSegments = normalized.split(/\n+/).map(s => s.trim()).filter(Boolean);
-    for (const sub of subSegments) {
-      // Split on period followed by space
-      const sentenceParts = sub.split(/(?<=\.)\s+/).map(p => p.trim()).filter(Boolean);
-      for (let part of sentenceParts) {
-        part = part.replace(/^[-•*–]\s*/, '').trim();
-        if (part) {
-          result.push(part);
+      // Ensure Check-in and Check-out lines have a clean bullet
+      if (
+        s.startsWith('تسجيل الوصول') ||
+        s.startsWith('وقت الوصول') ||
+        s.startsWith('تسجيل المغادرة') ||
+        s.startsWith('وقت المغادرة')
+      ) {
+        if (!s.startsWith('•')) {
+          s = `• ${s}`;
         }
       }
+      result.push(s);
     }
   }
 
@@ -181,7 +190,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   const googleMapsUrl = hotel.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel.name} ${hotel.address || ''} ${hotel.city} اليمن`)}`;
   
   const rawPolicy = currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr);
-  const policyLines = parsePolicyLines(rawPolicy);
+  const policyLines = formatHotelPolicies(rawPolicy);
 
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
@@ -420,7 +429,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                         </span>
                       </div>
 
-                      {/* Square button with very subtle corners (rounded-[4px]) */}
+                      {/* Square button with subtle light corners (rounded-[4px]) */}
                       <Link
                         href={roomHref(room.id)}
                         className="h-10 px-5 rounded-[4px] bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
@@ -440,18 +449,17 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           )}
         </div>
 
-        {/* ─── 5. HOTEL POLICIES WITH BULLET POINT LINE BREAKS ─── */}
+        {/* ─── 5. HOTEL POLICIES WITH CLEAN LINE BREAKS ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
           <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="p-4 bg-neutral-50/80 rounded-xl border border-neutral-100 space-y-2.5">
+          <div className="p-5 bg-neutral-50/80 rounded-xl border border-neutral-100 space-y-2.5">
             {policyLines.map((line, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 text-sm text-neutral-700 leading-6">
-                <span className="text-[#23096e] font-black text-base leading-5 select-none shrink-0">•</span>
-                <span>{line}</span>
-              </div>
+              <p key={idx} className="text-sm text-neutral-700 leading-relaxed font-normal">
+                {line}
+              </p>
             ))}
           </div>
         </div>
@@ -517,7 +525,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           </a>
         </div>
 
-        {/* ─── 7. NEARBY HOTELS SECTION (CLOSEST 3 HOTELS) ─── */}
+        {/* ─── 7. NEARBY HOTELS SECTION (CLOSEST 3 HOTELS BY DISTANCE) ─── */}
         {nearbyHotels && nearbyHotels.length > 0 && (
           <div className="mt-10">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
