@@ -8,52 +8,104 @@ import {
   Wifi, Utensils, Car, Waves,
   Calendar, Users, Check, ArrowRight, BedDouble,
   ChevronLeft, ChevronRight as ChevronR, Clock,
-  Sofa, Wind, Tv, Shield, Shirt, Coffee, HelpCircle,
+  Sofa, Wind, Tv, Shield, Shirt, Coffee,
   ShoppingBag, Bell, ArrowUpDown, Key, Dumbbell,
-  Bath, Eye, Maximize2, DoorOpen
+  Bath, Eye, Maximize2, DoorOpen, Lock, Sparkles
 } from 'lucide-react';
 import type { Hotel, Room } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
 
 /* ─── Slide placeholder backgrounds ─── */
-// Added `isImage: false` to fallback slides to satisfy TypeScript type checking.
 const FALLBACK_SLIDES = [
   { bg: 'linear-gradient(135deg,#23096e,#3A1C8F)', isImage: false },
   { bg: 'linear-gradient(135deg,#1a0654,#23096e)', isImage: false },
   { bg: 'linear-gradient(135deg,#2d1580,#3A1C8F)', isImage: false },
 ];
 
-const AMENITY_CFG: Record<string, { icon: React.ReactNode; color: string }> = {
-  internet:         { icon: <Wifi size={18}/>,         color: '#23096e' },
-  wifi:             { icon: <Wifi size={18}/>,         color: '#23096e' },
-  air_conditioning: { icon: <Wind size={18}/>,         color: '#0ea5e9' },
-  wind:             { icon: <Wind size={18}/>,         color: '#0ea5e9' },
-  smart_tv:         { icon: <Tv size={18}/>,           color: '#8b5cf6' },
-  tv:               { icon: <Tv size={18}/>,           color: '#8b5cf6' },
-  fridge:           { icon: <Coffee size={18}/>,       color: '#b45309' },
-  dining_table:     { icon: <Utensils size={18}/>,     color: '#d97706' },
-  wardrobe:         { icon: <Shirt size={18}/>,        color: '#4f46e5' },
-  city_view:        { icon: <Eye size={18}/>,          color: '#0284c7' },
-  hair_dryer:       { icon: <Wind size={18}/>,         color: '#ec4899' },
-  electric_kettle:  { icon: <Coffee size={18}/>,       color: '#d97706' },
-  bathtub:          { icon: <Bath size={18}/>,         color: '#06b6d4' },
-  bath:             { icon: <Bath size={18}/>,         color: '#06b6d4' },
-  pool:             { icon: <Waves size={18}/>,        color: '#0284c7' },
-  utensils:         { icon: <Utensils size={18}/>,     color: '#d97706' },
-  restaurant:       { icon: <Utensils size={18}/>,     color: '#d97706' },
-  parking:          { icon: <Car size={18}/>,          color: '#16a34a' },
-  waves:            { icon: <Waves size={18}/>,        color: '#0284c7' },
-  sofa:             { icon: <Sofa size={18}/>,         color: '#f59e0b' },
-  grocery:          { icon: <ShoppingBag size={18}/>,  color: '#e11d48' },
-  cafe:             { icon: <Coffee size={18}/>,        color: '#b45309' },
-  security:         { icon: <Shield size={18}/>,       color: '#059669' },
-  room_service:     { icon: <Bell size={18}/>,         color: '#6d28d9' },
-  laundry:          { icon: <Shirt size={18}/>,        color: '#4f46e5' },
-  elevator:         { icon: <ArrowUpDown size={18}/>,  color: '#0891b2' },
-  majlis_terrace:   { icon: <Sofa size={18}/>,         color: '#b45309' },
-  gym:              { icon: <Dumbbell size={18}/>,     color: '#db2777' },
-  reception:        { icon: <Key size={18}/>,          color: '#475569' },
+/* ─── Arabic names mapping for common amenity keys ─── */
+const AMENITY_AR_NAMES: Record<string, string> = {
+  internet: 'إنترنت / واي فاي',
+  wifi: 'واي فاي مجاني',
+  air_conditioning: 'تكييف هواء',
+  ac: 'تكييف هواء',
+  wind: 'تكييف هواء',
+  smart_tv: 'شاشة تلفزيون ذكية',
+  tv: 'شاشة تلفاز',
+  fridge: 'ثلاجة ميني بار',
+  mini_fridge: 'ثلاجة صغيرة',
+  dining_table: 'طاولة طعام',
+  wardrobe: 'خزانة ملابس',
+  city_view: 'إطلالة على المدينة',
+  hair_dryer: 'مجفف شعر',
+  electric_kettle: 'غلاية شاي وقهوة',
+  bathtub: 'حوض استحمام',
+  bath: 'حمام خاص',
+  bathroom: 'حمام خاص متكامل',
+  pool: 'مسبح',
+  utensils: 'أدوات مطبخ ومائدة',
+  restaurant: 'مطعم',
+  parking: 'موقف سيارات',
+  waves: 'إطلالة بحرية',
+  sofa: 'جلسة / أريكة مريحة',
+  grocery: 'بقالة / سوبرماركت',
+  cafe: 'مقهى',
+  security: 'حراسة وأمان 24/7',
+  room_service: 'خدمة الغرف',
+  laundry: 'خدمة غسيل وكي الملابس',
+  elevator: 'مصعد',
+  majlis_terrace: 'جلسة خارجية / تراس',
+  gym: 'نادي رياضي',
+  reception: 'استقبال 24 ساعة',
+  balcony: 'شرفة خاصة',
+  safe: 'صندوق أمانات',
+  iron: 'مكواة ملابس',
+  soundproofing: 'عزل صوتي',
 };
+
+const AMENITY_CFG: Record<string, { icon: React.ReactNode; color: string }> = {
+  internet:         { icon: <Wifi size={16}/>,         color: '#23096e' },
+  wifi:             { icon: <Wifi size={16}/>,         color: '#23096e' },
+  air_conditioning: { icon: <Wind size={16}/>,         color: '#0ea5e9' },
+  ac:               { icon: <Wind size={16}/>,         color: '#0ea5e9' },
+  wind:             { icon: <Wind size={16}/>,         color: '#0ea5e9' },
+  smart_tv:         { icon: <Tv size={16}/>,           color: '#8b5cf6' },
+  tv:               { icon: <Tv size={16}/>,           color: '#8b5cf6' },
+  fridge:           { icon: <Coffee size={16}/>,       color: '#b45309' },
+  mini_fridge:      { icon: <Coffee size={16}/>,       color: '#b45309' },
+  dining_table:     { icon: <Utensils size={16}/>,     color: '#d97706' },
+  wardrobe:         { icon: <Shirt size={16}/>,        color: '#4f46e5' },
+  city_view:        { icon: <Eye size={16}/>,          color: '#0284c7' },
+  hair_dryer:       { icon: <Wind size={16}/>,         color: '#ec4899' },
+  electric_kettle:  { icon: <Coffee size={16}/>,       color: '#d97706' },
+  bathtub:          { icon: <Bath size={16}/>,         color: '#06b6d4' },
+  bath:             { icon: <Bath size={16}/>,         color: '#06b6d4' },
+  bathroom:         { icon: <Bath size={16}/>,         color: '#06b6d4' },
+  pool:             { icon: <Waves size={16}/>,        color: '#0284c7' },
+  utensils:         { icon: <Utensils size={16}/>,     color: '#d97706' },
+  restaurant:       { icon: <Utensils size={16}/>,     color: '#d97706' },
+  parking:          { icon: <Car size={16}/>,          color: '#16a34a' },
+  waves:            { icon: <Waves size={16}/>,        color: '#0284c7' },
+  sofa:             { icon: <Sofa size={16}/>,         color: '#f59e0b' },
+  grocery:          { icon: <ShoppingBag size={16}/>,  color: '#e11d48' },
+  cafe:             { icon: <Coffee size={16}/>,        color: '#b45309' },
+  security:         { icon: <Shield size={16}/>,       color: '#059669' },
+  room_service:     { icon: <Bell size={16}/>,         color: '#6d28d9' },
+  laundry:          { icon: <Shirt size={16}/>,        color: '#4f46e5' },
+  elevator:         { icon: <ArrowUpDown size={16}/>,  color: '#0891b2' },
+  majlis_terrace:   { icon: <Sofa size={16}/>,         color: '#b45309' },
+  gym:              { icon: <Dumbbell size={16}/>,     color: '#db2777' },
+  reception:        { icon: <Key size={16}/>,          color: '#475569' },
+  safe:             { icon: <Lock size={16}/>,         color: '#059669' },
+};
+
+function getAmenityArabicName(amenity: { name: string; icon?: string }): string {
+  // If the amenity name already contains Arabic letters, use it
+  if (/[\u0600-\u06FF]/.test(amenity.name)) {
+    return amenity.name;
+  }
+  const key = (amenity.icon || amenity.name || '').toLowerCase().trim();
+  return AMENITY_AR_NAMES[key] || amenity.name;
+}
 
 interface Props {
   hotel: Hotel;
@@ -127,7 +179,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
   };
 
   return (
-    <div className="bg-[#f8f8fa] min-h-screen pb-20 pt-16">
+    <div className="bg-[#F8F9FC] min-h-screen pb-20 pt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {bookingError && (
@@ -137,8 +189,8 @@ export default function RoomDetailClient({ hotel, room }: Props) {
         )}
 
         {/* Back Link */}
-        <Link href={hotelBackHref()} className="inline-flex items-center gap-2 text-sm font-bold text-[#23096e] hover:text-[#3A1C8F] transition-colors mb-6 bg-white px-4 py-2 rounded-full shadow-sm">
-          <ArrowRight size={16} /> العودة للفندق
+        <Link href={hotelBackHref()} className="inline-flex items-center gap-2 text-sm font-bold text-[#23096e] hover:text-[#3A1C8F] transition-colors mb-6 bg-white px-4 py-2 rounded-full shadow-sm border border-neutral-100">
+          <ArrowRight size={16} /> العودة لفندق {hotel.name}
         </Link>
 
         {/* ── TWO-COLUMN layout: left content + right booking ── */}
@@ -147,23 +199,9 @@ export default function RoomDetailClient({ hotel, room }: Props) {
           {/* ═══ LEFT COLUMN ═══ */}
           <div className="flex-1 min-w-0 space-y-6 w-full">
 
-            {/* Room Heading */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-black text-neutral-900 mb-2">{room.name}</h1>
-                  <p className="text-neutral-500 font-medium">{room.nameEn}</p>
-                </div>
-                <div className={`px-4 py-1.5 rounded-full text-sm font-bold ${room.isAvailable ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                  {room.isAvailable ? 'متاح للحجز' : 'غير متاح'}
-                </div>
-              </div>
-            </div>
-
-            {/* Gallery */}
+            {/* 1. GALLERY (TOP) */}
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-              {/* Main Image */}
-              <div className="relative w-full aspect-[4/3] bg-neutral-900 group">
+              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] max-h-[460px] bg-neutral-900 group">
                 {slides.map((s, i) => (
                   <div
                     key={i}
@@ -175,8 +213,9 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                         src={s.bg.replace('url(', '').replace(')', '')}
                         alt={`${room.name} - ${i + 1}`}
                         fill
-                        className="object-contain"
+                        className="object-contain sm:object-cover"
                         sizes="(max-width: 1024px) 100vw, 60vw"
+                        priority={i === 0}
                       />
                     ) : (
                       <div className="w-20 h-20 rounded-3xl bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg"
@@ -190,14 +229,18 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                 {total > 1 && (
                   <>
                     <button onClick={() => go(slide - 1)}
-                      className="absolute start-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105">
-                      <ChevronR size={22} />
+                      className="absolute start-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
+                      title="السابق"
+                    >
+                      <ChevronR size={20} />
                     </button>
                     <button onClick={() => go(slide + 1)}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105">
-                      <ChevronLeft size={22} />
+                      className="absolute end-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-neutral-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
+                      title="التالي"
+                    >
+                      <ChevronLeft size={20} />
                     </button>
-                    <div className="absolute top-3 end-3 z-20 bg-black/60 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">
+                    <div className="absolute top-3 end-3 z-20 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
                       {slide + 1} / {total}
                     </div>
                     {/* Dots */}
@@ -214,49 +257,62 @@ export default function RoomDetailClient({ hotel, room }: Props) {
               </div>
             </div>
 
-            {/* Description & Specs */}
-            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100">
-              {room.description ? (
-                <>
-                  <h2 className="text-lg font-black text-neutral-900 mb-3">وصف الغرفة</h2>
-                  <p className="text-neutral-600 leading-8 text-[15px] mb-8 whitespace-pre-line">{room.description}</p>
-                </>
-              ) : null}
+            {/* 2. ROOM NAME & DESCRIPTION (DIRECTLY UNDER GALLERY) */}
+            <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
+              
+              {/* Room Header */}
+              <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-neutral-100">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-1">{room.name}</h1>
+                  {room.nameEn && <p className="text-neutral-400 text-xs sm:text-sm font-medium">{room.nameEn}</p>}
+                </div>
+                <div className={`px-3.5 py-1 rounded-full text-xs font-bold ${room.isAvailable ? 'bg-green-50 text-green-700 border border-green-200/50' : 'bg-red-50 text-red-700 border border-red-200/50'}`}>
+                  {room.isAvailable ? 'متاح للحجز' : 'غير متاح'}
+                </div>
+              </div>
 
-              <h2 className={`text-lg font-black text-neutral-900 mb-4 ${room.description ? 'pt-6 border-t border-neutral-100' : ''}`}>تفاصيل المساحة والسعة</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+              {/* Description (الوصف) */}
+              <div className="pt-5">
+                <h2 className="text-base sm:text-lg font-black text-neutral-900 mb-2">الوصف</h2>
+                <p className="text-neutral-600 leading-7 text-sm whitespace-pre-line">
+                  {room.description || `استمتع بإقامة مريحة في ${room.name} مع كافة وسائل الراحة والخدمات المتميزة.`}
+                </p>
+              </div>
+
+              {/* Specs Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 mt-6 border-t border-neutral-100">
                 {/* 1. Capacity */}
-                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                    <Users size={18} />
+                <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                  <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                    <Users size={16} />
                   </div>
                   <div>
-                    <div className="text-xs text-neutral-400 font-medium">السعة</div>
-                    <div className="text-sm font-bold text-neutral-900">{room.capacity} {room.capacity === 1 ? 'نزيل' : 'نزلاء'}</div>
+                    <div className="text-[10px] text-neutral-400 font-medium">السعة</div>
+                    <div className="text-xs sm:text-sm font-bold text-neutral-900">{room.capacity} {room.capacity === 1 ? 'نزيل' : 'نزلاء'}</div>
                   </div>
                 </div>
 
                 {/* 2. Beds */}
-                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                    <BedDouble size={18} />
+                <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                  <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                    <BedDouble size={16} />
                   </div>
                   <div>
-                    <div className="text-xs text-neutral-400 font-medium">الأسرة</div>
-                    <div className="text-sm font-bold text-neutral-900">
+                    <div className="text-[10px] text-neutral-400 font-medium">الأسرة</div>
+                    <div className="text-xs sm:text-sm font-bold text-neutral-900">
                       {room.numberOfBeds && room.numberOfBeds > 1 ? `${room.numberOfBeds} أسرة` : '1 سرير'}
                     </div>
                   </div>
                 </div>
 
                 {/* 3. Bathrooms */}
-                <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                    <Bath size={18} />
+                <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                  <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                    <Bath size={16} />
                   </div>
                   <div>
-                    <div className="text-xs text-neutral-400 font-medium">دورات المياه</div>
-                    <div className="text-sm font-bold text-neutral-900">
+                    <div className="text-[10px] text-neutral-400 font-medium">دورات المياه</div>
+                    <div className="text-xs sm:text-sm font-bold text-neutral-900">
                       {room.numberOfBathrooms && room.numberOfBathrooms > 1 ? `${room.numberOfBathrooms} حمامات` : '1 حمام خاص'}
                     </div>
                   </div>
@@ -264,59 +320,55 @@ export default function RoomDetailClient({ hotel, room }: Props) {
 
                 {/* 4. Rooms or Area */}
                 {room.numberOfRooms && room.numberOfRooms > 1 ? (
-                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                      <DoorOpen size={18} />
+                  <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                    <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                      <DoorOpen size={16} />
                     </div>
                     <div>
-                      <div className="text-xs text-neutral-400 font-medium">الغرف</div>
-                      <div className="text-sm font-bold text-neutral-900">{room.numberOfRooms} غرف نوم</div>
+                      <div className="text-[10px] text-neutral-400 font-medium">الغرف</div>
+                      <div className="text-xs sm:text-sm font-bold text-neutral-900">{room.numberOfRooms} غرف نوم</div>
                     </div>
                   </div>
                 ) : room.area ? (
-                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                      <Maximize2 size={18} />
+                  <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                    <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                      <Maximize2 size={16} />
                     </div>
                     <div>
-                      <div className="text-xs text-neutral-400 font-medium">المساحة</div>
-                      <div className="text-sm font-bold text-neutral-900">{room.area} م²</div>
+                      <div className="text-[10px] text-neutral-400 font-medium">المساحة</div>
+                      <div className="text-xs sm:text-sm font-bold text-neutral-900">{room.area} م²</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 bg-neutral-50 rounded-2xl p-4 border border-neutral-100/80">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center shrink-0">
-                      <DoorOpen size={18} />
+                  <div className="flex items-center gap-2.5 bg-neutral-50 rounded-xl p-3 border border-neutral-100">
+                    <div className="w-8 h-8 rounded-lg bg-[#23096E]/10 text-[#23096E] flex items-center justify-center shrink-0">
+                      <DoorOpen size={16} />
                     </div>
                     <div>
-                      <div className="text-xs text-neutral-400 font-medium">الغرف</div>
-                      <div className="text-sm font-bold text-neutral-900">غرفة واحدة</div>
+                      <div className="text-[10px] text-neutral-400 font-medium">الغرف</div>
+                      <div className="text-xs sm:text-sm font-bold text-neutral-900">غرفة واحدة</div>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Amenities Specific to Room */}
+            {/* 3. AMENITIES (تجهيزات ومرافق) */}
             {room.amenities && room.amenities.length > 0 && (
-              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-neutral-100">
-                <h2 className="text-lg font-black text-neutral-900 mb-5">تجهيزات ومرافق الغرفة</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+              <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
+                <h2 className="text-base sm:text-lg font-black text-neutral-900 mb-4">تجهيزات ومرافق</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {room.amenities.map((a, idx) => {
-                    const iconKey = (a.icon || '').toLowerCase();
-                    const cfg = AMENITY_CFG[iconKey] ?? { icon: <Check size={18}/>, color: '#23096e' };
+                    const iconKey = (a.icon || a.name || '').toLowerCase();
+                    const cfg = AMENITY_CFG[iconKey] ?? { icon: <Check size={16}/>, color: '#23096e' };
+                    const arabicName = getAmenityArabicName(a);
                     return (
-                      <div key={a.id || idx} className="flex items-center gap-3 p-3.5 rounded-2xl border border-neutral-100 bg-neutral-50 hover:border-[#23096e]/20 transition-all">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                      <div key={a.id || idx} className="flex items-center gap-2.5 p-3 rounded-xl border border-neutral-100 bg-neutral-50">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm"
                           style={{ backgroundColor: `${cfg.color}14`, color: cfg.color }}>
                           {cfg.icon}
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-sm text-neutral-800 truncate">{a.name}</p>
-                          {a.nameEn && a.nameEn !== a.name && (
-                            <p className="text-xs text-neutral-400 truncate">{a.nameEn}</p>
-                          )}
-                        </div>
+                        <span className="font-bold text-xs text-neutral-800 truncate">{arabicName}</span>
                       </div>
                     );
                   })}
@@ -330,115 +382,129 @@ export default function RoomDetailClient({ hotel, room }: Props) {
           <div className="w-full lg:w-80 shrink-0 sticky top-24">
             <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 overflow-hidden">
               <div className="h-1.5" style={{ background:'linear-gradient(to right,#23096e,#3A1C8F,#ff3b30)' }} />
+              
               <div className="px-6 pt-6 pb-5 border-b border-neutral-100">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black" style={{ color:'#23096e' }}>{formatPrice(priceToPay)}</span>
+                  <span className="text-3xl sm:text-4xl font-black text-[#FF3B30]">{formatPrice(priceToPay)}</span>
                   <span className="text-neutral-400 text-sm">/ ليلة</span>
                 </div>
                 {hotel.discount && (
                   <div className="flex items-center gap-2 mt-2">
                     <span className="text-neutral-400 line-through text-sm">{formatPrice(discounted)}</span>
                     <span className="text-xs font-bold text-white px-2.5 py-1 rounded-full shadow-sm" style={{ background:'#ff3b30' }}>
-                      خصم حصري للفندق {hotel.discount.percentage}%
+                      خصم {hotel.discount.percentage}%
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="px-6 py-5 space-y-4 border-b border-neutral-100 bg-[#f8f8fa]/50">
-                <div className="flex items-center gap-3 rounded-xl border border-neutral-200 px-4 py-3 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
-                    <Calendar size={15} />
+              <div className="px-5 py-5 space-y-3.5 border-b border-neutral-100 bg-[#f8f8fa]/50">
+                
+                {/* Check In & Check Out SIDE BY SIDE ON BOTH MOBILE & DESKTOP */}
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Check In */}
+                  <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2.5 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                      <Calendar size={13} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">الوصول</p>
+                      <input
+                        type="date"
+                        value={checkIn}
+                        onChange={e => setCheckIn(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="w-full text-[11px] sm:text-xs font-bold text-neutral-800 outline-none bg-transparent mt-0.5 cursor-pointer"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">الوصول</p>
-                    <input type="date" value={checkIn} onChange={e=>setCheckIn(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full text-sm font-bold text-neutral-800 outline-none bg-transparent mt-0.5" />
+
+                  {/* Check Out */}
+                  <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2.5 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                      <Clock size={13} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">المغادرة</p>
+                      <input
+                        type="date"
+                        value={checkOut}
+                        onChange={e => setCheckOut(e.target.value)}
+                        min={checkIn || new Date().toISOString().split('T')[0]}
+                        className="w-full text-[11px] sm:text-xs font-bold text-neutral-800 outline-none bg-transparent mt-0.5 cursor-pointer"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-xl border border-neutral-200 px-4 py-3 focus-within:border-[#23096e] transition-colors bg-white shadow-sm">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
-                    <Clock size={15} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">المغادرة</p>
-                    <input type="date" value={checkOut} onChange={e=>setCheckOut(e.target.value)}
-                      min={checkIn || new Date().toISOString().split('T')[0]}
-                      className="w-full text-sm font-bold text-neutral-800 outline-none bg-transparent mt-0.5" />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 bg-white shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
-                      <Users size={15} />
+                {/* Guests Counter */}
+                <div className="flex items-center justify-between rounded-xl border border-neutral-200 px-3.5 py-2.5 bg-white shadow-sm">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:'#23096e12', color:'#23096e' }}>
+                      <Users size={14} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">الضيوف</p>
-                      <p className="text-sm font-bold text-neutral-800 mt-0.5">{guests} ضيف</p>
+                      <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">الضيوف</p>
+                      <p className="text-xs font-bold text-neutral-800 mt-0.5">{guests} ضيف</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button onClick={() => setGuests(g=>Math.max(1,g-1))}
-                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-base flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none">
+                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none">
                       −
                     </button>
-                    <span className="w-5 text-center text-sm font-black">{guests}</span>
+                    <span className="w-5 text-center text-xs font-black">{guests}</span>
                     <button onClick={() => setGuests(g=>Math.min(room.capacity || 2,g+1))}
-                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-base flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none disabled:opacity-30">
+                      className="w-7 h-7 rounded-lg border border-neutral-200 font-black text-sm flex items-center justify-center hover:border-[#23096e] hover:text-[#23096e] hover:bg-[#23096e]/5 transition-colors leading-none disabled:opacity-30">
                       +
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div className="px-6 py-5 space-y-3 border-b border-neutral-100 text-sm">
-                <div className="flex justify-between text-neutral-500">
+              {/* Price Calculation */}
+              <div className="px-6 py-4 space-y-2.5 border-b border-neutral-100 text-sm">
+                <div className="flex justify-between text-neutral-500 text-xs">
                   <span>{formatPrice(priceToPay)} × {nights} {nights===1?'ليلة':'ليالٍ'}</span>
-                  <span className="font-semibold text-neutral-800">{formatPrice(priceToPay * nights)}</span>
+                  <span className="font-bold text-neutral-800">{formatPrice(priceToPay * nights)}</span>
                 </div>
                 {hotel.discount && (
-                  <div className="flex justify-between text-green-600 text-sm">
+                  <div className="flex justify-between text-green-600 text-xs">
                     <span>خصم {hotel.discount.percentage}%</span>
-                    <span className="font-semibold">− {formatPrice((discounted - priceToPay) * nights)}</span>
+                    <span className="font-bold">− {formatPrice((discounted - priceToPay) * nights)}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-black text-base border-t border-neutral-100 pt-3 mt-2">
+                <div className="flex justify-between font-black text-sm sm:text-base border-t border-neutral-100 pt-2.5 mt-1">
                   <span className="text-neutral-900">الإجمالي</span>
-                  <span style={{ color:'#23096e' }}>{formatPrice(priceToPay * nights)}</span>
+                  <span className="text-[#FF3B30]">{formatPrice(priceToPay * nights)}</span>
                 </div>
               </div>
 
+              {/* Action Button */}
               <div className="px-6 py-5 bg-white">
                 {!hasRequiredBookingData && (
                   <p className="text-center text-xs text-amber-600 mb-3">
-                    اختر تاريخ الوصول والمغادرة وعدد الضيوف للمتابعة.
+                    اختر تاريخ الوصول والمغادرة للمتابعة.
                   </p>
                 )}
                 <Link
                   href={room.isAvailable ? bookingHref() : '#'}
-                  className={`flex items-center justify-center gap-2 w-full font-black text-base py-4 rounded-xl transition-all ${
+                  className={`flex items-center justify-center gap-2 w-full font-black text-sm py-3.5 rounded-xl transition-all ${
                     room.isAvailable
                       ? hasRequiredBookingData
-                        ? 'text-white shadow-md hover:opacity-90 hover:-translate-y-0.5'
+                        ? 'text-white bg-[#23096E] hover:bg-[#1a0654] shadow-md hover:-translate-y-0.5'
                         : 'bg-neutral-100 text-neutral-400 cursor-not-allowed pointer-events-none'
-                      : 'opacity-50 cursor-not-allowed'
+                      : 'opacity-50 cursor-not-allowed bg-neutral-300 text-neutral-500'
                   }`}
-                  style={room.isAvailable && hasRequiredBookingData
-                    ? { background:'linear-gradient(135deg,#23096e,#3A1C8F)' }
-                    : room.isAvailable
-                      ? {}
-                      : { background: '#9ca3af' }}>
+                >
                   {room.isAvailable ? 'حجز الغرفة' : 'غير متاح'}
-                  {room.isAvailable && hasRequiredBookingData && <ArrowRight size={17} />}
+                  {room.isAvailable && hasRequiredBookingData && <ArrowRight size={16} />}
                 </Link>
                 
-                <div className="mt-5 space-y-2.5">
+                <div className="mt-4 space-y-2">
                   {['إلغاء مجاني قبل 24 ساعة', 'دفع عند الوصول أو تحويل بنكي', 'تأكيد فوري للحجز'].map(f=>(
                     <div key={f} className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
-                      <Check size={14} className="text-green-500 shrink-0" />
+                      <Check size={13} className="text-green-500 shrink-0" />
                       {f}
                     </div>
                   ))}
