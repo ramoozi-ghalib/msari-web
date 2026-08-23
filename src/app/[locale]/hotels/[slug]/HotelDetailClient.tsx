@@ -6,10 +6,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useParams } from 'next/navigation';
 import {
-  MapPin, Star, Heart, Share2, Users, Check, ArrowLeft,
+  MapPin, Star, Share2, Users, Check, ArrowLeft,
   ChevronLeft, ChevronRight as ChevronR, Clock, X,
   Shield, Zap, CreditCard, BedDouble, ExternalLink,
-  Sparkles, Maximize2, CheckCircle2
+  Sparkles, Maximize2, CheckCircle2, Bath
 } from 'lucide-react';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
@@ -75,7 +75,6 @@ export default function HotelDetailClient({ hotel }: Props) {
   const currentLocale = (locale as string) || 'ar';
 
   const [slide, setSlide] = useState(0);
-  const [fav, setFav] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -85,37 +84,6 @@ export default function HotelDetailClient({ hotel }: Props) {
   const guests = searchParams.get('guests') || '';
   const cityParam = searchParams.get('city') || hotel.city;
   const bookingError = searchParams.get('bookingError') || '';
-
-  // Handle Favorites persistence
-  useEffect(() => {
-    try {
-      const storedFavs = JSON.parse(localStorage.getItem('msari_favorite_hotels') || '[]');
-      if (Array.isArray(storedFavs) && storedFavs.includes(hotel.id)) {
-        setFav(true);
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, [hotel.id]);
-
-  const toggleFavorite = () => {
-    setFav(prev => {
-      const next = !prev;
-      try {
-        const storedFavs: string[] = JSON.parse(localStorage.getItem('msari_favorite_hotels') || '[]');
-        let updatedFavs: string[];
-        if (next) {
-          updatedFavs = Array.from(new Set([...storedFavs, hotel.id]));
-        } else {
-          updatedFavs = storedFavs.filter(id => id !== hotel.id);
-        }
-        localStorage.setItem('msari_favorite_hotels', JSON.stringify(updatedFavs));
-      } catch {
-        // Ignore storage errors
-      }
-      return next;
-    });
-  };
 
   // Handle Share functionality
   const handleShare = async () => {
@@ -130,7 +98,7 @@ export default function HotelDetailClient({ hotel }: Props) {
         await navigator.share(shareData);
         return;
       } catch {
-        // Fallback to clipboard if user dismissed or share failed
+        // Fallback to clipboard
       }
     }
 
@@ -203,81 +171,8 @@ export default function HotelDetailClient({ hotel }: Props) {
           </div>
         )}
 
-        {/* ─── Hotel Header & Actions ─── */}
-        <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-neutral-100 mb-6">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              {/* Hotel Name & Category Stars */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 tracking-tight">
-                  {hotel.name}
-                </h1>
-                {/* Hotel Category Stars Only */}
-                <div className="flex items-center gap-1 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full">
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: hotel.stars || 4 }).map((_, i) => (
-                      <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <span className="text-xs font-bold text-amber-800 me-0.5">
-                    فندق {hotel.stars || 4} نجوم
-                  </span>
-                </div>
-              </div>
-
-              {/* Location Address */}
-              <div className="flex items-center gap-1.5 text-neutral-500 text-sm mt-2">
-                <MapPin size={15} className="text-[#23096e] shrink-0" />
-                <span>{hotel.address || `${hotel.city}، اليمن`}</span>
-              </div>
-            </div>
-
-            {/* Top Right Actions: Share, Favorite, Starting Price */}
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Starting Price Preview Tag */}
-              <div className="text-start bg-neutral-50 border border-neutral-100 px-4 py-2 rounded-xl">
-                <span className="text-[10px] font-bold text-neutral-400 block">يبدأ السعر من</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl sm:text-2xl font-black text-[#23096e]">{formatPrice(discounted)}</span>
-                  <span className="text-neutral-400 text-xs">/ ليلة</span>
-                </div>
-              </div>
-
-              {/* Favorite Button */}
-              <button
-                onClick={toggleFavorite}
-                title={fav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
-                className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-200 ${
-                  fav
-                    ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-sm'
-                    : 'bg-white border-neutral-200 text-neutral-600 hover:text-neutral-900 hover:border-neutral-300'
-                }`}
-              >
-                <Heart size={18} fill={fav ? 'currentColor' : 'none'} />
-              </button>
-
-              {/* Share Button */}
-              <button
-                onClick={handleShare}
-                title="مشاركة الفندق"
-                className="w-11 h-11 rounded-xl bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all duration-200 relative"
-              >
-                {copied ? <CheckCircle2 size={18} className="text-green-600 animate-scale-in" /> : <Share2 size={18} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Copy Toast Alert */}
-          {copied && (
-            <div className="mt-3 p-2.5 bg-green-50 text-green-800 text-xs font-bold rounded-xl border border-green-200 flex items-center gap-2 animate-fade-in">
-              <Check size={14} className="text-green-600 shrink-0" />
-              تم نسخ رابط الفندق إلى الحافظة بنجاح!
-            </div>
-          )}
-        </div>
-
-        {/* ─── Interactive Gallery ─── */}
-        <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-900 mb-8 aspect-[16/10] sm:aspect-[21/9] max-h-[520px] group">
+        {/* ─── 1. GALLERY AT TOP ─── */}
+        <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-900 mb-6 aspect-[16/10] sm:aspect-[21/9] max-h-[540px] group">
           {slides.map((s, i) => (
             <div
               key={i}
@@ -344,7 +239,66 @@ export default function HotelDetailClient({ hotel }: Props) {
           )}
         </div>
 
-        {/* ─── Key Features Highlights ─── */}
+        {/* ─── 2. HOTEL HEADER & BASIC INFO (UNDER GALLERY) ─── */}
+        <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-neutral-100 mb-6">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              {/* Hotel Name & Category Stars */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 tracking-tight">
+                  {hotel.name}
+                </h1>
+                {/* Hotel Category Stars Only */}
+                <div className="flex items-center gap-1 bg-amber-50 border border-amber-200/80 px-3 py-1 rounded-full">
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: hotel.stars || 4 }).map((_, i) => (
+                      <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-amber-800 me-0.5">
+                    فندق {hotel.stars || 4} نجوم
+                  </span>
+                </div>
+              </div>
+
+              {/* Location Address */}
+              <div className="flex items-center gap-1.5 text-neutral-500 text-sm mt-2">
+                <MapPin size={15} className="text-[#23096e] shrink-0" />
+                <span>{hotel.address || `${hotel.city}، اليمن`}</span>
+              </div>
+            </div>
+
+            {/* Price Preview & Share Button */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="text-start bg-neutral-50 border border-neutral-100 px-4 py-2 rounded-xl">
+                <span className="text-[10px] font-bold text-neutral-400 block">يبدأ السعر من</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl sm:text-2xl font-black text-[#23096e]">{formatPrice(discounted)}</span>
+                  <span className="text-neutral-400 text-xs">/ ليلة</span>
+                </div>
+              </div>
+
+              {/* Share Button */}
+              <button
+                onClick={handleShare}
+                title="مشاركة الفندق"
+                className="w-11 h-11 rounded-xl bg-white border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 flex items-center justify-center transition-all duration-200 shadow-sm"
+              >
+                {copied ? <CheckCircle2 size={18} className="text-green-600 animate-scale-in" /> : <Share2 size={18} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Copy Toast Alert */}
+          {copied && (
+            <div className="mt-3 p-2.5 bg-green-50 text-green-800 text-xs font-bold rounded-xl border border-green-200 flex items-center gap-2 animate-fade-in">
+              <Check size={14} className="text-green-600 shrink-0" />
+              تم نسخ رابط الفندق إلى الحافظة بنجاح!
+            </div>
+          )}
+        </div>
+
+        {/* ─── 3. QUICK HIGHLIGHTS ─── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           <div className="flex items-center gap-2.5 bg-white rounded-xl p-3.5 shadow-sm border border-neutral-100">
             <div className="w-9 h-9 rounded-lg bg-[#23096e]/10 text-[#23096e] flex items-center justify-center shrink-0">
@@ -384,10 +338,10 @@ export default function HotelDetailClient({ hotel }: Props) {
           </div>
         </div>
 
-        {/* ─── Main Content Sections ─── */}
+        {/* ─── 4. MAIN CONTENT SECTIONS ─── */}
         <div className="space-y-8">
 
-          {/* 1. About Hotel */}
+          {/* About Hotel */}
           {hotel.description && (
             <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
               <h2 className="text-lg sm:text-xl font-black text-neutral-900 mb-3">عن الفندق</h2>
@@ -397,7 +351,7 @@ export default function HotelDetailClient({ hotel }: Props) {
             </div>
           )}
 
-          {/* 2. Amenities & Services */}
+          {/* Amenities & Services */}
           <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
             <h2 className="text-lg sm:text-xl font-black text-neutral-900 mb-5">المرافق والخدمات المتاحة</h2>
             {hotel.amenities && hotel.amenities.length > 0 ? (
@@ -436,7 +390,7 @@ export default function HotelDetailClient({ hotel }: Props) {
             )}
           </div>
 
-          {/* 3. Available Rooms (Direct Navigation to Room Details & Booking) */}
+          {/* 5. AVAILABLE ROOMS AS HORIZONTAL ROW CARDS (LIST LAYOUT) */}
           <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
             <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
               <div>
@@ -449,18 +403,20 @@ export default function HotelDetailClient({ hotel }: Props) {
             </div>
 
             {hotel.rooms && hotel.rooms.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-4">
                 {hotel.rooms.map(room => (
                   <div
                     key={room.id}
-                    className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col bg-white ${
-                      !room.isAvailable ? 'border-neutral-200 opacity-60' : 'border-neutral-200/80 hover:border-[#23096e]/40 hover:shadow-md'
+                    className={`rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col md:flex-row bg-white ${
+                      !room.isAvailable
+                        ? 'border-neutral-200 opacity-60'
+                        : 'border-neutral-200/80 hover:border-[#23096e]/40 hover:shadow-md'
                     }`}
                   >
-                    {/* Room Thumbnail */}
+                    {/* Room Thumbnail (Horizontal on Desktop) */}
                     <Link
                       href={roomHref(room.id)}
-                      className="w-full aspect-[16/9] relative block bg-neutral-100 overflow-hidden group"
+                      className="w-full md:w-64 lg:w-72 aspect-[16/10] md:aspect-auto shrink-0 relative block bg-neutral-100 overflow-hidden group min-h-[190px]"
                     >
                       {room.images && room.images.length > 0 && room.images[0]?.startsWith('http') ? (
                         <Image
@@ -468,7 +424,7 @@ export default function HotelDetailClient({ hotel }: Props) {
                           alt={room.name}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          sizes="(max-width: 768px) 100vw, 50vw"
+                          sizes="(max-width: 768px) 100vw, 300px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#23096e]/5 to-[#3A1C8F]/10">
@@ -484,15 +440,15 @@ export default function HotelDetailClient({ hotel }: Props) {
                       </span>
                     </Link>
 
-                    {/* Room Content */}
-                    <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                    {/* Room Details & Actions */}
+                    <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between gap-4">
                       <div>
-                        {/* Title */}
-                        <div className="flex items-start justify-between gap-2">
+                        {/* Title & Name */}
+                        <div className="flex items-start justify-between gap-2 flex-wrap">
                           <div>
                             <Link
                               href={roomHref(room.id)}
-                              className="font-black text-base sm:text-lg text-neutral-900 hover:text-[#23096e] transition-colors line-clamp-1"
+                              className="font-black text-lg sm:text-xl text-neutral-900 hover:text-[#23096e] transition-colors"
                             >
                               {room.name}
                             </Link>
@@ -501,23 +457,29 @@ export default function HotelDetailClient({ hotel }: Props) {
                         </div>
 
                         {room.description && (
-                          <p className="text-xs text-neutral-500 mt-2 leading-5 line-clamp-2">{room.description}</p>
+                          <p className="text-xs sm:text-sm text-neutral-500 mt-2 leading-6 line-clamp-2">{room.description}</p>
                         )}
 
                         {/* Specs & Features Badges */}
                         <div className="flex items-center flex-wrap gap-2 mt-3.5">
-                          <span className="flex items-center gap-1.5 text-xs text-neutral-700 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1 rounded-lg">
-                            <Users size={13} className="text-[#23096e]" />
+                          <span className="flex items-center gap-1.5 text-xs text-neutral-700 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1.5 rounded-lg">
+                            <Users size={14} className="text-[#23096e]" />
                             حتى {room.capacity} {room.capacity === 1 ? 'ضيف' : 'ضيوف'}
                           </span>
                           {room.numberOfBeds && (
-                            <span className="flex items-center gap-1.5 text-xs text-neutral-700 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1 rounded-lg">
-                              <BedDouble size={13} className="text-[#23096e]" />
+                            <span className="flex items-center gap-1.5 text-xs text-neutral-700 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1.5 rounded-lg">
+                              <BedDouble size={14} className="text-[#23096e]" />
                               {room.numberOfBeds} {room.numberOfBeds === 1 ? 'سرير' : 'أسرّة'}
                             </span>
                           )}
-                          {room.amenities?.slice(0, 2).map((a, idx) => (
-                            <span key={`${a.id || a.name}-${idx}`} className="text-xs text-neutral-600 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1 rounded-lg">
+                          {room.numberOfBathrooms && (
+                            <span className="flex items-center gap-1.5 text-xs text-neutral-700 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1.5 rounded-lg">
+                              <Bath size={14} className="text-[#23096e]" />
+                              {room.numberOfBathrooms} {room.numberOfBathrooms === 1 ? 'حمام' : 'حمامات'}
+                            </span>
+                          )}
+                          {room.amenities?.slice(0, 3).map((a, idx) => (
+                            <span key={`${a.id || a.name}-${idx}`} className="text-xs text-neutral-600 bg-neutral-50 border border-neutral-200/70 px-2.5 py-1.5 rounded-lg">
                               {a.name}
                             </span>
                           ))}
@@ -525,7 +487,7 @@ export default function HotelDetailClient({ hotel }: Props) {
                       </div>
 
                       {/* Room Price & Action Button */}
-                      <div className="pt-4 border-t border-neutral-100 flex items-center justify-between gap-3">
+                      <div className="pt-4 border-t border-neutral-100 flex items-center justify-between gap-4 flex-wrap">
                         <div>
                           <span className="text-[10px] text-neutral-400 font-bold block">السعر / ليلة</span>
                           <span className="text-xl sm:text-2xl font-black text-[#23096e]">
@@ -535,10 +497,10 @@ export default function HotelDetailClient({ hotel }: Props) {
 
                         <Link
                           href={roomHref(room.id)}
-                          className="inline-flex items-center gap-2 text-xs sm:text-sm font-black px-4 py-2.5 rounded-xl text-white bg-gradient-to-r from-[#23096e] to-[#3A1C8F] hover:from-[#1d075c] hover:to-[#2e1572] transition-all shadow-sm hover:shadow active:scale-[0.98]"
+                          className="inline-flex items-center gap-2 text-xs sm:text-sm font-black px-5 py-2.5 rounded-xl text-white bg-gradient-to-r from-[#23096e] to-[#3A1C8F] hover:from-[#1d075c] hover:to-[#2e1572] transition-all shadow-sm hover:shadow active:scale-[0.98]"
                         >
-                          عرض التفاصيل والحجز
-                          <ArrowLeft size={15} />
+                          عرض تفاصيل الغرفة والحجز
+                          <ArrowLeft size={16} />
                         </Link>
                       </div>
                     </div>
@@ -554,7 +516,7 @@ export default function HotelDetailClient({ hotel }: Props) {
             )}
           </div>
 
-          {/* 4. Hotel Policies */}
+          {/* 6. Hotel Policies */}
           <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
             <h2 className="text-lg sm:text-xl font-black text-neutral-900 mb-5 flex items-center gap-2">
               <Shield size={20} className="text-[#23096e]" /> سياسات وإرشادات الإقامة
@@ -605,7 +567,7 @@ export default function HotelDetailClient({ hotel }: Props) {
             )}
           </div>
 
-          {/* 5. Location & Google Maps */}
+          {/* 7. Location & Google Maps */}
           <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
             <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
               <h2 className="text-lg sm:text-xl font-black text-neutral-900 flex items-center gap-2">
