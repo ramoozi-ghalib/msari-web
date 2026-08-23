@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getHotelBySlug, getLocalHotels } from '@/actions/hotels';
 import { safeJsonLd } from '@/lib/sanitize';
 import HotelDetailClient from './HotelDetailClient';
+import type { Hotel } from '@/types';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -48,6 +49,20 @@ export async function generateMetadata(props: Props) {
   };
 }
 
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export default async function HotelDetailPage(props: Props) {
   const { slug } = await props.params;
   const hotel = await getHotelBySlug(slug);
@@ -56,13 +71,24 @@ export default async function HotelDetailPage(props: Props) {
     notFound();
   }
 
-  // Fetch up to 3 nearby hotels in the same city
-  let nearbyHotels: any[] = [];
+  // Fetch nearest hotels in the same city/region (excluding current hotel)
+  let nearbyHotels: Hotel[] = [];
   try {
-    const nearbyRes = await getLocalHotels({ city: hotel.city, pageSize: 6 });
-    nearbyHotels = (nearbyRes.data || [])
-      .filter(h => h.id !== hotel.id && h.slug !== hotel.slug)
-      .slice(0, 3);
+    const nearbyRes = await getLocalHotels({ city: hotel.city, pageSize: 20 });
+    const candidates = (nearbyRes.data || []).filter(h => h.id !== hotel.id && h.slug !== hotel.slug);
+
+    if (hotel.lat && hotel.lng) {
+      candidates.sort((a, b) => {
+        if (a.lat && a.lng && b.lat && b.lng) {
+          const distA = calculateDistanceKm(hotel.lat!, hotel.lng!, a.lat, a.lng);
+          const distB = calculateDistanceKm(hotel.lat!, hotel.lng!, b.lat, b.lng);
+          return distA - distB;
+        }
+        return 0;
+      });
+    }
+
+    nearbyHotels = candidates.slice(0, 3);
   } catch {
     // Graceful fallback
   }

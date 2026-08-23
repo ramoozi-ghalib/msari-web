@@ -66,6 +66,45 @@ const FALLBACK_AMENITIES = [
   { name: 'حراسة أمنية',       icon: 'ShieldCheck',    color: '#059669' },
 ];
 
+/**
+ * Parses policy text into discrete bullet points:
+ * - Breaks sentences on dots (.)
+ * - Separates check-in / check-out into individual lines
+ */
+function parsePolicyLines(rawText?: string): string[] {
+  if (!rawText || !rawText.trim()) {
+    return [
+      'تسجيل الوصول: من الساعة 02:00 ظهراً.',
+      'تسجيل المغادرة: حتى الساعة 12:00 ظهراً.',
+      'تطبق الشروط والأحكام العامة المعتمدة للفندق عند تسجيل الوصول والإقامة.'
+    ];
+  }
+
+  const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const result: string[] = [];
+
+  for (const line of rawLines) {
+    // Separate inline check-in and check-out mentions
+    const normalized = line
+      .replace(/([،,;])\s*(تسجيل المغادرة|وقت المغادرة|Check-out|Checkout)/gi, '.\n$2')
+      .replace(/(تسجيل الوصول|وقت الوصول|Check-in|Checkin)/gi, '\n$1');
+
+    const subSegments = normalized.split(/\n+/).map(s => s.trim()).filter(Boolean);
+    for (const sub of subSegments) {
+      // Split on period followed by space
+      const sentenceParts = sub.split(/(?<=\.)\s+/).map(p => p.trim()).filter(Boolean);
+      for (let part of sentenceParts) {
+        part = part.replace(/^[-•*–]\s*/, '').trim();
+        if (part) {
+          result.push(part);
+        }
+      }
+    }
+  }
+
+  return result.length > 0 ? result : [rawText];
+}
+
 interface Props {
   hotel: Hotel;
   nearbyHotels?: Hotel[];
@@ -140,6 +179,9 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   };
 
   const googleMapsUrl = hotel.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel.name} ${hotel.address || ''} ${hotel.city} اليمن`)}`;
+  
+  const rawPolicy = currentLocale === 'ar' ? (hotel.policyAr || hotel.policyEn) : (hotel.policyEn || hotel.policyAr);
+  const policyLines = parsePolicyLines(rawPolicy);
 
   return (
     <div className="bg-[#F8F9FC] min-h-screen pb-20">
@@ -369,7 +411,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                       </div>
                     </div>
 
-                    {/* Price in official red (#FF3B30) & Square rounded button */}
+                    {/* Price in official red (#FF3B30) & Subtle-rounded rectangular button */}
                     <div className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-3">
                       <div>
                         <span className="text-[10px] text-neutral-400 block font-medium">السعر / ليلة</span>
@@ -378,10 +420,10 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                         </span>
                       </div>
 
-                      {/* Square button with rounded borders (matching official theme) */}
+                      {/* Square button with very subtle corners (rounded-[4px]) */}
                       <Link
                         href={roomHref(room.id)}
-                        className="h-10 px-5 rounded-lg bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
+                        className="h-10 px-5 rounded-[4px] bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
                       >
                         عرض الغرفة
                       </Link>
@@ -398,18 +440,19 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           )}
         </div>
 
-        {/* ─── 5. HOTEL POLICIES (FROM DATABASE) ─── */}
+        {/* ─── 5. HOTEL POLICIES WITH BULLET POINT LINE BREAKS ─── */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 mb-6">
           <h2 className="text-lg font-black text-neutral-900 mb-4 flex items-center gap-2">
             <Shield size={18} className="text-[#23096e]" /> سياسة الفندق
           </h2>
 
-          <div className="p-4 bg-neutral-50/80 rounded-xl border border-neutral-100">
-            <p className="text-sm text-neutral-700 leading-7 whitespace-pre-line">
-              {currentLocale === 'ar' 
-                ? (hotel.policyAr || hotel.policyEn || 'تطبق الشروط والأحكام العامة المعتمدة للفندق عند تسجيل الوصول والإقامة.')
-                : (hotel.policyEn || hotel.policyAr || 'Standard hotel terms and policies apply upon check-in and stay.')}
-            </p>
+          <div className="p-4 bg-neutral-50/80 rounded-xl border border-neutral-100 space-y-2.5">
+            {policyLines.map((line, idx) => (
+              <div key={idx} className="flex items-start gap-2.5 text-sm text-neutral-700 leading-6">
+                <span className="text-[#23096e] font-black text-base leading-5 select-none shrink-0">•</span>
+                <span>{line}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -474,14 +517,11 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
           </a>
         </div>
 
-        {/* ─── 7. NEARBY HOTELS SECTION ─── */}
+        {/* ─── 7. NEARBY HOTELS SECTION (CLOSEST 3 HOTELS) ─── */}
         {nearbyHotels && nearbyHotels.length > 0 && (
           <div className="mt-10">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
-              <div>
-                <h2 className="text-lg sm:text-xl font-black text-neutral-900">الفنادق القريبة</h2>
-                <p className="text-xs text-neutral-500 mt-0.5">فنادق أخرى مميزة في {hotel.city || 'نفس المنطقة'}</p>
-              </div>
+              <h2 className="text-lg sm:text-xl font-black text-neutral-900">الفنادق القريبة</h2>
               <Link
                 href={`/${currentLocale}/hotels?city=${encodeURIComponent(hotel.city)}`}
                 className="text-xs font-bold text-[#23096e] hover:underline"
