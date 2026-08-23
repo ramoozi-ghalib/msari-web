@@ -378,12 +378,12 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                         </span>
                       </div>
 
-                      {/* Square button with subtle light corners (rounded-[4px]) */}
+                      {/* Room Booking Button */}
                       <Link
                         href={roomHref(room.id)}
-                        className="h-10 px-5 rounded-[4px] bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
+                        className="h-10 px-6 rounded-lg bg-[#23096E] hover:bg-[#1a0654] text-white text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-200 shadow-sm shrink-0"
                       >
-                        عرض الغرفة
+                        حجز الآن
                       </Link>
                     </div>
                   </div>
