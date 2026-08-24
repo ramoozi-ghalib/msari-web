@@ -18,7 +18,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
     {
       icon: Download,
       value: data?.downloads || '5000+',
-      label: isEn ? 'Users' : 'مستخدم',
+      label: isEn ? 'Downloads' : 'تحميل',
       color: 'text-[#23096E]',
       bg: 'bg-[#23096E]/10 border-[#23096E]/20',
       iconColor: 'text-[#23096E]',
@@ -33,7 +33,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
     },
     {
       icon: Building2,
-      value: data?.hotels || '50+',
+      value: data?.hotels || '100+',
       label: isEn ? 'Hotels' : 'فندق',
       color: 'text-[#FF3B30]',
       bg: 'bg-[#FF3B30]/10 border-[#FF3B30]/20',

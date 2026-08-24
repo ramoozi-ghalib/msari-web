@@ -46,7 +46,7 @@ export default function AppStickyMobileBar({
             <h4 className="text-[11px] font-black text-white truncate">{isEn ? 'Msari Travel App' : 'تطبيق مساري الذكي'}</h4>
             <div className="flex items-center gap-1 text-[9px] text-amber-400 font-bold mt-0.5">
               <span>★ 4.8</span>
-              <span className="text-white/70">({isEn ? '5000+ Users' : '+5000 مستخدم'})</span>
+              <span className="text-white/70">({isEn ? '5000+ Downloads' : '+5000 تحميل'})</span>
             </div>
           </div>
         </div>
