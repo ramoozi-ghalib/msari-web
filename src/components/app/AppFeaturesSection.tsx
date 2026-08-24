@@ -1,6 +1,16 @@
 'use client';
 
-import { Zap, Headphones, Layers, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { 
+  CreditCard, 
+  Coins, 
+  FileCheck2, 
+  Headphones, 
+  MapPin, 
+  Layers,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
@@ -13,109 +23,115 @@ interface Props {
   }>;
 }
 
-const DEFAULT_FEATURES = [
+const LOCAL_FEATURES = [
   {
-    icon: Zap,
-    title: 'تجربة حجز سهلة وسريعة',
-    desc: 'واجهة مستخدم مرنة وبسيطة تتيح لك إتمام حجوزاتك في دقيقة واحدة دون أي تعقيدات.',
+    icon: CreditCard,
+    title: 'حجز فوري بدون بطاقة فيزا دولية',
+    desc: 'لا تحتاج لبطاقات بنكية أجنبية؛ ادفع بسهولة عبر حسابك في بنك الكريمي (إم فلوس)، محفظة جيب، ون باي، أو بالدفع كاش عند الوصول.',
     color: 'from-[#23096E] to-[#3A1C8F]',
-    badge: 'سرعة ودقة',
+    badge: 'طرق دفع يمنية مرنة',
+  },
+  {
+    icon: Coins,
+    title: 'شفافية الأسعار وتعدد العملات',
+    desc: 'احصل على أسعار مباشرة ومحدثة بالريال اليمني (قعيطي وقديم)، الدولار الأمريكي، والريال السعودي بدون أي عمولات خفية.',
+    color: 'from-[#FF3B30] to-[#d92217]',
+    badge: 'ريال يمني / دولار / سعودي',
+  },
+  {
+    icon: FileCheck2,
+    title: 'قسيمة حجز رقمية معتمدة وفورية',
+    desc: 'بمجرد إتمام الحجز تستلم قسيمة الحجز الرسمية المزودة برمز QR على جوالك ومحفوظة للعمل بدون إنترنت عند الوصول للفندق.',
+    color: 'from-emerald-600 to-teal-700',
+    badge: 'تأكيد فوري مضمون',
   },
   {
     icon: Headphones,
-    title: 'دعم فني على مدار الساعة',
-    desc: 'فريق محلي متخصص جاهز لمساعدتك عبر الواتساب والاتصال لضمان إقامة مريحة.',
+    title: 'دعم فني يمني مباشر 24/7',
+    desc: 'فريق دعم محلي متخصص معك في كل خطوة عبر واتساب والاتصال الهاتفي لضمان وصولك واستلام غرفتك بكل راحة.',
     color: 'from-[#3A1C8F] to-[#23096E]',
-    badge: 'دعم يمني 24/7',
+    badge: 'خدمة عملاء حية',
+  },
+  {
+    icon: MapPin,
+    title: 'تغطية شاملة لأهم المدن والمحافظات',
+    desc: 'فنادق وأجنحة وشقق مفروشة في عدن، صنعاء، المكلا، سيئون، المهرة، تعز، إب، مأرب، وشبوة تناسب جميع الميزانيات.',
+    color: 'from-blue-600 to-indigo-800',
+    badge: 'جميع محافظات اليمن',
   },
   {
     icon: Layers,
-    title: 'تطبيق شامل ومبتكر',
-    desc: 'حجز فنادق، تذاكر طيران، وتأجير سيارات ونقل في جميع المحافظات من مكان واحد.',
-    color: 'from-[#FF3B30] to-[#e02d23]',
-    badge: 'فنادق وطيران وسيارات',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'أمان وضمان أفضل سعر',
-    desc: 'أسعار مباشرة وتنافسية مع تأكيد حجز فوري ودون أي رسوم خفية.',
-    color: 'from-emerald-600 to-teal-700',
-    badge: 'أمان وضمان',
+    title: 'منصة سفر شاملة ومتكاملة',
+    desc: 'بالإضافة لفنادق اليمن، يتيح لك التطبيق مقارنة أسعار الفنادق العالمية، وحجز تذاكر الطيران، وطلب تأجير السيارات والتنقل.',
+    color: 'from-purple-700 to-pink-700',
+    badge: 'فنادق · طيران · سيارات',
   },
 ];
 
-const ICON_MAP: Record<string, any> = {
-  Zap,
-  Headphones,
-  Layers,
-  ShieldCheck,
-};
-
 export default function AppFeaturesSection({ isEn = false, features }: Props) {
-  const items = (features && features.length > 0)
-    ? features.map((f, idx) => ({
-        icon: (f.icon && ICON_MAP[f.icon]) || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].icon,
-        title: f.title,
-        desc: f.desc,
-        color: f.color || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].color,
-        badge: f.badge || DEFAULT_FEATURES[idx % DEFAULT_FEATURES.length].badge,
-      }))
-    : DEFAULT_FEATURES;
+  const items = LOCAL_FEATURES;
 
   return (
     <section className="py-20 lg:py-28 bg-[#F4F2F8]/70 relative overflow-hidden">
-      {/* Glow shape */}
+      {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#FF3B30]/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container-msari relative z-10">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black">
-            {isEn ? 'Features & Benefits' : 'المميزات والفوائد'}
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E]">
-            {isEn ? 'Why Choose Msari App for Your Travel?' : 'لماذا تختار تطبيق مساري لرحلاتك القادمة؟'}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#23096E]/10 border border-[#23096E]/20 text-[#23096E] text-xs font-black">
+            <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
+            <span>{isEn ? 'Tailored for You' : 'صُمم خصيصاً للمسافر اليمني'}</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E] tracking-tight">
+            {isEn ? 'Why Download Msari App Today?' : 'لماذا يعتبر تطبيق مساري خيارك الأول للسفر؟'}
           </h2>
           <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
             {isEn
-              ? 'Everything you need to travel across Yemen safely, smoothly, and at the best guaranteed rates.'
-              : 'كل ما تحتاجه لتجربة سفر مريحة وآمنة في اليمن وبأفضل الأسعار المضمونة.'}
+              ? 'Enjoy unmatched convenience, zero foreign card requirements, direct hotel rates, and 24/7 local support across Yemen.'
+              : 'حلول ذكية تراعي واقع المعاملات في اليمن، مع حجز فوري وتأكيد رسمي بأفضل الأسعار المتاحة.'}
           </p>
         </div>
 
-        {/* Features 2x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* 3x2 Grid of Enhanced Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {items.map((feat, idx) => {
             const Icon = feat.icon;
             return (
               <div
                 key={idx}
-                className="group relative bg-white border border-slate-200/90 rounded-3xl p-8 lg:p-10 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col justify-between"
+                className="group relative bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden flex flex-col justify-between"
               >
-                {/* Accent Top Line with Dynamic Gradient */}
+                {/* Accent Top Line with Gradient */}
                 <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${feat.color}`} />
 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   {/* Badge & Icon Row */}
                   <div className="flex items-center justify-between">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feat.color} text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
-                      <Icon size={28} />
+                    <div className={`w-13 h-13 rounded-2xl bg-gradient-to-br ${feat.color} text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon size={26} />
                     </div>
-                    <span className="text-xs font-black text-slate-700 bg-slate-100 border border-slate-200/80 px-3.5 py-1.5 rounded-full">
+                    <span className="text-[11px] font-black text-slate-700 bg-slate-100 border border-slate-200/80 px-3 py-1 rounded-full">
                       {feat.badge}
                     </span>
                   </div>
 
                   {/* Text Content */}
-                  <div className="space-y-2.5">
-                    <h3 className="text-xl lg:text-2xl font-black text-slate-900 group-hover:text-[#23096E] transition-colors">
+                  <div className="space-y-2">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-[#23096E] transition-colors leading-snug">
                       {feat.title}
                     </h3>
-                    <p className="text-[#423861] text-sm lg:text-base leading-relaxed font-semibold">
+                    <p className="text-[#423861] text-xs sm:text-sm leading-relaxed font-semibold">
                       {feat.desc}
                     </p>
                   </div>
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center gap-1.5 text-emerald-700 text-xs font-black">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Included in App' : 'متاح ومفعل في التطبيق'}</span>
                 </div>
               </div>
             );

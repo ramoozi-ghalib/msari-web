@@ -4,16 +4,19 @@ import AppStatsBannerSection from '@/components/app/AppStatsBannerSection';
 import AppFeaturesSection from '@/components/app/AppFeaturesSection';
 import AppScreenshotsShowcase from '@/components/app/AppScreenshotsShowcase';
 import AppHowItWorksSection from '@/components/app/AppHowItWorksSection';
+import AppReviewsSection from '@/components/app/AppReviewsSection';
+import AppFaqSection from '@/components/app/AppFaqSection';
 import AppDownloadCtaSection from '@/components/app/AppDownloadCtaSection';
+import AppStickyMobileBar from '@/components/app/AppStickyMobileBar';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
 export const metadata: Metadata = {
-  title: 'تطبيق مساري حجز الفنادق والطيران والسيارات | مساري',
-  description: 'حمّل تطبيق مساري واستمتع بتجربة حجز مميزة وسريعة لأفضل الفنادق في اليمن، ومقارنة أسعار الفنادق حول العالم وحجز رحلات الطيران والسيارات.',
+  title: 'تطبيق مساري لحجز الفنادق في اليمن والطيران والسيارات | مساري',
+  description: 'حمّل تطبيق مساري الذكي واستمتع بحجز فوري ومؤكد لأفضل فنادق اليمن مع طرق دفع محلية ميسرة (الكريمي، جيب، كاش)، ومقارنة أسعار الفنادق العالمية وتذاكر الطيران.',
   alternates: { canonical: 'https://msari.net/ar/app' },
   openGraph: {
-    title: 'تطبيق مساري حجز الفنادق والطيران والسيارات | مساري',
-    description: 'حمّل تطبيق مساري واستمتع بتجربة حجز مميزة وسريعة لأفضل الفنادق في اليمن.',
+    title: 'تطبيق مساري لحجز الفنادق في اليمن والطيران والسيارات | مساري',
+    description: 'حمّل تطبيق مساري الذكي لحجز أفضل فنادق اليمن بدفع محلي وتأكيد فوري.',
     url: 'https://msari.net/ar/app',
   },
 };
@@ -43,14 +46,14 @@ export default async function AppPage(
   };
 
   return (
-    <main className="min-h-screen bg-[#F4F2F8] text-slate-900 selection:bg-[#23096E] selection:text-white">
+    <main className="min-h-screen bg-[#F4F2F8] text-slate-900 selection:bg-[#23096E] selection:text-white pb-12 md:pb-0">
       {/* 1. Hero Section */}
       <AppHeroSection isEn={isEn} data={heroData} />
 
       {/* 2. Stats Banner */}
       <AppStatsBannerSection isEn={isEn} />
 
-      {/* 3. Key Features */}
+      {/* 3. Key Local Features */}
       <AppFeaturesSection isEn={isEn} features={appContent?.features} />
 
       {/* 4. Interactive App Showcase */}
@@ -59,8 +62,21 @@ export default async function AppPage(
       {/* 5. How It Works in 3 Steps */}
       <AppHowItWorksSection isEn={isEn} howItWorks={appContent?.howItWorks} />
 
-      {/* 6. Bottom Sticky Download CTA Banner */}
+      {/* 6. Authentic Traveler Reviews */}
+      <AppReviewsSection isEn={isEn} />
+
+      {/* 7. App FAQs */}
+      <AppFaqSection isEn={isEn} />
+
+      {/* 8. Download CTA Banner */}
       <AppDownloadCtaSection isEn={isEn} data={ctaData} />
+
+      {/* 9. Floating Sticky Mobile Bar */}
+      <AppStickyMobileBar
+        isEn={isEn}
+        googlePlayUrl={settings.playStoreUrl}
+        appStoreUrl={settings.appStoreUrl}
+      />
     </main>
   );
 }
