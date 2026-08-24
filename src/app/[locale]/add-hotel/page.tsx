@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PagesCmsService } from '@/services/cms';
+import { getCurrentUser } from '@/lib/session';
 import AddHotelClient from './AddHotelClient';
 
 export const metadata: Metadata = {
@@ -14,6 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default async function AddHotelPage() {
-  const pageContent = await PagesCmsService.getAddHotelPage();
-  return <AddHotelClient pageContent={pageContent} />;
+  const [pageContent, user] = await Promise.all([
+    PagesCmsService.getAddHotelPage(),
+    getCurrentUser(),
+  ]);
+
+  return <AddHotelClient pageContent={pageContent} currentUser={user} />;
 }

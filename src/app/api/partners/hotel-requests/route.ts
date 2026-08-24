@@ -2,11 +2,13 @@
  * src/app/api/partners/hotel-requests/route.ts
  *
  * Operational Application Backend API Contract for Hotel Partner Inquiries.
+ * Requires user authentication to submit a request and links the request to the user account.
  * Stores validated requests in operational collection `hotel_partner_requests`.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { auth } from '@/auth';
 import { db, admin, storage } from '@/lib/firebase-admin';
 
 const hotelPartnerSchema = z.object({
@@ -49,6 +51,19 @@ const hotelPartnerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Enforce user authentication
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'يجب تسجيل الدخول بحسابك أولاً لتقديم ومتابعة طلب إضافة الفندق.',
+          requireAuth: true,
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
 
     // Honeypot check against bot spam
@@ -100,8 +115,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Save to Firestore collection `hotel_partner_requests`
+    // Save to Firestore collection `hotel_partner_requests` linked with user account
     const docRef = await db.collection('hotel_partner_requests').add({
+      userId: session.user.id,
+      userEmail: session.user.email || payload.ownerEmail || '',
       hotelName: payload.hotelName,
       city: payload.city,
       stars: payload.stars,
