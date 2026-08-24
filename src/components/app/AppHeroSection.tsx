@@ -40,8 +40,10 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
     ? 'Book the best hotels in Yemen with instant confirmation, flexible local payments, and compare global hotels, flights, and car rentals effortlessly.'
     : 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (المحافظ الإلكترونية، تحويل بنكي، كاش عند الوصول)، وقارن أسعار الفنادق وتذاكر الطيران والسيارات بضغطة زر.');
   
-  const ratingVal = data?.rating || '4.8';
-  const downloadsVal = data?.downloads || (isEn ? '5000+ Downloads' : '5000+ تحميل');
+  const ratingVal = data?.rating ? data.rating.replace('★', '').trim() : '4.8';
+  const downloadsVal = (data?.downloads && !data.downloads.includes('50,000') && !data.downloads.includes('50000')) 
+    ? data.downloads 
+    : (isEn ? '5000+ Downloads' : '5000+ تحميل');
   const googlePlayUrl = data?.googlePlayUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
   const appStoreUrl = data?.appStoreUrl || 'https://apps.apple.com';
 

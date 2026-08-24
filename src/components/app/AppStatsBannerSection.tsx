@@ -17,7 +17,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
   const stats = [
     {
       icon: Download,
-      value: data?.downloads || '5000+',
+      value: (data?.downloads && !data.downloads.includes('50,000') && !data.downloads.includes('50000')) ? data.downloads : '5000+',
       label: isEn ? 'Downloads' : 'تحميل',
       color: 'text-[#23096E]',
       bg: 'bg-[#23096E]/10 border-[#23096E]/20',
@@ -25,7 +25,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
     },
     {
       icon: Star,
-      value: (data?.rating || '4.8') + '★',
+      value: (data?.rating || '4.8').replace('★', '') + '★',
       label: isEn ? 'User Rating' : 'تقييم المسافرين',
       color: 'text-amber-500',
       bg: 'bg-amber-500/10 border-amber-500/20',
@@ -33,7 +33,7 @@ export default function AppStatsBannerSection({ isEn = false, data }: Props) {
     },
     {
       icon: Building2,
-      value: data?.hotels || '100+',
+      value: (data?.hotels && !data.hotels.includes('500')) ? data.hotels : '100+',
       label: isEn ? 'Hotels' : 'فندق',
       color: 'text-[#FF3B30]',
       bg: 'bg-[#FF3B30]/10 border-[#FF3B30]/20',
