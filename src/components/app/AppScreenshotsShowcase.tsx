@@ -61,16 +61,16 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
     },
     {
       id: 2,
-      title: isEn ? 'Local Payments' : 'الدفع وتأكيد الحجز',
+      title: isEn ? 'Multiple Payments' : 'خيارات دفع متعددة',
       icon: CreditCard,
-      headline: isEn ? 'Seamless Local Payment via Kuraimi & Wallets' : 'طرق دفع محلية ميسرة تناسب جميع المواطنين والزوار',
+      headline: isEn ? 'Multiple Local Payment Options in Yemen' : 'ادفع بسهولة عبر المحافظ الإلكترونية، تحويل بنكي، أو كاش',
       subtitle: isEn
-        ? 'Pay directly with Kuraimi (M-Floos), Jeeb wallet, CAC Bank, or choose to pay cash upon arrival.'
-        : 'أتمم حجزك خلال ثوانٍ عبر حسابك في بنك الكريمي، أو محفظة جيب، أو بالحوالات البنكية المباشرة، أو بالدفع كاش في الاستقبال.',
+        ? 'Pay easily via available electronic wallets, direct bank transfer, or cash upon arrival at the hotel.'
+        : 'ادفع بسهولة عبر المحافظ الإلكترونية المتوفرة، أو تحويل بنكي، أو الدفع كاش عند الوصول.',
       bullets: [
-        'دفع فوري عبر تطبيق الكريمي جوال (إم فلوس)',
-        'دعم المحافظ الإلكترونية اليمنية (جيب، ون باي، فلوسك)',
-        'خيار الدفع كاش عند الوصول للفنادق الشريكة',
+        'دفع عبر المحافظ الإلكترونية المتوفرة',
+        'تحويل بنكي مباشر وسريع',
+        'خيار الدفع كاش عند الوصول للفندق',
       ],
       renderScreen: () => <PaymentAppScreen isEn={isEn} />,
     },
@@ -81,7 +81,7 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
       headline: isEn ? 'Instant Official Booking Confirmation & Details' : 'تأكيد رسمي مباشر مع رقم مرجعي وتواصل فوري مع الفندق',
       subtitle: isEn
         ? 'Get your official booking confirmation instantly on your mobile with full check-in details and direct WhatsApp hotel chat.'
-        : 'استلم تفاصيل حجزك المؤكد فوراً على هاتفك متضمناً الرقم المرجعي الرسمي وسياسة الوصول، مع إمكانية حفظ التفاصيل للرجوع إليها بدون إنترنت والتواصل المباشر مع الفندق.',
+        : 'استلم تفاصيل حجزك المؤكد فوراً على هاتفك متضمناً الرقم المرجعي الرسمي وسياسة الوصول، مع إمكانية مراجعة التفاصيل بدون إنترنت والتواصل المباشر مع الفندق.',
       bullets: [
         'تأكيد حجز رسمي ومضمون ومباشر لدى إدارة الفندق',
         'حفظ تفاصيل الحجز للعمل بدون إنترنت وتنزيلها PDF',
@@ -95,32 +95,32 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
   const CurrentIcon = currentTab.icon;
 
   return (
-    <section className="py-20 lg:py-28 bg-white relative overflow-hidden">
+    <section className="py-14 sm:py-20 lg:py-28 bg-white relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-0 right-1/3 w-96 h-96 bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="container-msari relative z-10">
+      <div className="container-msari relative z-10 px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#23096E]/10 border border-[#23096E]/20 text-[#23096E] text-xs font-black">
+        <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#23096E]/10 border border-[#23096E]/20 text-[#23096E] text-xs font-black">
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'Inside the App' : 'شاهد التطبيق من الداخل'}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#23096E] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#23096E] tracking-tight leading-tight">
             {isEn ? 'Explore the Clean, Fast Mobile Interface' : 'استكشف واجهات وتجربة تطبيق مساري'}
           </h2>
-          <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
+          <p className="text-[#423861] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-semibold">
             {isEn
               ? 'Every screen is crafted for simplicity, high speed, and complete clarity on iPhone & Android.'
               : 'شاشات عصرية صُممت لتمنحك تجربة حجز سلسة على أجهزة آيفون وسامسونج دون أي تعقيد.'}
           </p>
 
           {/* Model Switcher for Showcase */}
-          <div className="inline-flex items-center gap-2 bg-[#F4F2F8] p-1.5 rounded-2xl border border-slate-200 shadow-inner mt-2">
+          <div className="inline-flex items-center gap-2 bg-[#F4F2F8] p-1.5 rounded-2xl border border-slate-200 shadow-inner mt-1 sm:mt-2">
             <button
               onClick={() => setDeviceFrame('iphone17')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                 deviceFrame === 'iphone17'
                   ? 'bg-[#23096E] text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
@@ -130,19 +130,19 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
             </button>
             <button
               onClick={() => setDeviceFrame('note24')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                 deviceFrame === 'note24'
                   ? 'bg-[#23096E] text-white shadow-md'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              📱 {isEn ? 'Samsung Note 24 Ultra View' : 'معاينة سامسونج نوت ٢٤ الترا'}
+              📱 {isEn ? 'Samsung Note 24 View' : 'معاينة سامسونج نوت ٢٤'}
             </button>
           </div>
         </div>
 
         {/* Tab Selector Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 mb-12">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 mb-8 sm:mb-12">
           {tabs.map((tab, idx) => {
             const Icon = tab.icon;
             const isActive = activeTab === idx;
@@ -150,13 +150,13 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
               <button
                 key={idx}
                 onClick={() => setActiveTab(idx)}
-                className={`flex items-center gap-2.5 px-4 sm:px-6 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all duration-300 transform cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-2 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-black transition-all duration-300 transform cursor-pointer ${
                   isActive
-                    ? 'bg-[#23096E] text-white shadow-xl shadow-[#23096E]/25 scale-105 border border-[#23096E]'
+                    ? 'bg-[#23096E] text-white shadow-lg shadow-[#23096E]/20 scale-105 border border-[#23096E]'
                     : 'bg-[#F4F2F8] text-slate-700 hover:bg-slate-200/90 hover:text-slate-900 border border-slate-200/60'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-[#FF3B30]' : 'text-slate-500'} />
+                <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'text-[#FF3B30]' : 'text-slate-500'}`} />
                 <span>{tab.title}</span>
               </button>
             );
@@ -164,33 +164,33 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
         </div>
 
         {/* Interactive Showcase Box */}
-        <div className="bg-[#F4F2F8]/70 border border-slate-200/80 rounded-3xl p-6 sm:p-10 lg:p-14 shadow-sm">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <div className="bg-[#F4F2F8]/70 border border-slate-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-10 lg:p-14 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Content Column (Left on RTL) */}
-            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1 text-start">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6 order-2 lg:order-1 text-start">
               
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black">
-                <CurrentIcon size={16} className="text-[#FF3B30]" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black">
+                <CurrentIcon className="w-3.5 h-3.5 text-[#FF3B30]" />
                 <span>{currentTab.title}</span>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
                 {currentTab.headline}
               </h3>
 
-              <p className="text-[#423861] text-base lg:text-lg leading-relaxed font-semibold">
+              <p className="text-[#423861] text-sm sm:text-base lg:text-lg leading-relaxed font-semibold">
                 {currentTab.subtitle}
               </p>
 
               {/* Bullet Points */}
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 pt-1">
                 {currentTab.bullets.map((bullet, bIdx) => (
-                  <div key={bIdx} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <div key={bIdx} className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
                     </div>
-                    <span className="text-sm sm:text-base font-bold text-slate-800">
+                    <span className="text-xs sm:text-base font-bold text-slate-800">
                       {bullet}
                     </span>
                   </div>
@@ -198,22 +198,22 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
               </div>
 
               {/* Action Button */}
-              <div className="pt-4 flex items-center gap-4">
+              <div className="pt-2 sm:pt-4 flex items-center gap-4">
                 <a
                   href="https://play.google.com/store/apps/details?id=net.msari.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#23096E] hover:bg-[#3A1C8F] text-white rounded-2xl text-xs sm:text-sm font-black shadow-lg shadow-[#23096E]/20 transition-all transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 sm:px-6 sm:py-3 bg-[#23096E] hover:bg-[#3A1C8F] text-white rounded-xl sm:rounded-2xl text-xs sm:text-sm font-black shadow-lg shadow-[#23096E]/20 transition-all transform hover:-translate-y-0.5"
                 >
-                  <span>{isEn ? 'Try This Screen in the App' : 'جرب هذه الميزة في التطبيق الآن'}</span>
-                  <Zap className="w-4 h-4 text-[#FF3B30]" />
+                  <span>{isEn ? 'Try in App Now' : 'جرب هذه الميزة في التطبيق'}</span>
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF3B30]" />
                 </a>
               </div>
 
             </div>
 
             {/* Mockup Display Column (Right on RTL) */}
-            <div className="lg:col-span-5 flex justify-center order-1 lg:order-2">
+            <div className="lg:col-span-5 flex justify-center order-1 lg:order-2 scale-90 sm:scale-100 origin-top">
               {deviceFrame === 'iphone17' ? (
                 <IPhone17ProMaxFrame className="shadow-2xl shadow-[#23096E]/25">
                   {currentTab.renderScreen()}
