@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import {
   Hotel, User, Send, CheckCircle, Building2, AlertCircle,
-  Loader2, MapPin, Globe, Mail, Phone, Upload, X, Star,
+  Loader2, MapPin, Globe, Mail, Phone, Upload, X,
   TrendingUp, BadgePercent, Headphones, Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -22,7 +22,6 @@ const POPULAR_AMENITIES = [
   'شاشات ذكية',
   'مياه ساخنة مستمرة',
   'خدمة غسيل وكي الملابس',
-  'طاقة كهربائية مستمرة (24h)',
 ];
 
 const PARTNER_BENEFITS = [
@@ -328,38 +327,32 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
         </div>
       </section>
 
-      {/* ── 3. HOW IT WORKS (3 Simple Steps) ── */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 mb-10 sm:mb-14 text-center">
-        <h2 className="text-base sm:text-lg font-bold text-neutral-800 mb-6">كيف تبدأ الشراكة في 3 خطوات بسيطة؟</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
-            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+      {/* ── 3. HOW IT WORKS (3 Steps side-by-side in 1 row) ── */}
+      <section className="max-w-3xl mx-auto px-3 sm:px-6 mb-10 sm:mb-14 text-center">
+        <h2 className="text-base sm:text-lg font-bold text-neutral-800 mb-5">كيف تبدأ الشراكة في 3 خطوات بسيطة؟</h2>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="bg-white p-2.5 sm:p-4 rounded-2xl border border-neutral-100 shadow-2xs flex flex-col items-center text-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs mb-1.5 shadow-xs">
               1
             </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">قدم طلبك الآن</h4>
-              <p className="text-[11px] text-neutral-400 leading-normal">املأ النموذج بالبيانات الأساسية</p>
-            </div>
+            <h4 className="font-bold text-[11px] sm:text-sm text-neutral-900 mb-0.5 leading-tight">قدم طلبك</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-400 leading-tight">املأ النموذج بدقيقة</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
-            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-2xl border border-neutral-100 shadow-2xs flex flex-col items-center text-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs mb-1.5 shadow-xs">
               2
             </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">المراجعة والاعتماد</h4>
-              <p className="text-[11px] text-neutral-400 leading-normal">يتواصل معك فريقنا خلال 24 ساعة</p>
-            </div>
+            <h4 className="font-bold text-[11px] sm:text-sm text-neutral-900 mb-0.5 leading-tight">المراجعة</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-400 leading-tight">نتواصل خلال 24 ساعة</p>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
-            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-2xl border border-neutral-100 shadow-2xs flex flex-col items-center text-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs mb-1.5 shadow-xs">
               3
             </div>
-            <div>
-              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">استقبل الحجوزات</h4>
-              <p className="text-[11px] text-neutral-400 leading-normal">يظهر فندقك وتبدأ استقبال النزلاء</p>
-            </div>
+            <h4 className="font-bold text-[11px] sm:text-sm text-neutral-900 mb-0.5 leading-tight">استقبل الحجوزات</h4>
+            <p className="text-[10px] sm:text-[11px] text-neutral-400 leading-tight">يظهر فندقك للمسافرين</p>
           </div>
         </div>
       </section>
@@ -382,7 +375,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             
             {/* Honeypot field for bot spam */}
             <input
@@ -402,78 +395,72 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 <span>بيانات الفندق</span>
               </h3>
 
-              {/* 1. Hotel Name */}
-              <div>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
-                  اسم الفندق الرسمي *
-                </label>
-                <input
-                  type="text"
-                  placeholder="مثال: فندق الأمل الدولي"
-                  required
-                  value={form.hotelName}
-                  onChange={e => set('hotelName', e.target.value)}
-                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
-                />
+              {/* 1. Hotel Name & Stars Selector in SAME ROW */}
+              <div className="grid grid-cols-12 gap-2.5 sm:gap-3.5">
+                <div className="col-span-7 sm:col-span-8">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
+                    اسم الفندق *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="مثال: فندق الأمل الدولي"
+                    required
+                    value={form.hotelName}
+                    onChange={e => set('hotelName', e.target.value)}
+                    className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
+                  />
+                </div>
+
+                <div className="col-span-5 sm:col-span-4">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
+                    عدد النجوم *
+                  </label>
+                  <select
+                    value={form.stars}
+                    onChange={e => set('stars', e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 outline-none transition-all bg-neutral-50/40 cursor-pointer"
+                  >
+                    <option value="5">5 نجوم ⭐⭐⭐⭐⭐</option>
+                    <option value="4">4 نجوم ⭐⭐⭐⭐</option>
+                    <option value="3">3 نجوم ⭐⭐⭐</option>
+                    <option value="2">2 نجوم ⭐⭐</option>
+                    <option value="1">1 نجمة ⭐</option>
+                  </select>
+                </div>
               </div>
 
-              {/* 2. City & Stars Selector */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
+              {/* 2. City & Detailed Address in SAME ROW */}
+              <div className="grid grid-cols-12 gap-2.5 sm:gap-3.5">
+                <div className="col-span-5 sm:col-span-4">
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     المدينة / المحافظة *
                   </label>
                   <input
                     type="text"
-                    placeholder="مثال: صنعاء / عدن / المكلا..."
+                    placeholder="صنعاء / عدن..."
                     required
                     value={form.city}
                     onChange={e => set('city', e.target.value)}
-                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
+                    className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
 
-                {/* Stars Interactive Selector */}
-                <div>
+                <div className="col-span-7 sm:col-span-8">
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
-                    تصنيف الفندق (النجوم) *
+                    العنوان التفصيلي *
                   </label>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {['1', '2', '3', '4', '5'].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => set('stars', star)}
-                        className={`h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                          form.stars === star
-                            ? 'bg-[#1D065C] text-white shadow-xs ring-2 ring-[#1D065C]/20'
-                            : 'bg-neutral-50 border border-neutral-200 text-neutral-600 hover:bg-neutral-100'
-                        }`}
-                      >
-                        <span>{star}</span>
-                        <Star size={12} className={form.stars === star ? 'fill-amber-400 text-amber-400' : 'text-neutral-400'} />
-                      </button>
-                    ))}
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="المديرية / الحي / اسم الشارع"
+                    required
+                    value={form.address}
+                    onChange={e => set('address', e.target.value)}
+                    className="w-full px-3 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
+                  />
                 </div>
               </div>
 
-              {/* 3. Address */}
-              <div>
-                <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
-                  العنوان التفصيلي *
-                </label>
-                <input
-                  type="text"
-                  placeholder="المديرية / الحي / اسم الشارع / أقرب معلم بارز"
-                  required
-                  value={form.address}
-                  onChange={e => set('address', e.target.value)}
-                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
-                />
-              </div>
-
-              {/* 4. Google Maps URL (Required for verification) */}
+              {/* 3. Google Maps URL */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
                   <MapPin size={14} className="text-[#FF3B30]" />
@@ -493,8 +480,8 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 </span>
               </div>
 
-              {/* 5. Hotel Email & Website */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {/* 4. Hotel Email & Website in SAME ROW */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
                     <Mail size={14} className="text-[#FF3B30]" />
@@ -527,8 +514,8 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 </div>
               </div>
 
-              {/* 6. Rooms & Suites */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {/* 5. Rooms & Suites in SAME ROW */}
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     عدد الغرف *
@@ -558,12 +545,12 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 </div>
               </div>
 
-              {/* 7. Facilities & Amenities (Interactive Chips) */}
+              {/* 6. Facilities & Amenities (Neat, balanced grid) */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-600 mb-2">
                   المرافق والخدمات المتوفرة *
                 </label>
-                <div className="flex flex-wrap gap-1.5 mb-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-2.5">
                   {POPULAR_AMENITIES.map((item) => {
                     const isSelected = selectedAmenities.includes(item);
                     return (
@@ -571,14 +558,18 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                         key={item}
                         type="button"
                         onClick={() => toggleAmenity(item)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`h-9 px-2.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between gap-1 border cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1D065C] text-white shadow-2xs'
-                            : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                            ? 'bg-[#1D065C] border-[#1D065C] text-white shadow-2xs'
+                            : 'bg-neutral-50/80 border-neutral-200/80 text-neutral-700 hover:bg-neutral-100'
                         }`}
                       >
-                        {isSelected ? <Check size={13} className="text-[#FF3B30]" /> : <span>+</span>}
-                        <span>{item}</span>
+                        <span className="truncate">{item}</span>
+                        {isSelected ? (
+                          <Check size={13} className="text-[#FF3B30] shrink-0" />
+                        ) : (
+                          <span className="text-neutral-400 text-xs shrink-0">+</span>
+                        )}
                       </button>
                     );
                   })}
@@ -592,7 +583,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 />
               </div>
 
-              {/* 8. Facade Image Upload (REQUIRED) */}
+              {/* 7. Facade Image Upload (REQUIRED) */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
                   <Upload size={14} className="text-[#FF3B30]" />
@@ -653,7 +644,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 <span>بيانات مقدم الطلب</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                 {/* 1. Owner Name */}
                 <div>
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
@@ -685,7 +676,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                 {/* 3. Phone / WhatsApp */}
                 <div>
                   <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
