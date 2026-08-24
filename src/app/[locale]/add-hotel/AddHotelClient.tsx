@@ -231,27 +231,27 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
     return (
       <div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center px-4 py-20">
         <div className="text-center max-w-lg bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-neutral-100">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={44} className="text-green-600" />
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle size={36} className="text-green-600" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mb-3">تم استلام طلبك بنجاح!</h2>
-          <p className="text-neutral-600 text-sm mb-6 leading-relaxed">
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-2.5">تم استلام طلبك بنجاح!</h2>
+          <p className="text-neutral-500 text-xs sm:text-sm mb-6 leading-relaxed">
             شكراً لاهتمامك بالانضمام لمنصة مساري. سيقوم فريق علاقات الفنادق بمراجعة بيانات فندقك والتواصل معك خلال ٢٤ ساعة لإتمام إجراءات التفعيل.
           </p>
 
           {referenceNumber && (
-            <div className="bg-neutral-50 border border-neutral-200/80 rounded-2xl p-4 mb-6">
-              <span className="text-xs text-neutral-500 font-bold block mb-1">الرقم المرجعي للطلب:</span>
-              <span className="text-lg font-black text-[#1D065C] select-all font-mono tracking-wide">{referenceNumber}</span>
+            <div className="bg-neutral-50 border border-neutral-200/80 rounded-2xl p-3.5 mb-6">
+              <span className="text-xs text-neutral-400 font-medium block mb-1">الرقم المرجعي للطلب:</span>
+              <span className="text-base sm:text-lg font-bold text-[#1D065C] select-all font-mono tracking-wide">{referenceNumber}</span>
             </div>
           )}
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <a
               href={`${whatsappLink()}?text=${encodeURIComponent(`مرحباً مساري، قمت بتقديم طلب انضمام فندق برقم مرجعي: ${referenceNumber}`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-sm transition-colors shadow-sm"
+              className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs sm:text-sm transition-colors shadow-xs"
             >
               متابعة الطلب مباشرة عبر واتساب
             </a>
@@ -281,7 +281,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 });
                 removeImage();
               }}
-              className="w-full py-3 px-6 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-sm transition-colors cursor-pointer"
+              className="w-full py-2.5 px-5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-600 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
             >
               تقديم طلب لفندق آخر
             </button>
@@ -295,94 +295,94 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
     <div className="min-h-screen bg-[#F8F9FC]">
       
       {/* ── 1. HERO BANNER ── */}
-      <section className="relative pt-24 pb-16 sm:pt-32 sm:pb-24 bg-gradient-to-r from-[#1D065C] via-[#23096E] to-[#2E0D80] text-white overflow-hidden border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 text-white text-xs sm:text-sm font-bold mb-5 border border-white/20 shadow-xs">
-            <Building2 size={15} className="text-[#FF3B30]" />
+      <section className="relative pt-24 pb-14 sm:pt-28 sm:pb-20 bg-gradient-to-r from-[#1D065C] via-[#23096E] to-[#2E0D80] text-white overflow-hidden border-b border-white/10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-semibold mb-4 border border-white/15 shadow-xs">
+            <Building2 size={14} className="text-[#FF3B30]" />
             <span>{badge}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
             {title}
           </h1>
-          <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/75 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
             {subtitle}
           </p>
         </div>
       </section>
 
       {/* ── 2. PARTNER BENEFITS (3 Clean Golden Cards) ── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 mb-12 sm:mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 -mt-6 relative z-20 mb-10 sm:mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {PARTNER_BENEFITS.map((b) => (
             <div
               key={b.title}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-neutral-100 transition-all duration-200"
+              className="bg-white rounded-2xl p-5 shadow-xs hover:shadow-sm border border-neutral-100 transition-all duration-200"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mb-4">
-                <b.icon size={22} />
+              <div className="w-10 h-10 rounded-xl bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mb-3">
+                <b.icon size={20} />
               </div>
-              <h3 className="font-black text-neutral-900 text-base mb-2">{b.title}</h3>
-              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed">{b.desc}</p>
+              <h3 className="font-bold text-neutral-900 text-sm sm:text-base mb-1.5">{b.title}</h3>
+              <p className="text-neutral-500 text-xs leading-relaxed">{b.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── 3. HOW IT WORKS (3 Simple Steps) ── */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 mb-12 sm:mb-16 text-center">
-        <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-8">كيف تبدأ الشراكة في 3 خطوات بسيطة؟</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 mb-10 sm:mb-14 text-center">
+        <h2 className="text-base sm:text-lg font-bold text-neutral-800 mb-6">كيف تبدأ الشراكة في 3 خطوات بسيطة؟</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
+            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
               1
             </div>
             <div>
-              <h4 className="font-bold text-sm text-neutral-900 mb-0.5">قدم طلبك الآن</h4>
-              <p className="text-xs text-neutral-500">املأ النموذج بالبيانات الأساسية</p>
+              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">قدم طلبك الآن</h4>
+              <p className="text-[11px] text-neutral-400 leading-normal">املأ النموذج بالبيانات الأساسية</p>
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
+            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
               2
             </div>
             <div>
-              <h4 className="font-bold text-sm text-neutral-900 mb-0.5">المراجعة والاعتماد</h4>
-              <p className="text-xs text-neutral-500">يتواصل معك فريقنا خلال 24 ساعة</p>
+              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">المراجعة والاعتماد</h4>
+              <p className="text-[11px] text-neutral-400 leading-normal">يتواصل معك فريقنا خلال 24 ساعة</p>
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+          <div className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-2xs flex items-center gap-3 sm:flex-col sm:text-center">
+            <div className="w-8 h-8 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
               3
             </div>
             <div>
-              <h4 className="font-bold text-sm text-neutral-900 mb-0.5">استقبل الحجوزات</h4>
-              <p className="text-xs text-neutral-500">يظهر فندقك وتبدأ الأرباح الفورية</p>
+              <h4 className="font-bold text-xs sm:text-sm text-neutral-900 mb-0.5">استقبل الحجوزات</h4>
+              <p className="text-[11px] text-neutral-400 leading-normal">يظهر فندقك وتبدأ استقبال النزلاء</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── 4. APPLICATION FORM ── */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
-        <div className="bg-white rounded-3xl shadow-sm border border-neutral-100 p-6 sm:p-10">
+      <section className="max-w-2xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="bg-white rounded-3xl shadow-xs border border-neutral-100 p-5 sm:p-8">
           
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-neutral-900 mb-2">نموذج تقديم طلب إضافة فندق</h2>
-            <p className="text-neutral-500 text-xs sm:text-sm">
+            <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-1.5">نموذج تقديم طلب إضافة فندق</h2>
+            <p className="text-neutral-400 text-xs sm:text-[13px] leading-relaxed">
               أدخل البيانات بدقة وسيقوم فريق علاقات الفنادق بالتواصل معك لمراجعة البيانات وتفعيل الفندق.
             </p>
           </div>
 
           {errorMsg && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-3">
-              <AlertCircle size={20} className="shrink-0 text-red-500" />
+            <div className="mb-6 p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-center gap-2.5">
+              <AlertCircle size={18} className="shrink-0 text-red-500" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
             
             {/* Honeypot field for bot spam */}
             <input
@@ -396,15 +396,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
             />
 
             {/* ═══ SECTION 1: بيانات الفندق ═══ */}
-            <div className="space-y-4 pb-8 border-b border-neutral-100">
-              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2">
-                <Hotel size={20} className="text-[#FF3B30]" />
+            <div className="space-y-4 pb-6 border-b border-neutral-100">
+              <h3 className="font-bold text-neutral-800 text-sm sm:text-base flex items-center gap-2">
+                <Hotel size={18} className="text-[#FF3B30]" />
                 <span>بيانات الفندق</span>
               </h3>
 
               {/* 1. Hotel Name */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                   اسم الفندق الرسمي *
                 </label>
                 <input
@@ -413,14 +413,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   required
                   value={form.hotelName}
                   onChange={e => set('hotelName', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                 />
               </div>
 
               {/* 2. City & Stars Selector */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     المدينة / المحافظة *
                   </label>
                   <input
@@ -429,13 +429,13 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     required
                     value={form.city}
                     onChange={e => set('city', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
 
                 {/* Stars Interactive Selector */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     تصنيف الفندق (النجوم) *
                   </label>
                   <div className="grid grid-cols-5 gap-1.5">
@@ -444,14 +444,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                         key={star}
                         type="button"
                         onClick={() => set('stars', star)}
-                        className={`h-11 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                        className={`h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
                           form.stars === star
-                            ? 'bg-[#1D065C] text-white shadow-sm ring-2 ring-[#1D065C]/30'
-                            : 'bg-neutral-50 border border-neutral-200 text-neutral-700 hover:bg-neutral-100'
+                            ? 'bg-[#1D065C] text-white shadow-xs ring-2 ring-[#1D065C]/20'
+                            : 'bg-neutral-50 border border-neutral-200 text-neutral-600 hover:bg-neutral-100'
                         }`}
                       >
                         <span>{star}</span>
-                        <Star size={13} className={form.stars === star ? 'fill-amber-400 text-amber-400' : 'text-neutral-400'} />
+                        <Star size={12} className={form.stars === star ? 'fill-amber-400 text-amber-400' : 'text-neutral-400'} />
                       </button>
                     ))}
                   </div>
@@ -460,7 +460,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
 
               {/* 3. Address */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                   العنوان التفصيلي *
                 </label>
                 <input
@@ -469,14 +469,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   required
                   value={form.address}
                   onChange={e => set('address', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                 />
               </div>
 
               {/* 4. Google Maps URL (Required for verification) */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                  <MapPin size={15} className="text-[#FF3B30]" />
+                <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-[#FF3B30]" />
                   <span>رابط موقع الفندق على خرائط Google *</span>
                 </label>
                 <input
@@ -486,18 +486,18 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   dir="ltr"
                   value={form.googleMapsUrl}
                   onChange={e => set('googleMapsUrl', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                 />
-                <span className="text-[11px] text-neutral-400 block mt-1">
+                <span className="text-[10.5px] text-neutral-400/90 block mt-1">
                   * انسخ رابط مشاركة موقع الفندق من تطبيق خرائط Google لتسهيل التحقق والاعتماد.
                 </span>
               </div>
 
               {/* 5. Hotel Email & Website */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Mail size={15} className="text-[#FF3B30]" />
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                    <Mail size={14} className="text-[#FF3B30]" />
                     <span>البريد الإلكتروني للفندق *</span>
                   </label>
                   <input
@@ -507,13 +507,13 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     dir="ltr"
                     value={form.hotelEmail}
                     onChange={e => set('hotelEmail', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Globe size={15} className="text-[#FF3B30]" />
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                    <Globe size={14} className="text-[#FF3B30]" />
                     <span>الموقع الإلكتروني للفندق (إن وجد)</span>
                   </label>
                   <input
@@ -522,15 +522,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     dir="ltr"
                     value={form.hotelWebsite}
                     onChange={e => set('hotelWebsite', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
               </div>
 
               {/* 6. Rooms & Suites */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     عدد الغرف *
                   </label>
                   <input
@@ -540,11 +540,11 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     required
                     value={form.rooms}
                     onChange={e => set('rooms', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     عدد الأجنحة
                   </label>
                   <input
@@ -553,17 +553,17 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     min="0"
                     value={form.suites}
                     onChange={e => set('suites', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
               </div>
 
               {/* 7. Facilities & Amenities (Interactive Chips) */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-2">
+                <label className="block text-xs font-semibold text-neutral-600 mb-2">
                   المرافق والخدمات المتوفرة *
                 </label>
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-1.5 mb-2.5">
                   {POPULAR_AMENITIES.map((item) => {
                     const isSelected = selectedAmenities.includes(item);
                     return (
@@ -571,13 +571,13 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                         key={item}
                         type="button"
                         onClick={() => toggleAmenity(item)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1D065C] text-white shadow-xs'
-                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                            ? 'bg-[#1D065C] text-white shadow-2xs'
+                            : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                         }`}
                       >
-                        {isSelected ? <Check size={14} className="text-[#FF3B30]" /> : <span>+</span>}
+                        {isSelected ? <Check size={13} className="text-[#FF3B30]" /> : <span>+</span>}
                         <span>{item}</span>
                       </button>
                     );
@@ -588,19 +588,19 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   placeholder="مرافق وخدمات إضافية أخرى (اختياري)..."
                   value={form.customAmenities}
                   onChange={e => set('customAmenities', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 outline-none bg-neutral-50/50"
+                  className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none bg-neutral-50/40"
                 />
               </div>
 
               {/* 8. Facade Image Upload (REQUIRED) */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                  <Upload size={15} className="text-[#FF3B30]" />
+                <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                  <Upload size={14} className="text-[#FF3B30]" />
                   <span>صورة واجهة الفندق الرسمية * (إجراء مطلوب للتحقق)</span>
                 </label>
 
                 {imagePreview ? (
-                  <div className="relative w-full aspect-video max-h-56 rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-900 shadow-sm">
+                  <div className="relative w-full aspect-video max-h-52 rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-900 shadow-xs">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imagePreview}
@@ -610,22 +610,22 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     <button
                       type="button"
                       onClick={removeImage}
-                      className="absolute top-3 end-3 p-1.5 rounded-full bg-[#FF3B30] text-white hover:bg-red-700 transition-colors shadow-md cursor-pointer"
+                      className="absolute top-2.5 end-2.5 p-1.5 rounded-full bg-[#FF3B30] text-white hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
                       title="حذف الصورة"
                     >
-                      <X size={16} />
+                      <X size={15} />
                     </button>
                   </div>
                 ) : (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-neutral-300 hover:border-[#FF3B30] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-neutral-50/50 hover:bg-[#FF3B30]/5"
+                    className="w-full border border-dashed border-neutral-300 hover:border-[#FF3B30] rounded-2xl p-5 text-center cursor-pointer transition-colors bg-neutral-50/40 hover:bg-[#FF3B30]/5"
                   >
-                    <Upload size={28} className="mx-auto text-[#FF3B30] mb-2" />
-                    <p className="font-bold text-xs sm:text-sm text-neutral-700 mb-1">
+                    <Upload size={24} className="mx-auto text-[#FF3B30] mb-1.5" />
+                    <p className="font-bold text-xs text-neutral-700 mb-0.5">
                       انقر هنا لاختيار صورة واجهة الفندق
                     </p>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[10.5px] text-neutral-400">
                       الصيغ المدعومة: JPG, PNG, WebP (الحد الأقصى: 5 ميجابايت)
                     </p>
                   </div>
@@ -648,15 +648,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
 
             {/* ═══ SECTION 2: بيانات مقدم الطلب ═══ */}
             <div className="space-y-4">
-              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2">
-                <User size={20} className="text-[#FF3B30]" />
+              <h3 className="font-bold text-neutral-800 text-sm sm:text-base flex items-center gap-2">
+                <User size={18} className="text-[#FF3B30]" />
                 <span>بيانات مقدم الطلب</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* 1. Owner Name */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     اسم المسؤول الرباعي (مقدم الطلب) *
                   </label>
                   <input
@@ -665,13 +665,13 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     required
                     value={form.ownerName}
                     onChange={e => set('ownerName', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
 
                 {/* 2. Position */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                     الصفة / المسمى الوظيفي *
                   </label>
                   <input
@@ -680,16 +680,16 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     required
                     value={form.position}
                     onChange={e => set('position', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* 3. Phone / WhatsApp */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Phone size={15} className="text-[#FF3B30]" />
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                    <Phone size={14} className="text-[#FF3B30]" />
                     <span>رقم الهاتف / واتساب للتواصل المباشر *</span>
                   </label>
                   <input
@@ -699,14 +699,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     dir="ltr"
                     value={form.ownerPhone}
                     onChange={e => set('ownerPhone', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
 
                 {/* 4. Owner Email */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Mail size={15} className="text-[#FF3B30]" />
+                  <label className="block text-xs font-semibold text-neutral-600 mb-1.5 flex items-center gap-1.5">
+                    <Mail size={14} className="text-[#FF3B30]" />
                     <span>البريد الإلكتروني للمسؤول (اختياري)</span>
                   </label>
                   <input
@@ -715,14 +715,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     dir="ltr"
                     value={form.ownerEmail}
                     onChange={e => set('ownerEmail', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40"
                   />
                 </div>
               </div>
 
               {/* 5. Additional Message */}
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-600 mb-1.5">
                   ملاحظات أو تفاصيل إضافية عن الفندق (اختياري)
                 </label>
                 <textarea
@@ -730,35 +730,35 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   rows={3}
                   value={form.message}
                   onChange={e => set('message', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50 resize-none"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-xs sm:text-sm text-neutral-800 placeholder:text-xs placeholder:text-neutral-400/80 outline-none transition-all bg-neutral-50/40 resize-none"
                 />
               </div>
             </div>
 
             {/* ═══ SUBMIT BUTTON ═══ */}
-            <div className="pt-4">
+            <div className="pt-3">
               <Button
                 type="submit"
                 variant="primary"
                 size="lg"
                 fullWidth
                 disabled={isSubmitting}
-                className="py-4 text-base font-bold bg-[#1D065C] hover:bg-[#150444] text-white shadow-md rounded-2xl cursor-pointer"
-                icon={isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                className="py-3.5 text-sm sm:text-base font-bold bg-[#1D065C] hover:bg-[#150444] text-white shadow-md rounded-2xl cursor-pointer"
+                icon={isSubmitting ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
               >
                 {isSubmitting ? 'جاري التحقق وإرسال الطلب...' : 'إرسال طلب الانضمام الآن'}
               </Button>
 
               {/* ⚠️ REQUIRED NOTICE ALERT (Under Submit Button) */}
-              <div className="mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-start gap-3">
-                <AlertCircle size={20} className="shrink-0 text-amber-600 mt-0.5" />
-                <div className="leading-relaxed">
-                  <strong className="block font-bold mb-0.5">تنبيه هام لضمان قبول الطلب:</strong>
+              <div className="mt-5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                <AlertCircle size={18} className="shrink-0 text-amber-600 mt-0.5" />
+                <div className="leading-relaxed text-amber-800/90">
+                  <strong className="block font-bold text-amber-900 mb-0.5">تنبيه هام لضمان قبول الطلب:</strong>
                   لن يتم قبول أي طلبات غير مكتملة أو غير صحيحة. يرجى تعبئة جميع الحقول المطلوبة والتأكد من صحة بيانات التواصل وصورة واجهة الفندق قبل الإرسال.
                 </div>
               </div>
 
-              <p className="text-[11px] text-neutral-400 text-center mt-4">
+              <p className="text-[10.5px] text-neutral-400 text-center mt-3.5">
                 🔒 يتم التعامل مع جميع البيانات بسرية تامة وسيتم التواصل معك مباشرة للتحقق وتفعيل الحساب.
               </p>
             </div>
