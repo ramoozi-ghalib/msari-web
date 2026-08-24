@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { User, Mail, Phone, LogOut, BookOpen, Heart, Hotel, ChevronLeft } from 'lucide-react';
 import { signOut } from 'next-auth/react';
@@ -13,13 +14,18 @@ interface ProfileClientProps {
 
 export default function ProfileClient({ user, locale }: ProfileClientProps) {
   const [loggingOut, setLoggingOut] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
     await signOut({ callbackUrl: `/${locale}` });
   };
 
-  const name = user.name || user.email || 'المستخدم';
+  const name = user?.name || user?.email || 'المستخدم';
+  const email = user?.email || 'لم يُحدد';
+  const phone = user?.phone || 'لم يُضَف بعد';
+  const userImage = (!imageError && user?.image && typeof user.image === 'string' && user.image.startsWith('http')) ? user.image : null;
+
   const initials = name
     .split(' ')
     .filter(Boolean)
@@ -37,24 +43,37 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
   return (
     <div className="min-h-screen bg-[#F8F9FC]">
       {/* ── 1. HERO HEADER ── */}
-      <section className="bg-gradient-to-r from-[#1D065C] via-[#23096E] to-[#2E0D80] pt-24 pb-12 sm:pt-28 sm:pb-16 text-white border-b border-white/10">
+      <section className="bg-gradient-to-r from-[#1D065C] via-[#23096E] to-[#2E0D80] pt-24 pb-10 sm:pt-28 sm:pb-14 text-white border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 sm:gap-6">
-            {/* Avatar Initials */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/15 border-2 border-white/30 rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-inner shrink-0">
-              {initials}
+            {/* Avatar Box (Profile Image or Initials) */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-white/15 border-2 border-white/30 rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-inner shrink-0 overflow-hidden">
+              {userImage ? (
+                <Image
+                  src={userImage}
+                  alt={name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 64px, 80px"
+                  onError={() => setImageError(true)}
+                  priority
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
+
             {/* Name & Email */}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="text-2xl sm:text-3xl font-black text-white mb-1 truncate">{name}</h1>
-              <p className="text-white/75 text-xs sm:text-sm font-medium truncate">{user.email}</p>
+              <p className="text-white/80 text-xs sm:text-sm font-medium truncate">{email}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 2. MOBILE HORIZONTAL SEGMENTED TABS (Visible only on mobile) ── */}
-      <div className="lg:hidden max-w-6xl mx-auto px-4 -mt-5 mb-6 relative z-10">
+      {/* ── 2. MOBILE HORIZONTAL SEGMENTED TABS ── */}
+      <div className="lg:hidden max-w-6xl mx-auto px-4 pt-4 mb-2">
         <div className="bg-white rounded-2xl p-1.5 shadow-sm border border-neutral-100 flex items-center gap-1">
           {navItems.map((item) => (
             <Link
@@ -77,7 +96,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
           
-          {/* ═══ DESKTOP SIDEBAR (Visible only on desktop lg+) ═══ */}
+          {/* ═══ DESKTOP SIDEBAR ═══ */}
           <aside className="hidden lg:block space-y-4">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-neutral-100">
               <h2 className="font-black text-neutral-900 mb-3 text-sm px-2">القائمة الرئيسية</h2>
@@ -111,20 +130,16 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
             </div>
           </aside>
 
-          {/* ═══ MAIN CONTENT AREA ═══ */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* ═══ MAIN CONTENT AREA (Visible on both Mobile and Desktop) ═══ */}
+          <div className="w-full lg:col-span-2 space-y-6">
             
-            {/* 1. Personal Information Card (الاسم، البريد، الهاتف فقط) */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
-              <div className="flex items-center justify-between mb-5 pb-4 border-b border-neutral-100">
+            {/* 1. Personal Information Card (الاسم، البريد، الهاتف فقط وبدون شارة حساب موثق) */}
+            <div className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-neutral-100">
+              <div className="mb-5 pb-4 border-b border-neutral-100">
                 <h2 className="text-base sm:text-lg font-black text-neutral-900">المعلومات الشخصية</h2>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  حساب موثق
-                </span>
               </div>
 
-              <div className="space-y-3.5">
+              <div className="space-y-3 sm:space-y-3.5">
                 {/* 1. Full Name */}
                 <div className="flex items-center gap-3.5 p-3.5 rounded-xl bg-[#F8F9FC] border border-neutral-100">
                   <div className="w-10 h-10 bg-[#1D065C]/10 text-[#1D065C] rounded-xl flex items-center justify-center shrink-0">
@@ -132,7 +147,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] text-neutral-400 font-semibold mb-0.5">الاسم الكامل</div>
-                    <div className="text-neutral-900 font-bold text-sm sm:text-base truncate">{user.name || 'لم يُحدد'}</div>
+                    <div className="text-neutral-900 font-bold text-sm sm:text-base break-words">{name}</div>
                   </div>
                 </div>
 
@@ -143,7 +158,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] text-neutral-400 font-semibold mb-0.5">البريد الإلكتروني</div>
-                    <div className="text-neutral-900 font-bold text-sm sm:text-base truncate">{user.email}</div>
+                    <div className="text-neutral-900 font-bold text-sm sm:text-base break-words">{email}</div>
                   </div>
                 </div>
 
@@ -154,8 +169,8 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] text-neutral-400 font-semibold mb-0.5">رقم الهاتف</div>
-                    <div className="text-neutral-900 font-bold text-sm sm:text-base truncate" dir="ltr" style={{ textAlign: 'right' }}>
-                      {user.phone || 'لم يُضَف بعد'}
+                    <div className="text-neutral-900 font-bold text-sm sm:text-base break-words" dir="ltr" style={{ textAlign: 'right' }}>
+                      {phone}
                     </div>
                   </div>
                 </div>
@@ -163,7 +178,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
             </div>
 
             {/* 2. Quick Actions Card */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-neutral-100">
+            <div className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-neutral-100">
               <h2 className="text-base sm:text-lg font-black text-neutral-900 mb-4">إجراءات سريعة</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <Link
@@ -200,7 +215,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
               </div>
             </div>
 
-            {/* 3. Mobile Logout Button (Visible only on mobile) */}
+            {/* 3. Mobile Logout Button */}
             <div className="lg:hidden pt-2">
               <button
                 onClick={handleLogout}

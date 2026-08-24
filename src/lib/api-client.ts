@@ -361,6 +361,7 @@ class ApiClient {
     email: string;
     name: string;
     phone?: string;
+    image?: string;
     role: 'CUSTOMER' | 'ADMIN' | 'BOOKING_STAFF';
     token?: string;
   }>> {
@@ -374,24 +375,35 @@ class ApiClient {
       return { success: false, error: res.error };
     }
 
-    // Call /me to get name and Firestore user details
+    // Call /me to get name, photo and Firestore user details
     const meRes = await this.get<{
       uid: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-      phoneNumber: string;
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+      email?: string;
+      phoneNumber?: string;
+      photoUrl?: string;
+      photoURL?: string;
+      avatarUrl?: string;
+      image?: string;
+      profilePicture?: string;
     }>('/me', { Authorization: `Bearer ${res.data.token}` });
 
     const role = (email.endsWith('@msari.net') || email === 'admin@msari.net') ? 'ADMIN' as const : 'CUSTOMER' as const;
+    const me = meRes.success && meRes.data ? meRes.data : null;
+    const name = me ? (me.name || `${me.firstName || ''} ${me.lastName || ''}`.trim() || 'User') : 'User';
+    const phone = me ? (me.phoneNumber || '') : '';
+    const image = me ? (me.photoURL || me.photoUrl || me.avatarUrl || me.image || me.profilePicture || '') : '';
 
     return {
       success: true,
       data: {
         id: res.data.uid,
         email: res.data.email,
-        name: meRes.success && meRes.data ? `${meRes.data.firstName} ${meRes.data.lastName}`.trim() || 'User' : 'User',
-        phone: meRes.success && meRes.data ? meRes.data.phoneNumber || '' : '',
+        name,
+        phone,
+        image,
         role,
         token: res.data.token,
       },

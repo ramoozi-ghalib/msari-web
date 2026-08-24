@@ -132,6 +132,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               phone: apiRes.data.phone || '',
               role: apiRes.data.role as UserRole,
               token: apiRes.data.token,
+              image: apiRes.data.image || '',
             };
           }
           await bcrypt.compare(password, DUMMY_HASH);
@@ -156,6 +157,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.role = user.role;
         token.firebaseToken = user.token;
         token.phone = user.phone;
+        token.picture = user.image;
+        token.image = user.image;
       }
       return token;
     },
@@ -168,6 +171,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         session.user.role = token.role as UserRole;
         session.user.firebaseToken = token.firebaseToken as string;
         session.user.phone = (token.phone as string) || '';
+        session.user.image = (token.image as string) || (token.picture as string) || '';
       }
       return session;
     },
