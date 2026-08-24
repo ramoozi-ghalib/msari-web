@@ -385,6 +385,7 @@ class ApiClient {
       phoneNumber?: string;
       photoUrl?: string;
       photoURL?: string;
+      profileImageUrl?: string;
       avatarUrl?: string;
       image?: string;
       profilePicture?: string;
@@ -394,7 +395,7 @@ class ApiClient {
     const me = meRes.success && meRes.data ? meRes.data : null;
     const name = me ? (me.name || `${me.firstName || ''} ${me.lastName || ''}`.trim() || 'User') : 'User';
     const phone = me ? (me.phoneNumber || '') : '';
-    const image = me ? (me.photoURL || me.photoUrl || me.avatarUrl || me.image || me.profilePicture || '') : '';
+    const image = me ? (me.profileImageUrl || me.photoURL || me.photoUrl || me.avatarUrl || me.image || me.profilePicture || '') : '';
 
     return {
       success: true,

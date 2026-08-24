@@ -22,34 +22,50 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   const enrichedUser = { ...user };
 
-  // Fetch fresh profile data (photoURL, name, phone) from Firestore and Firebase Auth
   try {
-    if (user.id && !user.id.startsWith('admin-')) {
-      const userDoc = await db.collection('users').doc(user.id).get();
-      if (userDoc.exists) {
-        const uData = userDoc.data();
-        if (uData) {
-          const freshImg = uData.photoURL || uData.photoUrl || uData.avatarUrl || uData.image || uData.profilePicture || uData.avatar || '';
-          const freshName = uData.displayName || uData.name || (uData.firstName ? `${uData.firstName} ${uData.lastName || ''}`.trim() : '');
-          const freshPhone = uData.phoneNumber || uData.phone || '';
+    if (user.id) {
+      // 1. Check in 'customers' collection (where regular users/customers are stored)
+      const custDoc = await db.collection('customers').doc(user.id).get();
+      if (custDoc.exists) {
+        const d = custDoc.data();
+        if (d) {
+          const freshImg = d.profileImageUrl || d.photoURL || d.photoUrl || d.image || d.avatarUrl || '';
+          const freshName = `${d.firstName || ''} ${d.lastName || ''}`.trim() || d.name || d.displayName || '';
+          const freshPhone = d.phoneNumber || d.phone || '';
 
           if (freshImg) enrichedUser.image = freshImg;
-          if (freshName && !enrichedUser.name) enrichedUser.name = freshName;
-          if (freshPhone && !enrichedUser.phone) enrichedUser.phone = freshPhone;
+          if (freshName) enrichedUser.name = freshName;
+          if (freshPhone) enrichedUser.phone = freshPhone;
         }
       } else {
-        try {
-          const authUser = await admin.auth().getUser(user.id);
-          if (authUser.photoURL) enrichedUser.image = authUser.photoURL;
-          if (authUser.displayName && !enrichedUser.name) enrichedUser.name = authUser.displayName;
-          if (authUser.phoneNumber && !enrichedUser.phone) enrichedUser.phone = authUser.phoneNumber;
-        } catch {
-          // ignore auth lookup error
+        // 2. Check in 'admins' collection
+        const adminDoc = await db.collection('admins').doc(user.id).get();
+        if (adminDoc.exists) {
+          const d = adminDoc.data();
+          if (d) {
+            const freshImg = d.profileImageUrl || d.photoURL || d.photoUrl || d.image || '';
+            const freshName = `${d.first_name || ''} ${d.last_name || ''}`.trim() || d.name || '';
+            const freshPhone = d.phone || d.phoneNumber || '';
+
+            if (freshImg) enrichedUser.image = freshImg;
+            if (freshName) enrichedUser.name = freshName;
+            if (freshPhone) enrichedUser.phone = freshPhone;
+          }
+        } else {
+          // 3. Fallback to Firebase Auth
+          try {
+            const authUser = await admin.auth().getUser(user.id);
+            if (authUser.photoURL) enrichedUser.image = authUser.photoURL;
+            if (authUser.displayName && !enrichedUser.name) enrichedUser.name = authUser.displayName;
+            if (authUser.phoneNumber && !enrichedUser.phone) enrichedUser.phone = authUser.phoneNumber;
+          } catch {
+            // ignore
+          }
         }
       }
     }
-  } catch (e) {
-    console.warn('[ProfilePage] Error fetching user profile from database:', e);
+  } catch (err) {
+    console.warn('[ProfilePage] Failed to fetch customer document from Firestore:', err);
   }
 
   return <ProfileClient user={enrichedUser} locale={locale} />;
