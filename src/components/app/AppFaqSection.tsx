@@ -5,9 +5,10 @@ import { ChevronDown, HelpCircle, Sparkles } from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
+  faqs?: Array<{ q: string; a: string }>;
 }
 
-const FAQS = [
+const DEFAULT_FAQS = [
   {
     q: 'هل تطبيق مساري مجاني للتحميل والاستخدام؟',
     a: 'نعم، تطبيق مساري مجاني 100% للتحميل على هواتف آيفون وسامسونج وأندرويد، ولا توجد أي رسوم اشتراك أو رسوم حجز إضافية. الأسعار المعروضة في التطبيق هي الأسعار الفعلية المباشرة للفنادق.',
@@ -34,8 +35,9 @@ const FAQS = [
   },
 ];
 
-export default function AppFaqSection({ isEn = false }: Props) {
+export default function AppFaqSection({ isEn = false, faqs }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const faqList = (Array.isArray(faqs) && faqs.length > 0) ? faqs : DEFAULT_FAQS;
 
   const toggle = (idx: number) => {
     setOpenIdx(openIdx === idx ? null : idx);
@@ -63,7 +65,7 @@ export default function AppFaqSection({ isEn = false }: Props) {
 
         {/* Accordion List */}
         <div className="space-y-3 sm:space-y-4">
-          {FAQS.map((faq, idx) => {
+          {faqList.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div

@@ -50,19 +50,19 @@ export default async function AppPage(
       <AppHeroSection isEn={isEn} data={heroData} />
 
       {/* 2. Stats Banner */}
-      <AppStatsBannerSection isEn={isEn} />
+      <AppStatsBannerSection isEn={isEn} stats={appContent?.stats} data={heroData} />
 
       {/* 3. Key Local Features */}
       <AppFeaturesSection isEn={isEn} features={appContent?.features} />
 
       {/* 4. Interactive App Showcase (iPhone 17 & Samsung Note 24 Ultra) */}
-      <AppScreenshotsShowcase isEn={isEn} />
+      <AppScreenshotsShowcase isEn={isEn} screensShowcase={appContent?.screensShowcase} />
 
       {/* 5. How It Works in 3 Steps */}
-      <AppHowItWorksSection isEn={isEn} />
+      <AppHowItWorksSection isEn={isEn} howItWorks={appContent?.howItWorks} />
 
       {/* 6. App FAQs */}
-      <AppFaqSection isEn={isEn} />
+      <AppFaqSection isEn={isEn} faqs={appContent?.faqs} />
 
       {/* 7. Download CTA Banner */}
       <AppDownloadCtaSection isEn={isEn} data={ctaData} />

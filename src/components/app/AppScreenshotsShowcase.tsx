@@ -22,9 +22,16 @@ import {
 
 interface Props {
   isEn?: boolean;
+  screensShowcase?: Array<{
+    id?: number;
+    title?: string;
+    headline?: string;
+    subtitle?: string;
+    bullets?: string[];
+  }>;
 }
 
-export default function AppScreenshotsShowcase({ isEn = false }: Props) {
+export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }: Props) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [deviceFrame, setDeviceFrame] = useState<'iphone17' | 'note24'>('iphone17');
 
@@ -91,7 +98,21 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
     },
   ];
 
-  const currentTab = tabs[activeTab] || tabs[0];
+  const effectiveTabs = tabs.map((defaultTab, idx) => {
+    const cmsItem = screensShowcase?.[idx];
+    if (!cmsItem) return defaultTab;
+    return {
+      ...defaultTab,
+      title: cmsItem.title || defaultTab.title,
+      headline: cmsItem.headline || defaultTab.headline,
+      subtitle: cmsItem.subtitle || defaultTab.subtitle,
+      bullets: (Array.isArray(cmsItem.bullets) && cmsItem.bullets.length > 0)
+        ? cmsItem.bullets
+        : defaultTab.bullets,
+    };
+  });
+
+  const currentTab = effectiveTabs[activeTab] || effectiveTabs[0];
   const CurrentIcon = currentTab.icon;
 
   return (
@@ -143,7 +164,7 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
 
         {/* Tab Selector Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 mb-8 sm:mb-12">
-          {tabs.map((tab, idx) => {
+          {effectiveTabs.map((tab, idx) => {
             const Icon = tab.icon;
             const isActive = activeTab === idx;
             return (

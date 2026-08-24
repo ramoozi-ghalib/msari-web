@@ -5,6 +5,13 @@ import { Smartphone, Search, CheckCircle2, ArrowLeft, Sparkles } from 'lucide-re
 
 interface Props {
   isEn?: boolean;
+  howItWorks?: Array<{
+    step?: string;
+    title: string;
+    subtitle?: string;
+    desc: string;
+    badge?: string;
+  }>;
 }
 
 const DEFAULT_STEPS = [
@@ -37,8 +44,22 @@ const DEFAULT_STEPS = [
   },
 ];
 
-export default function AppHowItWorksSection({ isEn = false }: Props) {
-  const steps = DEFAULT_STEPS;
+export default function AppHowItWorksSection({ isEn = false, howItWorks }: Props) {
+  const stepIcons = [Smartphone, Search, CheckCircle2];
+  const stepColors = ['bg-[#23096E]', 'bg-[#3A1C8F]', 'bg-[#FF3B30]'];
+  const defaultBadges = ['خطوة أولى', 'خطوة ثانية', 'تأكيد مباشر'];
+
+  const steps = (Array.isArray(howItWorks) && howItWorks.length > 0)
+    ? howItWorks.map((item, idx) => ({
+        num: item.step || `0${idx + 1}`,
+        icon: stepIcons[idx % stepIcons.length],
+        title: item.title,
+        subtitle: item.subtitle || (idx === 0 ? 'تثبيت سريع في ثوانٍ' : idx === 1 ? 'مقارنة الأسعار والصور' : 'دفع محلي وتأكيد فوري'),
+        desc: item.desc,
+        badge: item.badge || defaultBadges[idx % defaultBadges.length],
+        color: stepColors[idx % stepColors.length],
+      }))
+    : DEFAULT_STEPS;
 
   return (
     <section className="py-14 sm:py-20 lg:py-28 bg-[#F4F2F8] text-slate-900 relative overflow-hidden">

@@ -204,8 +204,9 @@ export interface AppPageData {
   };
   stats: Array<{ value: string; label: string }>;
   features: Array<{ title: string; desc: string; icon: string; badge?: string; color?: string }>;
-  screensShowcase: Array<{ id: number; title: string; headline: string; subtitle: string; image: string; icon?: string }>;
-  howItWorks: Array<{ step: string; title: string; desc: string }>;
+  screensShowcase: Array<{ id?: number; title: string; headline: string; subtitle: string; image?: string; icon?: string; bullets?: string[] }>;
+  howItWorks: Array<{ step: string; title: string; desc: string; subtitle?: string; badge?: string }>;
+  faqs?: Array<{ q: string; a: string }>;
   cta: { title: string; subtitle: string };
 }
 
