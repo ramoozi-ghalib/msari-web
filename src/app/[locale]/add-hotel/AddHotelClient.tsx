@@ -60,7 +60,7 @@ export default function AddHotelClient({
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
-  // Form State initialized with logged in user data if available
+  // Form State initialized with logged in user contact data if available
   const [form, setForm] = useState({
     hotelName: '',
     city: '',
@@ -141,7 +141,7 @@ export default function AddHotelClient({
     e.preventDefault();
     setErrorMsg(null);
 
-    // Double check authentication on client
+    // Check authentication
     if (!currentUser) {
       setErrorMsg('يجب تسجيل الدخول بحسابك أولاً لإرسال طلب إضافة الفندق.');
       return;
@@ -256,7 +256,7 @@ export default function AddHotelClient({
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-2.5">تم استلام طلبك بنجاح!</h2>
           <p className="text-neutral-500 text-xs sm:text-sm mb-6 leading-relaxed">
-            شكراً لاهتمامك بالانضمام لمنصة مساري. تم ربط الطلب بحسابك الموثق وسيصلك إشعار ويتواصل معك فريق علاقات الفنادق خلال ٢٤ ساعة لإتمام إجراءات التفعيل.
+            شكراً لاهتمامك بالانضمام لمنصة مساري. تم استلام طلبك بنجاح وسيقوم فريق علاقات الفنادق بمراجعة البيانات والتواصل معك هاتفياً أو عبر واتساب خلال ٢٤ ساعة لإتمام الإجراءات واعتماد الفندق.
           </p>
 
           {referenceNumber && (
@@ -393,26 +393,26 @@ export default function AddHotelClient({
             </div>
 
             <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-2.5">
-              يرجى تسجيل الدخول لتقديم ومتابعة طلب إضافة فندقك
+              يرجى تسجيل الدخول لتقديم طلب إضافة فندقك
             </h2>
 
             <p className="text-neutral-500 text-xs sm:text-sm max-w-md mx-auto mb-6 leading-relaxed">
-              لضمان توثيق ملكية الفندق وحماية بياناتك وربط طلبك بحسابك المعتمد لتلقي التحديثات، يتطلب تقديم الطلب تسجيل الدخول بحسابك في مساري.
+              لضمان جدية الطلب والتحقق من هوية مقدم الطلب، يتطلب إرسال النموذج تسجيل الدخول بحسابك في مساري. ستقوم إدارة مساري بمراجعة الطلب والتواصل معك لإتمام الإجراءات.
             </p>
 
             {/* Quick Benefits Checklist */}
             <div className="bg-neutral-50 rounded-2xl p-4 max-w-md mx-auto mb-6 text-start space-y-2 border border-neutral-200/60">
               <div className="flex items-center gap-2 text-xs text-neutral-700 font-medium">
                 <Check size={14} className="text-green-600 shrink-0" />
-                <span>ربط الفندق بحسابك الرسمي لمتابعة الحجوزات والمدفوعات</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-neutral-700 font-medium">
-                <Check size={14} className="text-green-600 shrink-0" />
-                <span>مراجعة فورية وتواصل مباشر مع فريق علاقات الفنادق</span>
+                <span>التحقق من هوية مقدم الطلب وضمان جدية الطلبات</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-neutral-700 font-medium">
                 <Check size={14} className="text-green-600 shrink-0" />
                 <span>تعبئة تلقائية لبيانات التواصل الخاصة بك لتوفير الوقت</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-neutral-700 font-medium">
+                <Check size={14} className="text-green-600 shrink-0" />
+                <span>مراجعة مباشرة وتواصل سريع من فريق علاقات الفنادق</span>
               </div>
             </div>
 
@@ -444,12 +444,9 @@ export default function AddHotelClient({
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs font-bold text-emerald-900">
-                  تم تسجيل الدخول: {currentUser.name || currentUser.email}
+                  مرحباً {currentUser.name || currentUser.email}، يمكنك الآن تعبئة النموذج وإرسال طلبك لإدارة مساري.
                 </span>
               </div>
-              <span className="text-[11px] text-emerald-700 hidden sm:inline">
-                (سيتم ربط الطلب بحسابك تلقائياً)
-              </span>
             </div>
 
             <div className="mb-6">
@@ -841,7 +838,7 @@ export default function AddHotelClient({
                 </div>
 
                 <p className="text-[10.5px] text-neutral-400 text-center mt-3.5">
-                  🔒 يتم ربط الطلب بحسابك الموثق والتعامل مع جميع البيانات بسرية تامة وسيتم التواصل معك مباشرة لتفعيل الحساب.
+                  🔒 يتم استلام الطلب ومراجعته من قبل إدارة منصة مساري فقط، وسيتم التواصل معك مباشرة للتحقق واعتماد الفندق.
                 </p>
               </div>
 
