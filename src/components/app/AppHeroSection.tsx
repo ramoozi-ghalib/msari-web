@@ -30,6 +30,8 @@ interface Props {
     rating?: string;
     googlePlayUrl?: string;
     appStoreUrl?: string;
+    mockupImage1?: string;
+    mockupImage2?: string;
   };
 }
 
@@ -221,7 +223,13 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             <div className="relative flex items-center justify-center scale-90 sm:scale-100 origin-top">
               {deviceModel === 'iphone17' ? (
                 <IPhone17ProMaxFrame className="transition-transform duration-500 hover:scale-[1.02]">
-                  {activeScreen === 'search' ? (
+                  {data?.mockupImage1 && data.mockupImage1.trim().length > 0 && !data.mockupImage1.includes('app-screen.png') ? (
+                    <img
+                      src={data.mockupImage1}
+                      alt={isEn ? 'Msari App iPhone Screen' : 'شاشة تطبيق مساري على الآيفون'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : activeScreen === 'search' ? (
                     <SearchAppScreen isEn={isEn} />
                   ) : (
                     <HotelDetailsAppScreen isEn={isEn} />
@@ -229,7 +237,13 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
                 </IPhone17ProMaxFrame>
               ) : (
                 <SamsungNote24UltraFrame className="transition-transform duration-500 hover:scale-[1.02]">
-                  {activeScreen === 'search' ? (
+                  {data?.mockupImage2 && data.mockupImage2.trim().length > 0 && !data.mockupImage2.includes('app-screen.png') ? (
+                    <img
+                      src={data.mockupImage2}
+                      alt={isEn ? 'Msari App Samsung Screen' : 'شاشة تطبيق مساري على السامسونج'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : activeScreen === 'search' ? (
                     <SearchAppScreen isEn={isEn} />
                   ) : (
                     <HotelDetailsAppScreen isEn={isEn} />

@@ -27,15 +27,27 @@ interface Props {
     title?: string;
     headline?: string;
     subtitle?: string;
+    image?: string;
     bullets?: string[];
   }>;
+}
+
+interface TabItem {
+  id: number;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  headline: string;
+  subtitle: string;
+  bullets: string[];
+  image?: string;
+  renderScreen: () => React.ReactNode;
 }
 
 export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }: Props) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [deviceFrame, setDeviceFrame] = useState<'iphone17' | 'note24'>('iphone17');
 
-  const tabs = [
+  const tabs: TabItem[] = [
     {
       id: 0,
       title: isEn ? 'Search & Filters' : 'الرئيسية والبحث الذكي',
@@ -106,6 +118,7 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
       title: cmsItem.title || defaultTab.title,
       headline: cmsItem.headline || defaultTab.headline,
       subtitle: cmsItem.subtitle || defaultTab.subtitle,
+      image: cmsItem.image,
       bullets: (Array.isArray(cmsItem.bullets) && cmsItem.bullets.length > 0)
         ? cmsItem.bullets
         : defaultTab.bullets,
@@ -237,11 +250,27 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
             <div className="lg:col-span-5 flex justify-center order-1 lg:order-2 scale-90 sm:scale-100 origin-top">
               {deviceFrame === 'iphone17' ? (
                 <IPhone17ProMaxFrame className="shadow-2xl shadow-[#23096E]/25">
-                  {currentTab.renderScreen()}
+                  {currentTab.image && currentTab.image.trim().length > 0 && !currentTab.image.includes('app-screen.png') ? (
+                    <img
+                      src={currentTab.image}
+                      alt={currentTab.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    currentTab.renderScreen()
+                  )}
                 </IPhone17ProMaxFrame>
               ) : (
                 <SamsungNote24UltraFrame className="shadow-2xl shadow-[#FF3B30]/20">
-                  {currentTab.renderScreen()}
+                  {currentTab.image && currentTab.image.trim().length > 0 && !currentTab.image.includes('app-screen.png') ? (
+                    <img
+                      src={currentTab.image}
+                      alt={currentTab.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    currentTab.renderScreen()
+                  )}
                 </SamsungNote24UltraFrame>
               )}
             </div>
