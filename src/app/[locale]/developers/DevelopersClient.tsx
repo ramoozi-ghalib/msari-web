@@ -103,47 +103,103 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
           <p className="text-neutral-500 font-medium max-w-2xl mx-auto">حلول مرنة ومخصصة للتطبيقات، مواقع السفر، الوكالات السياحية، والشركات للربط المباشر مع منصة مساري.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {data.plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`bg-white rounded-3xl p-8 flex flex-col justify-between border transition-all duration-300 relative ${
-                plan.popular
-                  ? 'border-[var(--brand-primary)] shadow-2xl scale-105 z-10'
-                  : 'border-neutral-200 shadow-md hover:shadow-xl'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 right-8 bg-gradient-to-r from-purple-600 to-[var(--brand-primary)] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md">
-                  الأكثر طلباً
+        {/* Pricing/Plans */}
+        {data.plans && data.plans.length === 1 ? (
+          <div className="max-w-3xl mx-auto">
+            {data.plans.map((plan) => (
+              <div
+                key={plan.id}
+                className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-[var(--brand-primary)] shadow-2xl shadow-[var(--brand-primary)]/10 relative overflow-hidden transition-all"
+              >
+                <div className="absolute top-0 right-0 left-0 h-2.5 bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#FF3B30]" />
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black mb-2">
+                      <Zap size={14} className="text-[#FF3B30]" />
+                      خطة الشراكة الموحدة (B2B Full Access)
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-black text-neutral-900">{plan.name}</h3>
+                  </div>
+                  <div className="text-start sm:text-end">
+                    <div className="text-xl sm:text-2xl font-black text-[var(--brand-primary)]">{plan.price}</div>
+                    <span className="text-xs text-neutral-500 font-bold block mt-0.5">عمولات وأسعار جملة مخصصة للشركاء</span>
+                  </div>
                 </div>
-              )}
-              <div>
-                <h3 className="text-xl font-black text-neutral-900 mb-2">{plan.name}</h3>
-                <p className="text-neutral-500 text-sm mb-6 min-h-[40px]">{plan.description}</p>
-                <div className="text-3xl font-black text-[var(--brand-primary)] mb-6">{plan.price}</div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feat, i) => (
-                    <li key={i} className="flex items-center gap-3 text-neutral-700 text-sm">
-                      <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
+
+                <p className="text-neutral-600 text-sm sm:text-base mb-8 leading-relaxed font-medium">
+                  {plan.description}
+                </p>
+
+                <div className="border-t border-b border-neutral-100 py-6 mb-8">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-neutral-400 mb-4">
+                    المزايا والقدرات التقنية المضمنة:
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {plan.features.map((feat, i) => (
+                      <div key={i} className="flex items-center gap-3 text-neutral-800 text-sm font-bold">
+                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                          <CheckCircle2 size={14} className="text-emerald-600" />
+                        </div>
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => openWhatsApp(plan.name)}
+                  className="w-full py-4 rounded-2xl bg-[var(--brand-primary)] hover:bg-[#3A1C8F] text-white text-base font-black transition-all shadow-xl shadow-[var(--brand-primary)]/20 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <MessageSquare size={18} />
+                  <span>تواصل معنا لطلب مفتاح الـ API وتفعيل الربط المباشر</span>
+                </button>
               </div>
-              <button
-                onClick={() => openWhatsApp(plan.name)}
-                className={`w-full py-3.5 rounded-xl font-black transition-all ${
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            {data.plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`bg-white rounded-3xl p-8 flex flex-col justify-between border transition-all duration-300 relative ${
                   plan.popular
-                    ? 'bg-[var(--brand-primary)] text-white hover:bg-purple-950 shadow-lg'
-                    : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
+                    ? 'border-[var(--brand-primary)] shadow-2xl scale-105 z-10'
+                    : 'border-neutral-200 shadow-md hover:shadow-xl'
                 }`}
               >
-                طلب انضمام
-              </button>
-            </div>
-          ))}
-        </div>
+                {plan.popular && (
+                  <div className="absolute -top-4 right-8 bg-gradient-to-r from-purple-600 to-[var(--brand-primary)] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md">
+                    الأكثر طلباً
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-xl font-black text-neutral-900 mb-2">{plan.name}</h3>
+                  <p className="text-neutral-500 text-sm mb-6 min-h-[40px]">{plan.description}</p>
+                  <div className="text-3xl font-black text-[var(--brand-primary)] mb-6">{plan.price}</div>
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feat, i) => (
+                      <li key={i} className="flex items-center gap-3 text-neutral-700 text-sm">
+                        <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => openWhatsApp(plan.name)}
+                  className={`w-full py-3.5 rounded-xl font-black transition-all ${
+                    plan.popular
+                      ? 'bg-[var(--brand-primary)] text-white hover:bg-purple-950 shadow-lg'
+                      : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
+                  }`}
+                >
+                  طلب انضمام
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* FAQ */}
