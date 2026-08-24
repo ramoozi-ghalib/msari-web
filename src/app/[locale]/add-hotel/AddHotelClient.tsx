@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Image from 'next/image';
 import {
   Hotel, User, Send, CheckCircle, Building2, AlertCircle,
   Loader2, MapPin, Globe, Mail, Phone, Upload, X, Star,
@@ -9,11 +8,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { whatsappLink } from '@/lib/site-config';
-
-const CITIES = [
-  'صنعاء', 'عدن', 'المكلا', 'مأرب', 'تعز', 'إب',
-  'الحديدة', 'سيئون', 'ذمار', 'حضرموت', 'شبوة', 'المهرة', 'سقطرى', 'أخرى'
-];
 
 const POPULAR_AMENITIES = [
   'واي فاي مجاني',
@@ -142,7 +136,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
       return;
     }
     if (!form.city.trim()) {
-      setErrorMsg('يرجى اختيار المدينة.');
+      setErrorMsg('يرجى إدخال المدينة / المحافظة.');
       return;
     }
     if (!form.address.trim()) {
@@ -287,7 +281,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 });
                 removeImage();
               }}
-              className="w-full py-3 px-6 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-sm transition-colors"
+              className="w-full py-3 px-6 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold text-sm transition-colors cursor-pointer"
             >
               تقديم طلب لفندق آخر
             </button>
@@ -304,33 +298,15 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
       <section className="relative pt-24 pb-16 sm:pt-32 sm:pb-24 bg-gradient-to-r from-[#1D065C] via-[#23096E] to-[#2E0D80] text-white overflow-hidden border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 text-white text-xs sm:text-sm font-bold mb-5 border border-white/20 shadow-xs">
-            <Building2 size={15} />
+            <Building2 size={15} className="text-[#FF3B30]" />
             <span>{badge}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             {subtitle}
           </p>
-
-          {/* Stats Bar */}
-          <div className="inline-flex flex-wrap items-center justify-center gap-4 sm:gap-8 bg-white/10 backdrop-blur-md px-6 py-3.5 rounded-2xl border border-white/15 text-xs sm:text-sm font-bold">
-            <div className="flex items-center gap-2">
-              <span className="text-[#FF3B30] text-base">●</span>
-              <span>+500 فندق مسجل في اليمن</span>
-            </div>
-            <div className="hidden sm:block w-px h-4 bg-white/20" />
-            <div className="flex items-center gap-2">
-              <span className="text-[#FF3B30] text-base">●</span>
-              <span>عمولة منافسة وضمان المستحقات</span>
-            </div>
-            <div className="hidden sm:block w-px h-4 bg-white/20" />
-            <div className="flex items-center gap-2">
-              <span className="text-[#FF3B30] text-base">●</span>
-              <span>دعم فندقي وتسويق 24/7</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -342,7 +318,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               key={b.title}
               className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-neutral-100 transition-all duration-200"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#1D065C]/10 text-[#1D065C] flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-[#FF3B30]/10 text-[#FF3B30] flex items-center justify-center mb-4">
                 <b.icon size={22} />
               </div>
               <h3 className="font-black text-neutral-900 text-base mb-2">{b.title}</h3>
@@ -357,7 +333,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
         <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-8">كيف تبدأ الشراكة في 3 خطوات بسيطة؟</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#1D065C] text-white flex items-center justify-center font-black text-sm shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
               1
             </div>
             <div>
@@ -367,7 +343,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#1D065C] text-white flex items-center justify-center font-black text-sm shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
               2
             </div>
             <div>
@@ -377,7 +353,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-neutral-100 shadow-xs flex items-center gap-3.5 sm:flex-col sm:text-center">
-            <div className="w-10 h-10 rounded-full bg-[#1D065C] text-white flex items-center justify-center font-black text-sm shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#FF3B30] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
               3
             </div>
             <div>
@@ -397,15 +373,6 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
             <p className="text-neutral-500 text-xs sm:text-sm">
               أدخل البيانات بدقة وسيقوم فريق علاقات الفنادق بالتواصل معك لمراجعة البيانات وتفعيل الفندق.
             </p>
-          </div>
-
-          {/* ⚠️ REQUIRED NOTICE ALERT */}
-          <div className="mb-8 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-start gap-3">
-            <AlertCircle size={20} className="shrink-0 text-amber-600 mt-0.5" />
-            <div className="leading-relaxed">
-              <strong className="block font-bold mb-0.5">تنبيه هام لضمان قبول الطلب:</strong>
-              لن يتم قبول أي طلبات غير مكتملة أو غير صحيحة. يرجى تعبئة جميع الحقول المطلوبة والتأكد من صحة بيانات التواصل وصورة واجهة الفندق قبل الإرسال.
-            </div>
           </div>
 
           {errorMsg && (
@@ -428,11 +395,11 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               autoComplete="off"
             />
 
-            {/* ═══ SECTION 1: HOTEL INFORMATION ═══ */}
+            {/* ═══ SECTION 1: بيانات الفندق ═══ */}
             <div className="space-y-4 pb-8 border-b border-neutral-100">
-              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2 text-[#1D065C]">
-                <Hotel size={20} />
-                <span>أولاً: بيانات ومعلومات الفندق</span>
+              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2">
+                <Hotel size={20} className="text-[#FF3B30]" />
+                <span>بيانات الفندق</span>
               </h3>
 
               {/* 1. Hotel Name */}
@@ -456,15 +423,14 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
                     المدينة / المحافظة *
                   </label>
-                  <select
+                  <input
+                    type="text"
+                    placeholder="مثال: صنعاء / عدن / المكلا..."
                     required
                     value={form.city}
                     onChange={e => set('city', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50 cursor-pointer"
-                  >
-                    <option value="">اختر المدينة</option>
-                    {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-[#1D065C] focus:ring-1 focus:ring-[#1D065C] text-sm text-neutral-900 outline-none transition-all bg-neutral-50/50"
+                  />
                 </div>
 
                 {/* Stars Interactive Selector */}
@@ -478,7 +444,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                         key={star}
                         type="button"
                         onClick={() => set('stars', star)}
-                        className={`h-11 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all ${
+                        className={`h-11 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all cursor-pointer ${
                           form.stars === star
                             ? 'bg-[#1D065C] text-white shadow-sm ring-2 ring-[#1D065C]/30'
                             : 'bg-neutral-50 border border-neutral-200 text-neutral-700 hover:bg-neutral-100'
@@ -510,7 +476,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               {/* 4. Google Maps URL (Required for verification) */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                  <MapPin size={15} className="text-[#1D065C]" />
+                  <MapPin size={15} className="text-[#FF3B30]" />
                   <span>رابط موقع الفندق على خرائط Google *</span>
                 </label>
                 <input
@@ -531,7 +497,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Mail size={15} className="text-[#1D065C]" />
+                    <Mail size={15} className="text-[#FF3B30]" />
                     <span>البريد الإلكتروني للفندق *</span>
                   </label>
                   <input
@@ -547,7 +513,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
 
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Globe size={15} className="text-[#1D065C]" />
+                    <Globe size={15} className="text-[#FF3B30]" />
                     <span>الموقع الإلكتروني للفندق (إن وجد)</span>
                   </label>
                   <input
@@ -565,7 +531,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
-                    إجمالي عدد الغرف *
+                    عدد الغرف *
                   </label>
                   <input
                     type="number"
@@ -579,7 +545,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5">
-                    عدد الأجنحة (إن وجدت)
+                    عدد الأجنحة
                   </label>
                   <input
                     type="number"
@@ -595,7 +561,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               {/* 7. Facilities & Amenities (Interactive Chips) */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-2">
-                  المرافق والخدمات المتوفرة بالفندق * (اختر بنقرة واحدة):
+                  المرافق والخدمات المتوفرة *
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {POPULAR_AMENITIES.map((item) => {
@@ -611,7 +577,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                             : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                         }`}
                       >
-                        {isSelected ? <Check size={14} /> : <span>+</span>}
+                        {isSelected ? <Check size={14} className="text-[#FF3B30]" /> : <span>+</span>}
                         <span>{item}</span>
                       </button>
                     );
@@ -629,7 +595,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
               {/* 8. Facade Image Upload (REQUIRED) */}
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                  <Upload size={15} className="text-[#1D065C]" />
+                  <Upload size={15} className="text-[#FF3B30]" />
                   <span>صورة واجهة الفندق الرسمية * (إجراء مطلوب للتحقق)</span>
                 </label>
 
@@ -644,7 +610,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                     <button
                       type="button"
                       onClick={removeImage}
-                      className="absolute top-3 end-3 p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors shadow-md"
+                      className="absolute top-3 end-3 p-1.5 rounded-full bg-[#FF3B30] text-white hover:bg-red-700 transition-colors shadow-md cursor-pointer"
                       title="حذف الصورة"
                     >
                       <X size={16} />
@@ -653,9 +619,9 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 ) : (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-neutral-300 hover:border-[#1D065C] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-neutral-50/50 hover:bg-[#1D065C]/5"
+                    className="w-full border-2 border-dashed border-neutral-300 hover:border-[#FF3B30] rounded-2xl p-6 text-center cursor-pointer transition-colors bg-neutral-50/50 hover:bg-[#FF3B30]/5"
                   >
-                    <Upload size={28} className="mx-auto text-neutral-400 mb-2" />
+                    <Upload size={28} className="mx-auto text-[#FF3B30] mb-2" />
                     <p className="font-bold text-xs sm:text-sm text-neutral-700 mb-1">
                       انقر هنا لاختيار صورة واجهة الفندق
                     </p>
@@ -674,17 +640,17 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 />
 
                 {imageError && (
-                  <p className="text-xs font-bold text-red-600 mt-1.5">{imageError}</p>
+                  <p className="text-xs font-bold text-[#FF3B30] mt-1.5">{imageError}</p>
                 )}
               </div>
 
             </div>
 
-            {/* ═══ SECTION 2: OWNER / MANAGER CONTACT ═══ */}
+            {/* ═══ SECTION 2: بيانات مقدم الطلب ═══ */}
             <div className="space-y-4">
-              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2 text-[#1D065C]">
-                <User size={20} />
-                <span>ثانياً: بيانات المسؤول للتواصل والاعتماد</span>
+              <h3 className="font-black text-neutral-900 text-base sm:text-lg flex items-center gap-2">
+                <User size={20} className="text-[#FF3B30]" />
+                <span>بيانات مقدم الطلب</span>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -723,7 +689,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 {/* 3. Phone / WhatsApp */}
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Phone size={15} className="text-[#1D065C]" />
+                    <Phone size={15} className="text-[#FF3B30]" />
                     <span>رقم الهاتف / واتساب للتواصل المباشر *</span>
                   </label>
                   <input
@@ -740,7 +706,7 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 {/* 4. Owner Email */}
                 <div>
                   <label className="block text-xs sm:text-sm font-bold text-neutral-700 mb-1.5 flex items-center gap-1.5">
-                    <Mail size={15} className="text-[#1D065C]" />
+                    <Mail size={15} className="text-[#FF3B30]" />
                     <span>البريد الإلكتروني للمسؤول (اختياري)</span>
                   </label>
                   <input
@@ -783,7 +749,16 @@ export default function AddHotelClient({ pageContent }: { pageContent?: any }) {
                 {isSubmitting ? 'جاري التحقق وإرسال الطلب...' : 'إرسال طلب الانضمام الآن'}
               </Button>
 
-              <p className="text-[11px] text-neutral-400 text-center mt-3">
+              {/* ⚠️ REQUIRED NOTICE ALERT (Under Submit Button) */}
+              <div className="mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-start gap-3">
+                <AlertCircle size={20} className="shrink-0 text-amber-600 mt-0.5" />
+                <div className="leading-relaxed">
+                  <strong className="block font-bold mb-0.5">تنبيه هام لضمان قبول الطلب:</strong>
+                  لن يتم قبول أي طلبات غير مكتملة أو غير صحيحة. يرجى تعبئة جميع الحقول المطلوبة والتأكد من صحة بيانات التواصل وصورة واجهة الفندق قبل الإرسال.
+                </div>
+              </div>
+
+              <p className="text-[11px] text-neutral-400 text-center mt-4">
                 🔒 يتم التعامل مع جميع البيانات بسرية تامة وسيتم التواصل معك مباشرة للتحقق وتفعيل الحساب.
               </p>
             </div>
