@@ -107,8 +107,8 @@ export default async function HotelsPage(props: {
 
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 items-start">
           
-          {/* Right Sidebar: Filters (Desktop Only) */}
-          <aside className="hidden lg:block w-72 xl:w-80 shrink-0">
+          {/* Right Sidebar: Filters */}
+          <aside className="w-full lg:w-72 xl:w-80 shrink-0">
             <Suspense fallback={<div className="h-96 bg-white animate-pulse rounded-2xl shadow-sm border border-neutral-100" />}>
               <HotelFilters cities={cities} />
             </Suspense>
@@ -117,15 +117,8 @@ export default async function HotelsPage(props: {
           {/* Left Main Content: Results & Grid */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Top Bar: Filter Button (Mobile) & Sort Control (Left Aligned) */}
-            <div className="flex items-center justify-between mb-4 sm:mb-5">
-              {/* Mobile Filter Button */}
-              <div className="lg:hidden">
-                <HotelFilters cities={cities} mobileOnly />
-              </div>
-              {/* Desktop Empty Spacer to keep sort button on the left */}
-              <div className="hidden lg:block" />
-
+            {/* Top Bar: Sort Control Only (Left Aligned) */}
+            <div className="flex items-center justify-end mb-4 sm:mb-5">
               <SortSelectClient currentSort={sortBy} />
             </div>
 
