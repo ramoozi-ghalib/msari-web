@@ -4,7 +4,6 @@ import AppStatsBannerSection from '@/components/app/AppStatsBannerSection';
 import AppFeaturesSection from '@/components/app/AppFeaturesSection';
 import AppScreenshotsShowcase from '@/components/app/AppScreenshotsShowcase';
 import AppHowItWorksSection from '@/components/app/AppHowItWorksSection';
-import AppReviewsSection from '@/components/app/AppReviewsSection';
 import AppFaqSection from '@/components/app/AppFaqSection';
 import AppDownloadCtaSection from '@/components/app/AppDownloadCtaSection';
 import AppStickyMobileBar from '@/components/app/AppStickyMobileBar';
@@ -47,7 +46,7 @@ export default async function AppPage(
 
   return (
     <main className="min-h-screen bg-[#F4F2F8] text-slate-900 selection:bg-[#23096E] selection:text-white pb-12 md:pb-0">
-      {/* 1. Hero Section */}
+      {/* 1. Hero Section (iPhone 17 & Samsung Note 24 Ultra Mockups) */}
       <AppHeroSection isEn={isEn} data={heroData} />
 
       {/* 2. Stats Banner */}
@@ -56,22 +55,19 @@ export default async function AppPage(
       {/* 3. Key Local Features */}
       <AppFeaturesSection isEn={isEn} features={appContent?.features} />
 
-      {/* 4. Interactive App Showcase */}
-      <AppScreenshotsShowcase isEn={isEn} screensShowcase={appContent?.screensShowcase} />
+      {/* 4. Interactive App Showcase (iPhone 17 & Samsung Note 24 Ultra) */}
+      <AppScreenshotsShowcase isEn={isEn} />
 
       {/* 5. How It Works in 3 Steps */}
-      <AppHowItWorksSection isEn={isEn} howItWorks={appContent?.howItWorks} />
+      <AppHowItWorksSection isEn={isEn} />
 
-      {/* 6. Authentic Traveler Reviews */}
-      <AppReviewsSection isEn={isEn} />
-
-      {/* 7. App FAQs */}
+      {/* 6. App FAQs */}
       <AppFaqSection isEn={isEn} />
 
-      {/* 8. Download CTA Banner */}
+      {/* 7. Download CTA Banner */}
       <AppDownloadCtaSection isEn={isEn} data={ctaData} />
 
-      {/* 9. Floating Sticky Mobile Bar */}
+      {/* 8. Floating Sticky Mobile Bar */}
       <AppStickyMobileBar
         isEn={isEn}
         googlePlayUrl={settings.playStoreUrl}

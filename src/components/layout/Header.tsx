@@ -68,7 +68,8 @@ export default function Header() {
     router.refresh();
   };
 
-  const isSolidHeader = scrolled || pathname.includes('/rooms/') || pathname.includes('/booking') || pathname.includes('/checkout');
+  const isHomePage = pathname === '/' || pathname === '/ar' || pathname === '/en';
+  const isSolidHeader = scrolled || !isHomePage;
 
   return (
     <>

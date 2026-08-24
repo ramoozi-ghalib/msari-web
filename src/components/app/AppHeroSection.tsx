@@ -13,7 +13,12 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Heading from '@/components/ui/Heading';
-import { SearchAppScreen, HotelDetailsAppScreen } from './AppMockupScreens';
+import { 
+  SearchAppScreen, 
+  HotelDetailsAppScreen, 
+  IPhone17ProMaxFrame, 
+  SamsungNote24UltraFrame 
+} from './AppMockupScreens';
 
 interface Props {
   isEn?: boolean;
@@ -35,7 +40,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
   const title = data?.title || (isEn ? 'Your Entire Journey in Yemen & Beyond — In One Smart App' : 'سفرك وفنادقك في جيبك — حمّل تطبيق مساري الآن');
   const subtitle = data?.subtitle || (isEn
     ? 'Book the best hotels in Yemen with instant confirmation, local payment methods (Kuraimi, Jeeb, Cash), and compare global hotels, flights, and car rentals effortlessly.'
-    : 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (كريمي، جيب، كاش عند الوصول)، وقارن أسعار الفنادق العالمية ورحلات الطيران والسيارات بضغطة زر واحدة.');
+    : 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (كريمي، جيب، كاش عند الوصول)، وقارن أسعار الفنادق العالمية وتذاكر الطيران والسيارات بضغطة زر واحدة.');
   
   const ratingVal = data?.rating || '4.8';
   const downloadsVal = data?.downloads || '+10,000';
@@ -45,23 +50,25 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
   const titlePart1 = title.split('—')[0] || title;
   const titlePart2 = title.split('—')[1] || '';
 
-  const [activeScreenTab, setActiveScreenTab] = useState<'search' | 'details'>('search');
+  // Device model switcher: iPhone 17 vs Samsung Note 24 Ultra
+  const [deviceModel, setDeviceModel] = useState<'iphone17' | 'note24'>('iphone17');
+  const [activeScreen, setActiveScreen] = useState<'search' | 'details'>('search');
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-28 bg-[#F4F2F8] text-[#0A0912] selection:bg-[#23096E] selection:text-white">
+    <section className="relative overflow-hidden pt-28 sm:pt-36 lg:pt-40 pb-16 lg:pb-24 bg-[#F4F2F8] text-[#0A0912] selection:bg-[#23096E] selection:text-white">
       {/* Dynamic Ambient Background Glows */}
-      <div className="absolute -top-24 right-1/4 w-[500px] h-[500px] bg-[#23096E]/12 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-10 right-1/4 w-[500px] h-[500px] bg-[#23096E]/12 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-10 w-96 h-96 bg-[#3A1C8F]/10 rounded-full blur-2xl pointer-events-none" />
 
       <div className="container-msari relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           
           {/* Content Column (Right on RTL) */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-start">
             
             {/* Top Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border border-[#23096E]/15 text-[#23096E] text-xs sm:text-sm font-extrabold shadow-sm backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-[#23096E]/15 text-[#23096E] text-xs sm:text-sm font-extrabold shadow-sm backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-[#FF3B30] animate-ping" />
               <Sparkles className="w-4 h-4 text-[#FF3B30]" />
               <span>{badge}</span>
@@ -98,7 +105,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
 
               <div className="flex items-center gap-2 text-xs font-black text-[#23096E] bg-[#23096E]/10 px-3.5 py-1.5 rounded-full border border-[#23096E]/20">
                 <Download className="w-3.5 h-3.5 text-[#FF3B30]" />
-                <span>{downloadsVal} {isEn ? 'Downloads on Google Play' : 'تحميل نشط'}</span>
+                <span>{downloadsVal} {isEn ? 'Active Users' : 'مستخدم نشط'}</span>
               </div>
 
               <div className="flex items-center gap-1.5 text-xs font-black text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200">
@@ -108,7 +115,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             </div>
 
             {/* Store Download Buttons & QR Code */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               
               {/* Badges Container */}
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3.5 w-full sm:w-auto">
@@ -150,7 +157,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
 
               </div>
 
-              {/* QR Code Container for Desktop */}
+              {/* QR Code Box for Desktop */}
               <div className="hidden xl:flex items-center gap-3 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-lg shadow-[#23096E]/5 hover:border-[#23096E]/30 transition-all">
                 <div className="relative w-14 h-14 bg-[#23096E] rounded-xl p-1.5 flex items-center justify-center shrink-0">
                   <QrCode className="w-full h-full text-white" />
@@ -168,96 +175,91 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             </div>
 
             {/* Local Yemeni Payment & Security Assurances */}
-            <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#423861] font-bold">
-              <div className="flex items-center gap-2">
+            <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center justify-center lg:justify-start gap-5 text-xs text-[#423861] font-bold">
+              <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>{isEn ? 'Yemeni Local Payments (Kuraimi, Jeeb, Cash)' : 'دفع محلي يمني (كريمي، جيب، كاش)'}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#23096E]" />
                 <span>{isEn ? 'Instant Booking Confirmation' : 'تأكيد حجز فوري ومباشر'}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Smartphone className="w-4 h-4 text-[#FF3B30]" />
-                <span>{isEn ? 'Offline Booking Voucher' : 'قسيمة حجز رقمية على الجوال'}</span>
+                <span>{isEn ? 'iOS & Android Ready' : 'متوافق مع آيفون وسامسونج'}</span>
               </div>
             </div>
 
           </div>
 
-          {/* Interactive 3D Phone Mockup Showcase (Left Column on RTL) */}
+          {/* Interactive Mockup Showcase (Left Column on RTL) */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
             
             {/* Ambient Halo behind phone */}
-            <div className="absolute w-80 h-80 bg-gradient-to-tr from-[#23096E]/25 to-[#FF3B30]/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute w-80 h-80 bg-gradient-to-tr from-[#23096E]/20 to-[#FF3B30]/15 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Phone Screen Toggle Selector */}
-            <div className="flex items-center gap-2 mb-4 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/80 shadow-md z-20">
+            {/* Device Switcher (iPhone 17 vs Samsung Note 24 Ultra) */}
+            <div className="flex items-center gap-2 mb-4 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-md z-20">
               <button
-                onClick={() => setActiveScreenTab('search')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                  activeScreenTab === 'search'
+                onClick={() => setDeviceModel('iphone17')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  deviceModel === 'iphone17'
                     ? 'bg-[#23096E] text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {isEn ? 'Search Screen' : 'شاشة البحث والاستكشاف'}
+                {isEn ? 'iPhone 17' : 'آيفون ١٧ برو'}
               </button>
               <button
-                onClick={() => setActiveScreenTab('details')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                  activeScreenTab === 'details'
+                onClick={() => setDeviceModel('note24')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  deviceModel === 'note24'
                     ? 'bg-[#23096E] text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {isEn ? 'Hotel & Amenities' : 'شاشة تفاصيل الفندق'}
+                {isEn ? 'Samsung Note 24 Ultra' : 'سامسونج نوت ٢٤ الترا'}
               </button>
             </div>
 
-            {/* Dual Phone Presentation */}
+            {/* Device Render */}
             <div className="relative flex items-center justify-center">
-              
-              {/* Main Realistic iPhone Device Frame */}
-              <div className="relative w-[300px] sm:w-[320px] h-[600px] sm:h-[630px] rounded-[48px] border-[10px] border-slate-900 bg-slate-950 shadow-2xl shadow-[#23096E]/30 overflow-hidden z-10 transition-transform duration-500 hover:scale-[1.02]">
-                
-                {/* Dynamic Island Notch */}
-                <div className="absolute top-2.5 inset-x-0 h-6 bg-black rounded-full z-30 w-28 mx-auto flex items-center justify-between px-3 border border-white/10 shadow-md">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-white/10" />
-                  <div className="w-2 h-2 rounded-full bg-emerald-400/80 animate-pulse" />
-                </div>
-
-                {/* Display Screen Content */}
-                <div className="w-full h-full pt-6">
-                  {activeScreenTab === 'search' ? (
+              {deviceModel === 'iphone17' ? (
+                <IPhone17ProMaxFrame className="transition-transform duration-500 hover:scale-[1.02]">
+                  {activeScreen === 'search' ? (
                     <SearchAppScreen isEn={isEn} />
                   ) : (
                     <HotelDetailsAppScreen isEn={isEn} />
                   )}
-                </div>
+                </IPhone17ProMaxFrame>
+              ) : (
+                <SamsungNote24UltraFrame className="transition-transform duration-500 hover:scale-[1.02]">
+                  {activeScreen === 'search' ? (
+                    <SearchAppScreen isEn={isEn} />
+                  ) : (
+                    <HotelDetailsAppScreen isEn={isEn} />
+                  )}
+                </SamsungNote24UltraFrame>
+              )}
 
-                {/* Home Indicator Bar */}
-                <div className="absolute bottom-1.5 inset-x-0 w-32 h-1 bg-white/40 rounded-full mx-auto z-30 pointer-events-none" />
-              </div>
-
-              {/* Floating Live Highlights Badges Around Phone */}
-              <div className="absolute -top-4 -start-8 bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xl z-20 hidden sm:flex items-center gap-2.5 animate-bounce" style={{ animationDuration: '3s' }}>
-                <div className="w-9 h-9 rounded-xl bg-[#FF3B30] text-white flex items-center justify-center shadow-md">
-                  <Zap className="w-5 h-5" />
+              {/* Floating Live Highlights Badges */}
+              <div className="absolute -top-3 -start-6 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-xl z-20 hidden sm:flex items-center gap-2.5 animate-bounce" style={{ animationDuration: '3s' }}>
+                <div className="w-8 h-8 rounded-xl bg-[#FF3B30] text-white flex items-center justify-center shadow-md">
+                  <Zap className="w-4 h-4" />
                 </div>
                 <div className="text-start">
-                  <p className="text-[10px] text-slate-500 font-bold">{isEn ? 'Booking Speed' : 'سرعة التأكيد'}</p>
+                  <p className="text-[9px] text-slate-500 font-bold">{isEn ? 'Booking Speed' : 'سرعة التأكيد'}</p>
                   <p className="text-xs font-black text-[#23096E]">{isEn ? '< 60 Seconds' : 'أقل من دقيقة'}</p>
                 </div>
               </div>
 
-              <div className="absolute -bottom-4 -end-6 bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xl z-20 hidden sm:flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
-                  <BadgePercent className="w-5 h-5" />
+              <div className="absolute -bottom-3 -end-5 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-xl z-20 hidden sm:flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                  <BadgePercent className="w-4 h-4" />
                 </div>
                 <div className="text-start">
-                  <p className="text-[10px] text-slate-500 font-bold">{isEn ? 'Best Rate' : 'ضمان السعر'}</p>
-                  <p className="text-xs font-black text-slate-900">{isEn ? 'Direct & Transparent' : 'مباشر وبدون وسيط'}</p>
+                  <p className="text-[9px] text-slate-500 font-bold">{isEn ? 'Best Rate' : 'ضمان السعر'}</p>
+                  <p className="text-xs font-black text-slate-900">{isEn ? 'Direct Hotel Rate' : 'سعر مباشر وبدون وسيط'}</p>
                 </div>
               </div>
 

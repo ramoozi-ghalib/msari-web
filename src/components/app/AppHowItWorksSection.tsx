@@ -1,15 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Smartphone, Search, CheckCircle2, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Smartphone, Search, CheckCircle2, ArrowLeft, Sparkles } from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
-  howItWorks?: Array<{
-    step?: string;
-    title: string;
-    desc: string;
-  }>;
 }
 
 const DEFAULT_STEPS = [
@@ -18,31 +13,31 @@ const DEFAULT_STEPS = [
     icon: Smartphone,
     title: '١. حمّل التطبيق مجاناً',
     subtitle: 'تثبيت سريع في ثوانٍ',
-    desc: 'قم بتحميل التطبيق مباشرة من متجر Google Play أو App Store وابدأ التصفح فوراً دون أي اشتراكات.',
+    desc: 'قم بتحميل تطبيق مساري مباشرة من متجر Google Play أو App Store وابدأ التصفح فوراً دون أي اشتراكات.',
     badge: 'خطوة أولى',
     color: 'bg-[#23096E]',
   },
   {
     num: '02',
     icon: Search,
-    title: '٢. اختر وجهتك والفندق الأنسب',
-    subtitle: 'تصفية ومقارنة دقيقة',
-    desc: 'ابحث في المدينة المطلوبة (عدن، صنعاء، المكلا، سيئون...) وقارن صور الغرف والأسعار والمرافق المتوفرة.',
+    title: '٢. اختر وجهتك وغرفتك',
+    subtitle: 'مقارنة الأسعار والصور',
+    desc: 'ابحث في المدينة المطلوبة (عدن، صنعاء، المكلا، سيئون...) وقارن صور الغرف والأسعار الحية والمرافق المتوفرة.',
     badge: 'خطوة ثانية',
     color: 'bg-[#3A1C8F]',
   },
   {
     num: '03',
     icon: CheckCircle2,
-    title: '٣. أكد حجزك واستلم قسيمتك',
+    title: '٣. أكد حجزك وسدد بسهولة',
     subtitle: 'دفع محلي وتأكيد فوري',
-    desc: 'ادفع عبر الكريمي أو جيب أو اختر الدفع كاش عند الوصول، واستلم قسيمة إقامتك المعتمدة مباشرة على جوالك.',
+    desc: 'ادفع عبر الكريمي أو جيب أو اختر الدفع كاش عند الوصول، واستلم تأكيد حجزك الرسمي فوراً مع رقم مرجعي معتمد.',
     badge: 'تأكيد مباشر',
     color: 'bg-[#FF3B30]',
   },
 ];
 
-export default function AppHowItWorksSection({ isEn = false, howItWorks }: Props) {
+export default function AppHowItWorksSection({ isEn = false }: Props) {
   const steps = DEFAULT_STEPS;
 
   return (
@@ -61,7 +56,7 @@ export default function AppHowItWorksSection({ isEn = false, howItWorks }: Props
           <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
             {isEn
               ? 'From searching available hotels to instant check-in confirmation in less than a minute.'
-              : 'من البحث عن الفندق وحتى استلام قسيمة الحجز المعتمدة بضغطة زر وبدون أي تعقيد.'}
+              : 'من البحث عن الفندق وحتى استلام تأكيد الحجز المعتمد بضغطة زر وبدون أي تعقيد.'}
           </p>
         </div>
 

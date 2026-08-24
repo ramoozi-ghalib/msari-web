@@ -87,7 +87,7 @@ export function SearchAppScreen({ isEn = false }: { isEn?: boolean }) {
               {isEn ? 'Diplomatic District' : 'حي السفارات، خور مكسر'}
             </p>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-[10px] text-emerald-400 font-bold">{isEn ? 'Free Cancellation' : 'إلغاء مجاني'}</span>
+              <span className="text-[10px] text-emerald-400 font-bold">{isEn ? 'Instant Booking' : 'تأكيد فوري'}</span>
               <div className="text-end">
                 <span className="text-xs font-black text-[#FF3B30]">$85</span>
                 <span className="text-[8px] text-slate-300 block">{isEn ? '/night' : '/ليلة'}</span>
@@ -121,7 +121,7 @@ export function SearchAppScreen({ isEn = false }: { isEn?: boolean }) {
         </div>
       </div>
 
-      {/* Bottom Floating Navigation */}
+      {/* Bottom Navigation */}
       <div className="bg-[#1C1542] border border-white/10 rounded-2xl py-2 px-4 flex items-center justify-around text-slate-400 text-[10px]">
         <div className="flex flex-col items-center text-[#FF3B30] font-black">
           <Search className="w-4 h-4" />
@@ -133,7 +133,7 @@ export function SearchAppScreen({ isEn = false }: { isEn?: boolean }) {
         </div>
         <div className="flex flex-col items-center hover:text-white">
           <Calendar className="w-4 h-4" />
-          <span>{isEn ? 'Trips' : 'رحلاتي'}</span>
+          <span>{isEn ? 'Bookings' : 'حجوزاتي'}</span>
         </div>
         <div className="flex flex-col items-center hover:text-white">
           <User className="w-4 h-4" />
@@ -150,7 +150,7 @@ export function SearchAppScreen({ isEn = false }: { isEn?: boolean }) {
 export function HotelDetailsAppScreen({ isEn = false }: { isEn?: boolean }) {
   return (
     <div className="w-full h-full bg-[#0F0A2A] text-white p-4 flex flex-col justify-between select-none font-sans overflow-hidden text-start">
-      {/* Top Visual Image & Actions */}
+      {/* Top Visual Image */}
       <div className="relative h-44 rounded-2xl overflow-hidden border border-white/15">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FIOfiz4EpAILtuN0nc7zg%2Fimg_1.jpg?alt=media&token=d33cdf0e-18fb-4dbe-ac1c-0ad1bbb78ef7')" }} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0F0A2A] via-transparent to-black/50" />
@@ -209,7 +209,7 @@ export function HotelDetailsAppScreen({ isEn = false }: { isEn?: boolean }) {
             <p className="text-[9px] text-slate-300">{isEn ? 'King Bed · City & Sea Panorama' : 'سرير ملكي · إطلالة بانورامية'}</p>
           </div>
           <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-black">
-            {isEn ? 'Instant' : 'حجز فوري'}
+            {isEn ? 'Instant Confirmation' : 'تأكيد فوري'}
           </span>
         </div>
         <div className="flex items-center justify-between pt-1 border-t border-white/10">
@@ -259,7 +259,7 @@ export function PaymentAppScreen({ isEn = false }: { isEn?: boolean }) {
             </div>
             <div>
               <p className="text-xs font-black text-white">{isEn ? 'Kuraimi Jawwal / M-Floos' : 'الكريمي جوال / إم فلوس'}</p>
-              <p className="text-[9px] text-slate-300">{isEn ? 'Instant deduction via PIN' : 'خصم فوري ومباشر مع تأكيد فوري'}</p>
+              <p className="text-[9px] text-slate-300">{isEn ? 'Instant deduction with instant confirmation' : 'خصم مباشر مع تأكيد حجز فوري'}</p>
             </div>
           </div>
           <span className="w-4 h-4 rounded-full bg-[#FF3B30] flex items-center justify-center text-white text-[9px] font-black">
@@ -267,7 +267,7 @@ export function PaymentAppScreen({ isEn = false }: { isEn?: boolean }) {
           </span>
         </div>
 
-        {/* Method 2: Jeeb / OnePay / Mobile Wallets */}
+        {/* Method 2: Jeeb / Wallets */}
         <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-purple-700 text-white font-black text-[10px] flex items-center justify-center">
@@ -303,7 +303,7 @@ export function PaymentAppScreen({ isEn = false }: { isEn?: boolean }) {
           <span className="font-bold text-white">$180</span>
         </div>
         <div className="flex justify-between text-slate-300">
-          <span>{isEn ? 'Platform Booking Fee' : 'رسوم الخدمة والتأكيد'}</span>
+          <span>{isEn ? 'Booking Fee' : 'رسوم الخدمة والتأكيد'}</span>
           <span className="text-emerald-400 font-bold">{isEn ? 'FREE' : 'مجاناً 0$'}</span>
         </div>
         <div className="flex justify-between font-black text-white pt-1.5 border-t border-white/10 text-xs">
@@ -316,7 +316,7 @@ export function PaymentAppScreen({ isEn = false }: { isEn?: boolean }) {
       <div className="pt-2">
         <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#FF3B30] text-white text-center font-black text-xs shadow-xl flex items-center justify-center gap-2">
           <ShieldCheck className="w-4 h-4 text-white" />
-          <span>{isEn ? 'Confirm & Issue Booking Voucher' : 'تأكيد الحجز وإصدار القسيمة'}</span>
+          <span>{isEn ? 'Confirm & Secure Booking Now' : 'تأكيد الحجز الفوري برقم مرجعي'}</span>
         </button>
       </div>
     </div>
@@ -324,27 +324,26 @@ export function PaymentAppScreen({ isEn = false }: { isEn?: boolean }) {
 }
 
 /**
- * Screen 4: Digital Booking Voucher & Offline Verification
+ * Screen 4: Digital Booking Confirmation Details
  */
-export function VoucherAppScreen({ isEn = false }: { isEn?: boolean }) {
+export function BookingConfirmationAppScreen({ isEn = false }: { isEn?: boolean }) {
   return (
     <div className="w-full h-full bg-[#0F0A2A] text-white p-4 flex flex-col justify-between select-none font-sans overflow-hidden text-start">
-      {/* Header with Success Tick */}
+      {/* Header with Success Badge */}
       <div className="text-center space-y-1">
         <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
           <CheckCircle2 className="w-6 h-6" />
         </div>
         <h4 className="text-xs font-black text-white">{isEn ? 'Booking Confirmed Successfully!' : 'تم تأكيد حجزك بنجاح!'}</h4>
-        <p className="text-[9px] text-slate-300">{isEn ? 'Reference:' : 'رقم القسيمة:'} <span className="font-mono text-amber-300 font-black">MSR-984210</span></p>
+        <p className="text-[9px] text-slate-300">{isEn ? 'Reference No:' : 'رقم تأكيد الحجز:'} <span className="font-mono text-amber-300 font-black">MSR-984210</span></p>
       </div>
 
-      {/* Modern Ticket Voucher Box */}
+      {/* Booking Details Card */}
       <div className="relative bg-white text-slate-950 rounded-2xl p-3.5 shadow-2xl my-2 space-y-3">
-        {/* Top Perforation notch effect */}
         <div className="flex justify-between items-start border-b border-slate-200 pb-2">
           <div>
             <span className="px-2 py-0.5 rounded-full bg-[#23096E] text-white text-[8px] font-black">
-              {isEn ? 'Official Voucher' : 'قسيمة معتمدة'}
+              {isEn ? 'Official Confirmation' : 'تأكيد حجز رسمي'}
             </span>
             <h5 className="text-xs font-black text-slate-900 mt-1">{isEn ? 'Horizon Luxury Aden Hotel' : 'فندق هورايزن الفاخر — عدن'}</h5>
             <p className="text-[9px] text-slate-600 font-semibold">{isEn ? 'Executive Room · 2 Adults' : 'غرفة تنفيذية · ٢ بالغين'}</p>
@@ -371,7 +370,7 @@ export function VoucherAppScreen({ isEn = false }: { isEn?: boolean }) {
         <div className="flex items-center justify-between text-[9px] font-bold text-slate-700">
           <span className="flex items-center gap-1 text-emerald-700">
             <ShieldCheck className="w-3.5 h-3.5" />
-            {isEn ? 'Paid & Guaranteed via Msari' : 'مدفوع ومضمون عبر مساري'}
+            {isEn ? 'Guaranteed via Msari Platform' : 'حجز مؤكد ومضمون عبر مساري'}
           </span>
           <span className="font-black text-[#23096E]">$180.00</span>
         </div>
@@ -381,13 +380,74 @@ export function VoucherAppScreen({ isEn = false }: { isEn?: boolean }) {
       <div className="grid grid-cols-2 gap-2 pt-1">
         <button className="py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[10px] font-black border border-white/20 flex items-center justify-center gap-1">
           <Download className="w-3 h-3 text-[#FF3B30]" />
-          <span>{isEn ? 'Save Offline PDF' : 'حفظ كملف PDF'}</span>
+          <span>{isEn ? 'Save Details PDF' : 'حفظ تفاصيل الحجز PDF'}</span>
         </button>
         <button className="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black flex items-center justify-center gap-1 shadow-md">
           <Phone className="w-3 h-3" />
           <span>{isEn ? 'Direct Hotel Chat' : 'محادثة الفندق واتساب'}</span>
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * 📱 Device Frame 1: iPhone 17 Pro Max
+ * Features: Smooth rounded titanium chassis, Dynamic Island Pill, Ultra-narrow bezels, Home Indicator.
+ */
+export function IPhone17ProMaxFrame({ 
+  children, 
+  className = '' 
+}: { 
+  children: React.ReactNode; 
+  className?: string; 
+}) {
+  return (
+    <div className={`relative w-[290px] sm:w-[320px] h-[590px] sm:h-[630px] rounded-[50px] border-[7px] border-slate-800 bg-slate-950 shadow-2xl shadow-[#23096E]/30 overflow-hidden ring-1 ring-white/20 ${className}`}>
+      {/* Dynamic Island Pill Notch */}
+      <div className="absolute top-2.5 inset-x-0 h-5 bg-black rounded-full z-30 w-28 mx-auto flex items-center justify-between px-3 border border-white/10 shadow-md">
+        <div className="w-2 h-2 rounded-full bg-slate-900 border border-white/10" />
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse" />
+      </div>
+
+      {/* Screen Inner Viewport */}
+      <div className="w-full h-full pt-5">
+        {children}
+      </div>
+
+      {/* iOS Home Indicator Bar */}
+      <div className="absolute bottom-1.5 inset-x-0 w-32 h-1 bg-white/40 rounded-full mx-auto z-30 pointer-events-none" />
+    </div>
+  );
+}
+
+/**
+ * 📱 Device Frame 2: Samsung Galaxy Note 24 Ultra
+ * Features: Iconic sharp rectangular boxy corners, Infinity-O center hole-punch camera, Ultra-thin symmetric bezels.
+ */
+export function SamsungNote24UltraFrame({ 
+  children, 
+  className = '' 
+}: { 
+  children: React.ReactNode; 
+  className?: string; 
+}) {
+  return (
+    <div className={`relative w-[290px] sm:w-[320px] h-[590px] sm:h-[630px] rounded-[22px] border-[6px] border-[#18181B] bg-slate-950 shadow-2xl shadow-[#FF3B30]/20 overflow-hidden ring-1 ring-slate-700/50 ${className}`}>
+      {/* Center Infinity-O Punch-hole Camera */}
+      <div className="absolute top-2 inset-x-0 z-30 flex justify-center pointer-events-none">
+        <div className="w-3.5 h-3.5 rounded-full bg-black border border-slate-800 flex items-center justify-center shadow-inner">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1C1542] border border-blue-900/60" />
+        </div>
+      </div>
+
+      {/* Screen Inner Viewport */}
+      <div className="w-full h-full pt-4">
+        {children}
+      </div>
+
+      {/* Subtle Android Navigation gesture cue */}
+      <div className="absolute bottom-1 inset-x-0 w-24 h-0.5 bg-white/30 rounded-full mx-auto z-30 pointer-events-none" />
     </div>
   );
 }

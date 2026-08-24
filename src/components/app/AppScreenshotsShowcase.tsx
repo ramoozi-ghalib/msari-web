@@ -5,34 +5,28 @@ import {
   Search, 
   Hotel, 
   CreditCard, 
-  FileCheck2, 
+  ShieldCheck, 
   CheckCircle2, 
   Sparkles, 
-  ArrowRight,
-  ShieldCheck,
-  Zap
+  Zap,
+  Smartphone
 } from 'lucide-react';
 import { 
   SearchAppScreen, 
   HotelDetailsAppScreen, 
   PaymentAppScreen, 
-  VoucherAppScreen 
+  BookingConfirmationAppScreen,
+  IPhone17ProMaxFrame,
+  SamsungNote24UltraFrame
 } from './AppMockupScreens';
 
 interface Props {
   isEn?: boolean;
-  screensShowcase?: Array<{
-    id: number;
-    title: string;
-    headline: string;
-    subtitle: string;
-    image: string;
-    icon?: string;
-  }>;
 }
 
 export default function AppScreenshotsShowcase({ isEn = false }: Props) {
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [deviceFrame, setDeviceFrame] = useState<'iphone17' | 'note24'>('iphone17');
 
   const tabs = [
     {
@@ -76,24 +70,24 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
       bullets: [
         'دفع فوري عبر تطبيق الكريمي جوال (إم فلوس)',
         'دعم المحافظ الإلكترونية اليمنية (جيب، ون باي، فلوسك)',
-        'خيار الدفع كاش عند الوصول لبعض الفنادق الشريكة',
+        'خيار الدفع كاش عند الوصول للفنادق الشريكة',
       ],
       renderScreen: () => <PaymentAppScreen isEn={isEn} />,
     },
     {
       id: 3,
-      title: isEn ? 'Digital Voucher' : 'القسيمة الإلكترونية الفورية',
-      icon: FileCheck2,
-      headline: isEn ? 'Instant Official Voucher with Offline QR Code' : 'قسيمة حجز رسمية معتمدة تعمل بدون اتصال بالإنترنت',
+      title: isEn ? 'Booking Confirmation' : 'تأكيد وتفاصيل الحجز',
+      icon: ShieldCheck,
+      headline: isEn ? 'Instant Official Booking Confirmation & Details' : 'تأكيد رسمي مباشر مع رقم مرجعي وتواصل فوري مع الفندق',
       subtitle: isEn
-        ? 'Get your official booking voucher instantly on your mobile with QR verification and direct WhatsApp hotel chat.'
-        : 'استلم قسيمة الحجز المعتمدة فوراً على هاتفك متضمنة كود QR ورقم مرجعي رسمي، مع إمكانية حفظها كملف PDF للتأكيد السريع عند الاستقبال.',
+        ? 'Get your official booking confirmation instantly on your mobile with full check-in details and direct WhatsApp hotel chat.'
+        : 'استلم تفاصيل حجزك المؤكد فوراً على هاتفك متضمناً الرقم المرجعي الرسمي وسياسة الوصول، مع إمكانية حفظ التفاصيل للرجوع إليها بدون إنترنت والتواصل المباشر مع الفندق.',
       bullets: [
-        'إصدار فوري لقسيمة الحجز المعتمدة لدى الفندق',
-        'تعمل بدون إنترنت (Offline) مع إمكانية التنزيل كـ PDF',
-        'زر اتصال ومحادثة واتساب مباشرة مع إدارة الفندق',
+        'تأكيد حجز رسمي ومضمون ومباشر لدى إدارة الفندق',
+        'حفظ تفاصيل الحجز للعمل بدون إنترنت وتنزيلها PDF',
+        'زر اتصال ومحادثة واتساب مباشرة مع موظف الاستقبال',
       ],
-      renderScreen: () => <VoucherAppScreen isEn={isEn} />,
+      renderScreen: () => <BookingConfirmationAppScreen isEn={isEn} />,
     },
   ];
 
@@ -102,13 +96,13 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
 
   return (
     <section className="py-20 lg:py-28 bg-white relative overflow-hidden">
-      {/* Subtle Background Elements */}
+      {/* Background Glow */}
       <div className="absolute top-0 right-1/3 w-96 h-96 bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container-msari relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
+        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#23096E]/10 border border-[#23096E]/20 text-[#23096E] text-xs font-black">
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'Inside the App' : 'شاهد التطبيق من الداخل'}</span>
@@ -118,9 +112,33 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
           </h2>
           <p className="text-[#423861] text-base sm:text-lg max-w-2xl mx-auto font-semibold">
             {isEn
-              ? 'Every screen is crafted for simplicity, high speed, and complete clarity for the traveler.'
-              : 'شاشات عصرية صُممت لتمنحك تجربة حجز سلسة دون أي تعقيد تقني أو خطوات زائدة.'}
+              ? 'Every screen is crafted for simplicity, high speed, and complete clarity on iPhone & Android.'
+              : 'شاشات عصرية صُممت لتمنحك تجربة حجز سلسة على أجهزة آيفون وسامسونج دون أي تعقيد.'}
           </p>
+
+          {/* Model Switcher for Showcase */}
+          <div className="inline-flex items-center gap-2 bg-[#F4F2F8] p-1.5 rounded-2xl border border-slate-200 shadow-inner mt-2">
+            <button
+              onClick={() => setDeviceFrame('iphone17')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                deviceFrame === 'iphone17'
+                  ? 'bg-[#23096E] text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              📱 {isEn ? 'iPhone 17 View' : 'معاينة آيفون ١٧'}
+            </button>
+            <button
+              onClick={() => setDeviceFrame('note24')}
+              className={`px-4 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                deviceFrame === 'note24'
+                  ? 'bg-[#23096E] text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              📱 {isEn ? 'Samsung Note 24 Ultra View' : 'معاينة سامسونج نوت ٢٤ الترا'}
+            </button>
+          </div>
         </div>
 
         {/* Tab Selector Buttons */}
@@ -179,7 +197,7 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
                 ))}
               </div>
 
-              {/* Action Prompt */}
+              {/* Action Button */}
               <div className="pt-4 flex items-center gap-4">
                 <a
                   href="https://play.google.com/store/apps/details?id=net.msari.app"
@@ -196,21 +214,15 @@ export default function AppScreenshotsShowcase({ isEn = false }: Props) {
 
             {/* Mockup Display Column (Right on RTL) */}
             <div className="lg:col-span-5 flex justify-center order-1 lg:order-2">
-              <div className="relative w-[280px] sm:w-[310px] h-[580px] sm:h-[610px] rounded-[44px] border-[8px] border-slate-900 bg-slate-950 shadow-2xl shadow-[#23096E]/20 overflow-hidden">
-                
-                {/* Notch */}
-                <div className="absolute top-2 inset-x-0 h-5 bg-black rounded-full z-30 w-24 mx-auto border border-white/10 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-slate-900 border border-white/15" />
-                </div>
-
-                {/* Render Selected Dynamic Screen */}
-                <div className="w-full h-full pt-5">
+              {deviceFrame === 'iphone17' ? (
+                <IPhone17ProMaxFrame className="shadow-2xl shadow-[#23096E]/25">
                   {currentTab.renderScreen()}
-                </div>
-
-                {/* Home Indicator */}
-                <div className="absolute bottom-1 inset-x-0 w-28 h-1 bg-white/40 rounded-full mx-auto z-30 pointer-events-none" />
-              </div>
+                </IPhone17ProMaxFrame>
+              ) : (
+                <SamsungNote24UltraFrame className="shadow-2xl shadow-[#FF3B30]/20">
+                  {currentTab.renderScreen()}
+                </SamsungNote24UltraFrame>
+              )}
             </div>
 
           </div>

@@ -4,7 +4,7 @@ import React from 'react';
 import { 
   CreditCard, 
   Coins, 
-  FileCheck2, 
+  ShieldCheck, 
   Headphones, 
   MapPin, 
   Layers,
@@ -39,9 +39,9 @@ const LOCAL_FEATURES = [
     badge: 'ريال يمني / دولار / سعودي',
   },
   {
-    icon: FileCheck2,
-    title: 'قسيمة حجز رقمية معتمدة وفورية',
-    desc: 'بمجرد إتمام الحجز تستلم قسيمة الحجز الرسمية المزودة برمز QR على جوالك ومحفوظة للعمل بدون إنترنت عند الوصول للفندق.',
+    icon: ShieldCheck,
+    title: 'تأكيد حجز فوري برقم مرجعي رسمي',
+    desc: 'بمجرد إتمام الحجز تستلم إشعار وتفاصيل الحجز المؤكد فورياً على جوالك، مع حفظ بيانات الحجز للرجوع إليها بدون إنترنت عند الوصول.',
     color: 'from-emerald-600 to-teal-700',
     badge: 'تأكيد فوري مضمون',
   },
@@ -68,7 +68,7 @@ const LOCAL_FEATURES = [
   },
 ];
 
-export default function AppFeaturesSection({ isEn = false, features }: Props) {
+export default function AppFeaturesSection({ isEn = false }: Props) {
   const items = LOCAL_FEATURES;
 
   return (
