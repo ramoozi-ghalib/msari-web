@@ -42,8 +42,8 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
   
   const ratingVal = data?.rating ? data.rating.replace('★', '').trim() : '4.8';
   const downloadsVal = (data?.downloads && !data.downloads.includes('50,000') && !data.downloads.includes('50000')) 
-    ? data.downloads 
-    : (isEn ? '5000+ Downloads' : '5000+ تحميل');
+    ? data.downloads.replace('تحميل', '').replace('Downloads', '').replace('مستخدم', '').replace('Users', '').trim() 
+    : '5000+';
   const googlePlayUrl = data?.googlePlayUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
   const appStoreUrl = data?.appStoreUrl || 'https://apps.apple.com';
 
