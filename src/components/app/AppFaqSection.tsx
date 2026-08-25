@@ -53,7 +53,7 @@ export default function AppFaqSection({ isEn = false, faqs }: Props) {
             <HelpCircle className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'FAQ' : 'الأسئلة الشائعة'}</span>
           </div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#23096E] tracking-tight leading-tight">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#23096E] tracking-tight leading-tight">
             {isEn ? 'Frequently Asked Questions' : 'كل ما تحتاج معرفته عن تطبيق مساري'}
           </h2>
           <p className="text-[#423861] text-xs sm:text-sm lg:text-base max-w-xl mx-auto font-semibold">

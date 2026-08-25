@@ -19,12 +19,12 @@ export function Heading({
   const Component = `h${level}` as React.ElementType;
 
   const sizeClasses = {
-    1: 'text-2xl sm:text-3xl lg:text-4xl font-black leading-[1.3] tracking-tight',
-    2: 'text-xl sm:text-2xl lg:text-3xl font-black leading-snug tracking-tight',
-    3: 'text-base sm:text-lg lg:text-xl font-bold leading-snug',
-    4: 'text-sm sm:text-base font-bold',
-    5: 'text-xs sm:text-sm font-bold',
-    6: 'text-[11px] sm:text-xs font-bold',
+    1: 'text-xl sm:text-2xl lg:text-3xl font-extrabold leading-[1.3] tracking-tight',
+    2: 'text-lg sm:text-xl lg:text-2xl font-bold leading-snug tracking-tight',
+    3: 'text-sm sm:text-base lg:text-lg font-bold leading-snug',
+    4: 'text-xs sm:text-sm font-bold',
+    5: 'text-[11px] sm:text-xs font-bold',
+    6: 'text-[10px] sm:text-[11px] font-bold',
   }[level];
 
   const variantClasses = {

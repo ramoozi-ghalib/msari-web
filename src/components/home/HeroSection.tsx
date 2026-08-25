@@ -94,16 +94,16 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           <div className="text-center space-y-2.5 sm:space-y-4 mb-2">
             {/* Line 1: حجزك أسهل... مع مساري */}
             <h1 
-              className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
-              style={{ fontSize: 'clamp(20px, 4.5vw, 36px)' }}
+              className="font-extrabold text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
+              style={{ fontSize: 'clamp(18px, 3.5vw, 28px)' }}
             >
               حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
             </h1>
 
             {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
             <p 
-              className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
-              style={{ fontSize: 'clamp(12px, 2.6vw, 18px)' }}
+              className="font-semibold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
+              style={{ fontSize: 'clamp(11px, 2vw, 15px)' }}
             >
               احجز فندقك في اليمن بأفضل سعر
             </p>

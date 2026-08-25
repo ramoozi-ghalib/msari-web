@@ -195,7 +195,7 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0A0912] leading-[1.3] tracking-tight mb-4">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#0A0912] leading-[1.3] tracking-tight mb-3">
             {heroTitle}
             <span className="block text-[#FF3B30] mt-1 sm:mt-2">
               بواجهة برمجية سريعة وتأكيد حجز فوري

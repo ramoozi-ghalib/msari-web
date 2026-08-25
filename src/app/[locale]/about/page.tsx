@@ -61,11 +61,11 @@ export default async function AboutPage() {
             <span>{heroBadge}</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-3 tracking-tight leading-tight">
             {heroTitle}
           </h1>
 
-          <p className="text-white/80 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-2xl mx-auto leading-relaxed font-medium">
             {heroSubtitle}
           </p>
         </div>
@@ -77,7 +77,7 @@ export default async function AboutPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
             {statsList.map((s, idx) => (
               <div key={idx} className="space-y-1">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)] tracking-tight">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-[var(--brand-primary)] tracking-tight">
                   {s.value}
                 </div>
                 <div className="text-xs sm:text-sm text-neutral-500 font-bold">
@@ -107,7 +107,7 @@ export default async function AboutPage() {
 
             {/* Narrative Text Column */}
             <div className="space-y-5">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 leading-tight tracking-tight">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-900 leading-tight tracking-tight">
                 {data?.story?.title || 'بوابتك الرقمية الموثوقة لاستكشاف اليمن'}
               </h2>
 
@@ -148,7 +148,7 @@ export default async function AboutPage() {
       <section className="py-16 sm:py-24 bg-[#fafafc] border-y border-neutral-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 mb-3 tracking-tight">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-900 mb-2.5 tracking-tight">
               القيم التي تقود مسيرتنا
             </h2>
             <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed">
@@ -167,10 +167,10 @@ export default async function AboutPage() {
                   <div className="w-11 h-11 rounded-xl bg-purple-50 text-[var(--brand-primary)] flex items-center justify-center mb-4">
                     <IconComponent size={20} />
                   </div>
-                  <h3 className="text-sm sm:text-base font-black text-neutral-900 mb-1.5">
+                  <h3 className="text-xs sm:text-sm font-bold text-neutral-900 mb-1.5">
                     {v.title}
                   </h3>
-                  <p className="text-xs text-neutral-500 leading-relaxed font-medium">
+                  <p className="text-xs text-neutral-500 leading-relaxed font-normal">
                     {v.desc}
                   </p>
                 </div>
@@ -184,7 +184,7 @@ export default async function AboutPage() {
       <section className="py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <div className="rounded-3xl bg-[var(--brand-primary)] text-white p-8 sm:p-14 shadow-xl space-y-5">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight">
               {data?.cta?.title || 'مستعد لسفرتك القادمة؟'}
             </h2>
 

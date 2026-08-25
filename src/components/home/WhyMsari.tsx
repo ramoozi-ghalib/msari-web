@@ -111,10 +111,10 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
             <span>{badge}</span>
           </div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[var(--brand-primary)] tracking-tight mb-1 sm:mb-2">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-[var(--brand-primary)] tracking-tight mb-1 sm:mb-2">
             {sectionTitle}
           </h2>
-          <p className="text-neutral-600 text-xs sm:text-sm font-semibold leading-relaxed">
+          <p className="text-neutral-600 text-xs sm:text-sm font-medium leading-relaxed">
             بنينا مساري لتكون منصة الحجز الأكثر موثوقية وأماناً للمسافر في اليمن والعالم
           </p>
         </div>
@@ -128,13 +128,13 @@ export default function WhyMsari({ whyMsari }: WhyMsariProps) {
                 key={`${feature.title}-${idx}`}
                 className="group relative p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-neutral-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-start"
               >
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-2.5 sm:mb-4 shadow-md border border-white/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shrink-0`}>
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br ${feature.color} text-white flex items-center justify-center mb-2.5 sm:mb-3.5 shadow-md border border-white/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shrink-0`}>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <h3 className="text-xs sm:text-sm lg:text-base font-black text-neutral-900 mb-1 group-hover:text-[var(--brand-primary)] transition-colors">
+                <h3 className="text-xs sm:text-sm font-bold text-neutral-900 mb-1 group-hover:text-[var(--brand-primary)] transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-neutral-500 text-[10px] sm:text-xs leading-relaxed font-medium">
+                <p className="text-neutral-500 text-[10px] sm:text-xs leading-relaxed font-normal">
                   {feature.desc}
                 </p>
               </div>

@@ -60,10 +60,10 @@ export default async function TransportPage() {
             <MapPin size={14} />
             {badge}
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 leading-tight whitespace-pre-line">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-3 leading-tight whitespace-pre-line">
             {title}
           </h1>
-          <p className="text-white/85 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-white/85 text-xs sm:text-sm lg:text-base max-w-2xl mx-auto mb-6">
             {subtitle}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">

@@ -13,8 +13,8 @@ export default function FavoritesPage() {
           <div className="w-16 h-16 bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Heart size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2.5">المفضلة</h1>
-          <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-md mx-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-2">المفضلة</h1>
+          <p className="text-white/80 text-xs sm:text-sm max-w-md mx-auto">
             احفظ الفنادق المفضلة لديك وارجع إليها في أي وقت
           </p>
         </div>
@@ -23,10 +23,10 @@ export default function FavoritesPage() {
       {/* Empty State */}
       <section className="container-msari py-24 text-center">
         <div className="max-w-md mx-auto">
-          <div className="w-20 h-20 bg-neutral-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Heart size={36} className="text-neutral-300" />
+          <div className="w-16 h-16 bg-neutral-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Heart size={30} className="text-neutral-300" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 mb-3">لا توجد عناصر محفوظة بعد</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-neutral-900 mb-2.5">لا توجد عناصر محفوظة بعد</h2>
           <p className="text-neutral-500 text-xs sm:text-sm mb-8 leading-relaxed">
             عند تصفحك للفنادق، اضغط على أيقونة القلب 🤍 لإضافتها إلى مفضلتك وتجدها هنا دائماً.
           </p>

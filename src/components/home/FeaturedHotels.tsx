@@ -53,10 +53,10 @@ export default function FeaturedHotels({ hotels }: FeaturedHotelsProps) {
               <Sparkles size={12} className="text-[#FF3B30]" />
               <span>⭐ الأكثر طلباً</span>
             </div>
-            <Heading level={2} variant="brand" className="mb-0.5 text-xl sm:text-2xl lg:text-3xl font-black">
+            <Heading level={2} variant="brand" className="mb-0.5 text-lg sm:text-xl lg:text-2xl font-bold">
               فنادق مقترحة
             </Heading>
-            <p className="text-[var(--text-secondary)] text-xs sm:text-sm font-semibold">
+            <p className="text-[var(--text-secondary)] text-xs sm:text-sm font-medium">
               الأكثر طلباً والأعلى تقييماً في اليمن
             </p>
           </div>

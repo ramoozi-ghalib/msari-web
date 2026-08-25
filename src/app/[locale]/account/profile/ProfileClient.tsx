@@ -65,7 +65,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
 
             {/* Name & Email */}
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white mb-1 truncate">{name}</h1>
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1 truncate">{name}</h1>
               <p className="text-white/80 text-xs sm:text-sm font-medium truncate">{email}</p>
             </div>
           </div>

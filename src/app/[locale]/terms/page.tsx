@@ -21,8 +21,8 @@ export default async function TermsPage() {
       {/* Hero */}
       <section className="relative pt-28 pb-16 bg-gradient-to-br from-[#1a0654] to-[#23096e]">
         <div className="container-msari text-center">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3">{data.title}</h1>
-          <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-xl mx-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-2.5">{data.title}</h1>
+          <p className="text-white/80 text-xs sm:text-sm max-w-xl mx-auto">
             يرجى قراءة هذه الشروط بعناية قبل استخدام منصة مساري.
           </p>
           <div className="mt-6 inline-block px-4 py-2 bg-white/10 border border-white/20 rounded-full text-white/70 text-sm">

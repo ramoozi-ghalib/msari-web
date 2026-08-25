@@ -75,7 +75,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             </div>
 
             {/* Main Headline */}
-            <Heading level={1} variant="brand" className="tracking-tight text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
+            <Heading level={1} variant="brand" className="tracking-tight text-xl sm:text-2xl lg:text-3xl font-extrabold leading-tight">
               {titlePart1}
               {titlePart2 && (
                 <span className="block text-[#FF3B30] mt-1 sm:mt-2">

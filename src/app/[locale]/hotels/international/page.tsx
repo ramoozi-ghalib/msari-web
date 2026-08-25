@@ -104,8 +104,8 @@ export default async function InternationalHotelsPage() {
       <section className="py-16 bg-[#F4F2F8]">
         <div className="container-msari">
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-10">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#23096E] mb-2">الوجهات الأكثر حجزاً</h2>
-            <p className="text-[#423861] text-xs sm:text-sm font-semibold mb-8">اختر وجهتك وتواصل معنا للحصول على أفضل سعر</p>
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#23096E] mb-1.5">الوجهات الأكثر حجزاً</h2>
+            <p className="text-[#423861] text-xs sm:text-sm font-medium mb-8">اختر وجهتك وتواصل معنا للحصول على أفضل سعر</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {destinations.map((dest: { city: string; country: string; emoji: string; hotels: number; img: string }) => (
                 <a
@@ -140,8 +140,8 @@ export default async function InternationalHotelsPage() {
                   <div className="w-12 h-12 bg-[#23096E]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Icon size={24} className="text-[#23096E]" />
                   </div>
-                  <h3 className="font-black text-[#23096E] mb-1.5 text-sm sm:text-base">{f.title}</h3>
-                  <p className="text-[#423861] text-xs font-semibold leading-relaxed">{f.desc}</p>
+                  <h3 className="font-bold text-[#23096E] mb-1.5 text-xs sm:text-sm">{f.title}</h3>
+                  <p className="text-[#423861] text-xs font-normal leading-relaxed">{f.desc}</p>
                 </div>
               );
             })}
@@ -153,8 +153,8 @@ export default async function InternationalHotelsPage() {
       <section className="py-16 bg-[#F4F2F8]">
         <div className="container-msari">
           <div className="bg-gradient-to-br from-[#23096E] via-[#2d1580] to-[#3A1C8F] rounded-3xl p-8 sm:p-12 text-center text-white shadow-2xl">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black mb-3 text-white">{ctaTitle}</h2>
-            <p className="text-[#F4F2F8] text-sm sm:text-base mb-6 max-w-xl mx-auto font-medium">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2.5 text-white">{ctaTitle}</h2>
+            <p className="text-[#F4F2F8] text-xs sm:text-sm mb-6 max-w-xl mx-auto font-normal">
               {ctaSubtitle}
             </p>
             <a

@@ -45,7 +45,7 @@ export default function AuthVisualSide({
       <div className="relative z-10 my-auto py-8 space-y-6 max-w-lg">
         {/* Main Headline */}
         <div>
-          <h2 className="text-2xl xl:text-3xl font-black text-white leading-tight mb-3 tracking-tight">
+          <h2 className="text-xl xl:text-2xl font-bold text-white leading-tight mb-2.5 tracking-tight">
             {headline}
           </h2>
           <p className="text-white/80 text-sm xl:text-base leading-relaxed">

@@ -27,7 +27,7 @@ export default function NotFound() {
         </div>
 
         {/* Text */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white mb-2.5">
           عذراً! الصفحة غير موجودة
         </h1>
         <p className="text-white/75 text-xs sm:text-sm lg:text-base mb-8 leading-relaxed">

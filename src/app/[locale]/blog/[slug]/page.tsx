@@ -119,7 +119,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-8">
         
         {/* Large Artistic Headline */}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 leading-[1.3] tracking-tight mb-6">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-neutral-900 leading-[1.3] tracking-tight mb-5">
           {post.title}
         </h1>
 

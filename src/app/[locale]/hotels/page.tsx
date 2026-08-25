@@ -83,10 +83,10 @@ export default async function HotelsPage(props: {
           </nav>
 
           {/* Title & Subtitle */}
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight mb-1.5">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white tracking-tight mb-1">
             فنادق اليمن
           </h1>
-          <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">
+          <p className="text-xs sm:text-sm text-white/90 font-normal max-w-xl">
             احجز فندقك المناسب بأفضل الأسعار
           </p>
         </div>

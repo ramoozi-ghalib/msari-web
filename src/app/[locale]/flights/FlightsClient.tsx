@@ -74,10 +74,10 @@ export default function FlightsClient({
         </div>
 
         <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 lg:pt-16">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black !text-white mb-4 leading-tight drop-shadow-lg" style={{ color: '#ffffff' }}>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold !text-white mb-3 leading-tight drop-shadow-lg" style={{ color: '#ffffff' }}>
             {title}
           </h1>
-          <p className="text-white/90 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-10">
+          <p className="text-white/90 text-xs sm:text-sm lg:text-base max-w-2xl mx-auto mb-8">
             {subtitle}
           </p>
         </div>
