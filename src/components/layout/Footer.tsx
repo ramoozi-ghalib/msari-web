@@ -34,7 +34,7 @@ export default async function Footer() {
 
   return (
     <footer 
-      className="relative bg-gradient-to-b from-[#1D065C] via-[#23096E] to-[#160549] text-white pt-12 pb-6 mt-16 border-t border-white/15 shadow-2xl overflow-hidden"
+      className="relative bg-gradient-to-b from-[#1D065C] via-[#23096E] to-[#160549] text-white pt-12 pb-28 lg:pb-6 mt-16 border-t border-white/15 shadow-2xl overflow-hidden"
       style={{ direction: 'rtl' }}
     >
       {/* Ambient Lighting Background Effect */}
@@ -48,16 +48,16 @@ export default async function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* ── 1. Top App Promo Banner (Sleek Compact Strip) ── */}
-        <div className="mb-12 p-6 sm:p-8 rounded-3xl bg-white/[0.08] border border-white/15 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="flex items-center gap-4 text-center md:text-start flex-col md:flex-row">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF3B30] to-[#E02D23] text-white flex items-center justify-center shadow-lg shadow-[#FF3B30]/30 shrink-0">
-              <Smartphone size={24} />
+        <div className="mb-12 p-5 sm:p-7 md:p-8 rounded-3xl bg-white/[0.08] border border-white/15 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-5 shadow-xl overflow-hidden">
+          <div className="flex items-center gap-3 sm:gap-4 text-center md:text-start flex-col sm:flex-row w-full md:w-auto min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#FF3B30] to-[#E02D23] text-white flex items-center justify-center shadow-lg shadow-[#FF3B30]/30 shrink-0">
+              <Smartphone size={22} />
             </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-white mb-1">
+            <div className="min-w-0 max-w-full overflow-hidden">
+              <h3 className="text-[12px] sm:text-base md:text-lg font-bold text-white mb-0.5 whitespace-nowrap tracking-tight">
                 تطبيق مساري في جيبك — أسهل وأسرع طريقة للحجز
               </h3>
-              <p className="text-xs sm:text-sm text-white/80 font-normal">
+              <p className="text-[10px] sm:text-xs md:text-sm text-white/80 font-normal whitespace-nowrap tracking-tight">
                 احجز فندقك، تاكسي المطار، أو رحلتك بنقرة زر وبأفضل الأسعار المباشرة.
               </p>
             </div>
@@ -209,7 +209,7 @@ export default async function Footer() {
                 <Phone size={15} className="text-[#FF3B30] mt-0.5 shrink-0" />
                 <div>
                   <span className="block text-[10px] text-white/50 font-semibold">اتصال هاتفي مباشر</span>
-                  <span className="font-bold text-white">{settings.supportPhone}</span>
+                  <span dir="ltr" className="font-bold text-white inline-block">{settings.supportPhone}</span>
                 </div>
               </a>
 
