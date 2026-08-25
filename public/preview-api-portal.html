@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معاينة تصميم بوابة المطورين والـ API — مساري</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .gradient-purple { background: linear-gradient(135deg, #23096E 0%, #3A1C8F 100%); }
+    .gradient-card-top { background: linear-gradient(90deg, #23096E 0%, #3A1C8F 50%, #FF3B30 100%); }
+  </style>
+</head>
+<body class="bg-[#F8F9FD] text-[#0A0912] selection:bg-[#23096E] selection:text-white min-h-screen pb-20">
+
+  <!-- Top Sticky Navigation -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-purple-900/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl gradient-purple flex items-center justify-center shadow-md shadow-purple-900/20">
+            <span class="text-white font-black text-2xl">م</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl font-black text-[#23096E]">مساري</span>
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-md bg-[#F4F2F8] text-[#3A1C8F] border border-purple-200">
+                B2B API
+              </span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-bold block">بوابة المطورين والربط البرمجي</span>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
+          <a href="#features" class="hover:text-[#23096E] transition-colors">المميزات والقدرات</a>
+          <a href="#quickstart" class="hover:text-[#23096E] transition-colors">خطوات البدء السريع</a>
+          <a href="#pricing" class="hover:text-[#23096E] transition-colors">خطة الشراكة B2B</a>
+          <a href="#faq" class="hover:text-[#23096E] transition-colors">الأسئلة الشائعة</a>
+        </nav>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+          <button class="px-5 py-2.5 rounded-xl gradient-purple text-white text-xs sm:text-sm font-black shadow-lg shadow-purple-900/20 hover:opacity-95 transition-all cursor-pointer">
+            طلب مفتاح الـ API
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-16 pb-20 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      
+      <!-- Top Pill Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-purple-900/15 text-[#23096E] text-xs sm:text-sm font-black shadow-sm mb-6">
+        <span class="w-2 h-2 rounded-full bg-[#FF3B30]"></span>
+        <span>بوابة المطورين والربط البرمجي B2B</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-[#0A0912] leading-[1.3] mb-5">
+        اربط نظامك مع مخزون أكبر شبكة سفر وفنادق في اليمن
+        <span class="block text-[#FF3B30] mt-2">بواجهة برمجية سريعة وتأكيد حجز فوري</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-slate-600 font-semibold max-w-3xl mx-auto leading-relaxed mb-8">
+        واجهة برمجية سريعة وموثوقة تتيح لوكالات السفر، التطبيقات، والشركات البحث اللحظي، جلب الأسعار، وتأكيد الحجوزات برمجياً في ثوانٍ.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <button class="px-8 py-4 rounded-2xl gradient-purple text-white font-black text-base shadow-xl shadow-purple-900/20 hover:opacity-95 transition-all">
+          💬 تواصل لطلب مفتاح الـ API والبدء فوراً
+        </button>
+        <a href="#features" class="px-6 py-4 rounded-2xl bg-white border border-slate-200 text-[#23096E] font-black text-base hover:bg-slate-50 transition-all shadow-sm">
+          استكشاف المزايا والقدرات
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Key Capabilities Grid -->
+  <section id="features" class="py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-black uppercase tracking-wider text-[#23096E] bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+          Core Capabilities
+        </span>
+        <h2 class="text-3xl font-black text-[#0A0912] mb-3">
+          لماذا يختار الشركاء والوكالات الربط مع مساري؟
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base font-semibold">
+          بنية تحتية موثوقة مصممة لتلبية احتياجات وكالات السفر، التطبيقات، والشركات السياحية.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-purple-900/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 text-[#23096E] flex items-center justify-center mb-5 font-black text-xl">⚡</div>
+          <h3 class="text-lg font-black text-[#0A0912] mb-2">استجابة فائقة السرعة</h3>
+          <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+            واجهة RESTful مبنية بأحدث معايير الأداء لمعالجة الطلبات اللحظية بكفاءة عالية.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-purple-900/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-5 font-black text-xl">🛡️</div>
+          <h3 class="text-lg font-black text-[#0A0912] mb-2">توثيق وأمان عالي</h3>
+          <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+            مفاتيح API مشفرة وصلاحيات دقيقة وتشفير كامل للبيانات عبر بروتوكول TLS 1.3.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-purple-900/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center mb-5 font-black text-xl">💱</div>
+          <h3 class="text-lg font-black text-[#0A0912] mb-2">تسعير متعدد العملات</h3>
+          <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+            تحديث لحظي لأسعار الغرف والتوفر بالريال اليمني والدولار والريال السعودي بدون عمولات خفية.
+          </p>
+        </div>
+
+        <div class="bg-white p-6 sm:p-7 rounded-3xl border border-purple-900/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mb-5 font-black text-xl">🏨</div>
+          <h3 class="text-lg font-black text-[#0A0912] mb-2">تأكيد حجز فوري معتمد</h3>
+          <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+            خصم مباشر من التوفر وإصدار رقم مرجعي رسمي وقسيمة إلكترونية معتمدة من الفندق.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2-Step Quickstart -->
+  <section id="quickstart" class="py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-12">
+        <span class="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+          Integration Flow
+        </span>
+        <h2 class="text-3xl font-black text-[#0A0912] mb-3">كيف تبدأ التكامل مع مساري في خطوات بسيطة؟</h2>
+        <p class="text-slate-600 text-sm font-semibold max-w-2xl mx-auto">
+          مسار واضح ومباشر لنقل نظامك إلى بيئة العمل الحية وتأكيد الحجوزات دون تعقيد.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-start">
+        <div class="bg-white p-8 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden">
+          <div class="text-4xl font-black text-[#23096E] font-mono mb-4">01</div>
+          <h3 class="text-xl font-black text-slate-900 mb-2">طلب مفتاح الـ API والتوثيق</h3>
+          <p class="text-sm text-slate-600 font-medium leading-relaxed">
+            تواصل معنا عبر واتساب الشركاء لاستلام مفتاح الربط وتوثيق بيانات الشراكة خلال دقائق.
+          </p>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden">
+          <div class="text-4xl font-black text-[#FF3B30] font-mono mb-4">02</div>
+          <h3 class="text-xl font-black text-slate-900 mb-2">إطلاق وتأكيد الحجوزات</h3>
+          <p class="text-sm text-slate-600 font-medium leading-relaxed">
+            ابدأ بتقديم خدمات حجز الفنادق لعملائك وتأكيد الحجوزات اللحظية مباشرة عبر نظامك.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Unified B2B Partnership Plan -->
+  <section id="pricing" class="py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-10">
+        <span class="text-xs font-black uppercase tracking-wider text-[#23096E] bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200 inline-block mb-3">
+          B2B Partnership Plan
+        </span>
+        <h2 class="text-3xl font-black text-[#0A0912] mb-2">خطة الشراكة والربط البرمجي الموحدة</h2>
+        <p class="text-slate-600 text-sm font-semibold">حلول مرنة ومخصصة للتطبيقات ومواقع السفر والوكالات السياحية.</p>
+      </div>
+
+      <div class="bg-white rounded-3xl border-2 border-purple-900/20 shadow-2xl shadow-purple-900/10 relative overflow-hidden p-8 sm:p-10">
+        <!-- Top Gradient Accent -->
+        <div class="absolute top-0 right-0 left-0 h-3 gradient-card-top"></div>
+
+        <div class="mb-6">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#23096E] text-xs font-black mb-3 border border-purple-200">
+            ⚡ خطة الشراكة الشاملة (Full B2B Access)
+          </span>
+          <h3 class="text-2xl sm:text-3xl font-black text-slate-900">خطة الشراكة والربط البرمجي (Msari B2B API)</h3>
+        </div>
+
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed font-medium mb-8">
+          خطة شاملة ومتكاملة تمنح وكالات السفر، التطبيقات، ومنصات السفر وصولاً مباشراً لآلاف الغرف الفندقية وتأكيد الحجوزات لحظياً.
+        </p>
+
+        <!-- Features Checklist Grid -->
+        <div class="border-t border-b border-slate-100 py-6 mb-8">
+          <div class="text-xs font-black text-slate-400 uppercase tracking-wider mb-4">المزايا والقدرات التقنية المضمنة في الخطة:</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3 text-slate-800 text-sm font-bold">
+              <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">✓</div>
+              <span>ربط فوري وتأكيد مباشر لجميع حجوزات الفنادق</span>
+            </div>
+            <div class="flex items-center gap-3 text-slate-800 text-sm font-bold">
+              <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">✓</div>
+              <span>معدل طلبات غير محدود وسرعة استجابة فائقة</span>
+            </div>
+            <div class="flex items-center gap-3 text-slate-800 text-sm font-bold">
+              <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">✓</div>
+              <span>تحديث لحظي لأسعار الغرف والتوفر بعدة عملات</span>
+            </div>
+            <div class="flex items-center gap-3 text-slate-800 text-sm font-bold">
+              <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">✓</div>
+              <span>نظام Webhooks للإشعارات والتحديثات اللحظية</span>
+            </div>
+            <div class="flex items-center gap-3 text-slate-800 text-sm font-bold">
+              <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">✓</div>
+              <span>دعم فني وهندسي مخصص 24/7 عبر واتساب</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full py-4 rounded-2xl gradient-purple text-white text-base font-black shadow-xl shadow-purple-900/20 hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          💬 تواصل معنا عبر واتساب لطلب مفتاح الـ API وتفعيل الربط
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-10">
+        <span class="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+          FAQ
+        </span>
+        <h2 class="text-3xl font-black text-[#0A0912] mb-2">الأسئلة الشائعة</h2>
+        <p class="text-slate-600 text-sm font-semibold">إجابات سريعة وواضحة حول الربط البرمجي وطرق العمل.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="bg-white rounded-2xl border border-purple-900/10 shadow-sm p-6">
+          <h3 class="font-black text-slate-900 text-base mb-2 flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-purple-50 text-[#23096E] text-xs font-mono font-bold flex items-center justify-center shrink-0">1</span>
+            <span>كيف أحصل على مفتاح API الخاص بي؟</span>
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed font-medium">
+            تواصل معنا عبر واتساب الشركاء وسيتم تزويدك بمفتاح الربط البرمجي بعد مراجعة طلب الشراكة وتوثيق الحساب.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-purple-900/10 shadow-sm p-6">
+          <h3 class="font-black text-slate-900 text-base mb-2 flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-purple-50 text-[#23096E] text-xs font-mono font-bold flex items-center justify-center shrink-0">2</span>
+            <span>هل يدعم الـ API تأكيد الحجز الفوري وإصدار القسيمة؟</span>
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed font-medium">
+            نعم، يتيح الـ API إتمام وتأكيد الحجز الفوري مع خصم التوفر لحظياً وإصدار رقم مرجعي معتمد ومباشر لدى إدارة الفندق وقسيمة حجز إلكترونية.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-purple-900/10 shadow-sm p-6">
+          <h3 class="font-black text-slate-900 text-base mb-2 flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-purple-50 text-[#23096E] text-xs font-mono font-bold flex items-center justify-center shrink-0">3</span>
+            <span>ما هي صيغة البيانات المعتمدة في الـ API؟</span>
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed font-medium">
+            البيانات تُرسل وتُستقبل بصيغة JSON القياسية عبر بروتوكول HTTPS المشفر، مع توفير Webhooks للإشعارات والتحديثات المباشرة لحالة الحجز.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-purple-900/10 shadow-sm p-6">
+          <h3 class="font-black text-slate-900 text-base mb-2 flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full bg-purple-50 text-[#23096E] text-xs font-mono font-bold flex items-center justify-center shrink-0">4</span>
+            <span>هل يتوفر دعم فني وهندسي أثناء عملية التكامل؟</span>
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed font-medium">
+            نعم، نوفر دعماً فنياً وهندسياً مباشراً لمساعدتك في إتمام عملية الربط والتكامل خطوة بخطوة عبر واتساب.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Bottom CTA Banner -->
+  <section class="py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="rounded-3xl gradient-purple p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-xl shadow-purple-900/20">
+        <div class="max-w-2xl mx-auto space-y-5 relative z-10">
+          <h3 class="text-2xl sm:text-3xl font-black">
+            جاهز لبناء شراكة سفر متكاملة مع مساري؟
+          </h3>
+          <p class="text-purple-100 text-sm sm:text-base leading-relaxed font-medium">
+            فريقنا التقني وإدارة الشراكات مستعدون لتقديم الدعم الفني وتسهيل عملية الربط خطوة بخطوة.
+          </p>
+          <div class="pt-2">
+            <button class="px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-[#23096E] font-black text-sm sm:text-base shadow-lg transition-all cursor-pointer">
+              تواصل معنا عبر واتساب الآن
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

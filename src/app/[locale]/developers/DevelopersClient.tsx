@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import {
-  CheckCircle2,
   Zap,
   Server,
   ShieldCheck,
   MessageSquare,
   Sparkles,
   ArrowRight,
-  Clock,
   Coins,
   Cpu,
   Globe2,
@@ -18,7 +16,6 @@ import {
   Layers,
   Code2,
   Lock,
-  Headphones,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { DevelopersPageData } from '@/services/cms';
@@ -44,8 +41,8 @@ const ICON_MAP: Record<string, any> = {
 export default function DevelopersClient({ data, whatsappNumber }: DevelopersClientProps) {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
-  const openWhatsApp = (planName: string) => {
-    const text = `مرحباً فريق مساري، نود طلب مفتاح الربط البرمجي (API Key) والاشتراك في ${planName}.`;
+  const openWhatsApp = (planName?: string) => {
+    const text = `مرحباً فريق مساري، نود طلب مفتاح الربط البرمجي (API Key) والاشتراك في ${planName || 'خطة الشراكة والربط البرمجي'}.`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -58,13 +55,15 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
   const heroTitle = data?.hero?.title || 'اربط نظامك مع مخزون أكبر شبكة سفر وفنادق في اليمن';
   const heroSubtitle =
     data?.hero?.subtitle ||
-    'واجهة برمجية سريعة وموثوقة تتيح لوكالات السفر والتطبيقات ومنصات السفر البحث اللحظي، جلب الأسعار، وتأكيد الحجوزات برمجياً في ثوانٍ مع أسعار جملة مخصصة.';
+    'واجهة برمجية سريعة وموثوقة تتيح لوكالات السفر والتطبيقات ومنصات السفر البحث اللحظي، جلب الأسعار، وتأكيد الحجوزات برمجياً في ثوانٍ.';
 
-  const features = data?.features && data.features.length > 0 ? data.features : [
+  const features = data?.features && data.features.length > 0 
+    ? data.features.filter(f => !f.title.includes('Sandbox') && !f.desc.includes('Sandbox'))
+    : [
     {
       icon: 'Zap',
       title: 'استجابة فائقة السرعة',
-      desc: 'واجهة RESTful مبنية بأحدث معايير الأداء بوقت استجابة يقل عن 150ms للطلبات اللحظية.',
+      desc: 'واجهة RESTful مبنية بأحدث معايير الأداء لمعالجة الطلبات اللحظية بكفاءة عالية.',
     },
     {
       icon: 'ShieldCheck',
@@ -83,27 +82,36 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
     },
   ];
 
-  const plan = data?.plans && data.plans.length > 0 ? data.plans[0] : {
-    id: 'b2b_integration',
-    name: 'خطة الشراكة والربط البرمجي (Msari B2B API)',
-    price: 'حسب الاستخدام / عمولات مخصصة',
-    description: 'خطة شاملة ومتكاملة تمنح وكالات السفر والتطبيقات ومنصات السفر وصولاً مباشراً لآلاف الغرف الفندقية وتأكيد الحجوزات لحظياً.',
-    features: [
-      'ربط فوري وتأكيد مباشر لجميع حجوزات الفنادق',
-      'معدل طلبات غير محدود بوقت استجابة فائق < 150ms',
-      'بيئة اختبار تجريبية كاملة (Sandbox Environment)',
-      'تحديث لحظي لأسعار الغرف والتوفر بعدة عملات',
-      'نظام Webhooks للإشعارات والتحديثات اللحظية',
-      'دعم فني وهندسي مخصص 24/7 عبر واتساب',
-      'عقد مستوى الخدمة المضمون (SLA 99.9%)',
-    ],
+  // Clean plan features to ensure excluded items are not displayed
+  const rawPlan = data?.plans && data.plans.length > 0 ? data.plans[0] : null;
+  const filteredPlanFeatures = (rawPlan?.features || [
+    'ربط فوري وتأكيد مباشر لجميع حجوزات الفنادق',
+    'معدل طلبات غير محدود وسرعة استجابة فائقة',
+    'تحديث لحظي لأسعار الغرف والتوفر بعدة عملات',
+    'نظام Webhooks للإشعارات والتحديثات اللحظية',
+    'دعم فني وهندسي مخصص 24/7 عبر واتساب',
+  ]).filter(
+    (feat: string) =>
+      !feat.includes('Sandbox') &&
+      !feat.includes('SLA') &&
+      !feat.includes('99.9%') &&
+      !feat.includes('بيئة اختبار')
+  );
+
+  const plan = {
+    id: rawPlan?.id || 'b2b_integration',
+    name: rawPlan?.name || 'خطة الشراكة والربط البرمجي (Msari B2B API)',
+    description:
+      rawPlan?.description ||
+      'خطة شاملة ومتكاملة تمنح وكالات السفر والتطبيقات ومنصات السفر وصولاً مباشراً لآلاف الغرف الفندقية وتأكيد الحجوزات لحظياً.',
+    features: filteredPlanFeatures,
     popular: true,
   };
 
-  const faqs = data?.faq && data.faq.length > 0 ? data.faq : [
+  const faqs = [
     {
       q: 'كيف أحصل على مفتاح API الخاص بي؟',
-      a: 'تواصل معنا عبر واتساب الشركاء وسيتم تزويدك بمفتاح تجريبي وبيئة Sandbox خلال دقائق بعد مراجعة طلب الشراكة وتوثيق الحساب.',
+      a: 'تواصل معنا عبر واتساب الشركاء وسيتم تزويدك بمفتاح الربط البرمجي فوراً بعد مراجعة طلب الشراكة وتوثيق الحساب.',
     },
     {
       q: 'هل يدعم الـ API تأكيد الحجز الفوري وإصدار القسيمة؟',
@@ -114,8 +122,8 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
       a: 'البيانات تُرسل وتُستقبل بصيغة JSON القياسية عبر بروتوكول HTTPS المشفر، مع توفير Webhooks للإشعارات والتحديثات المباشرة لحالة الحجز.',
     },
     {
-      q: 'هل تتوفر بيئة تجريبية (Sandbox) قبل إطلاق الإنتاج؟',
-      a: 'نعم، نوفر بيئة Sandbox متكاملة ومجانية تحتوي على بيانات فنادق حقيقية لتجربة تدفق البحث، اختيار الغرف، وإجراء الحجز دون أي مدفوعات فعلية.',
+      q: 'هل يتوفر دعم فني وهندسي أثناء عملية التكامل؟',
+      a: 'نعم، نوفر دعماً فنياً وهندسياً مباشراً لمساعدتك في إتمام عملية الربط والتكامل خطوة بخطوة عبر واتساب.',
     },
   ];
 
@@ -155,10 +163,6 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
 
             {/* Top Actions */}
             <div className="flex items-center gap-3">
-              <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>النظام يعمل 99.9%</span>
-              </div>
               <button
                 onClick={() => openWhatsApp(plan.name)}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#23096E] to-[#3A1C8F] hover:from-[#3A1C8F] hover:to-[#23096E] text-white text-xs sm:text-sm font-black shadow-md shadow-[#23096E]/20 transition-all cursor-pointer flex items-center gap-2"
@@ -173,7 +177,7 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
       </header>
 
       {/* ── Hero Section ──────────────────────────────────────────────── */}
-      <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-20 overflow-hidden">
+      <section className="relative pt-14 sm:pt-20 pb-16 sm:pb-20 overflow-hidden">
         {/* Soft Background Glows */}
         <div className="absolute -top-10 right-1/4 w-[500px] h-[500px] bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] bg-[#FF3B30]/5 rounded-full blur-3xl pointer-events-none" />
@@ -200,7 +204,7 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <button
               onClick={() => openWhatsApp(plan.name)}
               className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#23096E] text-white font-black text-sm sm:text-base shadow-xl shadow-[#23096E]/20 hover:opacity-95 transition-all flex items-center gap-2.5 cursor-pointer"
@@ -215,22 +219,6 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
               <span>استكشاف المزايا والقدرات</span>
               <ArrowRight size={16} />
             </a>
-          </div>
-
-          {/* Key Stat / Trust Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 font-mono">{'< 150ms'}</div>
-              <div className="text-xs text-slate-600 font-bold mt-1">متوسط سرعة الاستجابة</div>
-            </div>
-            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
-              <div className="text-2xl sm:text-3xl font-black text-[#3A1C8F] font-mono">99.9% SLA</div>
-              <div className="text-xs text-slate-600 font-bold mt-1">ضمان استقرار الخوادم</div>
-            </div>
-            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
-              <div className="text-2xl sm:text-3xl font-black text-[#FF3B30]">تأكيد فوري</div>
-              <div className="text-xs text-slate-600 font-bold mt-1">إصدار رقم مرجعي مباشر</div>
-            </div>
           </div>
 
         </div>
@@ -277,48 +265,39 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
         </div>
       </section>
 
-      {/* ── 3-Step Quickstart Guide ────────────────────────────────────── */}
+      {/* ── Quickstart Integration Guide ───────────────────────────────── */}
       <section id="quickstart" className="py-16 scroll-mt-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           
           <div className="mb-12">
             <span className="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
               Integration Flow
             </span>
             <h2 className="text-3xl font-black text-[#0A0912] mb-3">
-              كيف تبدأ التكامل مع مساري في 3 خطوات بسيطة؟
+              كيف تبدأ التكامل مع مساري في خطوات بسيطة؟
             </h2>
             <p className="text-slate-600 text-sm font-semibold max-w-2xl mx-auto">
-              مسار هندسي واضح ومباشر لنقل نظامك من مرحلة التجربة إلى بيئة الإنتاج الحية دون تعقيد.
+              مسار واضح ومباشر لنقل نظامك إلى بيئة العمل الحية وتأكيد الحجوزات دون تعقيد.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-start">
             
             {/* Step 1 */}
-            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
+            <div className="bg-white p-8 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
               <div className="text-4xl font-black text-[#23096E] font-mono mb-4">01</div>
-              <h3 className="text-lg font-black text-slate-900 mb-2">طلب مفتاح الـ API</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                تواصل معنا عبر واتساب الشركاء لاستلام مفتاح الـ Sandbox التجريبي فوراً وتوثيق بيانات الشراكة.
+              <h3 className="text-xl font-black text-slate-900 mb-2">طلب مفتاح الـ API والتوثيق</h3>
+              <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                تواصل معنا عبر واتساب الشركاء لاستلام مفتاح الربط وتوثيق بيانات الشراكة خلال دقائق.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
-              <div className="text-4xl font-black text-[#3A1C8F] font-mono mb-4">02</div>
-              <h3 className="text-lg font-black text-slate-900 mb-2">الاختبار في Sandbox</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                اختبر استعلامات البحث وتدفق الحجز وإشعارات Webhooks في بيئة تجريبية آمنة ومجانية بالكامل.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
-              <div className="text-4xl font-black text-[#FF3B30] font-mono mb-4">03</div>
-              <h3 className="text-lg font-black text-slate-900 mb-2">إطلاق الإنتاج المباشر</h3>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-                انتقل للمفتاح الحي وابدأ بتقديم خدمات حجز الفنادق لعملائك وتأكيد الحجوزات وجني العمولات.
+            <div className="bg-white p-8 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
+              <div className="text-4xl font-black text-[#FF3B30] font-mono mb-4">02</div>
+              <h3 className="text-xl font-black text-slate-900 mb-2">إطلاق وتأكيد الحجوزات</h3>
+              <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                ابدأ بتقديم خدمات حجز الفنادق لعملائك وتأكيد الحجوزات اللحظية مباشرة عبر نظامك.
               </p>
             </div>
 
@@ -331,7 +310,7 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-10">
-            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 inline-block mb-3">
+            <span className="text-xs font-black uppercase tracking-wider text-[#23096E] bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200 inline-block mb-3">
               B2B Partnership Plan
             </span>
             <h2 className="text-3xl font-black text-[#0A0912] mb-2">
@@ -347,18 +326,12 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
             {/* Top Gradient Border */}
             <div className="absolute top-0 right-0 left-0 h-3 bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#FF3B30]" />
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#23096E] text-xs font-black mb-2 border border-purple-200">
-                  <Zap size={14} className="text-[#FF3B30]" />
-                  خطة الشراكة الشاملة (Full B2B Access)
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-black text-slate-900">{plan.name}</h3>
-              </div>
-              <div className="text-start sm:text-end">
-                <div className="text-xl sm:text-2xl font-black text-[#23096E]">{plan.price}</div>
-                <span className="text-xs text-emerald-600 font-bold block mt-0.5">عمولات وأسعار جملة مخصصة للشركاء</span>
-              </div>
+            <div className="mb-6">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#23096E] text-xs font-black mb-3 border border-purple-200">
+                <Zap size={14} className="text-[#FF3B30]" />
+                خطة الشراكة الشاملة (Full B2B Access)
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900">{plan.name}</h3>
             </div>
 
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium mb-8">
@@ -473,4 +446,5 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
     </div>
   );
 }
+
 
