@@ -18,10 +18,10 @@ const navLinks = [
   { href: '/hotels/international', labelAr: 'فنادق عالمية', icon: Hotel },
   { href: '/flights', labelAr: 'رحلات طيران', icon: Plane },
   { href: '/cars', labelAr: 'خدمة السيارات', icon: Car },
+  { href: '/app', labelAr: 'تطبيق مساري', icon: Smartphone },
 ];
 
 const drawerExtraLinks = [
-  { href: '/app', labelAr: 'تطبيق مساري', icon: Smartphone },
   { href: '/about', labelAr: 'من نحن', icon: Info },
   { href: '/contact', labelAr: 'اتصل بنا', icon: Headphones },
 ];
@@ -71,6 +71,20 @@ export default function Header() {
   const isHomePage = pathname === '/' || pathname === '/ar' || pathname === '/en';
   const isSolidHeader = scrolled || !isHomePage;
 
+  const isLinkActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/' || pathname === '/ar' || pathname === '/en';
+    }
+    return (
+      pathname === href ||
+      pathname === `/ar${href}` ||
+      pathname === `/en${href}` ||
+      pathname.startsWith(`/ar${href}/`) ||
+      pathname.startsWith(`/en${href}/`) ||
+      pathname.startsWith(`${href}/`)
+    );
+  };
+
   return (
     <>
       {/* ── Top Header (Solid on light pages like rooms, transparent on hero, blurs on scroll) ── */}
@@ -108,7 +122,7 @@ export default function Header() {
             {/* Center: Navigation Links */}
             <nav className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-sm">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive = isLinkActive(link.href);
                 const Icon = link.icon;
                 return (
                   <Link
@@ -323,7 +337,7 @@ export default function Header() {
               <div className="space-y-1.5">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
-                  const isActive = pathname === link.href;
+                  const isActive = isLinkActive(link.href);
                   return (
                     <Link
                       key={link.href}
@@ -350,7 +364,7 @@ export default function Header() {
               <div className="mt-3.5 pt-3.5 border-t border-white/15 space-y-1.5">
                 {drawerExtraLinks.map((extra) => {
                   const Icon = extra.icon;
-                  const isActive = pathname === extra.href;
+                  const isActive = isLinkActive(extra.href);
                   return (
                     <Link
                       key={extra.href}
