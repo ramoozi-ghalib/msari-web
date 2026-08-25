@@ -1,6 +1,25 @@
 'use client';
 
-import { CheckCircle2, Zap, Server, ShieldCheck, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
+import {
+  CheckCircle2,
+  Zap,
+  Server,
+  ShieldCheck,
+  MessageSquare,
+  Sparkles,
+  ArrowRight,
+  Clock,
+  Coins,
+  Cpu,
+  Globe2,
+  Check,
+  ChevronDown,
+  Layers,
+  Code2,
+  Lock,
+  Headphones,
+} from 'lucide-react';
 import Link from 'next/link';
 import type { DevelopersPageData } from '@/services/cms';
 
@@ -14,210 +33,444 @@ const ICON_MAP: Record<string, any> = {
   Server,
   ShieldCheck,
   MessageSquare,
+  Coins,
+  Cpu,
+  Globe2,
+  Layers,
+  Code2,
+  Lock,
 };
 
 export default function DevelopersClient({ data, whatsappNumber }: DevelopersClientProps) {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
   const openWhatsApp = (planName: string) => {
-    const text = `مرحباً مساري، نود الاشتراك في ${planName} للربط المباشر عبر API.`;
+    const text = `مرحباً فريق مساري، نود طلب مفتاح الربط البرمجي (API Key) والاشتراك في ${planName}.`;
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  // Safe fallback data if CMS fields are partially empty
+  const heroBadge = data?.hero?.badge || 'بوابة المطورين والربط البرمجي B2B';
+  const heroTitle = data?.hero?.title || 'اربط نظامك مع مخزون أكبر شبكة سفر وفنادق في اليمن';
+  const heroSubtitle =
+    data?.hero?.subtitle ||
+    'واجهة برمجية سريعة وموثوقة تتيح لوكالات السفر والتطبيقات ومنصات السفر البحث اللحظي، جلب الأسعار، وتأكيد الحجوزات برمجياً في ثوانٍ مع أسعار جملة مخصصة.';
+
+  const features = data?.features && data.features.length > 0 ? data.features : [
+    {
+      icon: 'Zap',
+      title: 'استجابة فائقة السرعة',
+      desc: 'واجهة RESTful مبنية بأحدث معايير الأداء بوقت استجابة يقل عن 150ms للطلبات اللحظية.',
+    },
+    {
+      icon: 'ShieldCheck',
+      title: 'توثيق وأمان عالي',
+      desc: 'مفاتيح API مشفرة وصلاحيات دقيقة وتشفير كامل للبيانات عبر بروتوكول TLS 1.3.',
+    },
+    {
+      icon: 'Coins',
+      title: 'تسعير متعدد العملات',
+      desc: 'تحديث لحظي لأسعار الغرف والتوفر بالريال اليمني والدولار والريال السعودي بدون عمولات خفية.',
+    },
+    {
+      icon: 'Cpu',
+      title: 'تأكيد حجز فوري معتمد',
+      desc: 'خصم مباشر من التوفر وإصدار رقم مرجعي رسمي وقسيمة إلكترونية معتمدة من الفندق.',
+    },
+  ];
+
+  const plan = data?.plans && data.plans.length > 0 ? data.plans[0] : {
+    id: 'b2b_integration',
+    name: 'خطة الشراكة والربط البرمجي (Msari B2B API)',
+    price: 'حسب الاستخدام / عمولات مخصصة',
+    description: 'خطة شاملة ومتكاملة تمنح وكالات السفر والتطبيقات ومنصات السفر وصولاً مباشراً لآلاف الغرف الفندقية وتأكيد الحجوزات لحظياً.',
+    features: [
+      'ربط فوري وتأكيد مباشر لجميع حجوزات الفنادق',
+      'معدل طلبات غير محدود بوقت استجابة فائق < 150ms',
+      'بيئة اختبار تجريبية كاملة (Sandbox Environment)',
+      'تحديث لحظي لأسعار الغرف والتوفر بعدة عملات',
+      'نظام Webhooks للإشعارات والتحديثات اللحظية',
+      'دعم فني وهندسي مخصص 24/7 عبر واتساب',
+      'عقد مستوى الخدمة المضمون (SLA 99.9%)',
+    ],
+    popular: true,
+  };
+
+  const faqs = data?.faq && data.faq.length > 0 ? data.faq : [
+    {
+      q: 'كيف أحصل على مفتاح API الخاص بي؟',
+      a: 'تواصل معنا عبر واتساب الشركاء وسيتم تزويدك بمفتاح تجريبي وبيئة Sandbox خلال دقائق بعد مراجعة طلب الشراكة وتوثيق الحساب.',
+    },
+    {
+      q: 'هل يدعم الـ API تأكيد الحجز الفوري وإصدار القسيمة؟',
+      a: 'نعم، يتيح الـ API إتمام وتأكيد الحجز الفوري مع خصم التوفر لحظياً وإصدار رقم مرجعي معتمد ومباشر لدى إدارة الفندق وقسيمة حجز إلكترونية.',
+    },
+    {
+      q: 'ما هي صيغة البيانات المعتمدة في الـ API؟',
+      a: 'البيانات تُرسل وتُستقبل بصيغة JSON القياسية عبر بروتوكول HTTPS المشفر، مع توفير Webhooks للإشعارات والتحديثات المباشرة لحالة الحجز.',
+    },
+    {
+      q: 'هل تتوفر بيئة تجريبية (Sandbox) قبل إطلاق الإنتاج؟',
+      a: 'نعم، نوفر بيئة Sandbox متكاملة ومجانية تحتوي على بيانات فنادق حقيقية لتجربة تدفق البحث، اختيار الغرف، وإجراء الحجز دون أي مدفوعات فعلية.',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[var(--surface-page)] pb-20">
+    <div className="min-h-screen bg-[#F8F9FD] text-[#0A0912] selection:bg-[#23096E] selection:text-white pb-20">
       
-      {/* Navbar for Dev Portal */}
-      <nav className="bg-[var(--brand-primary)] text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── Top Navigation Bar ────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#23096E]/10 transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors">
-                <span className="text-white font-bold text-lg">م</span>
-              </div>
-              <div>
-                <span className="text-xl font-black tracking-wide leading-tight block text-white">مساري <span className="text-purple-200">للمطورين</span></span>
-                <span className="block text-[10px] text-white/60">B2B API Portal</span>
-              </div>
-            </Link>
-            <div className="hidden md:flex items-center gap-6">
-              <a href="#features" className="text-sm font-bold text-white/80 hover:text-white transition-colors">المميزات</a>
-              <a href="#pricing" className="text-sm font-bold text-white/80 hover:text-white transition-colors">خطط الشراكة</a>
+            
+            {/* Logo & Brand */}
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#23096E] via-[#3A1C8F] to-[#23096E] flex items-center justify-center shadow-md shadow-[#23096E]/20 group-hover:scale-105 transition-transform">
+                  <span className="text-white font-black text-2xl">م</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-black text-[#23096E] tracking-tight">مساري</span>
+                    <span className="text-xs font-black px-2.5 py-0.5 rounded-md bg-[#F4F2F8] text-[#3A1C8F] border border-purple-200/60">
+                      B2B API
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-bold block">بوابة المطورين والربط البرمجي</span>
+                </div>
+              </Link>
             </div>
+
+            {/* Nav Links */}
+            <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
+              <a href="#features" className="hover:text-[#23096E] transition-colors">المميزات والقدرات</a>
+              <a href="#quickstart" className="hover:text-[#23096E] transition-colors">خطوات البدء السريع</a>
+              <a href="#pricing" className="hover:text-[#23096E] transition-colors">خطة الشراكة B2B</a>
+              <a href="#faq" className="hover:text-[#23096E] transition-colors">الأسئلة الشائعة</a>
+            </nav>
+
+            {/* Top Actions */}
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>النظام يعمل 99.9%</span>
+              </div>
+              <button
+                onClick={() => openWhatsApp(plan.name)}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#23096E] to-[#3A1C8F] hover:from-[#3A1C8F] hover:to-[#23096E] text-white text-xs sm:text-sm font-black shadow-md shadow-[#23096E]/20 transition-all cursor-pointer flex items-center gap-2"
+              >
+                <MessageSquare size={15} />
+                <span>طلب مفتاح الـ API</span>
+              </button>
+            </div>
+
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <div className="bg-[var(--brand-primary)] text-white pt-16 pb-32 relative overflow-hidden">
-        {/* Background Patterns */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 rounded-full bg-[var(--brand-secondary)]/30 blur-3xl"></div>
-          <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[var(--brand-dark)]/40 blur-3xl"></div>
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-        </div>
+      {/* ── Hero Section ──────────────────────────────────────────────── */}
+      <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-20 overflow-hidden">
+        {/* Soft Background Glows */}
+        <div className="absolute -top-10 right-1/4 w-[500px] h-[500px] bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] bg-[#FF3B30]/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-purple-200 text-xs font-bold border border-white/10">
-              {data.hero.badge || 'B2B API Portal'}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          
+          {/* Pill Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#23096E]/15 text-[#23096E] text-xs sm:text-sm font-black shadow-sm mb-6">
+            <Sparkles size={14} className="text-[#FF3B30]" />
+            <span>{heroBadge}</span>
+          </div>
+
+          {/* Main Headline */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0A0912] leading-[1.3] tracking-tight mb-5">
+            {heroTitle}
+            <span className="block text-[#FF3B30] mt-2">
+              بواجهة برمجية سريعة وتأكيد حجز فوري
+            </span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-base sm:text-lg text-slate-600 font-semibold max-w-3xl mx-auto leading-relaxed mb-8">
+            {heroSubtitle}
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+            <button
+              onClick={() => openWhatsApp(plan.name)}
+              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#23096E] text-white font-black text-sm sm:text-base shadow-xl shadow-[#23096E]/20 hover:opacity-95 transition-all flex items-center gap-2.5 cursor-pointer"
+            >
+              <MessageSquare size={18} />
+              <span>تواصل لطلب مفتاح الـ API والبدء فوراً</span>
+            </button>
+            <a
+              href="#features"
+              className="px-6 py-4 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-[#23096E] font-black text-sm sm:text-base transition-all shadow-sm flex items-center gap-2"
+            >
+              <span>استكشاف المزايا والقدرات</span>
+              <ArrowRight size={16} />
+            </a>
+          </div>
+
+          {/* Key Stat / Trust Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 font-mono">{'< 150ms'}</div>
+              <div className="text-xs text-slate-600 font-bold mt-1">متوسط سرعة الاستجابة</div>
             </div>
+            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
+              <div className="text-2xl sm:text-3xl font-black text-[#3A1C8F] font-mono">99.9% SLA</div>
+              <div className="text-xs text-slate-600 font-bold mt-1">ضمان استقرار الخوادم</div>
+            </div>
+            <div className="bg-white p-5 rounded-2xl border border-purple-900/10 shadow-sm transition-all hover:border-[#23096E]/30">
+              <div className="text-2xl sm:text-3xl font-black text-[#FF3B30]">تأكيد فوري</div>
+              <div className="text-xs text-slate-600 font-bold mt-1">إصدار رقم مرجعي مباشر</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Capabilities & Features Grid ───────────────────────────────── */}
+      <section id="features" className="py-16 scroll-mt-24">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-xs font-black uppercase tracking-wider text-[#23096E] bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+              Core Capabilities
+            </span>
+            <h2 className="text-3xl font-black text-[#0A0912] mb-3">
+              لماذا يختار الشركاء والوكالات الربط مع مساري؟
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base font-semibold">
+              بنية تحتية موثوقة مصممة لتلبية احتياجات وكالات السفر، التطبيقات، والشركات السياحية.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feat, idx) => {
+              const Icon = ICON_MAP[feat.icon] || Zap;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white p-6 sm:p-7 rounded-3xl border border-purple-900/10 shadow-sm hover:shadow-xl hover:shadow-[#23096E]/5 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 text-[#23096E] flex items-center justify-center mb-5">
+                      <Icon size={22} className="text-[#23096E]" />
+                    </div>
+                    <h3 className="text-lg font-black text-[#0A0912] mb-2">{feat.title}</h3>
+                    <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+                      {feat.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── 3-Step Quickstart Guide ────────────────────────────────────── */}
+      <section id="quickstart" className="py-16 scroll-mt-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          
+          <div className="mb-12">
+            <span className="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+              Integration Flow
+            </span>
+            <h2 className="text-3xl font-black text-[#0A0912] mb-3">
+              كيف تبدأ التكامل مع مساري في 3 خطوات بسيطة؟
+            </h2>
+            <p className="text-slate-600 text-sm font-semibold max-w-2xl mx-auto">
+              مسار هندسي واضح ومباشر لنقل نظامك من مرحلة التجربة إلى بيئة الإنتاج الحية دون تعقيد.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-start">
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-white" style={{ color: '#ffffff' }}>
-              {data.hero.title}
-            </h1>
-            
-            <p className="text-lg md:text-xl text-white/80 font-medium leading-relaxed max-w-2xl mx-auto">
-              {data.hero.subtitle}
+            {/* Step 1 */}
+            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
+              <div className="text-4xl font-black text-[#23096E] font-mono mb-4">01</div>
+              <h3 className="text-lg font-black text-slate-900 mb-2">طلب مفتاح الـ API</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                تواصل معنا عبر واتساب الشركاء لاستلام مفتاح الـ Sandbox التجريبي فوراً وتوثيق بيانات الشراكة.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
+              <div className="text-4xl font-black text-[#3A1C8F] font-mono mb-4">02</div>
+              <h3 className="text-lg font-black text-slate-900 mb-2">الاختبار في Sandbox</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                اختبر استعلامات البحث وتدفق الحجز وإشعارات Webhooks في بيئة تجريبية آمنة ومجانية بالكامل.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white p-7 rounded-3xl border border-purple-900/10 shadow-sm relative overflow-hidden group hover:border-[#23096E]/30 transition-all">
+              <div className="text-4xl font-black text-[#FF3B30] font-mono mb-4">03</div>
+              <h3 className="text-lg font-black text-slate-900 mb-2">إطلاق الإنتاج المباشر</h3>
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+                انتقل للمفتاح الحي وابدأ بتقديم خدمات حجز الفنادق لعملائك وتأكيد الحجوزات وجني العمولات.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── Single Unified B2B Plan Card ──────────────────────────────── */}
+      <section id="pricing" className="py-16 scroll-mt-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-10">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 inline-block mb-3">
+              B2B Partnership Plan
+            </span>
+            <h2 className="text-3xl font-black text-[#0A0912] mb-2">
+              خطة الشراكة والربط البرمجي الموحدة
+            </h2>
+            <p className="text-slate-600 text-sm font-semibold">
+              حلول مرنة ومخصصة للتطبيقات ومواقع السفر والوكالات السياحية.
+            </p>
+          </div>
+
+          {/* Unified Plan Card */}
+          <div className="bg-white rounded-3xl border-2 border-[#23096E]/20 shadow-2xl shadow-[#23096E]/10 relative overflow-hidden p-8 sm:p-10">
+            {/* Top Gradient Border */}
+            <div className="absolute top-0 right-0 left-0 h-3 bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#FF3B30]" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-[#23096E] text-xs font-black mb-2 border border-purple-200">
+                  <Zap size={14} className="text-[#FF3B30]" />
+                  خطة الشراكة الشاملة (Full B2B Access)
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black text-slate-900">{plan.name}</h3>
+              </div>
+              <div className="text-start sm:text-end">
+                <div className="text-xl sm:text-2xl font-black text-[#23096E]">{plan.price}</div>
+                <span className="text-xs text-emerald-600 font-bold block mt-0.5">عمولات وأسعار جملة مخصصة للشركاء</span>
+              </div>
+            </div>
+
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium mb-8">
+              {plan.description}
             </p>
 
-            <div className="flex items-center justify-center pt-4">
-              <a href="#pricing" className="btn btn-white text-base font-black px-10 py-4 shadow-xl">
-                اكتشف خطط الشراكة
-              </a>
+            {/* Features Checklist Grid */}
+            <div className="border-t border-b border-slate-100 py-6 mb-8">
+              <div className="text-xs font-black text-slate-400 uppercase tracking-wider mb-4">
+                المزايا والقدرات التقنية المضمنة في الخطة:
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {plan.features.map((feat, i) => (
+                  <div key={i} className="flex items-center gap-3 text-slate-800 text-sm font-bold">
+                    <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+                      <Check size={14} className="text-emerald-600" />
+                    </div>
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => openWhatsApp(plan.name)}
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#23096E] hover:opacity-95 text-white text-base font-black transition-all shadow-xl shadow-[#23096E]/20 flex items-center justify-center gap-2.5 cursor-pointer"
+            >
+              <MessageSquare size={18} />
+              <span>تواصل معنا عبر واتساب لطلب مفتاح الـ API وتفعيل الربط</span>
+            </button>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── FAQ Section (Clean Expandable Accordions) ───────────────────── */}
+      <section id="faq" className="py-16 scroll-mt-24">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-10">
+            <span className="text-xs font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200/60 inline-block mb-3">
+              FAQ
+            </span>
+            <h2 className="text-3xl font-black text-[#0A0912] mb-2">الأسئلة الشائعة</h2>
+            <p className="text-slate-600 text-sm font-semibold">إجابات سريعة وواضحة حول الربط البرمجي وطرق العمل.</p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((item, i) => {
+              const isOpen = openFaqIndex === i;
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-purple-900/10 shadow-sm overflow-hidden transition-all"
+                >
+                  <button
+                    onClick={() => toggleFaq(i)}
+                    className="w-full p-5 sm:p-6 text-start flex items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                  >
+                    <h3 className="font-black text-slate-900 text-sm sm:text-base flex items-center gap-2.5">
+                      <span className="w-6 h-6 rounded-full bg-purple-50 text-[#23096E] text-xs font-mono font-bold flex items-center justify-center shrink-0">
+                        {i + 1}
+                      </span>
+                      <span>{item.q}</span>
+                    </h3>
+                    <ChevronDown
+                      size={18}
+                      className={`text-slate-400 transition-transform duration-200 shrink-0 ${
+                        isOpen ? 'rotate-180 text-[#23096E]' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 sm:px-6 pb-6 pt-1 text-slate-600 text-xs sm:text-sm leading-relaxed font-medium border-t border-slate-50">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Bottom Support CTA Banner ─────────────────────────────────── */}
+      <section className="py-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#23096E] p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-xl shadow-[#23096E]/20">
+            <div className="max-w-2xl mx-auto space-y-5 relative z-10">
+              <h3 className="text-2xl sm:text-3xl font-black">
+                جاهز لبناء شراكة سفر متكاملة مع مساري؟
+              </h3>
+              <p className="text-purple-100 text-sm sm:text-base leading-relaxed font-medium">
+                فريقنا التقني وإدارة الشراكات مستعدون لتقديم الدعم الفني وتسهيل عملية الربط خطوة بخطوة.
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={() => openWhatsApp(plan.name)}
+                  className="px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-[#23096E] font-black text-sm sm:text-base shadow-lg transition-all cursor-pointer"
+                >
+                  تواصل معنا عبر واتساب الآن
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features */}
-      <div id="features" className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20 mb-20 scroll-mt-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {data.features.map((feat, idx) => {
-            const Icon = ICON_MAP[feat.icon] || Zap;
-            return (
-              <div key={idx} className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl shadow-black/5 border border-neutral-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
-                <div className="w-12 h-12 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-xl flex items-center justify-center mb-6">
-                  <Icon size={24} />
-                </div>
-                <h3 className="text-lg font-black text-neutral-900 mb-3">{feat.title}</h3>
-                <p className="text-neutral-500 font-medium leading-relaxed">{feat.desc}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Pricing/Plans */}
-      <div id="pricing" className="container mx-auto px-4 sm:px-6 lg:px-8 mb-24 scroll-mt-24">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-black text-neutral-900 mb-4">خطط الشراكة والاستخدام (API B2B)</h2>
-          <p className="text-neutral-500 font-medium max-w-2xl mx-auto">حلول مرنة ومخصصة للتطبيقات، مواقع السفر، الوكالات السياحية، والشركات للربط المباشر مع منصة مساري.</p>
-        </div>
-
-        {/* Pricing/Plans */}
-        {data.plans && data.plans.length === 1 ? (
-          <div className="max-w-3xl mx-auto">
-            {data.plans.map((plan) => (
-              <div
-                key={plan.id}
-                className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-[var(--brand-primary)] shadow-2xl shadow-[var(--brand-primary)]/10 relative overflow-hidden transition-all"
-              >
-                <div className="absolute top-0 right-0 left-0 h-2.5 bg-gradient-to-r from-[#23096E] via-[#3A1C8F] to-[#FF3B30]" />
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#23096E]/10 text-[#23096E] text-xs font-black mb-2">
-                      <Zap size={14} className="text-[#FF3B30]" />
-                      خطة الشراكة الموحدة (B2B Full Access)
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-black text-neutral-900">{plan.name}</h3>
-                  </div>
-                  <div className="text-start sm:text-end">
-                    <div className="text-xl sm:text-2xl font-black text-[var(--brand-primary)]">{plan.price}</div>
-                    <span className="text-xs text-neutral-500 font-bold block mt-0.5">عمولات وأسعار جملة مخصصة للشركاء</span>
-                  </div>
-                </div>
-
-                <p className="text-neutral-600 text-sm sm:text-base mb-8 leading-relaxed font-medium">
-                  {plan.description}
-                </p>
-
-                <div className="border-t border-b border-neutral-100 py-6 mb-8">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-neutral-400 mb-4">
-                    المزايا والقدرات التقنية المضمنة:
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {plan.features.map((feat, i) => (
-                      <div key={i} className="flex items-center gap-3 text-neutral-800 text-sm font-bold">
-                        <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                          <CheckCircle2 size={14} className="text-emerald-600" />
-                        </div>
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => openWhatsApp(plan.name)}
-                  className="w-full py-4 rounded-2xl bg-[var(--brand-primary)] hover:bg-[#3A1C8F] text-white text-base font-black transition-all shadow-xl shadow-[var(--brand-primary)]/20 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <MessageSquare size={18} />
-                  <span>تواصل معنا لطلب مفتاح الـ API وتفعيل الربط المباشر</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-            {data.plans.map((plan) => (
-              <div
-                key={plan.id}
-                className={`bg-white rounded-3xl p-8 flex flex-col justify-between border transition-all duration-300 relative ${
-                  plan.popular
-                    ? 'border-[var(--brand-primary)] shadow-2xl scale-105 z-10'
-                    : 'border-neutral-200 shadow-md hover:shadow-xl'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 right-8 bg-gradient-to-r from-purple-600 to-[var(--brand-primary)] text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md">
-                    الأكثر طلباً
-                  </div>
-                )}
-                <div>
-                  <h3 className="text-xl font-black text-neutral-900 mb-2">{plan.name}</h3>
-                  <p className="text-neutral-500 text-sm mb-6 min-h-[40px]">{plan.description}</p>
-                  <div className="text-3xl font-black text-[var(--brand-primary)] mb-6">{plan.price}</div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feat, i) => (
-                      <li key={i} className="flex items-center gap-3 text-neutral-700 text-sm">
-                        <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <button
-                  onClick={() => openWhatsApp(plan.name)}
-                  className={`w-full py-3.5 rounded-xl font-black transition-all ${
-                    plan.popular
-                      ? 'bg-[var(--brand-primary)] text-white hover:bg-purple-950 shadow-lg'
-                      : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
-                  }`}
-                >
-                  طلب انضمام
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* FAQ */}
-      {data.faq && data.faq.length > 0 && (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-black text-neutral-900 mb-2">الأسئلة الشائعة</h2>
-          </div>
-          <div className="space-y-4">
-            {data.faq.map((item, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100">
-                <h3 className="font-black text-neutral-900 mb-2 text-base">{item.q}</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
