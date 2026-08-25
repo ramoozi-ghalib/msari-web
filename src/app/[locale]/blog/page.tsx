@@ -35,11 +35,11 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
             <span>أدلة وتجارب السفر في اليمن والعالم</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
             مدونة مساري السياحية
           </h1>
 
-          <p className="text-white/80 text-base sm:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-white/80 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
             استكشف أفضل نصائح السفر، الأدلة السياحية، وأحدث ترشيحات الفنادق وأسعار الإقامة في اليمن والوجهات العالمية.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default async function BlogIndexPage(props: { params: Promise<{ locale: s
         {/* Section Title Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-12 pb-6 border-b border-neutral-100">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 tracking-tight">
               أحدث المقالات والأدلة
             </h2>
             <p className="text-sm text-neutral-500 mt-1">

@@ -70,11 +70,11 @@ export default function DestinationDetailClient({ destination, locale }: Destina
             </div>
 
             {/* Main Destination Title forced in Pure High-Contrast White via inline style override */}
-            <h1 className="text-4xl sm:text-6xl font-black leading-tight tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
               <span style={{ color: '#FFFFFF' }}>وجهة {destination.name}</span>
             </h1>
 
-            <p className="text-base sm:text-xl text-white max-w-3xl leading-relaxed font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
+            <p className="text-sm sm:text-base lg:text-lg text-white max-w-3xl leading-relaxed font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
               {destination.tagline}
             </p>
           </div>

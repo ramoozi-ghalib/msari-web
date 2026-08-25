@@ -141,10 +141,10 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'Inside the App' : 'شاهد التطبيق من الداخل'}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#23096E] tracking-tight leading-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#23096E] tracking-tight leading-tight">
             {isEn ? 'Explore the Clean, Fast Mobile Interface' : 'استكشف واجهات وتجربة تطبيق مساري'}
           </h2>
-          <p className="text-[#423861] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-semibold">
+          <p className="text-[#423861] text-xs sm:text-sm lg:text-base max-w-2xl mx-auto font-semibold">
             {isEn
               ? 'Every screen is crafted for simplicity, high speed, and complete clarity on iPhone & Android.'
               : 'شاشات عصرية صُممت لتمنحك تجربة حجز سلسة على أجهزة آيفون وسامسونج دون أي تعقيد.'}
@@ -209,11 +209,11 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
                 <span>{currentTab.title}</span>
               </div>
 
-              <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 leading-tight">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 leading-tight">
                 {currentTab.headline}
               </h3>
 
-              <p className="text-[#423861] text-sm sm:text-base lg:text-lg leading-relaxed font-semibold">
+              <p className="text-[#423861] text-xs sm:text-sm lg:text-base leading-relaxed font-semibold">
                 {currentTab.subtitle}
               </p>
 

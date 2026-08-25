@@ -61,23 +61,23 @@ export default async function AboutPage() {
             <span>{heroBadge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 tracking-tight leading-tight">
             {heroTitle}
           </h1>
 
-          <p className="text-white/80 text-base sm:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-white/80 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
             {heroSubtitle}
           </p>
         </div>
       </section>
 
       {/* ─── 2. Integrated Clean Metrics Bar (Spacious & Separated) ─── */}
-      <section className="py-16 sm:py-20 border-b border-neutral-100 bg-[#fafafc]">
+      <section className="py-12 sm:py-16 border-b border-neutral-100 bg-[#fafafc]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
             {statsList.map((s, idx) => (
-              <div key={idx} className="space-y-1.5">
-                <div className="text-3xl sm:text-5xl font-black text-[var(--brand-primary)] tracking-tight">
+              <div key={idx} className="space-y-1">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)] tracking-tight">
                   {s.value}
                 </div>
                 <div className="text-xs sm:text-sm text-neutral-500 font-bold">
@@ -90,9 +90,9 @@ export default async function AboutPage() {
       </section>
 
       {/* ─── 3. Editorial Story Section (Spacious 2-Columns) ─── */}
-      <section className="py-20 sm:py-28">
+      <section className="py-16 sm:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
             {/* Image Column */}
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-lg border border-neutral-100">
@@ -106,12 +106,12 @@ export default async function AboutPage() {
             </div>
 
             {/* Narrative Text Column */}
-            <div className="space-y-6">
-              <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 leading-tight tracking-tight">
+            <div className="space-y-5">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 leading-tight tracking-tight">
                 {data?.story?.title || 'بوابتك الرقمية الموثوقة لاستكشاف اليمن'}
               </h2>
 
-              <div className="space-y-4 text-neutral-600 text-sm sm:text-base leading-relaxed">
+              <div className="space-y-3.5 text-neutral-600 text-xs sm:text-sm leading-relaxed">
                 {(data?.story?.paragraphs && data.story.paragraphs.length > 0) ? (
                   data.story.paragraphs.map((p, idx) => (
                     <p key={idx}>{p}</p>
@@ -145,13 +145,13 @@ export default async function AboutPage() {
       </section>
 
       {/* ─── 4. Values Section (Clean Light Canvas) ─── */}
-      <section className="py-20 sm:py-28 bg-[#fafafc] border-y border-neutral-100">
+      <section className="py-16 sm:py-24 bg-[#fafafc] border-y border-neutral-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-neutral-900 mb-3 tracking-tight">
               القيم التي تقود مسيرتنا
             </h2>
-            <p className="text-neutral-500 text-sm sm:text-base leading-relaxed">
+            <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed">
               نلتزم بأعلى معايير الخدمة والاحترافية لضمان راحة وطمأنينة كل مسافر يضع ثقته في مساري.
             </p>
           </div>
@@ -162,15 +162,15 @@ export default async function AboutPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl p-7 border border-neutral-200/70 shadow-sm hover:shadow-md transition-all duration-200"
+                  className="bg-white rounded-2xl p-6 border border-neutral-200/70 shadow-sm hover:shadow-md transition-all duration-200"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-purple-50 text-[var(--brand-primary)] flex items-center justify-center mb-5">
-                    <IconComponent size={22} />
+                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-[var(--brand-primary)] flex items-center justify-center mb-4">
+                    <IconComponent size={20} />
                   </div>
-                  <h3 className="text-base font-black text-neutral-900 mb-2">
+                  <h3 className="text-sm sm:text-base font-black text-neutral-900 mb-1.5">
                     {v.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                  <p className="text-xs text-neutral-500 leading-relaxed font-medium">
                     {v.desc}
                   </p>
                 </div>
@@ -181,14 +181,14 @@ export default async function AboutPage() {
       </section>
 
       {/* ─── 5. Minimalist CTA Section ─── */}
-      <section className="py-20 sm:py-28">
+      <section className="py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div className="rounded-3xl bg-[var(--brand-primary)] text-white p-10 sm:p-16 shadow-xl space-y-6">
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
+          <div className="rounded-3xl bg-[var(--brand-primary)] text-white p-8 sm:p-14 shadow-xl space-y-5">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight">
               {data?.cta?.title || 'مستعد لسفرتك القادمة؟'}
             </h2>
 
-            <p className="text-white/80 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            <p className="text-white/80 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-medium">
               {data?.cta?.subtitle || 'احجز الآن واستمتع بأفضل تجربة حجز وإقامة في اليمن.'}
             </p>
 

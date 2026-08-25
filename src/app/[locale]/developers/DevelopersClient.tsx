@@ -195,15 +195,15 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0A0912] leading-[1.3] tracking-tight mb-5">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0A0912] leading-[1.3] tracking-tight mb-4">
             {heroTitle}
-            <span className="block text-[#FF3B30] mt-2">
+            <span className="block text-[#FF3B30] mt-1 sm:mt-2">
               بواجهة برمجية سريعة وتأكيد حجز فوري
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg text-slate-600 font-semibold max-w-3xl mx-auto leading-relaxed mb-8">
+          <p className="text-xs sm:text-sm lg:text-base text-slate-600 font-semibold max-w-3xl mx-auto leading-relaxed mb-8">
             {heroSubtitle}
           </p>
 

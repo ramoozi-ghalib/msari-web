@@ -45,11 +45,11 @@ export default function AppDownloadCtaSection({ isEn = false, data }: Props) {
               <span>{isEn ? 'Download Now for Free' : 'التحميل مجاني 100%'}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight drop-shadow-md">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight drop-shadow-md">
               {ctaTitle}
             </h2>
 
-            <p className="text-[#F4F2F8] text-sm sm:text-base lg:text-lg font-bold max-w-2xl leading-relaxed">
+            <p className="text-[#F4F2F8] text-xs sm:text-sm lg:text-base font-medium max-w-2xl leading-relaxed">
               {ctaSubtitle}
             </p>
 

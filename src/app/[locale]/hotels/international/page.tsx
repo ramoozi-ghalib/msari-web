@@ -85,7 +85,7 @@ export default async function InternationalHotelsPage() {
           <Heading level={1} variant="on-dark" className="mb-6">
             {title}
           </Heading>
-          <p className="text-[#F4F2F8] text-lg sm:text-xl max-w-2xl mx-auto mb-8 font-semibold leading-relaxed">
+          <p className="text-[#F4F2F8] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
             {subtitle}
           </p>
           {/* Quick WhatsApp CTA */}
@@ -93,7 +93,7 @@ export default async function InternationalHotelsPage() {
             href={makeWaLink('مرحباً، أرغب في حجز فندق عالمي')}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black px-8 py-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-xl text-lg"
+            className="inline-flex items-center gap-2.5 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black px-7 py-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 shadow-xl text-base"
           >
             💬 تواصل معنا للحجز الآن
           </a>
@@ -104,8 +104,8 @@ export default async function InternationalHotelsPage() {
       <section className="py-16 bg-[#F4F2F8]">
         <div className="container-msari">
           <div className="bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-[#23096E] mb-2">الوجهات الأكثر حجزاً</h2>
-            <p className="text-[#423861] text-sm sm:text-base font-semibold mb-8">اختر وجهتك وتواصل معنا للحصول على أفضل سعر</p>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#23096E] mb-2">الوجهات الأكثر حجزاً</h2>
+            <p className="text-[#423861] text-xs sm:text-sm font-semibold mb-8">اختر وجهتك وتواصل معنا للحصول على أفضل سعر</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {destinations.map((dest: { city: string; country: string; emoji: string; hotels: number; img: string }) => (
                 <a
@@ -140,7 +140,7 @@ export default async function InternationalHotelsPage() {
                   <div className="w-12 h-12 bg-[#23096E]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Icon size={24} className="text-[#23096E]" />
                   </div>
-                  <h3 className="font-black text-[#23096E] mb-2 text-base">{f.title}</h3>
+                  <h3 className="font-black text-[#23096E] mb-1.5 text-sm sm:text-base">{f.title}</h3>
                   <p className="text-[#423861] text-xs font-semibold leading-relaxed">{f.desc}</p>
                 </div>
               );
@@ -152,9 +152,9 @@ export default async function InternationalHotelsPage() {
       {/* CTA */}
       <section className="py-16 bg-[#F4F2F8]">
         <div className="container-msari">
-          <div className="bg-gradient-to-br from-[#23096E] via-[#2d1580] to-[#3A1C8F] rounded-3xl p-10 sm:p-14 text-center text-white shadow-2xl">
-            <h2 className="text-2xl sm:text-4xl font-black mb-4 text-white">{ctaTitle}</h2>
-            <p className="text-[#F4F2F8] text-base sm:text-lg mb-8 max-w-xl mx-auto font-semibold">
+          <div className="bg-gradient-to-br from-[#23096E] via-[#2d1580] to-[#3A1C8F] rounded-3xl p-8 sm:p-12 text-center text-white shadow-2xl">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black mb-3 text-white">{ctaTitle}</h2>
+            <p className="text-[#F4F2F8] text-sm sm:text-base mb-6 max-w-xl mx-auto font-medium">
               {ctaSubtitle}
             </p>
             <a

@@ -83,7 +83,7 @@ export default async function HotelsPage(props: {
           </nav>
 
           {/* Title & Subtitle */}
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight mb-1.5">
             فنادق اليمن
           </h1>
           <p className="text-xs sm:text-sm text-white/90 font-medium max-w-xl">

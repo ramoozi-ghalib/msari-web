@@ -56,11 +56,11 @@ export default function ContactClient({ settings }: ContactClientProps) {
             <span>خدمة العملاء متواجدة لخدمتكم 24/7</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3 tracking-tight leading-tight">
             تواصل معنا
           </h1>
 
-          <p className="text-white/80 text-base sm:text-lg max-w-xl mx-auto leading-relaxed font-medium">
+          <p className="text-white/80 text-xs sm:text-sm lg:text-base max-w-xl mx-auto leading-relaxed font-medium">
             نسعد بالإجابة على استفساراتك وتقديم الدعم الكامل لرحلتك وحجوزاتك في أي وقت.
           </p>
         </div>

@@ -95,7 +95,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             {/* Line 1: حجزك أسهل... مع مساري */}
             <h1 
               className="font-black text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
-              style={{ fontSize: 'clamp(20px, 5.5vw, 48px)' }}
+              style={{ fontSize: 'clamp(20px, 4.5vw, 36px)' }}
             >
               حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
             </h1>
@@ -103,7 +103,7 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
             <p 
               className="font-bold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
-              style={{ fontSize: 'clamp(12px, 3.4vw, 24px)' }}
+              style={{ fontSize: 'clamp(12px, 2.6vw, 18px)' }}
             >
               احجز فندقك في اليمن بأفضل سعر
             </p>

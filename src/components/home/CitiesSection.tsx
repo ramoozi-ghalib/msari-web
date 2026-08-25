@@ -83,10 +83,10 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
               <Compass size={14} />
               <span>📍 استكشف اليمن</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--brand-primary)] tracking-tight mb-1">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[var(--brand-primary)] tracking-tight mb-1">
               وجهات رائجة
             </h2>
-            <p className="text-[var(--text-secondary)] text-xs sm:text-base font-semibold">
+            <p className="text-[var(--text-secondary)] text-xs sm:text-sm font-semibold">
               اكتشف أجمل مدن اليمن واحجز فندقك المفضل
             </p>
           </div>

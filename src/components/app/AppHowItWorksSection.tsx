@@ -71,10 +71,10 @@ export default function AppHowItWorksSection({ isEn = false, howItWorks }: Props
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'Simple 3-Step Process' : 'سهولة مطلقة'}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#23096E] tracking-tight leading-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#23096E] tracking-tight leading-tight">
             {isEn ? 'How to Book via Msari in 3 Easy Steps?' : 'كيف تبدأ حجزك في 3 خطوات بسيطة؟'}
           </h2>
-          <p className="text-[#423861] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-semibold">
+          <p className="text-[#423861] text-xs sm:text-sm lg:text-base max-w-2xl mx-auto font-semibold">
             {isEn
               ? 'From searching available hotels to instant check-in confirmation in less than a minute.'
               : 'من البحث عن الفندق وحتى استلام تأكيد الحجز المعتمد بضغطة زر وبدون أي تعقيد.'}

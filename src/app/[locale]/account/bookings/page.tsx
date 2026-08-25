@@ -47,8 +47,8 @@ export default async function AccountBookingsPage(props: {
               <BookOpen size={22} className="text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-white">حجوزاتي</h1>
-              <p className="text-white/70 text-sm">جميع حجوزاتك في مكان واحد</p>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white">حجوزاتي</h1>
+              <p className="text-white/80 text-xs sm:text-sm">جميع حجوزاتك في مكان واحد</p>
             </div>
           </div>
         </div>

@@ -128,7 +128,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
               <Sparkles className="w-3.5 h-3.5" />
               <span>🔥 أحدث العروض والخصومات</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[var(--brand-primary)]">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[var(--brand-primary)]">
               العروض الحصرية
             </h2>
           </div>

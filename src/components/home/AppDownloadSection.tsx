@@ -66,12 +66,12 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
             </div>
 
             {/* Main Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--brand-primary)] tracking-tight leading-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-[var(--brand-primary)] tracking-tight leading-tight">
               {title}
             </h2>
 
             {/* Subtitle */}
-            <p className="text-neutral-600 text-sm sm:text-base lg:text-lg font-bold leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-neutral-600 text-xs sm:text-sm lg:text-base font-semibold leading-relaxed max-w-xl mx-auto lg:mx-0">
               {subtitle}
             </p>
 

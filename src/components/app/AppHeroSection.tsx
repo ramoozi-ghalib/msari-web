@@ -75,7 +75,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             </div>
 
             {/* Main Headline */}
-            <Heading level={1} variant="brand" className="tracking-tight text-2xl sm:text-4xl lg:text-5xl font-black leading-tight">
+            <Heading level={1} variant="brand" className="tracking-tight text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
               {titlePart1}
               {titlePart2 && (
                 <span className="block text-[#FF3B30] mt-1 sm:mt-2">
@@ -85,7 +85,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             </Heading>
 
             {/* Subtitle */}
-            <p className="text-[#423861] text-sm sm:text-base lg:text-lg max-w-2xl leading-relaxed font-semibold">
+            <p className="text-[#423861] text-xs sm:text-sm lg:text-base max-w-2xl leading-relaxed font-semibold">
               {subtitle}
             </p>
 

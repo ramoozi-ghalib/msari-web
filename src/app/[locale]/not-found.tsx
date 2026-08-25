@@ -27,10 +27,10 @@ export default function NotFound() {
         </div>
 
         {/* Text */}
-        <h1 className="text-3xl md:text-4xl font-black text-white mb-4">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3">
           عذراً! الصفحة غير موجودة
         </h1>
-        <p className="text-white/70 text-lg mb-10 leading-relaxed">
+        <p className="text-white/75 text-xs sm:text-sm lg:text-base mb-8 leading-relaxed">
           يبدو أن الصفحة التي تبحث عنها قد انتقلت أو لم تعد موجودة.<br />
           لكن لا تقلق، يمكنك استكشاف ما نقدمه!
         </p>
