@@ -15,6 +15,8 @@ import {
   ChevronDown,
   Layers,
   Code2,
+  Code,
+  CheckCircle2,
   Lock,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -35,6 +37,8 @@ const ICON_MAP: Record<string, any> = {
   Globe2,
   Layers,
   Code2,
+  Code,
+  CheckCircle2,
   Lock,
 };
 
@@ -240,7 +244,17 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            className={`grid gap-6 ${
+              features.length === 1
+                ? 'grid-cols-1 max-w-xl mx-auto'
+                : features.length === 2
+                ? 'grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto'
+                : features.length === 3
+                ? 'grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+            }`}
+          >
             {features.map((feat, idx) => {
               const Icon = ICON_MAP[feat.icon] || Zap;
               return (
