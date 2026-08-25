@@ -22,8 +22,8 @@ const FALLBACK_SETTINGS: WebsiteSettingsData = {
   appStoreUrl: 'https://apps.apple.com',
   footerDescriptionAr: 'منصة السفر الأولى في اليمن — نوفر لك أفضل خيارات الإقامة والطيران وخدمات النقل بأمان وموثوقية.',
   footerDescriptionEn: "Yemen's #1 Travel Platform — providing premium hotel bookings, flights, and transportation.",
-  copyrightTextAr: 'جميع الحقوق محفوظة لـ مساري لخدمات السفر والسياحة.',
-  copyrightTextEn: 'All rights reserved to Msari Travel & Tourism Services.',
+  copyrightTextAr: 'جميع الحقوق محفوظة لـ شركة مساري للخدمات السياحية.',
+  copyrightTextEn: 'All rights reserved to Msari Tourism Services Company.',
   socialLinks: {
     facebook: 'https://facebook.com/msariapp',
     instagram: 'https://instagram.com/msariapp',
