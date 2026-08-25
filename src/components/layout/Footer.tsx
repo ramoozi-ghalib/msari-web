@@ -34,7 +34,7 @@ export default async function Footer() {
 
   return (
     <footer 
-      className="relative bg-gradient-to-b from-[#1D065C] via-[#23096E] to-[#160549] text-white pt-12 pb-28 lg:pb-6 mt-16 border-t border-white/15 shadow-2xl overflow-hidden"
+      className="relative bg-gradient-to-b from-[#1D065C] via-[#23096E] to-[#160549] text-white pt-12 pb-16 lg:pb-6 mt-16 border-t border-white/15 shadow-2xl overflow-hidden"
       style={{ direction: 'rtl' }}
     >
       {/* Ambient Lighting Background Effect */}
