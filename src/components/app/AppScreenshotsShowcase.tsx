@@ -127,14 +127,14 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
   const CurrentIcon = currentTab.icon;
 
   return (
-    <section className="py-14 sm:py-20 lg:py-28 bg-white relative overflow-hidden">
+    <section className="py-8 sm:py-12 lg:py-14 bg-white relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-0 right-1/3 w-96 h-96 bg-[#23096E]/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container-msari relative z-10 px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 mb-8 sm:mb-12">
+        <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#23096E]/10 border border-[#23096E]/20 text-[#23096E] text-xs font-black">
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" />
             <span>{isEn ? 'Inside the App' : 'شاهد التطبيق من الداخل'}</span>

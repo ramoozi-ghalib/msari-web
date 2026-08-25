@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, QrCode, ShieldCheck, Download, Star } from 'lucide-react';
+import { Sparkles, ShieldCheck, Download, Star } from 'lucide-react';
 
 interface Props {
   isEn?: boolean;
@@ -23,9 +23,9 @@ export default function AppDownloadCtaSection({ isEn = false, data }: Props) {
   const appStoreUrl = data?.appStoreUrl || 'https://apps.apple.com';
 
   return (
-    <section className="py-12 sm:py-16 lg:py-24 bg-white container-msari px-4 sm:px-6">
+    <section className="py-8 sm:py-12 lg:py-14 bg-white container-msari px-4 sm:px-6">
       <div
-        className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-12 lg:p-16 shadow-2xl border border-white/20"
+        className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-10 lg:p-12 shadow-2xl border border-white/20"
         style={{
           background: 'linear-gradient(135deg, #1C0657 0%, #23096E 40%, #3A1C8F 100%)',
         }}
@@ -49,7 +49,7 @@ export default function AppDownloadCtaSection({ isEn = false, data }: Props) {
             {ctaSubtitle}
           </p>
 
-          {/* Store Buttons + QR (Compact on mobile) */}
+          {/* Store Buttons (Centered) */}
           <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             
             <div className="flex items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
@@ -87,16 +87,6 @@ export default function AppDownloadCtaSection({ isEn = false, data }: Props) {
                   <p className="text-xs sm:text-base font-black leading-tight">App Store</p>
                 </div>
               </a>
-            </div>
-
-            {/* QR Code */}
-            <div className="hidden xl:flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-2.5">
-              <div className="w-12 h-12 bg-white rounded-xl p-1 flex items-center justify-center">
-                <QrCode className="w-full h-full text-[#23096E]" />
-              </div>
-              <div className="text-[10px] text-white/90 leading-tight font-extrabold max-w-[80px]">
-                {isEn ? 'Scan to Download' : 'امسح للتحميل السريع'}
-              </div>
             </div>
 
           </div>

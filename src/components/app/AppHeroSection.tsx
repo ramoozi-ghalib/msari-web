@@ -53,7 +53,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
   const [activeScreen, setActiveScreen] = useState<'search' | 'details'>('search');
 
   return (
-    <section className="relative overflow-hidden pt-24 sm:pt-32 lg:pt-36 pb-12 sm:pb-16 lg:pb-24 bg-[#F4F2F8] text-[#0A0912] selection:bg-[#23096E] selection:text-white">
+    <section className="relative overflow-hidden pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-10 lg:pb-12 bg-[#F4F2F8] text-[#0A0912] selection:bg-[#23096E] selection:text-white">
       {/* Dynamic Ambient Background Glows */}
       <div className="absolute -top-10 right-1/4 w-[500px] h-[500px] bg-[#23096E]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] bg-[#FF3B30]/10 rounded-full blur-3xl pointer-events-none" />
@@ -179,9 +179,9 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             {/* Device Render — Samsung Note 24 Ultra */}
             <div className="relative flex items-center justify-center scale-90 sm:scale-100 origin-top">
               <SamsungNote24UltraFrame className="transition-transform duration-500 hover:scale-[1.02]">
-                {data?.mockupImage2 && data.mockupImage2.trim().length > 0 && !data.mockupImage2.includes('app-screen.png') ? (
+                {((data?.mockupImage2 && data.mockupImage2.trim().length > 0 && !data.mockupImage2.includes('app-screen.png')) || (data?.mockupImage1 && data.mockupImage1.trim().length > 0 && !data.mockupImage1.includes('app-screen.png'))) ? (
                   <img
-                    src={data.mockupImage2}
+                    src={data.mockupImage2 || data.mockupImage1}
                     alt={isEn ? 'Msari App Samsung Screen' : 'شاشة تطبيق مساري على السامسونج'}
                     className="w-full h-full object-cover"
                   />
