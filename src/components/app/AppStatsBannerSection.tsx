@@ -25,7 +25,7 @@ export default function AppStatsBannerSection({ isEn = false, stats: cmsStats, d
 
   const defaultStats = [
     {
-      value: (data?.downloads && !data.downloads.includes('50,000') && !data.downloads.includes('50000')) ? data.downloads : '5000+',
+      value: data?.downloads || '5000+',
       label: isEn ? 'Downloads' : 'تحميل',
     },
     {
@@ -33,7 +33,7 @@ export default function AppStatsBannerSection({ isEn = false, stats: cmsStats, d
       label: isEn ? 'User Rating' : 'تقييم المسافرين',
     },
     {
-      value: (data?.hotels && !data.hotels.includes('500')) ? data.hotels : '100+',
+      value: data?.hotels || '100+',
       label: isEn ? 'Hotels' : 'فندق',
     },
     {
@@ -45,7 +45,7 @@ export default function AppStatsBannerSection({ isEn = false, stats: cmsStats, d
   const effectiveStats = (Array.isArray(cmsStats) && cmsStats.length >= 4)
     ? cmsStats.slice(0, 4).map((s, idx) => ({
         icon: statIcons[idx] || statIcons[0],
-        value: s.value.replace('50,000', '5000+').replace('50000', '5000+').replace('+500', '100+'),
+        value: s.value,
         label: s.label,
         ...statColors[idx % statColors.length],
       }))

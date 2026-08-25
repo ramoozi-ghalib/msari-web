@@ -41,7 +41,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
     : 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (المحافظ الإلكترونية، تحويل بنكي، كاش عند الوصول)، وقارن أسعار الفنادق وتذاكر الطيران والسيارات بضغطة زر.');
   
   const ratingVal = data?.rating ? data.rating.replace('★', '').trim() : '4.8';
-  const downloadsVal = (data?.downloads && !data.downloads.includes('50,000') && !data.downloads.includes('50000')) 
+  const downloadsVal = data?.downloads
     ? data.downloads.replace('تحميل', '').replace('Downloads', '').replace('مستخدم', '').replace('Users', '').trim() 
     : '5000+';
   const googlePlayUrl = data?.googlePlayUrl || 'https://play.google.com/store/apps/details?id=net.msari.app';
