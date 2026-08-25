@@ -16,7 +16,6 @@ import {
   HotelDetailsAppScreen, 
   PaymentAppScreen, 
   BookingConfirmationAppScreen,
-  IPhone17ProMaxFrame,
   SamsungNote24UltraFrame
 } from './AppMockupScreens';
 
@@ -45,7 +44,6 @@ interface TabItem {
 
 export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }: Props) {
   const [activeTab, setActiveTab] = useState<number>(0);
-  const [deviceFrame, setDeviceFrame] = useState<'iphone17' | 'note24'>('iphone17');
 
   const tabs: TabItem[] = [
     {
@@ -149,30 +147,6 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
               ? 'Every screen is crafted for simplicity, high speed, and complete clarity on iPhone & Android.'
               : 'شاشات عصرية صُممت لتمنحك تجربة حجز سلسة على أجهزة آيفون وسامسونج دون أي تعقيد.'}
           </p>
-
-          {/* Model Switcher for Showcase */}
-          <div className="inline-flex items-center gap-2 bg-[#F4F2F8] p-1.5 rounded-2xl border border-slate-200 shadow-inner mt-1 sm:mt-2">
-            <button
-              onClick={() => setDeviceFrame('iphone17')}
-              className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
-                deviceFrame === 'iphone17'
-                  ? 'bg-[#23096E] text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              📱 {isEn ? 'iPhone 17 View' : 'معاينة آيفون ١٧'}
-            </button>
-            <button
-              onClick={() => setDeviceFrame('note24')}
-              className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
-                deviceFrame === 'note24'
-                  ? 'bg-[#23096E] text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              📱 {isEn ? 'Samsung Note 24 View' : 'معاينة سامسونج نوت ٢٤'}
-            </button>
-          </div>
         </div>
 
         {/* Tab Selector Buttons */}
@@ -246,33 +220,19 @@ export default function AppScreenshotsShowcase({ isEn = false, screensShowcase }
 
             </div>
 
-            {/* Mockup Display Column (Right on RTL) */}
+            {/* Mockup Display Column (Right on RTL) — Samsung Note 24 Ultra */}
             <div className="lg:col-span-5 flex justify-center order-1 lg:order-2 scale-90 sm:scale-100 origin-top">
-              {deviceFrame === 'iphone17' ? (
-                <IPhone17ProMaxFrame className="shadow-2xl shadow-[#23096E]/25">
-                  {currentTab.image && currentTab.image.trim().length > 0 && !currentTab.image.includes('app-screen.png') ? (
-                    <img
-                      src={currentTab.image}
-                      alt={currentTab.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    currentTab.renderScreen()
-                  )}
-                </IPhone17ProMaxFrame>
-              ) : (
-                <SamsungNote24UltraFrame className="shadow-2xl shadow-[#FF3B30]/20">
-                  {currentTab.image && currentTab.image.trim().length > 0 && !currentTab.image.includes('app-screen.png') ? (
-                    <img
-                      src={currentTab.image}
-                      alt={currentTab.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    currentTab.renderScreen()
-                  )}
-                </SamsungNote24UltraFrame>
-              )}
+              <SamsungNote24UltraFrame className="shadow-2xl shadow-[#23096E]/20">
+                {currentTab.image && currentTab.image.trim().length > 0 && !currentTab.image.includes('app-screen.png') ? (
+                  <img
+                    src={currentTab.image}
+                    alt={currentTab.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  currentTab.renderScreen()
+                )}
+              </SamsungNote24UltraFrame>
             </div>
 
           </div>

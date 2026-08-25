@@ -6,7 +6,6 @@ import {
   Star, 
   ShieldCheck, 
   Smartphone, 
-  QrCode, 
   Download, 
   Zap, 
   BadgePercent,
@@ -16,7 +15,6 @@ import Heading from '@/components/ui/Heading';
 import { 
   SearchAppScreen, 
   HotelDetailsAppScreen, 
-  IPhone17ProMaxFrame, 
   SamsungNote24UltraFrame 
 } from './AppMockupScreens';
 
@@ -52,8 +50,6 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
   const titlePart1 = title.split('—')[0] || title;
   const titlePart2 = title.split('—')[1] || '';
 
-  // Device model switcher: iPhone 17 vs Samsung Note 24 Ultra
-  const [deviceModel, setDeviceModel] = useState<'iphone17' | 'note24'>('iphone17');
   const [activeScreen, setActiveScreen] = useState<'search' | 'details'>('search');
 
   return (
@@ -111,7 +107,7 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
               </div>
             </div>
 
-            {/* Store Download Buttons & QR Code */}
+            {/* Store Download Buttons */}
             <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4">
               
               {/* Badges Container (Compact on mobile) */}
@@ -154,21 +150,6 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
 
               </div>
 
-              {/* QR Code Box for Desktop */}
-              <div className="hidden xl:flex items-center gap-3 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-md hover:border-[#23096E]/30 transition-all">
-                <div className="relative w-12 h-12 bg-[#23096E] rounded-xl p-1 flex items-center justify-center shrink-0">
-                  <QrCode className="w-full h-full text-white" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-3.5 h-3.5 rounded bg-[#FF3B30] text-white flex items-center justify-center text-[8px] font-black border border-white">
-                      م
-                    </div>
-                  </div>
-                </div>
-                <div className="text-[10px] text-[#0A0912] leading-tight font-extrabold max-w-[90px]">
-                  {isEn ? 'Scan to Download' : 'امسح للتحميل المباشر'}
-                </div>
-              </div>
-
             </div>
 
             {/* Local Yemeni Payment & Security Assurances */}
@@ -195,61 +176,21 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
             {/* Ambient Halo behind phone */}
             <div className="absolute w-72 h-72 sm:w-80 sm:h-80 bg-gradient-to-tr from-[#23096E]/20 to-[#FF3B30]/15 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Device Switcher (iPhone 17 vs Samsung Note 24 Ultra) */}
-            <div className="flex items-center gap-2 mb-3 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-sm z-20">
-              <button
-                onClick={() => setDeviceModel('iphone17')}
-                className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
-                  deviceModel === 'iphone17'
-                    ? 'bg-[#23096E] text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {isEn ? 'iPhone 17 Pro' : 'آيفون ١٧ برو'}
-              </button>
-              <button
-                onClick={() => setDeviceModel('note24')}
-                className={`px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
-                  deviceModel === 'note24'
-                    ? 'bg-[#23096E] text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {isEn ? 'Samsung Note 24' : 'سامسونج نوت ٢٤'}
-              </button>
-            </div>
-
-            {/* Device Render */}
+            {/* Device Render — Samsung Note 24 Ultra */}
             <div className="relative flex items-center justify-center scale-90 sm:scale-100 origin-top">
-              {deviceModel === 'iphone17' ? (
-                <IPhone17ProMaxFrame className="transition-transform duration-500 hover:scale-[1.02]">
-                  {data?.mockupImage1 && data.mockupImage1.trim().length > 0 && !data.mockupImage1.includes('app-screen.png') ? (
-                    <img
-                      src={data.mockupImage1}
-                      alt={isEn ? 'Msari App iPhone Screen' : 'شاشة تطبيق مساري على الآيفون'}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : activeScreen === 'search' ? (
-                    <SearchAppScreen isEn={isEn} />
-                  ) : (
-                    <HotelDetailsAppScreen isEn={isEn} />
-                  )}
-                </IPhone17ProMaxFrame>
-              ) : (
-                <SamsungNote24UltraFrame className="transition-transform duration-500 hover:scale-[1.02]">
-                  {data?.mockupImage2 && data.mockupImage2.trim().length > 0 && !data.mockupImage2.includes('app-screen.png') ? (
-                    <img
-                      src={data.mockupImage2}
-                      alt={isEn ? 'Msari App Samsung Screen' : 'شاشة تطبيق مساري على السامسونج'}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : activeScreen === 'search' ? (
-                    <SearchAppScreen isEn={isEn} />
-                  ) : (
-                    <HotelDetailsAppScreen isEn={isEn} />
-                  )}
-                </SamsungNote24UltraFrame>
-              )}
+              <SamsungNote24UltraFrame className="transition-transform duration-500 hover:scale-[1.02]">
+                {data?.mockupImage2 && data.mockupImage2.trim().length > 0 && !data.mockupImage2.includes('app-screen.png') ? (
+                  <img
+                    src={data.mockupImage2}
+                    alt={isEn ? 'Msari App Samsung Screen' : 'شاشة تطبيق مساري على السامسونج'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : activeScreen === 'search' ? (
+                  <SearchAppScreen isEn={isEn} />
+                ) : (
+                  <HotelDetailsAppScreen isEn={isEn} />
+                )}
+              </SamsungNote24UltraFrame>
 
               {/* Floating Live Highlights Badges */}
               <div className="absolute -top-3 -start-6 bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-xl z-20 hidden sm:flex items-center gap-2.5 animate-bounce" style={{ animationDuration: '3s' }}>
