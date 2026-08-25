@@ -34,30 +34,30 @@ export default async function Footer() {
 
   return (
     <footer 
-      className="relative bg-[#0A021E] text-white pt-12 pb-6 mt-16 border-t border-white/10 overflow-hidden"
+      className="relative bg-gradient-to-b from-[#1D065C] via-[#23096E] to-[#160549] text-white pt-12 pb-6 mt-16 border-t border-white/15 shadow-2xl overflow-hidden"
       style={{ direction: 'rtl' }}
     >
       {/* Ambient Lighting Background Effect */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-40"
+        className="absolute inset-0 pointer-events-none opacity-30"
         style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(35, 9, 110, 0.4), transparent)',
+          background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 59, 48, 0.15), transparent)',
         }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* ── 1. Top App Promo Banner (Sleek Compact Strip) ── */}
-        <div className="mb-12 p-6 sm:p-8 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="mb-12 p-6 sm:p-8 rounded-3xl bg-white/[0.08] border border-white/15 backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="flex items-center gap-4 text-center md:text-start flex-col md:flex-row">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF3B30] to-[#E02D23] text-white flex items-center justify-center shadow-lg shadow-[#FF3B30]/20 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF3B30] to-[#E02D23] text-white flex items-center justify-center shadow-lg shadow-[#FF3B30]/30 shrink-0">
               <Smartphone size={24} />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-white mb-1">
                 تطبيق مساري في جيبك — أسهل وأسرع طريقة للحجز
               </h3>
-              <p className="text-xs sm:text-sm text-white/70 font-normal">
+              <p className="text-xs sm:text-sm text-white/80 font-normal">
                 احجز فندقك، تاكسي المطار، أو رحلتك بنقرة زر وبأفضل الأسعار المباشرة.
               </p>
             </div>
@@ -236,13 +236,13 @@ export default async function Footer() {
       </div>
 
       {/* ── 3. Sleek Bottom Copyright Bar ── */}
-      <div className="border-t border-white/10 pt-6 relative z-10">
+      <div className="border-t border-white/15 pt-6 pb-2 relative z-10 bg-black/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/60 text-center sm:text-start font-normal">
+          <p className="text-xs text-white/70 text-center sm:text-start font-normal">
             © {new Date().getFullYear()} {copyright}
           </p>
 
-          <div className="flex items-center gap-6 text-xs text-white/60 font-medium">
+          <div className="flex items-center gap-6 text-xs text-white/70 font-medium">
             <Link href="/privacy" className="hover:text-white transition-colors">
               سياسة الخصوصية
             </Link>
