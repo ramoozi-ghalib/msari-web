@@ -1,4 +1,3 @@
-import { prisma } from '@/lib/prisma';
 import { apiClient } from '@/lib/api-client';
 import { db } from '@/lib/firebase-admin';
 import type { City } from '@/types';
@@ -124,17 +123,21 @@ export class CityService {
     imageUrl?: string;
     isActive?: boolean;
   }): Promise<string> {
-    const city = await prisma.city.create({
-      data: {
-        nameAr: data.nameAr,
-        nameEn: data.nameEn,
-        governorateAr: data.governorateAr,
-        governorateEn: data.governorateEn,
-        imageUrl: data.imageUrl,
-        isActive: data.isActive !== undefined ? data.isActive : true,
-      },
+    const docRef = db.collection('destinations').doc();
+    await docRef.set({
+      id: docRef.id,
+      name: data.nameAr,
+      nameAr: data.nameAr,
+      nameEn: data.nameEn,
+      governorate: data.governorateAr,
+      governorateEn: data.governorateEn,
+      imageUrl: data.imageUrl || '',
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
-    return city.id;
+    return docRef.id;
   }
 
   static async updateCity(
@@ -148,31 +151,26 @@ export class CityService {
       isActive: boolean;
     }>
   ): Promise<void> {
-    await prisma.city.update({
-      where: { id },
-      data: {
-        nameAr: data.nameAr,
-        nameEn: data.nameEn,
-        governorateAr: data.governorateAr,
-        governorateEn: data.governorateEn,
-        imageUrl: data.imageUrl,
-        isActive: data.isActive,
-      },
-    });
+    const updatePayload: Record<string, any> = {
+      updatedAt: new Date(),
+    };
+    if (data.nameAr !== undefined) {
+      updatePayload.name = data.nameAr;
+      updatePayload.nameAr = data.nameAr;
+    }
+    if (data.nameEn !== undefined) updatePayload.nameEn = data.nameEn;
+    if (data.governorateAr !== undefined) updatePayload.governorate = data.governorateAr;
+    if (data.governorateEn !== undefined) updatePayload.governorateEn = data.governorateEn;
+    if (data.imageUrl !== undefined) updatePayload.imageUrl = data.imageUrl;
+    if (data.isActive !== undefined) updatePayload.isActive = data.isActive;
+
+    await db.collection('destinations').doc(id).update(updatePayload);
   }
 
   static async deleteCity(id: string): Promise<void> {
-    const city = await prisma.city.findUnique({
-      where: { id },
-      include: { _count: { select: { hotels: true } } },
-    });
-
-    if (city && city._count.hotels > 0) {
-      throw new Error('HAS_HOTELS');
-    }
-
-    await prisma.city.delete({
-      where: { id },
+    await db.collection('destinations').doc(id).update({
+      isDeleted: true,
+      updatedAt: new Date(),
     });
   }
 

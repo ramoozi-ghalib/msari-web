@@ -110,18 +110,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
         const { email, password } = parsed.data;
 
-        // ── Step 4: المصادقة الإدارية الصريحة والمباشرة ──
-        if (email === 'ramoozi.ghalib@msari.net' && password === 'Password123!') {
-          return {
-            id: 'admin-1',
-            email: 'ramoozi.ghalib@msari.net',
-            name: 'رمزي غالب',
-            phone: '+967 733 644 466',
-            role: 'ADMIN' as UserRole,
-            token: 'dev-admin-token',
-          };
-        }
-
+        // ── Step 4: المصادقة المعتمدة عبر الـ API Backend ──
         try {
           const apiRes = await apiClient.loginUser(email, password);
           if (apiRes.success && apiRes.data) {

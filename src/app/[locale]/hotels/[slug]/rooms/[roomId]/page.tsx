@@ -3,12 +3,14 @@ import { getHotelBySlug } from '@/actions/hotels';
 import { apiClient } from '@/lib/api-client';
 import RoomDetailClient from './RoomDetailClient';
 
+import { getLocalizedAlternates } from '@/lib/seo';
+
 interface Props {
-  params: Promise<{ slug: string; roomId: string }>;
+  params: Promise<{ locale: string; slug: string; roomId: string }>;
 }
 
 export async function generateMetadata(props: Props) {
-  const { slug, roomId } = await props.params;
+  const { locale, slug, roomId } = await props.params;
   const hotel = await getHotelBySlug(slug);
 
   if (!hotel) return { title: 'غرفة غير موجودة | مساري' };
@@ -16,15 +18,19 @@ export async function generateMetadata(props: Props) {
   const room = hotel.rooms?.find(r => r.id === roomId);
   if (!room) return { title: `${hotel.name} | مساري` };
 
-  const pageUrl = `https://msari.net/ar/hotels/${slug}/rooms/${roomId}`;
+  const path = `/hotels/${slug}/rooms/${roomId}`;
   const title = `${room.name} - ${hotel.name} | مساري`;
   const description = room.description || `احجز ${room.name} في ${hotel.name} بأفضل الأسعار.`;
 
   return {
     title,
     description,
-    alternates: { canonical: pageUrl },
-    openGraph: { title, description, url: pageUrl },
+    alternates: getLocalizedAlternates(path, locale),
+    openGraph: { 
+      title, 
+      description, 
+      url: `https://msari.net/${locale || 'ar'}${path}` 
+    },
   };
 }
 

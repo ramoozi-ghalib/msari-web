@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag, revalidatePath } from 'next/cache';
 
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN || 'msari_cms_revalidate_prod_2026_xK9mP3';
+const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN;
 
 function triggerRevalidation(tag?: string, path?: string) {
   if (tag === 'all') {
