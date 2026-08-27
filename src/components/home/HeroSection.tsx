@@ -63,10 +63,13 @@ export default function HeroSection({ hero }: HeroSectionProps) {
     }
   };
 
-  // Ultra-Luxury 5-Star Hotel & Grand Resort Photography
-  const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
+  // Dynamic Hero Image from CMS or Ultra-Luxury 5-Star Hotel default
+  const bgImage = (hero?.backgroundImageUrl && hero.backgroundImageUrl.trim() !== '' && hero.backgroundImageUrl !== '/images/hero-bg.jpg')
     ? hero.backgroundImageUrl
     : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop';
+
+  const heroTitle = hero?.titleAr || 'حجزك أسهل... مع مساري';
+  const heroSubtitle = hero?.subtitleAr || 'احجز فندقك في اليمن بأفضل سعر';
 
   return (
     <div className="relative w-full">
@@ -88,24 +91,24 @@ export default function HeroSection({ hero }: HeroSectionProps) {
           />
         </div>
 
-        {/* Content Container: Clean 2-Line Headline */}
+        {/* Content Container: Dynamic Headline */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
           <div className="text-center space-y-2.5 sm:space-y-4 mb-2">
-            {/* Line 1: حجزك أسهل... مع مساري */}
+            {/* Line 1: Dynamic Title */}
             <h1 
-              className="font-extrabold text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
+              className="font-extrabold text-white leading-tight tracking-tight max-w-full drop-shadow-xl"
               style={{ fontSize: 'clamp(18px, 3.5vw, 28px)' }}
             >
-              حجزك أسهل... <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
+              {heroTitle}
             </h1>
 
-            {/* Line 2: احجز فندقك في اليمن بأفضل سعر */}
+            {/* Line 2: Dynamic Subtitle */}
             <p 
-              className="font-semibold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
+              className="font-semibold text-white/95 leading-tight max-w-full drop-shadow-lg"
               style={{ fontSize: 'clamp(11px, 2vw, 15px)' }}
             >
-              احجز فندقك في اليمن بأفضل سعر
+              {heroSubtitle}
             </p>
           </div>
 

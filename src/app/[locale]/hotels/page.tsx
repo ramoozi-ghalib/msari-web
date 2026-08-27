@@ -9,23 +9,54 @@ import { getLocalHotels } from '@/actions/hotels';
 import { getActiveCities } from '@/actions/cities';
 import { SearchX, ChevronLeft } from 'lucide-react';
 
-export const metadata = {
-  title: 'فنادق اليمن - حجز جميع الفنادق في اليمن بأفضل سعر | مساري',
-  description: 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية (عدن، صنعاء، تعز، المكلا، إب، الحديدة) بأسعار حصرية وخيارات تناسب جميع الميزانيات.',
-  alternates: {
-    canonical: 'https://msari.net/ar/hotels',
-    languages: {
-      'ar': 'https://msari.net/ar/hotels',
-      'en': 'https://msari.net/en/hotels',
-      'x-default': 'https://msari.net/ar/hotels',
+import { getLocalizedAlternates } from '@/lib/seo';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const searchParams = await props.searchParams;
+  const isEn = locale === 'en';
+  const city = typeof searchParams.city === 'string' ? searchParams.city : undefined;
+
+  let title = isEn
+    ? 'Hotels in Yemen - Book Top Yemen Hotels at Best Rates | Msari'
+    : 'فنادق اليمن - حجز جميع الفنادق في اليمن بأفضل سعر | مساري';
+
+  let description = isEn
+    ? 'Discover and book top hotels across Yemen (Aden, Sanaa, Taiz, Mukalla, Ibb) with instant confirmation and best rates on Msari.'
+    : 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية (عدن، صنعاء، تعز، المكلا، إب، الحديدة) بأسعار حصرية وخيارات تناسب جميع الميزانيات عبر مساري.';
+
+  if (city) {
+    title = isEn
+      ? `Hotels in ${city} - Best Accommodation & Rates | Msari`
+      : `فنادق ${city} - حجز أفضل الفنادق وأماكن الإقامة في ${city} | مساري`;
+    description = isEn
+      ? `Find top rated hotels and accommodation in ${city}, Yemen. Exclusive offers and instant booking on Msari.`
+      : `استعرض واحجز أفضل فنادق ${city} في اليمن بأسعار حصرية وضمان أفضل قيمة وتأكيد فوري عبر مساري.`;
+  }
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/hotels', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${locale === 'en' ? 'en' : 'ar'}/hotels`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
     },
-  },
-  openGraph: {
-    title: 'فنادق اليمن - حجز جميع الفنادق في اليمن | مساري',
-    description: 'اكتشف واحجز أفضل الفنادق في جميع المدن اليمنية بأسعار حصرية وخيارات تناسب جميع الميزانيات.',
-    url: 'https://msari.net/ar/hotels',
-  },
-};
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function HotelsPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>

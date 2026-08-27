@@ -4,39 +4,39 @@ import { safeJsonLd } from '@/lib/sanitize';
 import HotelDetailClient from './HotelDetailClient';
 import type { Hotel } from '@/types';
 
+import { getLocalizedAlternates, generateBreadcrumbSchema } from '@/lib/seo';
+
 interface Props {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export async function generateMetadata(props: Props) {
-  const { slug } = await props.params;
+  const { locale, slug } = await props.params;
   const hotel = await getHotelBySlug(slug);
 
   if (!hotel) {
     return { title: 'فندق غير موجود' };
   }
 
-  const pageTitle = `${hotel.name} - فنادق ${hotel.city || 'اليمن'}`;
-  const pageDesc = hotel.description || `احجز إقامتك في ${hotel.name} بمدينة ${hotel.city || 'اليمن'} عبر منصة مساري بأفضل الأسعار المتاحة مع تأكيد حجز فوري.`;
-  const mainImage = hotel.images && hotel.images.length > 0 ? hotel.images[0] : 'https://msari.net/images/logo-dark.png';
+  const isEn = locale === 'en';
+  const pageTitle = isEn
+    ? `${hotel.name} - Hotels in ${hotel.city || 'Yemen'} | Msari`
+    : `${hotel.name} - فنادق ${hotel.city || 'اليمن'} | مساري`;
+  const pageDesc = hotel.description || (isEn
+    ? `Book your stay at ${hotel.name} in ${hotel.city || 'Yemen'} via Msari platform at the best available rates with instant confirmation.`
+    : `احجز إقامتك في ${hotel.name} بمدينة ${hotel.city || 'اليمن'} عبر منصة مساري بأفضل الأسعار المتاحة مع تأكيد حجز فوري.`);
+  const mainImage = hotel.images && hotel.images.length > 0 ? hotel.images[0] : 'https://msari.net/logo.png';
 
   return {
     title: pageTitle,
     description: pageDesc,
-    alternates: {
-      canonical: `https://msari.net/ar/hotels/${slug}`,
-      languages: {
-        'ar': `https://msari.net/ar/hotels/${slug}`,
-        'en': `https://msari.net/en/hotels/${slug}`,
-        'x-default': `https://msari.net/ar/hotels/${slug}`,
-      },
-    },
+    alternates: getLocalizedAlternates(`/hotels/${slug}`, locale),
     openGraph: {
       title: `${pageTitle} | مساري`,
       description: pageDesc,
-      url: `https://msari.net/ar/hotels/${slug}`,
+      url: `https://msari.net/${locale === 'en' ? 'en' : 'ar'}/hotels/${slug}`,
       siteName: 'مساري',
-      locale: 'ar_YE',
+      locale: isEn ? 'en_US' : 'ar_YE',
       type: 'website',
       images: [{ url: mainImage, alt: hotel.name }],
     },
@@ -106,7 +106,8 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
 }
 
 export default async function HotelDetailPage(props: Props) {
-  const { slug } = await props.params;
+  const { locale, slug } = await props.params;
+  const isEn = locale === 'en';
   const hotel = await getHotelBySlug(slug);
 
   if (!hotel) {
@@ -147,7 +148,7 @@ export default async function HotelDetailPage(props: Props) {
     '@type': 'Hotel',
     name: hotel.name,
     description: hotel.description || `فندق ${hotel.name} في ${hotel.city}`,
-    url: `https://msari.net/ar/hotels/${slug}`,
+    url: `https://msari.net/${isEn ? 'en' : 'ar'}/hotels/${slug}`,
     image: hotel.images || [],
     address: {
       '@type': 'PostalAddress',
@@ -162,15 +163,19 @@ export default async function HotelDetailPage(props: Props) {
     },
   };
 
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: 'https://msari.net/ar' },
-      { '@type': 'ListItem', position: 2, name: 'فنادق اليمن', item: 'https://msari.net/ar/hotels' },
-      { '@type': 'ListItem', position: 3, name: hotel.name, item: `https://msari.net/ar/hotels/${slug}` },
-    ],
-  };
+  const breadcrumbs = isEn
+    ? [
+        { name: 'Home', url: '/en' },
+        { name: 'Hotels in Yemen', url: '/en/hotels' },
+        { name: hotel.name, url: `/en/hotels/${slug}` },
+      ]
+    : [
+        { name: 'الرئيسية', url: '/ar' },
+        { name: 'فنادق اليمن', url: '/ar/hotels' },
+        { name: hotel.name, url: `/ar/hotels/${slug}` },
+      ];
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
 
   return (
     <>

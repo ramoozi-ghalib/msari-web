@@ -1,23 +1,38 @@
 import type { Metadata } from 'next';
 import { PagesCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'سياسة الخصوصية',
-  description: 'تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية على منصة مساري لخدمات السفر.',
-  alternates: {
-    canonical: 'https://msari.net/ar/privacy',
-    languages: {
-      'ar': 'https://msari.net/ar/privacy',
-      'en': 'https://msari.net/en/privacy',
-      'x-default': 'https://msari.net/ar/privacy',
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn ? 'Privacy Policy | Msari' : 'سياسة الخصوصية | مساري';
+  const description = isEn
+    ? 'Learn how Msari collects, uses, and protects your personal data when booking hotels and travel services in Yemen.'
+    : 'تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية على منصة مساري لخدمات السفر وحجز الفنادق في اليمن.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/privacy', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/privacy`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
     },
-  },
-  openGraph: {
-    title: 'سياسة الخصوصية | مساري',
-    description: 'تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية على منصة مساري لخدمات السفر.',
-    url: 'https://msari.net/ar/privacy',
-  },
-};
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PrivacyPage() {
   const data = await PagesCmsService.getPrivacyPage();

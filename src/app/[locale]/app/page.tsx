@@ -9,16 +9,41 @@ import AppDownloadCtaSection from '@/components/app/AppDownloadCtaSection';
 import AppStickyMobileBar from '@/components/app/AppStickyMobileBar';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'تطبيق مساري لحجز الفنادق في اليمن والطيران والسيارات | مساري',
-  description: 'حمّل تطبيق مساري الذكي واستمتع بحجز فوري ومؤكد لأفضل فنادق اليمن مع طرق دفع محلية ميسرة (الكريمي، جيب، كاش)، ومقارنة أسعار الفنادق العالمية وتذاكر الطيران.',
-  alternates: { canonical: 'https://msari.net/ar/app' },
-  openGraph: {
-    title: 'تطبيق مساري لحجز الفنادق في اليمن والطيران والسيارات | مساري',
-    description: 'حمّل تطبيق مساري الذكي لحجز أفضل فنادق اليمن بدفع محلي وتأكيد فوري.',
-    url: 'https://msari.net/ar/app',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'Msari Mobile App - Hotel Booking, Flights & Cars in Yemen | Msari'
+    : 'تطبيق مساري لحجز الفنادق في اليمن والطيران والسيارات | مساري';
+
+  const description = isEn
+    ? 'Download Msari mobile app for instant and verified hotel bookings across Yemen with local payment methods, flight comparison, and car transportation.'
+    : 'حمّل تطبيق مساري الذكي واستمتع بحجز فوري ومؤكد لأفضل فنادق اليمن مع طرق دفع محلية ميسرة (الكريمي، جيب، كاش)، ومقارنة أسعار الفنادق العالمية وتذاكر الطيران.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/app', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/app`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function AppPage(
   props: { params: Promise<{ locale: string }> }

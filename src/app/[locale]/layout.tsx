@@ -4,27 +4,7 @@ import Footer from '@/components/layout/Footer';
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
 import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
 import { safeJsonLd } from '@/lib/sanitize';
-
-// JSON-LD structured data for SEO
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'TravelAgency',
-  name: 'مساري (Msari Travel)',
-  url: 'https://msari.net',
-  description: 'منصة مساري لحجز أفضل الفنادق في اليمن بأقل الأسعار وتوفير خدمات الطيران والنقل المساندة.',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Sanaa',
-    addressCountry: 'YE',
-  },
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: WHATSAPP_DISPLAY,
-    contactType: 'customer service',
-    areaServed: 'YE',
-    availableLanguage: ['ar', 'en'],
-  },
-};
+import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
 
 // This layout is a content wrapper only — <html> and <body> live in app/layout.tsx.
 // Having <html><body> here AND in the root layout causes nested HTML errors in React.
@@ -38,11 +18,18 @@ export default async function LocaleLayout(
   setRequestLocale(locale);
   const messages = await getMessages();
 
+  const orgSchema = generateOrganizationSchema();
+  const websiteSchema = generateWebSiteSchema();
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(orgSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteSchema) }}
       />
       <ConditionalLayout
         header={<Header />}

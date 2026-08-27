@@ -1,0 +1,352 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1780" width="1200" height="1780" style="background:#F4F2F8; font-family:'Cairo', 'Segoe UI', Tahoma, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="msariGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#23096E"/>
+      <stop offset="60%" stop-color="#3A1C8F"/>
+      <stop offset="100%" stop-color="#FF3B30"/>
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#23096E"/>
+      <stop offset="100%" stop-color="#3A1C8F"/>
+    </linearGradient>
+    <linearGradient id="cardTopBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#23096E"/>
+      <stop offset="50%" stop-color="#3A1C8F"/>
+      <stop offset="100%" stop-color="#FF3B30"/>
+    </linearGradient>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    
+    <!-- Shadows & Filters -->
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#23096E" flood-opacity="0.06"/>
+    </filter>
+    <filter id="cardShadowHover" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="24" flood-color="#23096E" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="80" result="blur" />
+    </filter>
+  </defs>
+
+  <!-- Ambient Glow Backgrounds -->
+  <circle cx="950" cy="180" r="220" fill="#23096E" opacity="0.07" filter="url(#softGlow)"/>
+  <circle cx="200" cy="450" r="240" fill="#FF3B30" opacity="0.06" filter="url(#softGlow)"/>
+  <circle cx="600" cy="1200" r="260" fill="#3A1C8F" opacity="0.06" filter="url(#softGlow)"/>
+
+  <!-- ==================== 1. TOP HEADER / NAVBAR ==================== -->
+  <g id="navbar">
+    <rect x="0" y="0" width="1200" height="85" fill="#FFFFFF" opacity="0.95" />
+    <line x1="0" y1="85" x2="1200" y2="85" stroke="#23096E" stroke-opacity="0.08" stroke-width="1"/>
+    
+    <!-- Logo & Brand (RTL - Right Side) -->
+    <g transform="translate(1020, 20)">
+      <rect x="100" y="0" width="46" height="46" rx="14" fill="url(#purpleGradient)" />
+      <text x="123" y="32" font-size="22" font-weight="900" fill="#FFFFFF" text-anchor="middle">م</text>
+      <text x="85" y="26" font-size="20" font-weight="900" fill="#23096E" text-anchor="end">مساري</text>
+      <rect x="0" y="8" width="75" height="24" rx="6" fill="#F4F2F8" stroke="#23096E" stroke-opacity="0.15"/>
+      <text x="37" y="24" font-size="11" font-weight="800" fill="#3A1C8F" text-anchor="middle">B2B API</text>
+    </g>
+
+    <!-- Nav Links (Center) -->
+    <g transform="translate(480, 48)" text-anchor="middle" font-size="14" font-weight="700" fill="#423861">
+      <text x="260" y="0" fill="#23096E" font-weight="900">نظرة عامة</text>
+      <text x="140" y="0">نقاط الاتصال Endpoints</text>
+      <text x="0" y="0">خطوات البدء</text>
+      <text x="-120" y="0">خطة الشراكة</text>
+      <text x="-230" y="0">الأسئلة الشائعة</text>
+    </g>
+
+    <!-- Header Actions (Left Side) -->
+    <g transform="translate(60, 22)">
+      <!-- System Status Pill -->
+      <rect x="180" y="6" width="150" height="30" rx="15" fill="#ECFDF5" stroke="#10B981" stroke-opacity="0.3"/>
+      <circle cx="315" cy="21" r="4" fill="#10B981" />
+      <text x="245" y="26" font-size="11" font-weight="800" fill="#065F46" text-anchor="middle">النظام يعمل 99.9%</text>
+
+      <!-- Primary CTA Button -->
+      <rect x="0" y="0" width="165" height="42" rx="12" fill="url(#purpleGradient)" filter="url(#cardShadow)"/>
+      <text x="82" y="26" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">طلب مفتاح الـ API</text>
+    </g>
+  </g>
+
+  <!-- ==================== 2. HERO SECTION ==================== -->
+  <g id="hero" transform="translate(0, 120)">
+    <!-- Pill Badge -->
+    <g transform="translate(600, 20)">
+      <rect x="-140" y="0" width="280" height="36" rx="18" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.12" filter="url(#cardShadow)"/>
+      <circle cx="115" cy="18" r="4" fill="#FF3B30"/>
+      <text x="-5" y="23" font-size="13" font-weight="800" fill="#23096E" text-anchor="middle">بوابة المطورين والربط البرمجي B2B</text>
+    </g>
+
+    <!-- Main Title -->
+    <text x="600" y="105" font-size="40" font-weight="900" fill="#0A0912" text-anchor="middle" letter-spacing="-0.5">
+      اربط نظامك مع مخزون أكبر شبكة سفر وفنادق في اليمن
+    </text>
+    <text x="600" y="150" font-size="28" font-weight="900" fill="#FF3B30" text-anchor="middle">
+      بواجهة برمجية RESTful فائقة السرعة وتأكيد فوري
+    </text>
+
+    <!-- Subtitle -->
+    <text x="600" y="195" font-size="16" font-weight="600" fill="#423861" text-anchor="middle">
+      واجهة موحدة تتيح لوكالات السفر والتطبيقات ومنصات السفر البحث اللحظي، جلب الأسعار، وتأكيد الحجوزات برمجياً في ثوانٍ.
+    </text>
+
+    <!-- Hero CTA Buttons -->
+    <g transform="translate(600, 235)">
+      <rect x="15" y="0" width="230" height="50" rx="14" fill="url(#purpleGradient)" filter="url(#cardShadow)"/>
+      <text x="130" y="31" font-size="15" font-weight="800" fill="#FFFFFF" text-anchor="middle">طلب مفتاح الـ API والبدء</text>
+      
+      <rect x="-245" y="0" width="230" height="50" rx="14" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.15" filter="url(#cardShadow)"/>
+      <text x="-130" y="31" font-size="15" font-weight="800" fill="#23096E" text-anchor="middle">استكشاف نقاط الاتصال</text>
+    </g>
+
+    <!-- Trust / Performance Badges Row -->
+    <g transform="translate(600, 320)">
+      <!-- Metric 1 -->
+      <g transform="translate(240, 0)">
+        <rect x="-100" y="0" width="200" height="65" rx="16" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+        <text x="0" y="30" font-size="20" font-weight="900" fill="#10B981" text-anchor="middle">&lt; 150ms</text>
+        <text x="0" y="50" font-size="12" font-weight="700" fill="#64748B" text-anchor="middle">متوسط سرعة الاستجابة</text>
+      </g>
+      <!-- Metric 2 -->
+      <g transform="translate(0, 0)">
+        <rect x="-100" y="0" width="200" height="65" rx="16" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+        <text x="0" y="30" font-size="20" font-weight="900" fill="#3A1C8F" text-anchor="middle">99.9% SLA</text>
+        <text x="0" y="50" font-size="12" font-weight="700" fill="#64748B" text-anchor="middle">ضمان استقرار الخوادم</text>
+      </g>
+      <!-- Metric 3 -->
+      <g transform="translate(-240, 0)">
+        <rect x="-100" y="0" width="200" height="65" rx="16" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+        <text x="0" y="30" font-size="20" font-weight="900" fill="#FF3B30" text-anchor="middle">تأكيد فوري</text>
+        <text x="0" y="50" font-size="12" font-weight="700" fill="#64748B" text-anchor="middle">إصدار رقم مرجعي مباشر</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== 3. INTERACTIVE API STUDIO WIDGET ==================== -->
+  <g id="apiStudio" transform="translate(80, 540)">
+    <!-- Studio Card Container -->
+    <rect x="0" y="0" width="1040" height="420" rx="24" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.1" filter="url(#cardShadowHover)"/>
+    
+    <!-- Studio Header & Endpoint Tabs -->
+    <rect x="0" y="0" width="1040" height="65" rx="24" fill="#FBFBFE" />
+    <line x1="0" y1="65" x2="1040" y2="65" stroke="#23096E" stroke-opacity="0.08" stroke-width="1"/>
+    
+    <!-- Title on Left -->
+    <text x="40" y="38" font-size="13" font-weight="800" fill="#64748B">API STUDIO v1.0</text>
+    <circle cx="25" cy="34" r="5" fill="#10B981" />
+
+    <!-- Tabs on Right (RTL) -->
+    <g transform="translate(1000, 16)">
+      <!-- Tab 1: Active -->
+      <rect x="-190" y="0" width="180" height="36" rx="10" fill="#23096E" />
+      <text x="-100" y="23" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle">🔍 البحث عن الفنادق</text>
+      
+      <!-- Tab 2 -->
+      <rect x="-360" y="0" width="160" height="36" rx="10" fill="#FFFFFF" stroke="#E2E8F0" />
+      <text x="-280" y="23" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">🏨 تفاصيل الفندق</text>
+      
+      <!-- Tab 3 -->
+      <rect x="-530" y="0" width="160" height="36" rx="10" fill="#FFFFFF" stroke="#E2E8F0" />
+      <text x="-450" y="23" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">💳 إنشاء الحجز الفوري</text>
+      
+      <!-- Tab 4 -->
+      <rect x="-690" y="0" width="150" height="36" rx="10" fill="#FFFFFF" stroke="#E2E8F0" />
+      <text x="-615" y="23" font-size="12" font-weight="700" fill="#475569" text-anchor="middle">🔔 إشعارات الويب هوك</text>
+    </g>
+
+    <!-- Studio Content Split View -->
+    <!-- Right Box: Endpoint Details & Parameters (Width: 460) -->
+    <g transform="translate(550, 85)">
+      <!-- Method & URL Pill -->
+      <rect x="370" y="0" width="55" height="26" rx="6" fill="#ECFDF5" stroke="#10B981" stroke-opacity="0.4"/>
+      <text x="397" y="18" font-size="12" font-weight="900" fill="#065F46" text-anchor="middle">GET</text>
+      <text x="355" y="19" font-size="14" font-weight="800" fill="#23096E" text-anchor="end">/v1/hotels/search</text>
+
+      <text x="425" y="55" font-size="16" font-weight="900" fill="#0F172A" text-anchor="end">البحث في مخزون الفنادق بالمدن اليمنية</text>
+      <text x="425" y="78" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">استعلام فوري عن الأسعار والتوفر المباشر بالريال اليمني والدولار.</text>
+
+      <!-- Parameters Table Box -->
+      <g transform="translate(0, 100)">
+        <rect x="0" y="0" width="450" height="195" rx="14" fill="#F8FAFC" stroke="#E2E8F0" />
+        <text x="430" y="25" font-size="12" font-weight="800" fill="#475569" text-anchor="end">معاملات الطلب (Query Parameters):</text>
+        
+        <!-- Param 1 -->
+        <g transform="translate(15, 40)">
+          <text x="410" y="16" font-size="12" font-weight="800" fill="#23096E" text-anchor="end">city</text>
+          <text x="320" y="16" font-size="11" font-weight="700" fill="#DC2626" text-anchor="end">مطلوب (sanaa, aden..)</text>
+        </g>
+        <line x1="15" y1="70" x2="435" y2="70" stroke="#E2E8F0" />
+        
+        <!-- Param 2 -->
+        <g transform="translate(15, 80)">
+          <text x="410" y="16" font-size="12" font-weight="800" fill="#23096E" text-anchor="end">checkIn / checkOut</text>
+          <text x="250" y="16" font-size="11" font-weight="700" fill="#DC2626" text-anchor="end">مطلوب (YYYY-MM-DD)</text>
+        </g>
+        <line x1="15" y1="110" x2="435" y2="110" stroke="#E2E8F0" />
+
+        <!-- Param 3 -->
+        <g transform="translate(15, 120)">
+          <text x="410" y="16" font-size="12" font-weight="800" fill="#23096E" text-anchor="end">currency</text>
+          <text x="280" y="16" font-size="11" font-weight="700" fill="#64748B" text-anchor="end">اختياري (USD, YER, SAR)</text>
+        </g>
+        <line x1="15" y1="150" x2="435" y2="150" stroke="#E2E8F0" />
+
+        <!-- Param 4 -->
+        <g transform="translate(15, 160)">
+          <text x="410" y="16" font-size="12" font-weight="800" fill="#23096E" text-anchor="end">guests</text>
+          <text x="310" y="16" font-size="11" font-weight="700" fill="#64748B" text-anchor="end">اختياري (عدد النزلاء)</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Left Box: Light Clean Code & Response Viewer (Width: 480) -->
+    <g transform="translate(30, 85)">
+      <rect x="0" y="0" width="490" height="295" rx="16" fill="#F8FAFC" stroke="#E2E8F0" />
+      
+      <!-- Code Window Header -->
+      <rect x="0" y="0" width="490" height="38" rx="16" fill="#EDE9FE" opacity="0.6"/>
+      <circle cx="20" cy="19" r="4" fill="#EF4444" />
+      <circle cx="34" cy="19" r="4" fill="#F59E0B" />
+      <circle cx="48" cy="19" r="4" fill="#10B981" />
+      <text x="70" y="23" font-size="11" font-weight="800" fill="#3A1C8F">Response (200 OK) — JSON</text>
+      <text x="470" y="23" font-size="11" font-weight="800" fill="#10B981" text-anchor="end">⚡ 84ms</text>
+
+      <!-- Code Snippet -->
+      <g transform="translate(20, 55)" font-family="Consolas, Monaco, monospace" font-size="11" line-height="1.5">
+        <text x="0" y="15" fill="#334155">{</text>
+        <text x="15" y="32" fill="#2563EB">"status"</text><text x="65" y="32" fill="#334155">: </text><text x="75" y="32" fill="#16A34A">"success"</text><text x="130" y="32" fill="#334155">,</text>
+        <text x="15" y="49" fill="#2563EB">"total"</text><text x="60" y="49" fill="#334155">: </text><text x="70" y="49" fill="#D97706">42</text><text x="85" y="49" fill="#334155">,</text>
+        <text x="15" y="66" fill="#2563EB">"hotels"</text><text x="65" y="66" fill="#334155">: [</text>
+        <text x="30" y="83" fill="#334155">{</text>
+        <text x="45" y="100" fill="#2563EB">"id"</text><text x="65" y="100" fill="#334155">: </text><text x="75" y="100" fill="#16A34A">"htl_sanaa_grand_01"</text><text x="210" y="100" fill="#334155">,</text>
+        <text x="45" y="117" fill="#2563EB">"name"</text><text x="85" y="117" fill="#334155">: </text><text x="95" y="117" fill="#16A34A">"فندق جراند صنعاء الدولي"</text><text x="245" y="117" fill="#334155">,</text>
+        <text x="45" y="134" fill="#2563EB">"stars"</text><text x="85" y="134" fill="#334155">: </text><text x="95" y="134" fill="#D97706">5</text><text x="105" y="134" fill="#334155">,</text>
+        <text x="45" y="151" fill="#2563EB">"priceUSD"</text><text x="105" y="151" fill="#334155">: </text><text x="115" y="151" fill="#D97706">85.00</text><text x="150" y="151" fill="#334155">,</text>
+        <text x="45" y="168" fill="#2563EB">"instantConfirmation"</text><text x="180" y="168" fill="#334155">: </text><text x="190" y="168" fill="#9333EA">true</text>
+        <text x="30" y="185" fill="#334155">}</text>
+        <text x="15" y="202" fill="#334155">]</text>
+        <text x="0" y="219" fill="#334155">}</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== 4. 3-STEP QUICKSTART SECTION ==================== -->
+  <g id="quickstart" transform="translate(80, 1000)">
+    <text x="520" y="0" font-size="28" font-weight="900" fill="#0A0912" text-anchor="middle">
+      كيف تبدأ التكامل مع مساري خلال 3 خطوات بسيطة؟
+    </text>
+    <text x="520" y="30" font-size="14" font-weight="600" fill="#64748B" text-anchor="middle">
+      مسار هندسي سلس يُمكّنك من بدء الربط والاختبار والإنتاج دون تعقيد.
+    </text>
+
+    <!-- Step 1 -->
+    <g transform="translate(700, 60)">
+      <rect x="0" y="0" width="340" height="150" rx="20" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+      <text x="315" y="45" font-size="32" font-weight="900" fill="#23096E" text-anchor="end">01</text>
+      <text x="315" y="75" font-size="16" font-weight="900" fill="#0F172A" text-anchor="end">طلب مفتاح الـ API</text>
+      <text x="315" y="100" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">تواصل معنا عبر واتساب الشركاء لاستلام</text>
+      <text x="315" y="120" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">مفتاح الـ Sandbox التجريبي فوراً.</text>
+    </g>
+
+    <!-- Step 2 -->
+    <g transform="translate(350, 60)">
+      <rect x="0" y="0" width="340" height="150" rx="20" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+      <text x="315" y="45" font-size="32" font-weight="900" fill="#3A1C8F" text-anchor="end">02</text>
+      <text x="315" y="75" font-size="16" font-weight="900" fill="#0F172A" text-anchor="end">الاختبار في الـ Sandbox</text>
+      <text x="315" y="100" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">اختبر البحث، تأكيد الحجز، والـ Webhooks</text>
+      <text x="315" y="120" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">في بيئة تجريبية آمنة دون رسوم.</text>
+    </g>
+
+    <!-- Step 3 -->
+    <g transform="translate(0, 60)">
+      <rect x="0" y="0" width="340" height="150" rx="20" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.08" filter="url(#cardShadow)"/>
+      <text x="315" y="45" font-size="32" font-weight="900" fill="#FF3B30" text-anchor="end">03</text>
+      <text x="315" y="75" font-size="16" font-weight="900" fill="#0F172A" text-anchor="end">إطلاق الإنتاج المباشر</text>
+      <text x="315" y="100" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">انتقل للمفتاح الحي وابدأ بتأكيد الحجوزات</text>
+      <text x="315" y="120" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">لعملائك فوراً وجني العمولات.</text>
+    </g>
+  </g>
+
+  <!-- ==================== 5. UNIFIED B2B PARTNERSHIP PLAN ==================== -->
+  <g id="pricingCard" transform="translate(180, 1260)">
+    <rect x="0" y="0" width="840" height="420" rx="28" fill="#FFFFFF" stroke="#23096E" stroke-opacity="0.12" filter="url(#cardShadowHover)"/>
+    
+    <!-- Top Gradient Accent Border -->
+    <path d="M 0,28 Q 0,0 28,0 L 812,0 Q 840,0 840,28 L 840,8 L 0,8 Z" fill="url(#cardTopBar)" />
+
+    <!-- Plan Header Area -->
+    <g transform="translate(800, 45)">
+      <!-- Badge -->
+      <rect x="-240" y="0" width="240" height="28" rx="8" fill="#EDE9FE" stroke="#3A1C8F" stroke-opacity="0.2"/>
+      <text x="-120" y="19" font-size="12" font-weight="800" fill="#23096E" text-anchor="middle">⚡ خطة الشراكة الموحدة (B2B Full Access)</text>
+
+      <text x="0" y="60" font-size="24" font-weight="900" fill="#0A0912" text-anchor="end">خطة الشراكة والربط البرمجي (Msari B2B API)</text>
+      <text x="0" y="85" font-size="13" font-weight="600" fill="#64748B" text-anchor="end">خطة شاملة ومتكاملة لوكالات السفر والتطبيقات ومنصات السفر للربط المباشر مع شبكة فنادق مساري.</text>
+    </g>
+
+    <!-- Price Tag (Left Side) -->
+    <g transform="translate(45, 55)">
+      <text x="0" y="30" font-size="20" font-weight="900" fill="#23096E" text-anchor="start">حسب الاستخدام</text>
+      <text x="0" y="52" font-size="12" font-weight="800" fill="#10B981" text-anchor="start">عمولات وأسعار جملة مخصصة</text>
+    </g>
+
+    <line x1="45" y1="150" x2="795" y2="150" stroke="#E2E8F0" stroke-width="1"/>
+
+    <!-- Features 2-Column Grid -->
+    <g transform="translate(45, 175)">
+      <text x="750" y="0" font-size="12" font-weight="800" fill="#64748B" text-anchor="end">المزايا والقدرات التقنية المضمنة:</text>
+      
+      <!-- Column 1 (Right) -->
+      <g transform="translate(400, 20)">
+        <g transform="translate(0, 15)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">ربط فوري وتأكيد مباشر لجميع حجوزات الفنادق</text>
+        </g>
+        <g transform="translate(0, 45)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">بيئة اختبار تجريبية كاملة (Sandbox Environment)</text>
+        </g>
+        <g transform="translate(0, 75)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">نظام Webhooks للإشعارات والتحديثات اللحظية</text>
+        </g>
+      </g>
+
+      <!-- Column 2 (Left) -->
+      <g transform="translate(0, 20)">
+        <g transform="translate(0, 15)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">معدل طلبات غير محدود بوقت استجابة &lt; 150ms</text>
+        </g>
+        <g transform="translate(0, 45)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">تحديث لحظي لأسعار الغرف بالريال والدولار</text>
+        </g>
+        <g transform="translate(0, 75)">
+          <circle cx="340" cy="0" r="9" fill="#DCFCE7" />
+          <text x="340" y="4" font-size="11" font-weight="900" fill="#16A34A" text-anchor="middle">✓</text>
+          <text x="320" y="4" font-size="13" font-weight="800" fill="#1E293B" text-anchor="end">دعم فني وهندسي مخصص 24/7 عبر واتساب</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Bottom WhatsApp Action Button -->
+    <g transform="translate(45, 335)">
+      <rect x="0" y="0" width="750" height="55" rx="16" fill="url(#purpleGradient)" filter="url(#cardShadow)"/>
+      <text x="375" y="34" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle">
+        💬 تواصل معنا عبر واتساب لطلب مفتاح الـ API وتفعيل الربط المباشر
+      </text>
+    </g>
+  </g>
+
+</svg>

@@ -5,6 +5,12 @@ import { auth } from '@/auth';
 import { getMyBookings } from '@/actions/bookings';
 import { Button } from '@/components/ui/Button';
 import { whatsappLink } from '@/lib/site-config';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'حجوزاتي — مساري',
+  robots: { index: false, follow: false },
+};
 
 export default async function AccountBookingsPage(props: {
   params: Promise<{ locale: string }>;

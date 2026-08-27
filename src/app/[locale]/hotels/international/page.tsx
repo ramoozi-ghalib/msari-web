@@ -4,16 +4,41 @@ import { Globe, Shield, CreditCard, HeartHandshake, Star } from 'lucide-react';
 import Heading from '@/components/ui/Heading';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'فنادق عالمية — مساري',
-  description: 'احجز أفضل الفنادق العالمية حول العالم بأسعار تنافسية مع مساري.',
-  alternates: { canonical: 'https://msari.net/ar/hotels/international' },
-  openGraph: {
-    title: 'فنادق عالمية — مساري',
-    description: 'احجز أفضل الفنادق العالمية حول العالم بأسعار تنافسية مع مساري.',
-    url: 'https://msari.net/ar/hotels/international',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'International Hotels Worldwide Booking | Msari'
+    : 'فنادق عالمية — حجز ومقارنة أسعار الفنادق حول العالم | مساري';
+
+  const description = isEn
+    ? 'Book the best international hotels around the world (Dubai, Cairo, Istanbul, Riyadh) with exclusive offers and easy payment on Msari.'
+    : 'احجز أفضل الفنادق العالمية حول العالم (دبي، القاهرة، إسطنبول، الرياض، عمّان) بأسعار تنافسية وخيارات دفع متعددة ومضمونة مع مساري.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/hotels/international', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/hotels/international`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 const DEFAULT_DESTINATIONS = [
   { city: 'دبي', country: 'الإمارات', emoji: '🏙️', hotels: 240, img: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=800&auto=format&fit=crop' },

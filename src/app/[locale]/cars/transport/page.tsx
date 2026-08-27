@@ -3,16 +3,41 @@ import Image from 'next/image';
 import { Car, MapPin, Clock, Shield, Users, CheckCircle, ArrowRight } from 'lucide-react';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'النقل بين المدن — مساري',
-  description: 'خدمة نقل مريحة وآمنة بين جميع مدن اليمن مع سائقين محترفين.',
-  alternates: { canonical: 'https://msari.net/ar/cars/transport' },
-  openGraph: {
-    title: 'النقل بين المدن — مساري',
-    description: 'خدمة نقل مريحة وآمنة بين جميع مدن اليمن مع سائقين محترفين.',
-    url: 'https://msari.net/ar/cars/transport',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'Intercity Transportation in Yemen | Msari'
+    : 'النقل والتنقل بين المدن والمحافظات في اليمن | مساري';
+
+  const description = isEn
+    ? 'Safe and comfortable intercity transportation between all major Yemeni cities with professional drivers and modern vehicles on Msari.'
+    : 'خدمة نقل مريحة وآمنة بسيارات حديثة وسائقين محترفين بين جميع مدن ومحافظات اليمن (صنعاء، عدن، تعز، حضرموت، مأرب) مع مساري.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/cars/transport', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/cars/transport`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 const ICON_MAP: Record<string, any> = {
   Shield,

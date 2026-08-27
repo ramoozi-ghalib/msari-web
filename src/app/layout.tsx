@@ -18,8 +18,11 @@ const inter = Inter({
   display: 'swap',
 });
 
+import { SEO_VERIFICATIONS } from '@/lib/seo';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://msari.net'),
+  verification: SEO_VERIFICATIONS,
   title: {
     default: 'مساري | بوابتك لحجز أفضل فنادق اليمن',
     template: '%s | مساري',

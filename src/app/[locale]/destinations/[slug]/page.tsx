@@ -12,38 +12,38 @@ interface PageProps {
   }>;
 }
 
+import { getLocalizedAlternates, generateBreadcrumbSchema } from '@/lib/seo';
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
+  const isEn = resolvedParams.locale === 'en';
   const destination = await getDestinationBySlug(resolvedParams.slug);
 
   if (!destination) {
     return {
-      title: 'الوجهة غير موجودة',
+      title: isEn ? 'Destination Not Found' : 'الوجهة غير موجودة',
     };
   }
 
-  const pageTitle = `فنادق ${destination.name} - أفضل الفنادق وأماكن الإقامة في ${destination.name}`;
-  const pageDesc = destination.tagline || `اكتشف واحجز أفضل فنادق ${destination.name} اليمنية بأقل الأسعار وحسومات حصرية مع تأكيد حجز فوري عبر منصة مساري.`;
-  const mainImage = destination.heroImage || 'https://msari.net/images/logo-dark.png';
+  const pageTitle = isEn
+    ? `Hotels in ${destination.nameEn || destination.name} - Best Accommodation & Guide | Msari`
+    : `فنادق ${destination.name} - أفضل الفنادق وأماكن الإقامة في ${destination.name} | مساري`;
+  const pageDesc = destination.tagline || (isEn
+    ? `Discover and book top hotels in ${destination.nameEn || destination.name}, Yemen. Exclusive offers, tourist attractions, and instant booking on Msari.`
+    : `اكتشف واحجز أفضل فنادق ${destination.name} اليمنية بأقل الأسعار وحسومات حصرية مع تأكيد حجز فوري عبر منصة مساري.`);
+  const mainImage = destination.heroImage || 'https://msari.net/logo.png';
 
   return {
     title: pageTitle,
     description: pageDesc,
     keywords: [`فنادق ${destination.name}`, `أفضل فنادق ${destination.name}`, `حجز فنادق ${destination.name}`],
-    alternates: {
-      canonical: `https://msari.net/ar/destinations/${resolvedParams.slug}`,
-      languages: {
-        'ar': `https://msari.net/ar/destinations/${resolvedParams.slug}`,
-        'en': `https://msari.net/en/destinations/${resolvedParams.slug}`,
-        'x-default': `https://msari.net/ar/destinations/${resolvedParams.slug}`,
-      },
-    },
+    alternates: getLocalizedAlternates(`/destinations/${resolvedParams.slug}`, resolvedParams.locale),
     openGraph: {
       title: `${pageTitle} | مساري`,
       description: pageDesc,
-      url: `https://msari.net/ar/destinations/${resolvedParams.slug}`,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/destinations/${resolvedParams.slug}`,
       siteName: 'مساري',
-      locale: 'ar_YE',
+      locale: isEn ? 'en_US' : 'ar_YE',
       type: 'website',
       images: [{ url: mainImage, alt: destination.name }],
     },
@@ -58,6 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function DestinationDetailPage({ params }: PageProps) {
   const resolvedParams = await params;
+  const isEn = resolvedParams.locale === 'en';
   const destination = await getDestinationBySlug(resolvedParams.slug);
 
   if (!destination) {
@@ -67,9 +68,9 @@ export default async function DestinationDetailPage({ params }: PageProps) {
   const destinationSchema = {
     '@context': 'https://schema.org',
     '@type': 'TouristDestination',
-    name: destination.name,
+    name: isEn ? (destination.nameEn || destination.name) : destination.name,
     description: destination.tagline || `دليل السياحة وفنادق الإقامة في ${destination.name}`,
-    url: `https://msari.net/ar/destinations/${resolvedParams.slug}`,
+    url: `https://msari.net/${isEn ? 'en' : 'ar'}/destinations/${resolvedParams.slug}`,
     image: destination.heroImage || '',
     includesAttraction: (destination.landmarks || []).map((a: any) => ({
       '@type': 'TouristAttraction',
@@ -78,15 +79,19 @@ export default async function DestinationDetailPage({ params }: PageProps) {
     })),
   };
 
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: 'https://msari.net/ar' },
-      { '@type': 'ListItem', position: 2, name: 'الوجهات', item: 'https://msari.net/ar/hotels' },
-      { '@type': 'ListItem', position: 3, name: `فنادق ${destination.name}`, item: `https://msari.net/ar/destinations/${resolvedParams.slug}` },
-    ],
-  };
+  const breadcrumbs = isEn
+    ? [
+        { name: 'Home', url: '/en' },
+        { name: 'Destinations', url: '/en/destinations' },
+        { name: destination.nameEn || destination.name, url: `/en/destinations/${resolvedParams.slug}` },
+      ]
+    : [
+        { name: 'الرئيسية', url: '/ar' },
+        { name: 'الوجهات', url: '/ar/destinations' },
+        { name: destination.name, url: `/ar/destinations/${resolvedParams.slug}` },
+      ];
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
 
   return (
     <>

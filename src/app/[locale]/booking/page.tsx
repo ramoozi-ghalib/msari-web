@@ -15,6 +15,12 @@ import BookingPage from './BookingPage';
 import { getHotelBySlug } from '@/actions/hotels';
 import { auth } from '@/auth';
 import { db } from '@/lib/firebase-admin';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'إتمام الحجز — مساري',
+  robots: { index: false, follow: false },
+};
 
 function isValidDateString(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);

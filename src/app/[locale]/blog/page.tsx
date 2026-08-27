@@ -4,16 +4,41 @@ import Image from 'next/image';
 import { getBlogPosts } from '@/actions/blog';
 import { Calendar, Clock, ArrowLeft, Sparkles, BookOpen } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'مدونة مساري — دليل السفر والفنادق في اليمن والعالم',
-  description: 'اكتشف أفضل النصائح، الأدلة السياحية، وترشيحات الفنادق وأسعار الإقامة في عدن، صنعاء، حضرموت، وأشهر الوجهات العالمية.',
-  alternates: { canonical: 'https://msari.net/ar/blog' },
-  openGraph: {
-    title: 'مدونة مساري — دليل السفر والفنادق في اليمن والعالم',
-    description: 'اكتشف أفضل النصائح، الأدلة السياحية، وترشيحات الفنادق وأسعار الإقامة في عدن، صنعاء، حضرموت، وأشهر الوجهات العالمية.',
-    url: 'https://msari.net/ar/blog',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'Msari Blog - Yemen Travel & Hotel Booking Guides'
+    : 'مدونة مساري — دليل السفر والفنادق في اليمن والعالم';
+
+  const description = isEn
+    ? 'Discover top travel tips, destination guides, and hotel booking recommendations in Yemen (Aden, Sanaa, Socotra, Mukalla).'
+    : 'اكتشف أفضل النصائح، الأدلة السياحية، وترشيحات الفنادق وأسعار الإقامة في عدن، صنعاء، حضرموت، وأشهر الوجهات اليمنية والعالمية.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/blog', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/blog`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function BlogIndexPage(props: { params: Promise<{ locale: string }> }) {
   const { locale } = await props.params;

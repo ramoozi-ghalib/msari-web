@@ -31,7 +31,7 @@ export default function DestinationDetailClient({ destination, locale }: Destina
   return (
     <div className="min-h-screen bg-[var(--surface-page)] space-y-6 sm:space-y-8 pb-20">
       {/* ─── 1. HERO SECTION (Full-Width Banner with Light Brand Gradient & Pure White Title) ─── */}
-      <div className="relative w-full overflow-hidden bg-[var(--brand-dark)] pt-24 sm:pt-32 pb-14 sm:pb-18 shadow-lg">
+      <div className="relative w-full overflow-hidden bg-[var(--brand-dark)] pt-24 sm:pt-32 pb-14 sm:pb-18 lg:pt-40 lg:pb-24 lg:min-h-[460px] flex flex-col justify-center shadow-lg">
         {destination.heroImage ? (
           <Image
             src={destination.heroImage}

@@ -9,33 +9,49 @@ import {
 } from 'lucide-react';
 import { sanitizeHtml, safeJsonLd } from '@/lib/sanitize';
 
+import { getLocalizedAlternates, generateBreadcrumbSchema } from '@/lib/seo';
+
 interface BlogDetailPageProps {
   params: Promise<{ slug: string; locale: string }>;
 }
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const post = await getBlogPostBySlug(slug);
+  const isEn = locale === 'en';
 
   if (!post) {
-    return { title: 'المقال غير موجود — مساري' };
+    return { title: isEn ? 'Article Not Found — Msari' : 'المقال غير موجود — مساري' };
   }
 
+  const pageTitle = `${post.title} — ${isEn ? 'Msari Blog' : 'مدونة مساري'}`;
+
   return {
-    title: `${post.title} — مدونة مساري`,
+    title: pageTitle,
     description: post.excerpt,
-    alternates: { canonical: `https://msari.net/ar/blog/${post.slug}` },
+    alternates: getLocalizedAlternates(`/blog/${post.slug}`, locale),
     openGraph: {
       title: post.title,
       description: post.excerpt,
       images: [{ url: post.coverImage }],
-      url: `https://msari.net/ar/blog/${post.slug}`,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/blog/${post.slug}`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'article',
+      publishedTime: post.publishedAt,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.coverImage],
     },
   };
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug, locale } = await params;
+  const isEn = locale === 'en';
   const currentLocale = locale || 'ar';
   const post = await getBlogPostBySlug(slug);
 
@@ -44,13 +60,14 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   }
 
   // Structured Article Schema (Published by Msari Travel)
-  const jsonLd = {
+  const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
     image: post.coverImage,
     datePublished: post.publishedAt,
+    url: `https://msari.net/${isEn ? 'en' : 'ar'}/blog/${post.slug}`,
     publisher: {
       '@type': 'Organization',
       name: 'مساري (Msari Travel)',
@@ -60,9 +77,27 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         url: 'https://msari.net/logo.png',
       },
     },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://msari.net/${isEn ? 'en' : 'ar'}/blog/${post.slug}`,
+    },
   };
 
-  const formattedDate = new Date(post.publishedAt).toLocaleDateString('ar-YE', {
+  const breadcrumbs = isEn
+    ? [
+        { name: 'Home', url: '/en' },
+        { name: 'Blog', url: '/en/blog' },
+        { name: post.title, url: `/en/blog/${post.slug}` },
+      ]
+    : [
+        { name: 'الرئيسية', url: '/ar' },
+        { name: 'المدونة', url: '/ar/blog' },
+        { name: post.title, url: `/ar/blog/${post.slug}` },
+      ];
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+
+  const formattedDate = new Date(post.publishedAt).toLocaleDateString(isEn ? 'en-US' : 'ar-YE', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -72,7 +107,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     <div className="min-h-screen bg-white text-neutral-900 pb-28">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
 
       {/* ─── 1. Cinematic Hero Section (Official Cover Image as Hero) ─── */}

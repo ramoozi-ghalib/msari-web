@@ -7,16 +7,41 @@ import {
 } from 'lucide-react';
 import { PagesCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'من نحن — مساري لخدمات السفر والسياحة',
-  description: 'مساري هي منصة السفر الأولى والرائدة في اليمن، نربطك بأفضل الفنادق والرحلات الجوية وخدمات السيارات بأعلى معايير الأمان والشفافية.',
-  alternates: { canonical: 'https://msari.net/ar/about' },
-  openGraph: {
-    title: 'من نحن — مساري لخدمات السفر والسياحة',
-    description: 'مساري هي منصة السفر الأولى في اليمن، نربطك بأفضل الفنادق والرحلات الجوية وخدمات السيارات بأسعار تنافسية.',
-    url: 'https://msari.net/ar/about',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'About Us — Msari Travel & Tourism Services'
+    : 'من نحن — مساري لخدمات السفر والسياحة';
+
+  const description = isEn
+    ? 'Msari is the leading travel platform in Yemen, connecting you with top hotels, flights, and car transportation with highest safety standards.'
+    : 'مساري هي منصة السفر الأولى والرائدة في اليمن، نربطك بأفضل الفنادق والرحلات الجوية وخدمات السيارات بأعلى معايير الأمان والشفافية.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/about', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/about`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 const VALUE_ICONS: Record<string, any> = {
   Shield: ShieldCheck,

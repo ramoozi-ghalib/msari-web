@@ -4,16 +4,41 @@ import Image from 'next/image';
 import { Car, MapPin, Clock, Shield, Star, Phone, CheckCircle, ArrowLeft } from 'lucide-react';
 import { PagesCmsService, SettingsCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'تاكسي المطار — مساري',
-  description: 'احجز تاكسي المطار في اليمن بسهولة. خدمة استقبال احترافية من وإلى المطار في صنعاء وعدن.',
-  alternates: { canonical: 'https://msari.net/ar/cars/airport' },
-  openGraph: {
-    title: 'تاكسي المطار — مساري',
-    description: 'احجز تاكسي المطار في اليمن بسهولة. خدمة استقبال احترافية من وإلى المطار في صنعاء وعدن.',
-    url: 'https://msari.net/ar/cars/airport',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'Airport Taxi & Airport Transfers in Yemen | Msari'
+    : 'تاكسي المطار وتوصيل المطارات في اليمن (عدن، صنعاء، سيئون) | مساري';
+
+  const description = isEn
+    ? 'Book reliable airport taxi and private transfers in Yemen with professional meet and greet in Aden, Sanaa, and Seiyun.'
+    : 'احجز تاكسي المطار في اليمن بسهولة مع مساري. خدمة استقبال احترافية وسيارات حديثة من وإلى مطارات عدن، صنعاء، وسيئون بأفضل الأسعار.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/cars/airport', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/cars/airport`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 const ICON_MAP: Record<string, any> = {
   Clock,

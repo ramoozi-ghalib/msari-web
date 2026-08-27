@@ -1,16 +1,38 @@
 import type { Metadata } from 'next';
 import { PagesCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: 'شروط الاستخدام — مساري',
-  description: 'شروط وأحكام استخدام منصة مساري لخدمات السفر والحجز في اليمن.',
-  alternates: { canonical: 'https://msari.net/ar/terms' },
-  openGraph: {
-    title: 'شروط الاستخدام — مساري',
-    description: 'شروط وأحكام استخدام منصة مساري لخدمات السفر والحجز في اليمن.',
-    url: 'https://msari.net/ar/terms',
-  },
-};
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn ? 'Terms & Conditions | Msari' : 'شروط الاستخدام والأحكام | مساري';
+  const description = isEn
+    ? 'Terms and conditions for using Msari platform for hotel booking and travel services in Yemen.'
+    : 'شروط وأحكام استخدام منصة مساري لخدمات السفر والحجز الفندقي في اليمن.';
+
+  return {
+    title,
+    description,
+    alternates: getLocalizedAlternates('/terms', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${isEn ? 'en' : 'ar'}/terms`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function TermsPage() {
   const data = await PagesCmsService.getTermsPage();

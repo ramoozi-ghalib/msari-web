@@ -70,17 +70,20 @@ async function fetchHomepageInternal(): Promise<HomepageContentData> {
     return FALLBACK_HOMEPAGE;
   }
 
+  const rawHero = (data.hero || {}) as any;
+  const heroBg = rawHero.bgImageUrl || rawHero.backgroundImageUrl || rawHero.imageUrl || FALLBACK_HOMEPAGE.hero.backgroundImageUrl;
+
   return {
     hero: {
-      badgeAr: data.hero?.badgeAr || FALLBACK_HOMEPAGE.hero.badgeAr,
-      badgeEn: data.hero?.badgeEn,
-      titleAr: data.hero?.titleAr || FALLBACK_HOMEPAGE.hero.titleAr,
-      titleEn: data.hero?.titleEn,
-      subtitleAr: data.hero?.subtitleAr || FALLBACK_HOMEPAGE.hero.subtitleAr,
-      subtitleEn: data.hero?.subtitleEn,
-      backgroundImageUrl: data.hero?.backgroundImageUrl || FALLBACK_HOMEPAGE.hero.backgroundImageUrl,
-      stats: Array.isArray(data.hero?.stats) && data.hero.stats.length > 0
-        ? data.hero.stats
+      badgeAr: rawHero.badgeAr || (data as any).hero_badge_text || FALLBACK_HOMEPAGE.hero.badgeAr,
+      badgeEn: rawHero.badgeEn,
+      titleAr: rawHero.titleAr || FALLBACK_HOMEPAGE.hero.titleAr,
+      titleEn: rawHero.titleEn,
+      subtitleAr: rawHero.subtitleAr || FALLBACK_HOMEPAGE.hero.subtitleAr,
+      subtitleEn: rawHero.subtitleEn,
+      backgroundImageUrl: heroBg,
+      stats: Array.isArray(rawHero.stats) && rawHero.stats.length > 0
+        ? rawHero.stats
         : FALLBACK_HOMEPAGE.hero.stats,
     },
     whyMsari: {

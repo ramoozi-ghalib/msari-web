@@ -11,20 +11,41 @@ import { getActiveOffers } from '@/actions/offers';
 import { getActiveCities } from '@/actions/cities';
 import { HomepageCmsService, SettingsCmsService } from '@/services/cms';
 
-export const metadata: Metadata = {
-  title: {
-    absolute: 'مساري | بوابتك لحجز أفضل فنادق اليمن',
-  },
-  description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك مع خدمة عملاء مميزة على مدار الساعة.',
-  alternates: {
-    canonical: 'https://msari.net/ar',
-    languages: {
-      'ar': 'https://msari.net/ar',
-      'en': 'https://msari.net/en',
-      'x-default': 'https://msari.net/ar',
+import { getLocalizedAlternates } from '@/lib/seo';
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  const title = isEn
+    ? 'Msari | Your Gateway to Hotel Booking in Yemen'
+    : 'مساري | بوابتك لحجز أفضل فنادق اليمن';
+
+  const description = isEn
+    ? 'Book the best hotels in Yemen with ease on Msari. Enjoy exclusive rates and multiple options for Aden, Sanaa, Mukalla, and Taiz.'
+    : 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك في عدن، صنعاء، تعز، والمكلا مع خدمة عملاء مميزة.';
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: getLocalizedAlternates('', locale),
+    openGraph: {
+      title,
+      description,
+      url: `https://msari.net/${locale === 'en' ? 'en' : 'ar'}`,
+      siteName: 'مساري',
+      locale: isEn ? 'en_US' : 'ar_YE',
+      type: 'website',
     },
-  },
-};
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function HomePage() {
   const [{ data: hotels }, offers, cities, homepageContent, settings] = await Promise.all([
