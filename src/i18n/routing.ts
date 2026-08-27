@@ -8,8 +8,8 @@ export const routing = defineRouting({
   // Used when no locale matches
   defaultLocale: 'ar',
   
-  // You can set localePrefix to 'as-needed' to keep default locale clean
-  localePrefix: 'as-needed' 
+  // Unified locale prefix: 'always' ensures explicit /ar and /en canonical URLs matching sitemap.xml
+  localePrefix: 'always' 
 });
 
 // Lightweight wrappers around Next.js' navigation APIs
