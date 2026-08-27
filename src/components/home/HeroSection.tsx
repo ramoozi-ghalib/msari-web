@@ -71,6 +71,30 @@ export default function HeroSection({ hero }: HeroSectionProps) {
   const heroTitle = hero?.titleAr || 'حجزك أسهل... مع مساري';
   const heroSubtitle = hero?.subtitleAr || 'احجز فندقك في اليمن بأفضل سعر';
 
+  const renderHeroTitle = (title: string) => {
+    if (title.includes('مع مساري')) {
+      const parts = title.split('مع مساري');
+      return (
+        <>
+          {parts[0]}
+          <span className="text-[#FF3B30] drop-shadow-md">مع مساري</span>
+          {parts.slice(1).join('مع مساري')}
+        </>
+      );
+    }
+    if (title.includes('with Msari')) {
+      const parts = title.split('with Msari');
+      return (
+        <>
+          {parts[0]}
+          <span className="text-[#FF3B30] drop-shadow-md">with Msari</span>
+          {parts.slice(1).join('with Msari')}
+        </>
+      );
+    }
+    return title;
+  };
+
   return (
     <div className="relative w-full">
       
@@ -95,17 +119,17 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center w-full">
           
           <div className="text-center space-y-2.5 sm:space-y-4 mb-2">
-            {/* Line 1: Dynamic Title */}
+            {/* Line 1: Dynamic Title with Brand Red Highlight */}
             <h1 
-              className="font-extrabold text-white leading-tight tracking-tight max-w-full drop-shadow-xl"
+              className="font-extrabold text-white whitespace-nowrap leading-tight tracking-tight max-w-full drop-shadow-xl"
               style={{ fontSize: 'clamp(18px, 3.5vw, 28px)' }}
             >
-              {heroTitle}
+              {renderHeroTitle(heroTitle)}
             </h1>
 
             {/* Line 2: Dynamic Subtitle */}
             <p 
-              className="font-semibold text-white/95 leading-tight max-w-full drop-shadow-lg"
+              className="font-semibold text-white/95 whitespace-nowrap leading-tight max-w-full drop-shadow-lg"
               style={{ fontSize: 'clamp(11px, 2vw, 15px)' }}
             >
               {heroSubtitle}
