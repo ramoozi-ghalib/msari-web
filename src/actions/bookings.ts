@@ -19,7 +19,6 @@ import { revalidatePath } from 'next/cache';
 import { BookingStatus, PaymentMethod, Prisma } from '@prisma/client';
 
 import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { apiClient } from '@/lib/api-client';
 import { db, admin, storage } from '@/lib/firebase-admin';

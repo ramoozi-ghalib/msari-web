@@ -1,9 +1,7 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
-import { prisma } from '@/lib/prisma';
 import { RegisterSchema } from '@/schemas/auth.schema';
-import { Prisma } from '@prisma/client';
 
 import { apiClient } from '@/lib/api-client';
 

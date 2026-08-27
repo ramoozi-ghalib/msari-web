@@ -21,7 +21,7 @@ if (getApps().length === 0) {
 
 const db = getFirestore();
 const BASE_URL = process.env.TEST_URL || 'http://localhost:3000';
-const REVALIDATE_SECRET = 'msari_cms_revalidate_prod_2026_xK9mP3';
+const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN || '';
 
 async function revalidate(tag, path) {
   try {

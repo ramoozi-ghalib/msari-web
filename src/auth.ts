@@ -11,12 +11,10 @@
  *   handlers — GET/POST handlers for /api/auth/[...nextauth] route
  */
 import NextAuth from 'next-auth';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { headers } from 'next/headers';
 
-import { prisma } from '@/lib/prisma';
 import { authConfig } from './auth.config';
 import { LoginSchema } from '@/schemas/auth.schema';
 import {
