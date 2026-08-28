@@ -80,7 +80,9 @@ export const adminActionLimiter = makeLimiter('1 h', 200, 'action:admin');
 
 // ─── 4. تحديد رفع الملفات (per userId) ──────────────────────────────────────
 // الحد: 30 رفع/ساعة — أقل من العمليات العامة لأن الرفع أكثر تكلفةً
-export const uploadLimiter = makeLimiter('1 h', 30, 'upload');
+// ─── 4. Booking creation (per caller identity) ───────────────────────────────
+// الحد: 10 حجوزات/ساعة — يمنع إغراق نظام الحجز وإشعارات الإدارة
+export const bookingLimiter = makeLimiter('1 h', 10, 'booking:create');
 
 // ─── 5. تحديد طلبات الـ API العامة (per IP) ──────────────────────────────────
 // [FIX H-4] الحد: 60 طلب/دقيقة — يتيح الاستخدام الطبيعي ويوقف الاستنزاف الآلي

@@ -16,7 +16,6 @@
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { BookingStatus, PaymentMethod, Prisma } from '@prisma/client';
 
 import crypto from 'crypto';
 import { auth } from '@/auth';
@@ -29,6 +28,8 @@ import {
 } from '@/lib/action-guard';
 import { Policies } from '@/lib/policies';
 import { clampLimit } from '@/lib/action-utils';
+import { bookingLimiter, RATE_LIMIT_RESPONSE } from '@/lib/rate-limiter';
+import { validateReceiptDataUrl, RECEIPT_MAX_BASE64_CHARS } from '@/lib/receipt-validation';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -37,12 +38,15 @@ import { clampLimit } from '@/lib/action-utils';
 /** الحد الأقصى لليالي المسموح بها في حجز واحد */
 const MAX_NIGHTS = 90;
 
+/** حالات الحجز — مطابقة لنموذج التطبيق التشغيلي في Firestore */
+type BookingStatusKey = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
+
 /**
  * الانتقالات المسموح بها بين حالات الحجز.
  * لا يمكن الانتقال إلا عبر هذه الخريطة — أي حالة غير مدرجة هي خطأ.
  */
 const ALLOWED_TRANSITIONS: Readonly<
-  Partial<Record<BookingStatus, BookingStatus[]>>
+  Partial<Record<BookingStatusKey, BookingStatusKey[]>>
 > = {
   PENDING:   ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['COMPLETED', 'CANCELLED', 'NO_SHOW'],
@@ -72,7 +76,7 @@ const CreateBookingSchema = z.object({
   transferAmount:       z.number().nonnegative().optional(),
   transferCurrencyCode: z.string().optional(),
   transferToNumber:     z.string().max(50).trim().optional(),
-  receiptDataUrl:       z.string().optional(),
+  receiptDataUrl:       z.string().max(RECEIPT_MAX_BASE64_CHARS, 'حجم إيصال الدفع يتجاوز الحد المسموح (2MB)').optional(),
   receiptFileName:      z.string().max(200).optional(),
   notes:                z.string().max(1000).trim().optional(),
 }).strict();
@@ -88,80 +92,12 @@ const GetMyBookingsSchema = z.object({
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * [FIX H-1] يولّد كود حجز فريد بصيغة MS-XXXXXXXX باستخدام
- * crypto.getRandomValues() — آمن تشفيرياً (CSPRNG).
- *
- * الأحرف المختارة تستبعد: 0/O و 1/I/l لتفادي الالتباس البصري.
- * السابق: Math.random() — غير آمن وقابل للتنبؤ.
- */
-function generateBookingCode(): string {
-  const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = new Uint8Array(8);
-  crypto.getRandomValues(bytes);
-  let code = 'MS-';
-  for (let i = 0; i < 8; i++) {
-    code += charset[bytes[i] % charset.length];
-  }
-  return code;
-}
-
-/**
- * يحاول توليد كود فريد في DB بعدد محدد من المحاولات.
- * الاحتمال الإحصائي للتعارض ضئيل جداً مع 8 أحرف (32^8 ≈ 1 تريليون تركيبة).
- */
-async function generateUniqueCode(tx: Prisma.TransactionClient): Promise<string | null> {
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const code = generateBookingCode();
-    const existing = await tx.booking.findUnique({
-      where: { code },
-      select: { code: true },
-    });
-    if (!existing) return code;
-  }
-  return null;
-}
-
-/**
  * يحسب عدد الليالي من تاريخين.
  * يُستدعى server-side فقط — قيمة الـ Client تُتجاهل دائماً.
  */
 function calculateNights(checkIn: Date, checkOut: Date): number {
   const msPerDay = 1000 * 60 * 60 * 24;
   return Math.round((checkOut.getTime() - checkIn.getTime()) / msPerDay);
-}
-
-/**
- * يُعيد تنفيذ الـ transaction عند فشل الـ Serialization (Prisma P2034).
- */
-async function withSerializableRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries = 3,
-): Promise<T> {
-  let lastError: unknown;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-
-      const isSerializationError =
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2034';
-
-      if (!isSerializationError || attempt === maxRetries) {
-        throw error;
-      }
-
-      const delay = 50 * Math.pow(2, attempt - 1);
-      console.warn(
-        `[withSerializableRetry] Serialization conflict (attempt ${attempt}/${maxRetries}). Retrying in ${delay}ms.`
-      );
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
-
-  throw lastError;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -232,6 +168,16 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
   }
 
   const input = parsed.data;
+
+  // [F4 CLOSURE] Booking-creation rate limit — 10/hour per caller identity.
+  // Guests are keyed by their (validated) email; logged-in users by uid.
+  const limiterKey = (callerUser?.id || input.guestEmail).toLowerCase();
+  const bookingAllowed = await bookingLimiter.limit(limiterKey);
+  if (!bookingAllowed.success) {
+    logger('warn', 'Booking creation rate limit exceeded', { key: limiterKey.slice(0, 3) + '***' });
+    return RATE_LIMIT_RESPONSE;
+  }
+
   const checkIn = new Date(input.checkIn);
   const checkOut = new Date(input.checkOut);
   const now = new Date();
@@ -277,17 +223,29 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
       let receiptUrl = '';
       let receiptStoragePath = '';
       if (input.receiptDataUrl) {
+        // [F4 CLOSURE] Deep validation before any Storage write:
+        // format -> MIME allowlist -> size limit -> magic bytes.
+        const receipt = validateReceiptDataUrl(input.receiptDataUrl);
+        if (!receipt.ok) {
+          logger('warn', 'Receipt validation failed', { reason: receipt.reason });
+          await releaseLockSafely();
+          return {
+            success: false as const,
+            error: {
+              code: 'VALIDATION_ERROR' as const,
+              message: 'ملف الإيصال غير صالح — يجب أن يكون صورة (JPG/PNG/WEBP) بحجم لا يتجاوز 2MB',
+            },
+          };
+        }
         try {
           const bucket = storage.bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'msariapp-v2.firebasestorage.app');
-          const ext = (input.receiptFileName?.split('.').pop() || 'jpg').toLowerCase();
+          const ext = receipt.contentType === 'image/png' ? 'png' : receipt.contentType === 'image/webp' ? 'webp' : 'jpg';
           const filePath = `booking_receipts/${userId}/${bookingNumber}.${ext}`;
           const file = bucket.file(filePath);
-          const base64Data = input.receiptDataUrl.replace(/^data:image\/\w+;base64,/, '');
-          const buffer = Buffer.from(base64Data, 'base64');
-          
-          await file.save(buffer, {
+
+          await file.save(receipt.buffer, {
             metadata: {
-              contentType: `image/${ext === 'png' ? 'png' : ext === 'webp' ? 'webp' : 'jpeg'}`,
+              contentType: receipt.contentType,
               metadata: {
                 bookingNumber,
                 userId,
