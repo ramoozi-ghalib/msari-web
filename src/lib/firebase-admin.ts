@@ -22,9 +22,9 @@ if (!admin.apps.length) {
     } catch (error) {
       console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK from env:', error);
     }
-  } else if (fs.existsSync(keyPath)) {
+  } else if (fs.existsSync(/*turbopackIgnore: true*/ keyPath)) {
     try {
-      const serviceAccount = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+      const serviceAccount = JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ keyPath, 'utf8'));
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
