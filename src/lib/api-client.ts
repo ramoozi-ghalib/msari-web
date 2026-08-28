@@ -357,7 +357,6 @@ class ApiClient {
     name: string;
     phone?: string;
     image?: string;
-    role: 'CUSTOMER' | 'ADMIN' | 'BOOKING_STAFF';
     token?: string;
   }>> {
     const res = await this.post<{
@@ -386,7 +385,10 @@ class ApiClient {
       profilePicture?: string;
     }>('/me', { Authorization: `Bearer ${res.data.token}` });
 
-    const role = (email.endsWith('@msari.net') || email === 'admin@msari.net') ? 'ADMIN' as const : 'CUSTOMER' as const;
+    // [SECURITY FIX] Role is NO LONGER derived from the email suffix here.
+    // Role resolution is performed server-side in auth.ts via
+    // resolveUserRole() against the operational Firestore `admins`
+    // registry. The API response carries identity only.
     const me = meRes.success && meRes.data ? meRes.data : null;
     const name = me ? (me.name || `${me.firstName || ''} ${me.lastName || ''}`.trim() || 'User') : 'User';
     const phone = me ? (me.phoneNumber || '') : '';
@@ -400,7 +402,6 @@ class ApiClient {
         name,
         phone,
         image,
-        role,
         token: res.data.token,
       },
     };

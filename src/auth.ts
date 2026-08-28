@@ -17,12 +17,13 @@ import { headers } from 'next/headers';
 
 import { authConfig } from './auth.config';
 import { LoginSchema } from '@/schemas/auth.schema';
+import { resolveUserRole } from '@/lib/user-roles';
+import type { UserRole } from '@/lib/user-roles';
 import {
   loginEmailIpLimiter,
   loginIpLimiter,
   getClientIp,
 } from '@/lib/rate-limiter';
-import type { UserRole } from '@prisma/client';
 import { apiClient } from '@/lib/api-client';
 
 // Hash وهمي ثابت لمنع Timing Attack:
@@ -112,12 +113,16 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         try {
           const apiRes = await apiClient.loginUser(email, password);
           if (apiRes.success && apiRes.data) {
+            // [SECURITY FIX] Role is resolved from the authoritative operational
+            // Firestore `admins` registry — never from the email address.
+            // Fail-closed: any resolution error yields 'CUSTOMER'.
+            const role = await resolveUserRole(apiRes.data.id);
             return {
               id: apiRes.data.id,
               email: apiRes.data.email,
               name: apiRes.data.name,
               phone: apiRes.data.phone || '',
-              role: apiRes.data.role as UserRole,
+              role,
               token: apiRes.data.token,
               image: apiRes.data.image || '',
             };

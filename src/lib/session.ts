@@ -11,7 +11,6 @@
  */
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { UserRole } from '@prisma/client';
 import type { Session } from 'next-auth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

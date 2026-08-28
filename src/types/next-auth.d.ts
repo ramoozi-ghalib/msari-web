@@ -7,7 +7,7 @@
  *
  * These declarations merge with Auth.js's own types at compile time.
  */
-import type { UserRole } from '@prisma/client';
+import type { UserRole } from '@/lib/user-roles';
 
 declare module 'next-auth' {
   /**
