@@ -26,7 +26,6 @@ export function getLocalizedAlternates(path: string, locale: string = 'ar') {
     canonical: canonicalUrl,
     languages: {
       'ar': arUrl,
-      'en': enUrl,
       'x-default': arUrl, // Arabic is the default primary market
     },
   };

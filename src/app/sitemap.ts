@@ -5,7 +5,7 @@ export const revalidate = 86400; // Revalidate every 24 hours at runtime
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://msari.net';
-  const locales = ['ar', 'en'];
+  const locales = ['ar']; // English (/en) excluded from sitemap until editorial content is complete
 
   const staticRoutes = [
     { path: '', priority: 1.0, changeFrequency: 'daily' as const },

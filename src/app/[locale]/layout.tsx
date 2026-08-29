@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -10,6 +11,35 @@ import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
 // Having <html><body> here AND in the root layout causes nested HTML errors in React.
 import { setRequestLocale, getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+
+export async function generateMetadata(
+  props: { params: Promise<{ locale: string }> }
+): Promise<Metadata> {
+  const { locale } = await props.params;
+  const isEn = locale === 'en';
+
+  return {
+    robots: isEn
+      ? {
+          index: false,
+          follow: true,
+          googleBot: {
+            index: false,
+            follow: true,
+          },
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+          },
+        },
+  };
+}
 
 export default async function LocaleLayout(
   props: { children: React.ReactNode; params: Promise<{ locale: string }> }
