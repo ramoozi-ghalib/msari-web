@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 import { Cairo, Inter } from 'next/font/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
