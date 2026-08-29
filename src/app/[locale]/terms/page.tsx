@@ -67,10 +67,10 @@ export default async function TermsPage() {
           )}
 
           {/* Sections */}
-          {data.sections.map((section) => (
+          {(data.sections || []).map((section) => (
             <div key={section.id || section.title} className="bg-white rounded-2xl p-8 shadow-sm border border-neutral-100">
               <h2 className="text-xl font-black text-neutral-900 mb-4">{section.title}</h2>
-              {section.content.map((p, idx) => (
+              {(section.content || []).map((p, idx) => (
                 <p key={idx} className="text-neutral-600 text-sm leading-relaxed mb-2">
                   {p}
                 </p>

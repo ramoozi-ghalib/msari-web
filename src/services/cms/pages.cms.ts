@@ -449,6 +449,16 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
     ];
   }
 
+  const sanitizedSections = Array.isArray(sections) && sections.length > 0
+    ? sections.map((s: any, idx: number) => ({
+        id: String(s?.id || `sec-${idx}`),
+        title: String(s?.title || ''),
+        content: Array.isArray(s?.content)
+          ? s.content.map((item: any) => String(item || '')).filter(Boolean)
+          : (s?.content ? [String(s.content)] : []),
+      }))
+    : fallback.sections;
+
   return {
     type: 'legal_page',
     slug,
@@ -458,8 +468,16 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
     status: 'published',
     isPublished: true,
     intro: data.intro || fallback.intro,
-    sections: Array.isArray(sections) && sections.length > 0 ? sections : fallback.sections,
+    sections: sanitizedSections.length > 0 ? sanitizedSections : fallback.sections,
   };
+}
+
+async function fetchPrivacyInternal(): Promise<LegalPageData> {
+  return fetchLegalInternal('privacy');
+}
+
+async function fetchTermsInternal(): Promise<LegalPageData> {
+  return fetchLegalInternal('terms');
 }
 
 async function fetchDevelopersInternal(): Promise<DevelopersPageData> {
@@ -681,13 +699,13 @@ export class PagesCmsService {
   );
 
   static getPrivacyPage = unstable_cache(
-    () => fetchLegalInternal('privacy'),
+    fetchPrivacyInternal,
     ['website_page_privacy'],
     { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:privacy'] }
   );
 
   static getTermsPage = unstable_cache(
-    () => fetchLegalInternal('terms'),
+    fetchTermsInternal,
     ['website_page_terms'],
     { revalidate: CMS_REVALIDATE, tags: ['cms:pages', 'cms:page:terms'] }
   );

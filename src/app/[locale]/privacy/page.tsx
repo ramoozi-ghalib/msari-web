@@ -68,11 +68,11 @@ export default async function PrivacyPage() {
 
           {/* Sections */}
           <div className="space-y-10">
-            {data.sections.map((section) => (
+            {(data.sections || []).map((section) => (
               <div key={section.id || section.title} className="bg-white rounded-2xl p-8 shadow-sm border border-neutral-100">
                 <h2 className="text-xl font-black text-neutral-900 mb-5">{section.title}</h2>
                 <ul className="space-y-3">
-                  {section.content.map((item, i) => (
+                  {(section.content || []).map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-neutral-600 text-sm leading-relaxed">
                       <span className="w-5 h-5 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold">✓</span>
                       {item}
