@@ -565,18 +565,20 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
   const sanitizedSections = Array.isArray(sections) && sections.length > 0
     ? sections.map((s: any, idx: number) => {
         let contentArr: string[] = [];
-        if (Array.isArray(s?.content)) {
-          contentArr = s.content.map((item: any) => String(item || '')).filter(Boolean);
+        if (Array.isArray(s?.items) && s.items.length > 0) {
+          contentArr = s.items.map((item: any) => String(item || '').trim()).filter(Boolean);
+        } else if (Array.isArray(s?.content)) {
+          contentArr = s.content.map((item: any) => String(item || '').trim()).filter(Boolean);
         } else if (typeof s?.content === 'string') {
           let str = s.content.trim();
           if (str.startsWith('[') && str.endsWith(']')) {
             str = str.slice(1, -1).trim();
           }
-          contentArr = str ? [str] : [];
+          contentArr = str.split('\n').map((line: string) => line.trim()).filter(Boolean);
         }
         return {
           id: String(s?.id || `sec-${idx}`),
-          title: String(s?.title || ''),
+          title: String(s?.title || fallback.sections[idx]?.title || ''),
           content: contentArr.length > 0 ? contentArr : (fallback.sections[idx]?.content || []),
         };
       })

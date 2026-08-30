@@ -56,6 +56,7 @@ export default function ProfileClient({ user, locale }: ProfileClientProps) {
                   className="object-cover"
                   sizes="(max-width: 640px) 64px, 80px"
                   onError={() => setImageError(true)}
+                  unoptimized
                   priority
                 />
               ) : (

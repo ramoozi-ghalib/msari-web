@@ -10,6 +10,8 @@ if (!admin.apps.length) {
 
   const keyPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || '';
 
+  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'msariapp-v2.firebasestorage.app';
+
   if (projectId && clientEmail && privateKey) {
     try {
       admin.initializeApp({
@@ -18,6 +20,7 @@ if (!admin.apps.length) {
           clientEmail,
           privateKey,
         }),
+        storageBucket,
       });
     } catch (error) {
       console.warn('[firebase-admin] ⚠️ Failed to initialize Firebase Admin SDK from env:', error);
@@ -27,6 +30,7 @@ if (!admin.apps.length) {
       const serviceAccount = JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ keyPath, 'utf8'));
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
+        storageBucket,
       });
 
     } catch (error) {

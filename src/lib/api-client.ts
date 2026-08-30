@@ -385,14 +385,16 @@ class ApiClient {
       profilePicture?: string;
     }>('/me', { Authorization: `Bearer ${res.data.token}` });
 
-    // [SECURITY FIX] Role is NO LONGER derived from the email suffix here.
-    // Role resolution is performed server-side in auth.ts via
-    // resolveUserRole() against the operational Firestore `admins`
-    // registry. The API response carries identity only.
-    const me = meRes.success && meRes.data ? meRes.data : null;
-    const name = me ? (me.name || `${me.firstName || ''} ${me.lastName || ''}`.trim() || 'User') : 'User';
-    const phone = me ? (me.phoneNumber || '') : '';
-    const image = me ? (me.profileImageUrl || me.photoURL || me.photoUrl || me.avatarUrl || me.image || me.profilePicture || '') : '';
+    // Deep unwrap for /me response structure (whether nested under data, user, customer, profile or flat)
+    const rawMe = meRes.success && meRes.data ? (meRes.data as any) : null;
+    const me = rawMe?.user || rawMe?.customer || rawMe?.profile || rawMe?.data || rawMe;
+
+    const firstName = me?.firstName || me?.first_name || '';
+    const lastName = me?.lastName || me?.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    const name = me ? (me.name || me.displayName || (fullName.length > 0 ? fullName : '') || me.email?.split('@')[0] || 'المستخدم') : 'المستخدم';
+    const phone = me ? (me.phoneNumber || me.phone_number || me.phone || me.mobile || '') : '';
+    const image = me ? (me.profileImageUrl || me.profile_image_url || me.photoURL || me.photoUrl || me.avatarUrl || me.avatar_url || me.image || me.profilePicture || me.avatar || me.picture || '') : '';
 
     return {
       success: true,

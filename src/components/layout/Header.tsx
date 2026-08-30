@@ -44,7 +44,11 @@ export default function Header() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated' && !!session?.user;
-  const user = session?.user ? { name: session.user.name || session.user.email || 'المستخدم', email: session.user.email || '' } : null;
+  const user = session?.user ? {
+    name: session.user.name || session.user.email || 'المستخدم',
+    email: session.user.email || '',
+    image: session.user.image || '',
+  } : null;
   const logout = () => signOut({ callbackUrl: '/' });
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -186,8 +190,12 @@ export default function Header() {
                     onClick={() => setUserMenuOpen(o => !o)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all"
                   >
-                    <div className="w-5 h-5 bg-[#FF3B30] text-white rounded-full flex items-center justify-center text-[10px] font-black">
-                      {user.name.charAt(0)}
+                    <div className="w-5 h-5 bg-[#FF3B30] text-white rounded-full flex items-center justify-center text-[10px] font-black shrink-0 overflow-hidden relative">
+                      {user.image ? (
+                        <Image src={user.image} alt={user.name} fill className="object-cover" unoptimized sizes="20px" />
+                      ) : (
+                        <span>{user.name.charAt(0)}</span>
+                      )}
                     </div>
                     <span className="max-w-[70px] truncate">{user.name.split(' ')[0]}</span>
                     <ChevronDown size={12} className={cn('transition-transform', userMenuOpen && 'rotate-180')} />

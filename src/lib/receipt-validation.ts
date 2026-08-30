@@ -14,14 +14,14 @@
  * not alter any Operational API contract (no booking API exists — proven).
  */
 
-/** Maximum accepted receipt size: 2 MB (binary, after base64 decode). */
-export const RECEIPT_MAX_BYTES = 2 * 1024 * 1024;
+/** Maximum accepted receipt size: 5 MB (binary, after base64 decode). */
+export const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 
 /**
  * Maximum accepted base64 string length (chars).
- * base64 inflates 4/3: ceil(2MB / 3) * 4 = 2,796,204 chars + "data:...;base64," prefix.
+ * base64 inflates 4/3: ceil(5MB / 3) * 4 = ~7MB + "data:...;base64," prefix.
  */
-export const RECEIPT_MAX_BASE64_CHARS = 3_000_000;
+export const RECEIPT_MAX_BASE64_CHARS = 8_000_000;
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 

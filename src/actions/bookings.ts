@@ -76,7 +76,7 @@ const CreateBookingSchema = z.object({
   transferAmount:       z.number().nonnegative().optional(),
   transferCurrencyCode: z.string().optional(),
   transferToNumber:     z.string().max(50).trim().optional(),
-  receiptDataUrl:       z.string().max(RECEIPT_MAX_BASE64_CHARS, 'حجم إيصال الدفع يتجاوز الحد المسموح (2MB)').optional(),
+  receiptDataUrl:       z.string().max(RECEIPT_MAX_BASE64_CHARS, 'حجم إيصال الدفع يتجاوز الحد المسموح').optional(),
   receiptFileName:      z.string().max(200).optional(),
   notes:                z.string().max(1000).trim().optional(),
 }).strict();
@@ -242,11 +242,13 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           const ext = receipt.contentType === 'image/png' ? 'png' : receipt.contentType === 'image/webp' ? 'webp' : 'jpg';
           const filePath = `booking_receipts/${userId}/${bookingNumber}.${ext}`;
           const file = bucket.file(filePath);
+          const downloadToken = crypto.randomUUID();
 
           await file.save(receipt.buffer, {
             metadata: {
               contentType: receipt.contentType,
               metadata: {
+                firebaseStorageDownloadTokens: downloadToken,
                 bookingNumber,
                 userId,
                 paymentMethod: mappedPaymentMethod,
@@ -255,7 +257,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           });
 
           receiptStoragePath = filePath;
-          receiptUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media`;
+          receiptUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
         } catch (uploadErr) {
           logger('warn', 'Failed to upload receipt to Firebase Storage:', { uploadErr });
         }

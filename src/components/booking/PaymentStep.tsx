@@ -92,7 +92,7 @@ export default function PaymentStep({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -102,9 +102,9 @@ export default function PaymentStep({
       return;
     }
 
-    // Validate size (max 8MB)
-    if (file.size > 8 * 1024 * 1024) {
-      setValidationError('حجم الصورة كبير جداً. الحد الأقصى هو 8 ميغابايت.');
+    // Validate size (max 15MB before client compression)
+    if (file.size > 15 * 1024 * 1024) {
+      setValidationError('حجم الصورة كبير جداً. الحد الأقصى هو 15 ميغابايت.');
       return;
     }
 
@@ -112,11 +112,58 @@ export default function PaymentStep({
     setReceiptFileName(file.name);
     setReceiptFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setReceiptImage(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Compress and resize image client-side to ensure fast and lightweight upload (<500KB)
+      const compressedDataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new window.Image();
+          img.onload = () => {
+            const maxDimension = 1600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              resolve(event.target?.result as string);
+              return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            resolve(dataUrl);
+          };
+          img.onerror = () => resolve(event.target?.result as string);
+          img.src = event.target?.result as string;
+        };
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      });
+
+      if (compressedDataUrl) {
+        setReceiptImage(compressedDataUrl);
+      }
+    } catch {
+      // Fallback to raw file read
+      const reader = new FileReader();
+      reader.onload = () => {
+        setReceiptImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRemoveReceipt = () => {
