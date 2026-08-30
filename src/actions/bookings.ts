@@ -251,13 +251,19 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           };
         }
         try {
-          const bucket = storage.bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'msariapp-v2.firebasestorage.app');
+          const rawBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '';
+          const bucketName = (!rawBucket || rawBucket.includes('appspot.com'))
+            ? 'msariapp-v2.firebasestorage.app'
+            : rawBucket;
+          const bucket = storage.bucket(bucketName);
           const ext = receipt.contentType === 'image/png' ? 'png' : receipt.contentType === 'image/webp' ? 'webp' : 'jpg';
           const filePath = `booking_receipts/${userId}/${bookingNumber}.${ext}`;
           const file = bucket.file(filePath);
           const downloadToken = crypto.randomUUID();
 
           await file.save(receipt.buffer, {
+            resumable: false,
+            validation: false,
             metadata: {
               contentType: receipt.contentType,
               metadata: {
@@ -272,7 +278,8 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           receiptStoragePath = filePath;
           receiptUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
         } catch (uploadErr) {
-          logger('warn', 'Failed to upload receipt to Firebase Storage:', { uploadErr });
+          const errorMsg = uploadErr instanceof Error ? uploadErr.message : String(uploadErr);
+          logger('error', 'Failed to upload receipt to Firebase Storage:', { error: errorMsg });
         }
 
         if (mappedPaymentMethod === 'transfer' && !receiptUrl) {
