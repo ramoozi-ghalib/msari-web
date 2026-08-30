@@ -222,6 +222,19 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
     // 2. Upload Receipt to Firebase Storage if provided
       let receiptUrl = '';
       let receiptStoragePath = '';
+
+      if (mappedPaymentMethod === 'transfer' && !input.receiptDataUrl) {
+        logger('warn', 'Transfer booking submitted without receiptDataUrl');
+        await releaseLockSafely();
+        return {
+          success: false as const,
+          error: {
+            code: 'VALIDATION_ERROR' as const,
+            message: 'إشعار التحويل البنكي مطلوب لإتمام حجز التحويل.',
+          },
+        };
+      }
+
       if (input.receiptDataUrl) {
         // [F4 CLOSURE] Deep validation before any Storage write:
         // format -> MIME allowlist -> size limit -> magic bytes.
@@ -233,7 +246,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
             success: false as const,
             error: {
               code: 'VALIDATION_ERROR' as const,
-              message: 'ملف الإيصال غير صالح — يجب أن يكون صورة (JPG/PNG/WEBP) بحجم لا يتجاوز 2MB',
+              message: 'ملف الإيصال غير صالح — يجب أن يكون صورة (JPG/PNG/WEBP) بحجم لا يتجاوز 5MB',
             },
           };
         }
@@ -260,6 +273,18 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           receiptUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
         } catch (uploadErr) {
           logger('warn', 'Failed to upload receipt to Firebase Storage:', { uploadErr });
+        }
+
+        if (mappedPaymentMethod === 'transfer' && !receiptUrl) {
+          logger('error', 'Transfer booking receipt upload failed');
+          await releaseLockSafely();
+          return {
+            success: false as const,
+            error: {
+              code: 'RECEIPT_UPLOAD_FAILED' as const,
+              message: 'تعذر رفع إشعار التحويل البنكي إلى الخادم. يرجى إعادة المحاولة.',
+            },
+          };
         }
       }
 

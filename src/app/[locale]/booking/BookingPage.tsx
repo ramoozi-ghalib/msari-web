@@ -291,7 +291,7 @@ export default function BookingPage({
                   className="w-full text-white font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-md cursor-pointer"
                   style={{ background: 'linear-gradient(135deg,#23096e,#3A1C8F)' }}
                 >
-                  متابعة إلى بيانات الضيف
+                  متابعة الحجز
                 </button>
               </div>
             )}

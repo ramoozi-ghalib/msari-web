@@ -541,15 +541,14 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
 
   const data = resolveContent(raw);
 
-  // [FIX — legal pages body ownership]
-  // The page body is the TOP-LEVEL `sections` array (the full document model).
-  // The dashboard editor's `content` map may carry its own partial `sections`
-  // copy (e.g. 2 items vs 7/8) — a content-map spread must never override the
-  // canonical body. `data.intro`/`data.contactInfo` (editorial values) are
-  // still honored via the resolveContent merge below.
-  const sectionsSource = (Array.isArray(raw.sections) && raw.sections.length > 0)
-    ? raw.sections
-    : data.sections;
+  // [CANONICAL SINGLE SCHEMA]
+  // The CMS dashboard saves editorial content in `content.sections` and `content.contactInfo`.
+  // Priority: raw.content.sections -> data.sections -> raw.sections -> fallback.sections.
+  const rawContentSections = Array.isArray(raw.content?.sections) && raw.content.sections.length > 0 ? raw.content.sections : null;
+  const dataSections = Array.isArray(data.sections) && data.sections.length > 0 ? data.sections : null;
+  const topLevelSections = Array.isArray(raw.sections) && raw.sections.length > 0 ? raw.sections : null;
+
+  const sectionsSource = rawContentSections || dataSections || topLevelSections || fallback.sections;
 
   let sections = sectionsSource;
   if (!Array.isArray(sections) && data.rawContent) {
@@ -584,6 +583,19 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
       })
     : fallback.sections;
 
+  const rawContactInfo = raw.content?.contactInfo || raw.contactInfo || data.contactInfo || null;
+  const contactInfo = {
+    email: typeof rawContactInfo?.email === 'string' && rawContactInfo.email.trim()
+      ? rawContactInfo.email.trim()
+      : (slug === 'privacy' ? 'privacy@msari.net' : 'legal@msari.net'),
+    phone: typeof rawContactInfo?.phone === 'string' && rawContactInfo.phone.trim()
+      ? rawContactInfo.phone.trim()
+      : undefined,
+    address: typeof rawContactInfo?.address === 'string' && rawContactInfo.address.trim()
+      ? rawContactInfo.address.trim()
+      : undefined,
+  };
+
   return {
     type: 'legal_page',
     slug,
@@ -592,8 +604,9 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
     lastUpdatedText: raw.lastUpdatedText || fallback.lastUpdatedText,
     status: 'published',
     isPublished: true,
-    intro: data.intro || fallback.intro,
+    intro: data.intro || raw.content?.intro || fallback.intro,
     sections: sanitizedSections.length > 0 ? sanitizedSections : fallback.sections,
+    contactInfo,
   };
 }
 

@@ -77,6 +77,7 @@ export default function PaymentStep({
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [receiptFileName, setReceiptFileName] = useState<string>('');
   const [receiptFileSize, setReceiptFileSize] = useState<string>('');
+  const [isProcessingReceipt, setIsProcessingReceipt] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeAccount =
@@ -109,60 +110,79 @@ export default function PaymentStep({
     }
 
     setValidationError(null);
+    setIsProcessingReceipt(true);
     setReceiptFileName(file.name);
     setReceiptFileSize((file.size / (1024 * 1024)).toFixed(2) + ' MB');
 
     try {
       // Compress and resize image client-side to ensure fast and lightweight upload (<500KB)
-      const compressedDataUrl = await new Promise<string>((resolve) => {
+      const compressedDataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (event) => {
           const img = new window.Image();
           img.onload = () => {
-            const maxDimension = 1600;
-            let width = img.width;
-            let height = img.height;
+            try {
+              const maxDimension = 1600;
+              let width = img.width;
+              let height = img.height;
 
-            if (width > maxDimension || height > maxDimension) {
-              if (width > height) {
-                height = Math.round((height * maxDimension) / width);
-                width = maxDimension;
-              } else {
-                width = Math.round((width * maxDimension) / height);
-                height = maxDimension;
+              if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                  height = Math.round((height * maxDimension) / width);
+                  width = maxDimension;
+                } else {
+                  width = Math.round((width * maxDimension) / height);
+                  height = maxDimension;
+                }
               }
-            }
 
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-              resolve(event.target?.result as string);
-              return;
-            }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) {
+                resolve(event.target?.result as string);
+                return;
+              }
 
-            ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            resolve(dataUrl);
+              ctx.drawImage(img, 0, 0, width, height);
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+              resolve(dataUrl);
+            } catch (err) {
+              reject(err);
+            }
           };
-          img.onerror = () => resolve(event.target?.result as string);
+          img.onerror = () => reject(new Error('Failed to decode image'));
           img.src = event.target?.result as string;
         };
-        reader.onerror = () => resolve('');
+        reader.onerror = () => reject(new Error('Failed to read file'));
         reader.readAsDataURL(file);
       });
 
       if (compressedDataUrl) {
         setReceiptImage(compressedDataUrl);
+      } else {
+        throw new Error('Empty image data');
       }
     } catch {
-      // Fallback to raw file read
+      // Fallback to raw file read with validation
       const reader = new FileReader();
       reader.onload = () => {
-        setReceiptImage(reader.result as string);
+        const res = reader.result as string;
+        if (res) {
+          setReceiptImage(res);
+        } else {
+          setValidationError('فشلت قراءة ملف الإيصال. يرجى إعادة المحاولة.');
+          setReceiptImage(null);
+        }
+      };
+      reader.onerror = () => {
+        setValidationError('تعذر قراءة ملف الإيصال. يرجى اختيار ملف صالح.');
+        setReceiptImage(null);
       };
       reader.readAsDataURL(file);
+    } finally {
+      setIsProcessingReceipt(false);
     }
   };
 
@@ -170,6 +190,7 @@ export default function PaymentStep({
     setReceiptImage(null);
     setReceiptFileName('');
     setReceiptFileSize('');
+    setIsProcessingReceipt(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -181,6 +202,10 @@ export default function PaymentStep({
     setValidationError(null);
 
     if (isBankTransfer) {
+      if (isProcessingReceipt) {
+        setValidationError('جاري معالجة وتجهيز صورة الإشعار، يرجى الانتظار ثوانٍ معدودة...');
+        return;
+      }
       if (!senderName || senderName.trim().length < 2) {
         setValidationError('يرجى إدخال اسم المحوّل بالكامل (حرفين على الأقل).');
         return;
@@ -188,6 +213,10 @@ export default function PaymentStep({
       const parsedAmount = parseFloat(transferAmount.trim().replace(',', '.'));
       if (!transferAmount || isNaN(parsedAmount) || parsedAmount <= 0) {
         setValidationError('يرجى إدخال مبلغ التحويل بشكل صحيح.');
+        return;
+      }
+      if (!receiptImage) {
+        setValidationError('يرجى إرفاق صورة إشعار التحويل البنكي للمتابعة.');
         return;
       }
 
@@ -198,8 +227,8 @@ export default function PaymentStep({
         transferAmount: parsedAmount,
         transferCurrencyCode: activeAccount?.currencyCode || selectedCurrency,
         transferToNumber: activeAccount?.accountNumber || '',
-        receiptDataUrl: receiptImage || undefined,
-        receiptFileName: receiptFileName || undefined,
+        receiptDataUrl: receiptImage,
+        receiptFileName: receiptFileName || 'receipt.jpg',
       });
       return;
     }
@@ -399,7 +428,7 @@ export default function PaymentStep({
                   {/* Receipt Upload Section (مطابق لتطبيق مساري) */}
                   <div className="pt-2 border-t border-neutral-200/80">
                     <label className="block text-xs font-bold text-neutral-700 mb-2">
-                      إرفاق إشعار / إيصال التحويل (اختياري لتأكيد الحجز فوراً)
+                      إرفاق إشعار / إيصال التحويل (لتأكيد الحجز)
                     </label>
 
                     <input
@@ -411,7 +440,14 @@ export default function PaymentStep({
                       id="receipt-upload-input"
                     />
 
-                    {!receiptImage ? (
+                    {isProcessingReceipt ? (
+                      <div className="w-full border-2 border-dashed border-[#23096e]/30 rounded-xl p-4 flex flex-col items-center justify-center gap-2 bg-[#23096e]/5 text-center animate-pulse">
+                        <Loader2 size={24} className="animate-spin text-[#23096e]" />
+                        <p className="text-xs font-bold text-[#23096e]">
+                          جاري معالجة وتحسين صورة الإيصال...
+                        </p>
+                      </div>
+                    ) : !receiptImage ? (
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -424,7 +460,7 @@ export default function PaymentStep({
                           اضغط لاختيار صورة إشعار التحويل
                         </p>
                         <p className="text-[10px] text-neutral-400">
-                          PNG, JPG, WEBP حتى 8 ميغابايت
+                          PNG, JPG, WEBP حتى 15 ميغابايت
                         </p>
                       </button>
                     ) : (
@@ -585,7 +621,7 @@ export default function PaymentStep({
         <button
           type="button"
           onClick={onBack}
-          disabled={isLoading}
+          disabled={isLoading || isProcessingReceipt}
           className="flex-1 py-3.5 rounded-xl border-2 border-neutral-200 font-bold text-neutral-600 hover:border-neutral-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-sm"
         >
           رجوع
@@ -593,7 +629,7 @@ export default function PaymentStep({
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={isLoading || isProcessingReceipt}
           className="flex-[2] flex items-center justify-center gap-2 text-white font-black py-3.5 rounded-xl hover:opacity-90 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 shadow-md disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-y-0 cursor-pointer text-sm sm:text-base"
           style={{ background: 'linear-gradient(135deg,#23096e,#3A1C8F)' }}
         >
@@ -601,6 +637,11 @@ export default function PaymentStep({
             <>
               <Loader2 size={18} className="animate-spin" />
               جاري إرسال الحجز...
+            </>
+          ) : isProcessingReceipt ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              جاري معالجة الإيصال...
             </>
           ) : (
             <>

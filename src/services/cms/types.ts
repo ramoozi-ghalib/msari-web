@@ -155,6 +155,11 @@ export interface LegalPageData {
     title: string;
     content: string[];
   }>;
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
 }
 
 export interface DevelopersPageData {

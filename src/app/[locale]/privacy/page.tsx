@@ -87,12 +87,30 @@ export default async function PrivacyPage() {
           <div className="mt-10 bg-[var(--brand-primary)] rounded-2xl p-8 text-center">
             <h3 className="text-xl font-black text-white mb-3">هل لديك استفسار حول خصوصيتك؟</h3>
             <p className="text-white/70 text-sm mb-6">تواصل مع فريق حماية البيانات لدينا</p>
-            <a
-              href="mailto:privacy@msari.net"
-              className="inline-block bg-white text-[var(--brand-primary)] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
-            >
-              privacy@msari.net
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {data.contactInfo?.email && (
+                <a
+                  href={`mailto:${data.contactInfo.email}`}
+                  className="inline-block bg-white text-[var(--brand-primary)] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
+                >
+                  {data.contactInfo.email}
+                </a>
+              )}
+              {data.contactInfo?.phone && (
+                <a
+                  href={`tel:${data.contactInfo.phone}`}
+                  className="inline-block bg-white/10 border border-white/20 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-300"
+                  dir="ltr"
+                >
+                  {data.contactInfo.phone}
+                </a>
+              )}
+            </div>
+            {data.contactInfo?.address && (
+              <p className="text-white/60 text-xs mt-4">
+                {data.contactInfo.address}
+              </p>
+            )}
           </div>
         </div>
       </section>

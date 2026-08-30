@@ -82,12 +82,30 @@ export default async function TermsPage() {
           <div className="bg-[#23096e] rounded-2xl p-8 text-center mt-10">
             <h3 className="text-xl font-black text-white mb-3">لديك سؤال حول الشروط؟</h3>
             <p className="text-white/70 text-sm mb-6">فريقنا القانوني جاهز للإجابة</p>
-            <a
-              href="mailto:legal@msari.net"
-              className="inline-block bg-white text-[#23096e] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
-            >
-              legal@msari.net
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {data.contactInfo?.email && (
+                <a
+                  href={`mailto:${data.contactInfo.email}`}
+                  className="inline-block bg-white text-[#23096e] font-black px-8 py-3 rounded-xl hover:shadow-xl transition-all duration-300"
+                >
+                  {data.contactInfo.email}
+                </a>
+              )}
+              {data.contactInfo?.phone && (
+                <a
+                  href={`tel:${data.contactInfo.phone}`}
+                  className="inline-block bg-white/10 border border-white/20 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-all duration-300"
+                  dir="ltr"
+                >
+                  {data.contactInfo.phone}
+                </a>
+              )}
+            </div>
+            {data.contactInfo?.address && (
+              <p className="text-white/60 text-xs mt-4">
+                {data.contactInfo.address}
+              </p>
+            )}
           </div>
         </div>
       </section>
