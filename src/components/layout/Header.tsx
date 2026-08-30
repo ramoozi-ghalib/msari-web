@@ -33,6 +33,12 @@ const currencies = [
   { code: 'YER_OLD', symbol: 'ر.ي.ق', label: 'ريال يمني قديم' },
 ];
 
+function setClientCurrencyCookie(code: string) {
+  if (typeof document !== 'undefined') {
+    document.cookie = `currency=${code}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -62,7 +68,7 @@ export default function Header() {
   }, []);
 
   const changeCurrency = (code: string) => {
-    document.cookie = `currency=${code}; path=/; max-age=31536000; SameSite=Lax`;
+    setClientCurrencyCookie(code);
     setCurrency(code);
     setCurrencyOpen(false);
     router.refresh();

@@ -340,6 +340,20 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           customerId: userId,
+          userName: input.guestName,
+          userEmail: callerUser?.email || input.guestEmail || '',
+          userPhone: input.guestPhone || '',
+          customer: {
+            id: userId,
+            name: input.guestName,
+            email: callerUser?.email || input.guestEmail || '',
+            phone: input.guestPhone || '',
+          },
+          bookingOwner: {
+            name: input.guestName,
+            phone: input.guestPhone || '',
+            email: callerUser?.email || input.guestEmail || '',
+          },
           otherGuest: {
             enabled: input.isForAnotherGuest || false,
             name: input.anotherGuestName || '',
@@ -375,6 +389,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
             transferCurrencyCode: input.transferCurrencyCode || null,
             transferToNumber: input.transferToNumber || '',
             receiptUrl: receiptUrl || '',
+            receiptStoragePath: receiptStoragePath || '',
           },
           receipt: {
             required: mappedPaymentMethod === 'transfer',
@@ -396,12 +411,13 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           roomId: input.roomId || '',
           source: 'website',
           platform: 'web',
-          titleAr: 'حجز فندقي جديد (الموقع الإلكتروني)',
-          titleEn: 'New hotel booking (Website)',
-          messageAr: `تم إرسال حجز جديد رقم ${bookingNumber} عبر الموقع الإلكتروني`,
-          messageEn: `A new booking #${bookingNumber} has been submitted via website`,
+          titleAr: 'حجز فندقي جديد',
+          titleEn: 'New hotel booking',
+          messageAr: `تم إرسال حجز جديد رقم ${bookingNumber}`,
+          messageEn: `A new booking #${bookingNumber} has been submitted`,
           isRead: false,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAtClient: admin.firestore.FieldValue.serverTimestamp(),
         });
 
         return {

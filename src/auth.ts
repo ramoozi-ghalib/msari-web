@@ -147,6 +147,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.name = user.name;
+        token.email = user.email;
         token.firebaseToken = user.token;
         token.phone = user.phone;
         token.picture = user.image;
@@ -161,6 +163,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
+        if (token.name) session.user.name = token.name as string;
+        if (token.email) session.user.email = token.email as string;
         session.user.firebaseToken = token.firebaseToken as string;
         session.user.phone = (token.phone as string) || '';
         session.user.image = (token.image as string) || (token.picture as string) || '';

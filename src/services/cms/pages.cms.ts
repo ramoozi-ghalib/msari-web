@@ -36,9 +36,9 @@ export const FALLBACK_ABOUT: AboutPageData = {
     subtitle: 'منصة يمنية حديثة تجمع بين التكنولوجيا المتقدمة والضيافة اليمنية الأصيلة لتسهيل حجز الفنادق والتنقلات.',
   },
   stats: [
-    { value: '+50', label: 'فندق شريك' },
+    { value: '+100', label: 'فندق شريك' },
     { value: '+10', label: 'مدن ومحافظات' },
-    { value: '+5000', label: 'حجز مؤكد' },
+    { value: '+5000', label: 'تحميل' },
     { value: '24/7', label: 'دعم العملاء' },
   ],
   story: {
@@ -60,7 +60,7 @@ export const FALLBACK_ABOUT: AboutPageData = {
   ],
   team: [
     { name: 'فريق العمليات والشركاء', role: 'إدارة شبكة الفنادق والنقل', emoji: '🤝' },
-    { name: 'فريق خدمة العملاء', role: 'دعم ومساندة على مدار 24/7', emoji: '🎧' },
+    { name: 'فريق خدمة العملاء', role: 'دعم على مدار 24/7', emoji: '🎧' },
     { name: 'فريق التطوير والتقنية', role: 'هندسة المنصة والتطبيق', emoji: '💻' },
   ],
   cta: {
@@ -83,13 +83,69 @@ export const FALLBACK_PRIVACY: LegalPageData = {
   sections: [
     {
       id: 'collection',
-      title: '١. البيانات التي نجمعها',
-      content: ['البيانات الشخصية كالحساب والاسم ورقم الهاتف والبريد لتأكيد الحجز وتوثيق الهوية.'],
+      title: '١. المعلومات التي نجمعها',
+      content: [
+        'المعلومات الشخصية التي تقدمها عند الحجز (الاسم، رقم الهاتف، البريد الإلكتروني)',
+        'بيانات الحجز والرحلات التي تجريها عبر المنصة',
+        'معلومات تقنية مثل عنوان IP ونوع المتصفح لتحسين تجربتك',
+        'ملفات تعريف الارتباط (Cookies) لتسريع وتحسين أداء الموقع',
+      ],
     },
     {
       id: 'usage',
-      title: '٢. كيفية استخدام البيانات',
-      content: ['تأكيد حجوزات الفنادق والتذاكر وإصدار قسائم السفر الرسمية وتقديم الدعم الفني.'],
+      title: '٢. كيف نستخدم معلوماتك',
+      content: [
+        'معالجة وتأكيد حجوزاتك مع الفنادق والموردين',
+        'التواصل معك بشأن حجوزاتك عبر واتساب والبريد الإلكتروني',
+        'إرسال عروض وتخفيضات حصرية (يمكنك إلغاء الاشتراك في أي وقت)',
+        'تحسين خدماتنا بناءً على تجربتك وملاحظاتك',
+        'الامتثال لالتزاماتنا القانونية',
+      ],
+    },
+    {
+      id: 'protection',
+      title: '٣. حماية بياناتك',
+      content: [
+        'نستخدم بروتوكول HTTPS لتشفير جميع البيانات المنقولة',
+        'لا نشارك بياناتك مع أطراف ثالثة لأغراض تسويقية دون إذنك',
+        'نشارك بيانات الحجز الضرورية فقط مع الفنادق والمزودين المعتمدين',
+        'يحق لنا الكشف عن معلوماتك إذا طلب ذلك قانونياً',
+      ],
+    },
+    {
+      id: 'rights',
+      title: '٤. حقوقك',
+      content: [
+        'حق الوصول: يمكنك طلب نسخة من بياناتك الشخصية المحفوظة لدينا',
+        'حق التصحيح: يمكنك تصحيح أي بيانات غير دقيقة',
+        'حق الحذف: يمكنك طلب حذف بياناتك مع عدم المساس بحجوزاتك الفعلية',
+        'حق إلغاء الاشتراك: يمكنك إلغاء تلقي الرسائل التسويقية في أي وقت',
+      ],
+    },
+    {
+      id: 'cookies',
+      title: '٥. ملفات تعريف الارتباط (Cookies)',
+      content: [
+        'نستخدم cookies ضرورية لتشغيل الموقع بشكل صحيح',
+        'cookies تحليلية لفهم كيفية استخدامك للموقع (مجهولة الهوية)',
+        'يمكنك تعطيل cookies من إعدادات متصفحك، لكن قد يؤثر ذلك على بعض وظائف الموقع',
+      ],
+    },
+    {
+      id: 'updates',
+      title: '٦. التعديلات على هذه السياسة',
+      content: [
+        'قد نحدث هذه السياسة من وقت لآخر لتعكس التغييرات في خدماتنا أو القوانين',
+        'سنخطرك بأي تغييرات جوهرية عبر البريد الإلكتروني أو إشعار بارز على الموقع',
+        'استمرارك في استخدام المنصة بعد التحديثات يعني موافقتك على السياسة الجديدة',
+      ],
+    },
+    {
+      id: 'contact',
+      title: '٧. تواصل معنا',
+      content: [
+        'إذا كانت لديك أي استفسارات أو ملاحظات بخصوص سياسة الخصوصية، يرجى التواصل عبر privacy@msari.net أو الدعم الفني.',
+      ],
     },
   ],
 };
@@ -102,17 +158,63 @@ export const FALLBACK_TERMS: LegalPageData = {
   lastUpdatedText: 'مارس ٢٠٢٦',
   status: 'published',
   isPublished: true,
-  intro: 'تحدد هذه الاتفاقية شروط استخدامك لمنصة وتطبيق مساري لخدمات السفر والسياحة.',
+  intro: 'يرجى قراءة هذه الشروط بعناية قبل استخدام منصة مساري لخدمات السفر والحجز في اليمن.',
   sections: [
     {
-      id: 'terms-acceptance',
+      id: 'acceptance',
       title: '١. قبول الشروط',
-      content: ['استخدامك للمنصة أو التطبيق يعتبر موافقة صريحة على كافة البنود والسياسات المعلنة.'],
+      content: [
+        'باستخدامك لمنصة مساري (msari.net)، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة.',
+      ],
     },
     {
-      id: 'booking-policy',
-      title: '٢. سياسة الحجز والإلغاء',
-      content: ['يتم تأكيد الحجز فورياً، وتخضع شروط الإلغاء لسياسة الفندق ومزود الخدمة المحدد.'],
+      id: 'pricing',
+      title: '٢. الحجوزات والأسعار',
+      content: [
+        'جميع الأسعار المعروضة على المنصة بالدولار الأمريكي (USD) ما لم يُشر لغير ذلك. الأسعار قابلة للتغيير وتعتمد على التوفر. الحجز لا يُعتبر مؤكداً حتى تتلقى تأكيداً رسمياً من فريقنا.',
+      ],
+    },
+    {
+      id: 'cancellation',
+      title: '٣. الإلغاء والاسترداد',
+      content: [
+        'سياسة الإلغاء تختلف من فندق لآخر وستظهر بوضوح قبل إتمام الحجز. عموماً، الإلغاء قبل ٢٤ ساعة من موعد الوصول يستحق استرداداً كاملاً. الإلغاء المتأخر قد يخضع لرسوم جزئية أو عدم استرداد وفقاً لسياسة الفندق.',
+      ],
+    },
+    {
+      id: 'responsibilities',
+      title: '٤. مسؤوليات المستخدم',
+      content: [
+        'أنت مسؤول عن التحقق من صحة بيانات الحجز قبل التأكيد. أنت مسؤول عن امتلاك الوثائق الرسمية المطلوبة للسفر. يجب عدم استخدام المنصة لأي أغراض غير مشروعة.',
+      ],
+    },
+    {
+      id: 'liability',
+      title: '٥. حدود المسؤولية',
+      content: [
+        'مساري وسيط بينك وبين مزودي الخدمات (الفنادق وشركات النقل). لا تتحمل مساري مسؤولية أي خلاف مباشر مع مزودي الخدمات، لكننا ملتزمون بمساعدتك في حل أي مشكلة قدر المستطاع.',
+      ],
+    },
+    {
+      id: 'ip',
+      title: '٦. الملكية الفكرية',
+      content: [
+        'جميع محتويات المنصة (التصميم، الشعار، النصوص، الصور) هي ملكية حصرية لمساري ومحمية بقوانين الملكية الفكرية. لا يُسمح بإعادة نشر أو نسخ أي محتوى دون إذن خطي مسبق.',
+      ],
+    },
+    {
+      id: 'law',
+      title: '٧. القانون الواجب التطبيق',
+      content: [
+        'تخضع هذه الشروط لقوانين جمهورية اليمن. أي نزاع ينشأ عن استخدام المنصة يُحل أولاً بالتفاوض الودي، ثم بالتحكيم إذا لزم الأمر.',
+      ],
+    },
+    {
+      id: 'changes',
+      title: '٨. التعديلات على الشروط',
+      content: [
+        'نحتفظ بحق تعديل هذه الشروط في أي وقت. سيتم إعلامك بالتغييرات الجوهرية عبر البريد الإلكتروني أو إشعار على الموقع. استمرارك في استخدام المنصة بعد التعديل يمثل قبولك للشروط الجديدة.',
+      ],
     },
   ],
 };
@@ -438,7 +540,18 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
   if (!isPub) return fallback;
 
   const data = resolveContent(raw);
-  let sections = data.sections;
+
+  // [FIX — legal pages body ownership]
+  // The page body is the TOP-LEVEL `sections` array (the full document model).
+  // The dashboard editor's `content` map may carry its own partial `sections`
+  // copy (e.g. 2 items vs 7/8) — a content-map spread must never override the
+  // canonical body. `data.intro`/`data.contactInfo` (editorial values) are
+  // still honored via the resolveContent merge below.
+  const sectionsSource = (Array.isArray(raw.sections) && raw.sections.length > 0)
+    ? raw.sections
+    : data.sections;
+
+  let sections = sectionsSource;
   if (!Array.isArray(sections) && data.rawContent) {
     sections = [
       {
@@ -450,13 +563,23 @@ async function fetchLegalInternal(slug: 'privacy' | 'terms'): Promise<LegalPageD
   }
 
   const sanitizedSections = Array.isArray(sections) && sections.length > 0
-    ? sections.map((s: any, idx: number) => ({
-        id: String(s?.id || `sec-${idx}`),
-        title: String(s?.title || ''),
-        content: Array.isArray(s?.content)
-          ? s.content.map((item: any) => String(item || '')).filter(Boolean)
-          : (s?.content ? [String(s.content)] : []),
-      }))
+    ? sections.map((s: any, idx: number) => {
+        let contentArr: string[] = [];
+        if (Array.isArray(s?.content)) {
+          contentArr = s.content.map((item: any) => String(item || '')).filter(Boolean);
+        } else if (typeof s?.content === 'string') {
+          let str = s.content.trim();
+          if (str.startsWith('[') && str.endsWith(']')) {
+            str = str.slice(1, -1).trim();
+          }
+          contentArr = str ? [str] : [];
+        }
+        return {
+          id: String(s?.id || `sec-${idx}`),
+          title: String(s?.title || ''),
+          content: contentArr.length > 0 ? contentArr : (fallback.sections[idx]?.content || []),
+        };
+      })
     : fallback.sections;
 
   return {
