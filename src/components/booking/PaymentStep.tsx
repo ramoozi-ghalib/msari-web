@@ -14,6 +14,9 @@ import {
   Image as ImageIcon,
   Trash2,
   FileCheck,
+  Eye,
+  RefreshCw,
+  X,
 } from 'lucide-react';
 import type { BankAccount } from '@/types';
 
@@ -78,6 +81,7 @@ export default function PaymentStep({
   const [receiptFileName, setReceiptFileName] = useState<string>('');
   const [receiptFileSize, setReceiptFileSize] = useState<string>('');
   const [isProcessingReceipt, setIsProcessingReceipt] = useState<boolean>(false);
+  const [showReceiptZoom, setShowReceiptZoom] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeAccount =
@@ -441,57 +445,132 @@ export default function PaymentStep({
                     />
 
                     {isProcessingReceipt ? (
-                      <div className="w-full border-2 border-dashed border-[#23096e]/30 rounded-xl p-4 flex flex-col items-center justify-center gap-2 bg-[#23096e]/5 text-center animate-pulse">
-                        <Loader2 size={24} className="animate-spin text-[#23096e]" />
+                      <div className="w-full border-2 border-dashed border-[#23096e]/40 rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-[#23096e]/5 text-center animate-pulse">
+                        <Loader2 size={26} className="animate-spin text-[#23096e]" />
                         <p className="text-xs font-bold text-[#23096e]">
                           جاري معالجة وتحسين صورة الإيصال...
+                        </p>
+                        <p className="text-[11px] text-neutral-500">
+                          يتم ضغط الصورة تلقائياً لسرعة الإرسال والتأكيد
                         </p>
                       </div>
                     ) : !receiptImage ? (
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full border-2 border-dashed border-neutral-300 hover:border-[#23096e] rounded-xl p-4 flex flex-col items-center justify-center gap-1.5 bg-white transition-colors cursor-pointer text-center group"
+                        className="w-full border-2 border-dashed border-neutral-300 hover:border-[#23096e] rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-neutral-50/50 hover:bg-[#23096e]/5 transition-all cursor-pointer text-center group shadow-sm hover:shadow"
                       >
-                        <div className="w-10 h-10 rounded-full bg-neutral-100 group-hover:bg-[#23096e]/10 text-neutral-500 group-hover:text-[#23096e] flex items-center justify-center transition-colors">
-                          <Upload size={18} />
+                        <div className="w-12 h-12 rounded-full bg-white group-hover:bg-[#23096e]/10 text-neutral-500 group-hover:text-[#23096e] flex items-center justify-center transition-colors shadow-sm">
+                          <Upload size={20} />
                         </div>
-                        <p className="text-xs font-bold text-neutral-700">
-                          اضغط لاختيار صورة إشعار التحويل
-                        </p>
-                        <p className="text-[10px] text-neutral-400">
-                          PNG, JPG, WEBP حتى 15 ميغابايت
-                        </p>
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-neutral-800 group-hover:text-[#23096e] transition-colors">
+                            اضغط هنا لاختيار صورة إشعار التحويل البنكي
+                          </p>
+                          <p className="text-[11px] text-neutral-400 mt-0.5">
+                            يقبل صور JPG, PNG, WEBP من الكاميرا أو المعرض
+                          </p>
+                        </div>
                       </button>
                     ) : (
-                      <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <img
-                            src={receiptImage}
-                            alt="Receipt Preview"
-                            className="w-12 h-12 rounded-lg object-cover border border-neutral-200 shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-neutral-900 truncate">
-                              {receiptFileName || 'إشعار التحويل'}
-                            </p>
-                            <p className="text-[10px] text-neutral-400">
-                              {receiptFileSize || 'صورة مرفقة'}
-                            </p>
-                            <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold mt-0.5">
-                              <FileCheck size={12} />
-                              جاهز للإرسال مع الحجز
+                      <div className="rounded-xl border-2 border-emerald-500/40 bg-emerald-50/30 p-3.5 shadow-sm transition-all">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {/* Thumbnail with zoom trigger */}
+                            <button
+                              type="button"
+                              onClick={() => setShowReceiptZoom(true)}
+                              className="relative group w-14 h-14 rounded-lg overflow-hidden border border-emerald-300 shrink-0 cursor-pointer shadow-sm"
+                              title="اضغط لتكبير ومعاينة الصورة"
+                            >
+                              <img
+                                src={receiptImage}
+                                alt="Receipt Preview"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
+                                <Eye size={16} />
+                              </div>
+                            </button>
+
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                                <FileCheck size={14} className="text-emerald-600 shrink-0" />
+                                <span>تم إرفاق وتجهيز الإيصال بنجاح</span>
+                              </div>
+                              <p className="text-xs font-medium text-neutral-700 truncate mt-0.5" dir="ltr">
+                                {receiptFileName || 'receipt.jpg'}
+                              </p>
+                              <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 mt-1">
+                                {receiptFileSize || 'جاهز للإرسال'}
+                              </span>
                             </div>
                           </div>
+
+                          {/* Actions: View / Replace / Remove */}
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setShowReceiptZoom(true)}
+                              className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                              title="معاينة الصورة بالحجم الكامل"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                              title="استبدال بصورة أخرى"
+                            >
+                              <RefreshCw size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleRemoveReceipt}
+                              className="p-2 rounded-lg text-red-500 hover:bg-red-100 transition-colors cursor-pointer"
+                              title="حذف الإيصال"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={handleRemoveReceipt}
-                          className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
-                          title="إزالة الإشعار"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+
+                        {/* Full Image Zoom Modal */}
+                        {showReceiptZoom && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+                            <div className="relative max-w-2xl w-full bg-white rounded-2xl p-4 shadow-2xl flex flex-col max-h-[90vh]">
+                              <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
+                                <h4 className="text-sm font-bold text-neutral-900">
+                                  معاينة إشعار التحويل البنكي
+                                </h4>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowReceiptZoom(false)}
+                                  className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 cursor-pointer"
+                                >
+                                  <X size={18} />
+                                </button>
+                              </div>
+                              <div className="overflow-auto py-3 flex items-center justify-center">
+                                <img
+                                  src={receiptImage}
+                                  alt="Receipt Full Preview"
+                                  className="max-h-[70vh] rounded-lg object-contain"
+                                />
+                              </div>
+                              <div className="pt-3 border-t border-neutral-200 flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowReceiptZoom(false)}
+                                  className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold rounded-xl text-xs cursor-pointer"
+                                >
+                                  إغلاق المعاينة
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -645,8 +724,17 @@ export default function PaymentStep({
             </>
           ) : (
             <>
-              تأكيد وإرسال الحجز
-              <CheckCircle2 size={18} />
+              {selectedMethod !== 'cash' && receiptImage ? (
+                <>
+                  تأكيد وإرسال الحجز (الإيصال مرفق ✓)
+                  <CheckCircle2 size={18} className="text-emerald-300" />
+                </>
+              ) : (
+                <>
+                  تأكيد وإرسال الحجز
+                  <CheckCircle2 size={18} />
+                </>
+              )}
             </>
           )}
         </button>
