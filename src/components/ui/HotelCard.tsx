@@ -121,9 +121,8 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
               src={hotel.thumbnail}
               alt={hotel.name}
               fill
-              loading="lazy"
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 384px"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#23096E]/10 to-[#FF3B30]/10 flex items-center justify-center">
