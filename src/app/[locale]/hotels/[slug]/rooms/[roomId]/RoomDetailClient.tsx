@@ -93,6 +93,10 @@ export default function RoomDetailClient({ hotel, room }: Props) {
 
   const validImages = room.images?.filter(img => typeof img === 'string' && img.startsWith('http')) || [];
   const slides = validImages.length ? validImages : (hotel.images?.filter(img => typeof img === 'string' && img.startsWith('http')) || FALLBACK_SLIDES);
+  // P0 incident mitigation: bypass Vercel Image Optimization (quota 402) for
+  // Firebase Storage sources only — all other hosts keep default optimization.
+  const isFirebaseStorageUrl = (url: string) =>
+    /firebasestorage|storage\.googleapis/.test(url || '');
   const total = slides.length;
   const go = useCallback((n: number) => setSlide((n + total) % total), [total]);
 
@@ -176,6 +180,7 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                       className="object-contain sm:object-cover"
                       sizes="(max-width: 1024px) 100vw, 60vw"
                       priority={i === 0}
+                      unoptimized={isFirebaseStorageUrl(src)}
                     />
                   </div>
                 ))}

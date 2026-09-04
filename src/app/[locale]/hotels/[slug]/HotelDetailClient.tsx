@@ -114,6 +114,10 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   };
 
   const isValidUrl = (url: string) => Boolean(url?.startsWith('http'));
+  // P0 incident mitigation: bypass Vercel Image Optimization (quota 402) for
+  // Firebase Storage sources only — all other hosts keep default optimization.
+  const isFirebaseStorageUrl = (url: string) =>
+    /firebasestorage|storage\.googleapis/.test(url || '');
   const validImages = hotel.images?.filter(isValidUrl) || [];
   const slides = validImages.length
     ? validImages.map(src => ({ src, alt: hotel.name }))
@@ -168,6 +172,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
               className="object-contain sm:object-cover"
               priority={i === 0}
               sizes="100vw"
+              unoptimized={isFirebaseStorageUrl(s.src)}
             />
           </div>
         ))}
@@ -335,6 +340,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, 224px"
+                        unoptimized={isFirebaseStorageUrl(room.images[0])}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#23096e]/5 to-[#3A1C8F]/10">
@@ -536,6 +542,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                 className="object-contain"
                 sizes="100vw"
                 priority
+                unoptimized={isFirebaseStorageUrl(slides[slide].src)}
               />
             </div>
 
@@ -573,7 +580,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                     i === slide ? 'border-white scale-105' : 'border-transparent opacity-50 hover:opacity-100'
                   }`}
                 >
-                  <Image src={s.src} alt="" fill className="object-cover" sizes="64px" />
+                  <Image src={s.src} alt="" fill className="object-cover" sizes="64px" unoptimized={isFirebaseStorageUrl(s.src)} />
                 </button>
               ))}
             </div>
