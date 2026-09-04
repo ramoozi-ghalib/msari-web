@@ -190,9 +190,9 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
                       src={offer.image}
                       alt={offer.title}
                       fill
+                      loading="lazy"
                       className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      priority={idx === 2 || idx === 3}
                     />
                   ) : (
                     <div
