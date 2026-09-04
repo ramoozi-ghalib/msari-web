@@ -21,7 +21,7 @@ export async function generateMetadata(props: {
 
   const title = isEn
     ? 'Msari | Your Gateway to Hotel Booking in Yemen'
-    : 'مساري | بوابتك لحجز أفضل فنادق اليمن';
+    : 'مساري | بوابتك لحجز أفضل الفنادق في اليمن';
 
   const description = isEn
     ? 'Book the best hotels in Yemen with ease on Msari. Enjoy exclusive rates and multiple options for Aden, Sanaa, Mukalla, and Taiz.'

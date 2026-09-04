@@ -32,7 +32,7 @@ export async function generateMetadata(props: Props) {
     description: pageDesc,
     alternates: getLocalizedAlternates(`/hotels/${slug}`, locale),
     openGraph: {
-      title: `${pageTitle} | مساري`,
+      title: pageTitle,
       description: pageDesc,
       url: `https://msari.net/${locale === 'en' ? 'en' : 'ar'}/hotels/${slug}`,
       siteName: 'مساري',
@@ -42,7 +42,7 @@ export async function generateMetadata(props: Props) {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${pageTitle} | مساري`,
+      title: pageTitle,
       description: pageDesc,
       images: [mainImage],
     },

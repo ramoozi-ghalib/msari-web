@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: [`فنادق ${destination.name}`, `أفضل فنادق ${destination.name}`, `حجز فنادق ${destination.name}`],
     alternates: getLocalizedAlternates(`/destinations/${resolvedParams.slug}`, resolvedParams.locale),
     openGraph: {
-      title: `${pageTitle} | مساري`,
+      title: pageTitle,
       description: pageDesc,
       url: `https://msari.net/${isEn ? 'en' : 'ar'}/destinations/${resolvedParams.slug}`,
       siteName: 'مساري',
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${pageTitle} | مساري`,
+      title: pageTitle,
       description: pageDesc,
       images: [mainImage],
     },

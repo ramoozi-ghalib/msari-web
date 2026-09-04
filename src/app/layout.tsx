@@ -24,10 +24,7 @@ import { SEO_VERIFICATIONS } from '@/lib/seo';
 export const metadata: Metadata = {
   metadataBase: new URL('https://msari.net'),
   verification: SEO_VERIFICATIONS,
-  title: {
-    default: 'مساري | بوابتك لحجز أفضل فنادق اليمن',
-    template: '%s | مساري',
-  },
+  title: 'مساري | بوابتك لحجز أفضل الفنادق في اليمن',
   description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك في عدن، صنعاء، تعز، والمكلا.',
   authors: [{ name: 'مساري', url: 'https://msari.net' }],
   formatDetection: { email: false, address: false, telephone: false },
@@ -35,13 +32,13 @@ export const metadata: Metadata = {
     siteName: 'مساري',
     locale: 'ar_YE',
     type: 'website',
-    title: 'مساري | بوابتك لحجز أفضل فنادق اليمن',
+    title: 'مساري | بوابتك لحجز أفضل الفنادق في اليمن',
     description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك.',
     url: 'https://msari.net',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'مساري | بوابتك لحجز أفضل فنادق اليمن',
+    title: 'مساري | بوابتك لحجز أفضل الفنادق في اليمن',
     description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك.',
   },
   robots: {
