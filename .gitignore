@@ -30,6 +30,16 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # ======================
+# Local perf-measurement artifacts (regenerable lab output, never commit)
+# ======================
+lh-*.json
+lh-*.log
+psi-*.json
+psi-*.log
+psi-done*.flag
+run-psi*.cmd
+
+# ======================
 # Environment variables
 # ======================
 .env*
