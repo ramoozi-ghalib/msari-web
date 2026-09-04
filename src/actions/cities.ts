@@ -10,7 +10,7 @@
  * The guard runs as the FIRST operation in every mutation.
  */
 
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { adminGuard, handleActionSafe } from '@/lib/action-guard';
 import { Policies } from '@/lib/policies';
 import { clampLimit, validateInput } from '@/lib/action-utils';
@@ -64,7 +64,6 @@ export async function createCity(rawData: unknown) {
   try {
     const id = await CityService.createCity(data);
 
-    (revalidateTag as any)('cities');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const, id };
@@ -88,7 +87,6 @@ export async function updateCity(rawId: unknown, rawData: unknown) {
   try {
     await CityService.updateCity(id, data);
 
-    (revalidateTag as any)('cities');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const };
@@ -112,7 +110,6 @@ export async function deleteCity(rawId: unknown) {
   try {
     await CityService.deleteCity(id);
 
-    (revalidateTag as any)('cities');
     revalidatePath('/destinations');
     revalidatePath('/');
     return { success: true as const };

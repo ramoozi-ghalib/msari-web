@@ -112,8 +112,6 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
               src={mainFeatured.image}
               alt={mainFeatured.name}
               fill
-              loading="lazy"
-              quality={65}
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               sizes="(max-width: 768px) 100vw, 60vw"
             />
@@ -155,8 +153,6 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
                   src={city.image}
                   alt={city.name}
                   fill
-                  loading="lazy"
-                  quality={65}
                   className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />

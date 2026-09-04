@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import Image from 'next/image';
 import { 
   Smartphone, MapPin, Search, Bell, Check, Sparkles
 } from 'lucide-react';
@@ -176,14 +175,10 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
 
                       {appDownload?.samsungScreenImageUrl ? (
                         <div className="relative w-full h-full">
-                          <Image
-                            src={appDownload.samsungScreenImageUrl}
-                            alt="Samsung App Screen"
-                            fill
-                            loading="lazy"
-                            quality={65}
-                            sizes="(max-width: 768px) 210px, 250px"
-                            className="object-cover"
+                          <img 
+                            src={appDownload.samsungScreenImageUrl} 
+                            alt="Samsung App Screen" 
+                            className="w-full h-full object-cover" 
                           />
                         </div>
                       ) : (
@@ -291,14 +286,10 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
 
                       {appDownload?.iphoneScreenImageUrl ? (
                         <div className="relative w-full h-full rounded-[26px] sm:rounded-[34px] lg:rounded-[38px] overflow-hidden">
-                          <Image
-                            src={appDownload.iphoneScreenImageUrl}
-                            alt="iPhone App Screen"
-                            fill
-                            loading="lazy"
-                            quality={65}
-                            sizes="(max-width: 768px) 210px, 250px"
-                            className="object-cover"
+                          <img 
+                            src={appDownload.iphoneScreenImageUrl} 
+                            alt="iPhone App Screen" 
+                            className="w-full h-full object-cover" 
                           />
                         </div>
                       ) : (

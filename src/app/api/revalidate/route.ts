@@ -5,7 +5,7 @@ const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET_TOKEN;
 
 function triggerRevalidation(tag?: string, path?: string) {
   if (tag === 'all') {
-    const allTags = ['cms:pages', 'cms:destinations', 'cms:homepage', 'cms:settings', 'cms:blog', 'cities', 'hotels', 'offers'];
+    const allTags = ['cms:pages', 'cms:destinations', 'cms:homepage', 'cms:settings', 'cms:blog'];
     for (const t of allTags) {
       try { (revalidateTag as any)(t); } catch (_) {}
     }

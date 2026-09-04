@@ -9,10 +9,6 @@ import type { Hotel } from '@/types';
 import { clampLimit } from '@/lib/action-utils';
 import { db } from '@/lib/firebase-admin';
 import { CityService } from '@/services/city.service';
-import { unstable_cache } from 'next/cache';
-
-// Phase 2: كاش 60s لقوائم الفنادق (قرار المستخدم) — تُبطلها mutations الفنادق عبر tag 'hotels'
-const HOTELS_REVALIDATE = 60;
 
 export type GetLocalHotelsParams = {
   limit?:    unknown;
@@ -32,38 +28,8 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
   page:     number;
   pageSize: number;
 }> {
-  // Normalise params so the cache key is stable (clampLimit also guards junk input)
-  const normalised = {
-    city: params?.city,
-    q: params?.q,
-    minPrice: params?.minPrice,
-    maxPrice: params?.maxPrice,
-    ratings: params?.ratings ? [...params.ratings].sort((a, b) => a - b) : undefined,
-    sort: params?.sort ?? 'recommended',
-    page: Math.max(1, params?.page ?? 1),
-    pageSize: clampLimit(params?.pageSize, 12, 100),
-  };
-  return getLocalHotelsCached(normalised);
-}
-
-const getLocalHotelsCached = unstable_cache(
-  async (params: {
-    city?: string;
-    q?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    ratings?: number[];
-    sort?: 'recommended' | 'price_asc' | 'price_desc' | 'rating';
-    page: number;
-    pageSize: number;
-  }): Promise<{
-    data:     Hotel[];
-    total:    number;
-    page:     number;
-    pageSize: number;
-  }> => {
-  const page      = params.page;
-  const pageSize  = params.pageSize;
+  const page      = Math.max(1, params?.page ?? 1);
+  const pageSize  = clampLimit(params?.pageSize, 12, 100);
   const skip      = (page - 1) * pageSize;
 
   try {
@@ -75,25 +41,28 @@ const getLocalHotelsCached = unstable_cache(
       .get();
 
     const hotelDocs = snapshot.docs.filter(doc => doc.data().isDeleted !== true);
-
-    // Phase 2 (N+1 fix): نبني السعر الصريح أولاً WITHOUT أي قراءة rooms،
-    // ثم نصفّي/نرتّب/نرقّم، ثم نجلب rooms للشريحة المعروضة فقط (≤ pageSize بدل كل الفنادق)
-    type Prepared = { docId: string; data: FirebaseFirestore.DocumentData; explicitPrice: number; starsCount: number };
-    const prepared: Prepared[] = hotelDocs.map((doc) => {
+    let hotels: Hotel[] = await Promise.all(hotelDocs.map(async (doc) => {
       const data = doc.data();
-      return {
-        docId: doc.id,
-        data,
-        starsCount: Math.max(1, Math.min(5, Number(data.stars) || 3)),
-        explicitPrice: Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0),
-      };
-    });
 
-    const toHotel = (
-      p: Prepared,
-      minRoomPrice: number,
-    ): Hotel => {
-      const { data, starsCount, explicitPrice } = p;
+      const starsCount = Math.max(1, Math.min(5, Number(data.stars) || 3));
+      const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
+
+      let minRoomPrice = 0;
+      try {
+        const roomsSnap = await db.collection("hotels").doc(doc.id).collection("rooms").get();
+        if (!roomsSnap.empty) {
+          const prices = roomsSnap.docs
+            .filter(rdoc => rdoc.data().isDeleted !== true)
+            .map(rdoc => Number(rdoc.data().price || rdoc.data().pricePerNight || 0))
+            .filter(p => p > 0);
+          if (prices.length > 0) {
+            minRoomPrice = Math.min(...prices);
+          }
+        }
+      } catch (e) {
+        // ignore fallback
+      }
+
       let finalMinPrice = 0;
       if (explicitPrice > 0 && minRoomPrice > 0) {
         finalMinPrice = Math.min(explicitPrice, minRoomPrice);
@@ -106,7 +75,7 @@ const getLocalHotelsCached = unstable_cache(
       }
 
       const apiHotel: any = {
-        id: p.docId,
+        id: doc.id,
         destination: data.destination || '',
         name: data.name || { ar: '', en: '' },
         address: data.address || { ar: '', en: '' },
@@ -114,11 +83,11 @@ const getLocalHotelsCached = unstable_cache(
         mainImageUrl: data.mainImageUrl || '',
         images: data.images || [],
         amenities: mapAmenitiesToDTO(data.amenities),
-        policies: (data.policies || []).map((pol: any) => {
-          if (typeof pol === 'object' && pol !== null) {
-            return pol.ar || pol.en || '';
+        policies: (data.policies || []).map((p: any) => {
+          if (typeof p === 'object' && p !== null) {
+            return p.ar || p.en || '';
           }
-          return String(pol);
+          return String(p);
         }),
         stars: starsCount,
         price: finalMinPrice,
@@ -133,38 +102,37 @@ const getLocalHotelsCached = unstable_cache(
       };
 
       return mapApiHotelToHotel(apiHotel, [], apiCities);
-    };
+    }));
 
-    // 4. تطبيق الفلترة في الذاكرة خادمياً (على السعر الصريح أولياً)
-    let filtered = prepared.filter((p) => {
-      const probe = toHotel(p, 0);
-      if (!probe.isActive) return false;
+    // 4. تطبيق الفلترة في الذاكرة خادمياً
+    hotels = hotels.filter((hotel) => {
+      if (!hotel.isActive) return false;
 
       if (params?.city) {
         const cityFilter = params.city.toLowerCase().trim();
-        const matchesCity =
-          (probe.city && probe.city.toLowerCase().includes(cityFilter)) ||
-          (probe.cityEn && probe.cityEn.toLowerCase().includes(cityFilter)) ||
-          (probe.cityId && probe.cityId.toLowerCase() === cityFilter) ||
-          (probe.governorate && probe.governorate.toLowerCase().includes(cityFilter));
+        const matchesCity = 
+          (hotel.city && hotel.city.toLowerCase().includes(cityFilter)) || 
+          (hotel.cityEn && hotel.cityEn.toLowerCase().includes(cityFilter)) ||
+          (hotel.cityId && hotel.cityId.toLowerCase() === cityFilter) ||
+          (hotel.governorate && hotel.governorate.toLowerCase().includes(cityFilter));
         if (!matchesCity) return false;
       }
 
       if (params?.q) {
         const q = params.q.toLowerCase().trim();
-        const matchesName = probe.name.toLowerCase().includes(q) || probe.nameEn.toLowerCase().includes(q);
-        const matchesAddress = probe.address.toLowerCase().includes(q);
+        const matchesName = hotel.name.toLowerCase().includes(q) || hotel.nameEn.toLowerCase().includes(q);
+        const matchesAddress = hotel.address.toLowerCase().includes(q);
         if (!matchesName && !matchesAddress) return false;
       }
 
       if (params?.minPrice !== undefined && params?.maxPrice !== undefined) {
-        if (probe.priceFrom < params.minPrice || probe.priceFrom > params.maxPrice) {
+        if (hotel.priceFrom < params.minPrice || hotel.priceFrom > params.maxPrice) {
           return false;
         }
       }
 
       if (params?.ratings?.length) {
-        if (!params.ratings.includes(probe.stars)) {
+        if (!params.ratings.includes(hotel.stars)) {
           return false;
         }
       }
@@ -172,59 +140,27 @@ const getLocalHotelsCached = unstable_cache(
       return true;
     });
 
-    // 5. تطبيق الترتيب (على السعر الصريح؛ يُعاد ضبط الصفحة المعروضة بعد تكرير الأسعار)
-    if (params?.sort === 'price_asc') {
-      filtered.sort((a, b) => a.explicitPrice - b.explicitPrice);
-    } else if (params?.sort === 'price_desc') {
-      filtered.sort((a, b) => b.explicitPrice - a.explicitPrice);
-    } else if (params?.sort === 'rating') {
-      filtered.sort((a, b) => toHotel(b, 0).rating - toHotel(a, 0).rating);
-    } else {
-      filtered.sort((a, b) => {
-        const ah = a.data.isFeatured ? 1 : 0;
-        const bh = b.data.isFeatured ? 1 : 0;
-        if (ah !== bh) return bh - ah;
-        const at = a.data.createdAt?.toDate?.()?.getTime?.() ?? 0;
-        const bt = b.data.createdAt?.toDate?.()?.getTime?.() ?? 0;
-        return bt - at;
-      });
-    }
-
-    const total = filtered.length;
-    const pageSlice = filtered.slice(skip, skip + pageSize);
-
-    // rooms للشريحة المعروضة فقط — من O(N) إلى O(pageSize)
-    const hotels: Hotel[] = await Promise.all(pageSlice.map(async (p) => {
-      let minRoomPrice = 0;
-      // تخطّي قراءة rooms عند وجود سعر صريح؟ لا — الغرف قد تكون أرخص، لكن نقرأ فقط لصفحة العرض
-      try {
-        const roomsSnap = await db.collection("hotels").doc(p.docId).collection("rooms")
-          .select('price', 'pricePerNight', 'isDeleted')
-          .get();
-        if (!roomsSnap.empty) {
-          const prices = roomsSnap.docs
-            .filter(rdoc => rdoc.data().isDeleted !== true)
-            .map(rdoc => Number(rdoc.data().price || rdoc.data().pricePerNight || 0))
-            .filter(pr => pr > 0);
-          if (prices.length > 0) {
-            minRoomPrice = Math.min(...prices);
-          }
-        }
-      } catch {
-        // ignore fallback
-      }
-      return toHotel(p, minRoomPrice);
-    }));
-
-    // إعادة ترتيب الشريحة بالسعر النهائي عند فرز سعري
+    // 5. تطبيق الترتيب
     if (params?.sort === 'price_asc') {
       hotels.sort((a, b) => a.priceFrom - b.priceFrom);
     } else if (params?.sort === 'price_desc') {
       hotels.sort((a, b) => b.priceFrom - a.priceFrom);
+    } else if (params?.sort === 'rating') {
+      hotels.sort((a, b) => b.rating - a.rating);
+    } else {
+      hotels.sort((a, b) => {
+        if (a.isFeatured !== b.isFeatured) {
+          return a.isFeatured ? -1 : 1;
+        }
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     }
 
+    const total = hotels.length;
+    const paginatedHotels = hotels.slice(skip, skip + pageSize);
+
     return {
-      data: hotels,
+      data: paginatedHotels,
       total,
       page,
       pageSize,
@@ -233,10 +169,7 @@ const getLocalHotelsCached = unstable_cache(
     console.error('Error fetching local hotels:', error);
     return { data: [], total: 0, page: 1, pageSize: 12 };
   }
-  },
-  ['hotels:list'],
-  { revalidate: HOTELS_REVALIDATE, tags: ['hotels'] }
-);
+}
 
 // Admin/Public fetch all hotels using getLocalHotels
 export async function getHotels(params?: GetLocalHotelsParams) {
