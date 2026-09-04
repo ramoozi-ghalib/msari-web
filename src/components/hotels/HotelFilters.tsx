@@ -26,12 +26,19 @@ export default function HotelFilters({ cities }: HotelFiltersProps) {
   ].filter(Boolean).length;
 
   useEffect(() => {
+    // P1: لا تدفع إلا عند تغيّر الفلاتر فعلياً عن الـ URL — وإلا فإن أي تنقل
+    // (مثل ?page=2) يعيد تشغيل هذا الـ effect (searchParams تغيّر) فيحذف page
+    // ويعيد المستخدم للصفحة الأولى (ping-pong).
+    const urlQuery = searchParams.get('q') || '';
+    const urlCity = searchParams.get('city') || '';
+    if (searchQuery === urlQuery && selectedCity === urlCity) return;
+
     const delayDebounceFn = setTimeout(() => {
       const params = new URLSearchParams(Array.from(searchParams.entries()));
-      
+
       if (searchQuery) params.set('q', searchQuery); else params.delete('q');
       if (selectedCity) params.set('city', selectedCity); else params.delete('city');
-      
+
       // Reset page on filter change
       params.delete('page');
 
