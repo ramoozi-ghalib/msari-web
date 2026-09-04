@@ -96,7 +96,9 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
         mapLink: data.mapLink || data.mapUrl || '',
         lat: data.lat || data.latitude || data.location?.latitude || data.location?._latitude || data.coordinates?.lat,
         lng: data.lng || data.longitude || data.location?.longitude || data.location?._longitude || data.coordinates?.lng,
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        // P1: fallback حتمي — new Date() كان يولّد طابعاً مختلفاً كل طلب (بعد awaits
+        // متداخلة زمنياً) فيكسر حتمية الفرز. القيمة الثابتة تحفظ الترتيب عبر الطلبات.
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || '1970-01-01T00:00:00.000Z',
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
         isDeleted: data.isDeleted || false,
       };
@@ -148,11 +150,21 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
     } else if (params?.sort === 'rating') {
       hotels.sort((a, b) => b.rating - a.rating);
     } else {
+      // الترتيب الافتراضي: المميز أولاً، ثم الأحدث، ثم معرّف الوثيقة ككاسر
+      // تعادل حتمي (P1: يمنع انزياح نوافذ slice بين الطلبات).
       hotels.sort((a, b) => {
         if (a.isFeatured !== b.isFeatured) {
           return a.isFeatured ? -1 : 1;
         }
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const bt = new Date(b.createdAt).getTime();
+        const at = new Date(a.createdAt).getTime();
+        const safeBt = Number.isNaN(bt) ? 0 : bt;
+        const safeAt = Number.isNaN(at) ? 0 : at;
+        if (safeBt !== safeAt) {
+          return safeBt - safeAt;
+        }
+        if (a.id === b.id) return 0;
+        return a.id < b.id ? -1 : 1;
       });
     }
 
