@@ -1,119 +1,136 @@
+import { unstable_cache } from 'next/cache';
 import { apiClient } from '@/lib/api-client';
 import { db } from '@/lib/firebase-admin';
 import type { City } from '@/types';
 import { getDestinationData } from '@/data/destinations';
 
+// Phase 2: كاش 60s لقراءات الصفحة الرئيسية + select() لتقليل حمولة عدّ الفنادق
+const CITIES_REVALIDATE = 60;
+
 export class CityService {
   /**
-   * Fetch active cities with count of active hotels
+   * Fetch active cities with count of active hotels (cached 60s)
    */
-  static async getActiveCities(limit: number): Promise<City[]> {
-    try {
-      let cities: City[] = [];
+  static getActiveCities = unstable_cache(
+    async (limit: number): Promise<City[]> => {
+      try {
+        let cities: City[] = [];
 
-      // Query Firestore destinations directly for fast response
-      const snap = await db.collection("destinations").get();
-      const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
-      if (validDocs.length > 0) {
-        cities = validDocs.map((doc) => {
-          const d = doc.data();
+        // Query Firestore destinations directly for fast response
+        const snap = await db.collection("destinations").get();
+        const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
+        if (validDocs.length > 0) {
+          cities = validDocs.map((doc) => {
+            const d = doc.data();
+            return {
+              id: doc.id,
+              name: d.name || d.nameAr || '',
+              nameEn: d.nameEn || '',
+              governorate: d.name || d.nameAr || '',
+              governorateEn: d.nameEn || '',
+              image: d.imageUrl || '',
+              hotelCount: 0,
+              isActive: true,
+            };
+          });
+        } else {
+          cities = await apiClient.getCities();
+        }
+
+        // عدّ الفنادق بحقول مصغّرة فقط بدل الوثائق الكاملة
+        const hotelsSnap = await db.collection('hotels')
+          .select('destination', 'cityId', 'city', 'cityEn', 'isPublished', 'isDeleted')
+          .get();
+        const hotels = hotelsSnap.docs.map((doc) => doc.data());
+
+        const mapped = cities.map((city) => {
+          const hotelCount = hotels.filter((h) => {
+            const dest = (h.destination || '').toLowerCase();
+            const isMatch =
+              dest === city.id.toLowerCase() ||
+              (city.nameEn && dest === city.nameEn.toLowerCase()) ||
+              (city.name && dest === city.name.toLowerCase()) ||
+              h.cityId === city.id ||
+              h.city === city.name ||
+              h.cityEn === city.nameEn;
+            return isMatch && h.isPublished !== false && h.isDeleted !== true;
+          }).length;
+
           return {
-            id: doc.id,
-            name: d.name || d.nameAr || '',
-            nameEn: d.nameEn || '',
-            governorate: d.name || d.nameAr || '',
-            governorateEn: d.nameEn || '',
-            image: d.imageUrl || '',
-            hotelCount: 0,
-            isActive: true,
+            ...city,
+            hotelCount,
           };
         });
-      } else {
-        cities = await apiClient.getCities();
+
+        return mapped.slice(0, limit);
+      } catch (error) {
+        console.error('Error in getActiveCities:', error);
+        return [];
       }
-
-      const hotelsSnap = await db.collection('hotels').get();
-      const hotels = hotelsSnap.docs.map((doc) => doc.data());
-
-      const mapped = cities.map((city) => {
-        const hotelCount = hotels.filter((h) => {
-          const dest = (h.destination || '').toLowerCase();
-          const isMatch =
-            dest === city.id.toLowerCase() ||
-            (city.nameEn && dest === city.nameEn.toLowerCase()) ||
-            (city.name && dest === city.name.toLowerCase()) ||
-            h.cityId === city.id ||
-            h.city === city.name ||
-            h.cityEn === city.nameEn;
-          return isMatch && h.isPublished !== false && h.isDeleted !== true;
-        }).length;
-
-        return {
-          ...city,
-          hotelCount,
-        };
-      });
-
-      return mapped.slice(0, limit);
-    } catch (error) {
-      console.error('Error in getActiveCities:', error);
-      return [];
-    }
-  }
+    },
+    ['cities:active'],
+    { revalidate: CITIES_REVALIDATE, tags: ['cities'] }
+  );
 
   /**
-   * Fetch all cities with count of all hotels
+   * Fetch all cities with count of all hotels (cached 60s)
    */
-  static async getAllCities(limit: number): Promise<City[]> {
-    try {
-      let cities: City[] = [];
+  static getAllCities = unstable_cache(
+    async (limit: number): Promise<City[]> => {
+      try {
+        let cities: City[] = [];
 
-      const snap = await db.collection("destinations").get();
-      if (!snap.empty) {
-        cities = snap.docs.map((doc) => {
-          const d = doc.data();
+        const snap = await db.collection("destinations").get();
+        if (!snap.empty) {
+          cities = snap.docs.map((doc) => {
+            const d = doc.data();
+            return {
+              id: doc.id,
+              name: d.name || d.nameAr || '',
+              nameEn: d.nameEn || '',
+              governorate: d.name || d.nameAr || '',
+              governorateEn: d.nameEn || '',
+              image: d.imageUrl || '',
+              hotelCount: 0,
+              isActive: true,
+            };
+          });
+        } else {
+          cities = await apiClient.getCities();
+        }
+
+        const hotelsSnap = await db.collection('hotels')
+          .select('destination', 'cityId', 'city', 'cityEn', 'isDeleted')
+          .get();
+        const hotels = hotelsSnap.docs.map((doc) => doc.data());
+
+        const mapped = cities.map((city) => {
+          const hotelCount = hotels.filter((h) => {
+            const d = (h.destination || '').toLowerCase();
+            const isMatch =
+              d === city.id.toLowerCase() ||
+              (city.nameEn && d === city.nameEn.toLowerCase()) ||
+              (city.name && d === city.name.toLowerCase()) ||
+              h.cityId === city.id ||
+              h.city === city.name ||
+              h.cityEn === city.nameEn;
+            return isMatch && h.isDeleted !== true;
+          }).length;
           return {
-            id: doc.id,
-            name: d.name || d.nameAr || '',
-            nameEn: d.nameEn || '',
-            governorate: d.name || d.nameAr || '',
-            governorateEn: d.nameEn || '',
-            image: d.imageUrl || '',
-            hotelCount: 0,
-            isActive: true,
+            ...city,
+            hotelCount,
           };
         });
-      } else {
-        cities = await apiClient.getCities();
+
+        return mapped.slice(0, limit);
+      } catch (error) {
+        console.error('Error in getAllCities:', error);
+        return [];
       }
-
-      const hotelsSnap = await db.collection('hotels').get();
-      const hotels = hotelsSnap.docs.map((doc) => doc.data());
-
-      const mapped = cities.map((city) => {
-        const hotelCount = hotels.filter((h) => {
-          const dest = (h.destination || '').toLowerCase();
-          const isMatch =
-            dest === city.id.toLowerCase() ||
-            (city.nameEn && dest === city.nameEn.toLowerCase()) ||
-            (city.name && dest === city.name.toLowerCase()) ||
-            h.cityId === city.id ||
-            h.city === city.name ||
-            h.cityEn === city.nameEn;
-          return isMatch && h.isDeleted !== true;
-        }).length;
-        return {
-          ...city,
-          hotelCount,
-        };
-      });
-
-      return mapped.slice(0, limit);
-    } catch (error) {
-      console.error('Error in getAllCities:', error);
-      return [];
-    }
-  }
+    },
+    ['cities:all'],
+    { revalidate: CITIES_REVALIDATE, tags: ['cities'] }
+  );
 
   static async createCity(data: {
     nameAr: string;

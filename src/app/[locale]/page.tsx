@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import HeroSection from '@/components/home/HeroSection';
 import OffersSlider from '@/components/home/OffersSlider';
 import CitiesSection from '@/components/home/CitiesSection';
@@ -12,6 +13,9 @@ import { getActiveCities } from '@/actions/cities';
 import { HomepageCmsService, SettingsCmsService } from '@/services/cms';
 
 import { getLocalizedAlternates } from '@/lib/seo';
+
+// Phase 2: كاش المسار 60s (قرار المستخدم) — TTFB يدفع مرة واحدة بالدقيقة
+export const revalidate = 60;
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -47,16 +51,34 @@ export async function generateMetadata(props: {
   };
 }
 
+function SectionSkeleton({ height = 'h-64' }: { height?: string }) {
+  return (
+    <div className={`max-w-6xl mx-auto px-4 sm:px-6 my-8 ${height} rounded-3xl bg-neutral-100 animate-pulse`} aria-hidden />
+  );
+}
+
+// أقسام مستقلة بجلبها الخاص — تُبثّ (stream) بعد الهيرو بدل حجب الصفحة كاملة
+async function OffersSection() {
+  const offers = await getActiveOffers();
+  return <OffersSlider offers={offers} />;
+}
+
+async function FeaturedHotelsSection() {
+  const { data: hotels } = await getLocalHotels({ sort: 'recommended', pageSize: 12 });
+  return <FeaturedHotels hotels={hotels.filter((h) => h.isFeatured)} />;
+}
+
+async function CitiesSectionWrapper() {
+  const cities = await getActiveCities();
+  return <CitiesSection cities={cities} />;
+}
+
 export default async function HomePage() {
-  const [{ data: hotels }, offers, cities, homepageContent, settings] = await Promise.all([
-    getLocalHotels({ sort: 'recommended', pageSize: 12 }),
-    getActiveOffers(),
-    getActiveCities(),
+  // CMS مكاش أصلاً (10s) — فوق الشاشة يُرسم فوراً دون انتظار Firestore البطيء
+  const [homepageContent, settings] = await Promise.all([
     HomepageCmsService.getHomepageContent(),
     SettingsCmsService.getSettings(),
   ]);
-
-  const featuredHotels = hotels.filter((h) => h.isFeatured);
 
   const appDownloadFixed = {
     ...homepageContent.appDownload,
@@ -67,9 +89,15 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection hero={homepageContent.hero} />
-      <OffersSlider offers={offers} />
-      <FeaturedHotels hotels={featuredHotels} />
-      <CitiesSection cities={cities} />
+      <Suspense fallback={<SectionSkeleton height="h-48" />}>
+        <OffersSection />
+      </Suspense>
+      <Suspense fallback={<SectionSkeleton height="h-96" />}>
+        <FeaturedHotelsSection />
+      </Suspense>
+      <Suspense fallback={<SectionSkeleton height="h-96" />}>
+        <CitiesSectionWrapper />
+      </Suspense>
       <WhyMsari whyMsari={homepageContent.whyMsari} />
       <AppDownloadSection appDownload={appDownloadFixed} />
       <SocialFollowSection socialFollow={homepageContent.socialFollow} />
