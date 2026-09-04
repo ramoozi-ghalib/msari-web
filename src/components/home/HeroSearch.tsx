@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -8,9 +8,9 @@ import {
 import { cn } from '@/lib/utils';
 
 const desktopTabs = [
-  { id: 'hotels', labelAr: '┘┘╪د╪»┘é', icon: Hotel },
-  { id: 'flights', labelAr: '╪╖┘è╪▒╪د┘', icon: Plane },
-  { id: 'cars', labelAr: '╪│┘è╪د╪▒╪د╪ز', icon: Car },
+  { id: 'hotels', labelAr: 'فنادق', icon: Hotel },
+  { id: 'flights', labelAr: 'طيران', icon: Plane },
+  { id: 'cars', labelAr: 'سيارات', icon: Car },
 ];
 
 export default function HeroSearch() {
@@ -61,7 +61,7 @@ export default function HeroSearch() {
   return (
     <div className="relative z-30 max-w-5xl mx-auto px-3 sm:px-6 -mt-[140px] sm:-mt-20 lg:-mt-22">
 
-      {/* ظ¤ظ¤ DESKTOP VIEW: Full 12-Column Luxury Search Console with Prominent Fields ظ¤ظ¤ */}
+      {/* ── DESKTOP VIEW: Full 12-Column Luxury Search Console with Prominent Fields ── */}
       <div
         className="hidden md:block bg-white rounded-3xl p-4 sm:p-5 shadow-[0_20px_50px_-15px_rgba(35,9,110,0.22)] border border-neutral-100/90 text-neutral-800"
         style={{ direction: 'rtl' }}
@@ -96,12 +96,12 @@ export default function HeroSearch() {
 
             {/* Destination */}
             <div className="col-span-4 text-start p-2.5 rounded-2xl bg-neutral-50 hover:bg-white focus-within:bg-white focus-within:border-[var(--brand-primary)] border border-neutral-200/90 shadow-sm transition-all">
-              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">╪د┘┘ê╪ش┘ç╪ر ╪ث┘ê ╪د┘┘┘╪»┘é</label>
+              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الوجهة أو الفندق</label>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                 <input
                   type="text"
-                  placeholder="╪د┘┘à╪»┘è┘╪ر╪î ╪د┘┘┘╪»┘é"
+                  placeholder="المدينة، الفندق"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="w-full bg-transparent text-sm font-bold text-neutral-900 placeholder:text-neutral-400 placeholder:font-normal outline-none"
@@ -111,7 +111,7 @@ export default function HeroSearch() {
 
             {/* Dates */}
             <div className="col-span-4 text-start p-2.5 rounded-2xl bg-neutral-50 hover:bg-white focus-within:bg-white focus-within:border-[var(--brand-primary)] border border-neutral-200/90 shadow-sm transition-all">
-              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">╪ز╪د╪▒┘è╪« ╪د┘┘ê╪╡┘ê┘ ┘ê╪د┘┘à╪║╪د╪»╪▒╪ر</label>
+              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">تاريخ الوصول والمغادرة</label>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                 <div className="flex items-center gap-1.5 w-full text-xs font-bold text-neutral-700">
@@ -134,22 +134,22 @@ export default function HeroSearch() {
 
             {/* Guests & Rooms */}
             <div className="col-span-2 relative text-start p-2.5 rounded-2xl bg-neutral-50 hover:bg-white focus-within:bg-white focus-within:border-[var(--brand-primary)] border border-neutral-200/90 shadow-sm transition-all">
-              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">╪د┘╪╢┘è┘ê┘ ┘ê╪د┘╪║╪▒┘</label>
+              <label className="block text-[10px] font-black text-neutral-400 mb-0.5">الضيوف والغرف</label>
               <button
                 type="button"
                 onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
                 className="flex items-center gap-1.5 text-xs font-bold text-neutral-800 w-full"
               >
                 <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
-                <span className="truncate">{guests} ╪╢┘è┘ê┘╪î {rooms} ╪║╪▒┘╪ر</span>
+                <span className="truncate">{guests} ضيوف، {rooms} غرفة</span>
               </button>
 
               {showGuestsDropdown && (
                 <div className="absolute top-full end-0 mt-3 w-64 bg-white rounded-2xl p-4 shadow-2xl border border-neutral-100 z-50 animate-fade-in text-neutral-900">
                   <div className="flex items-center justify-between py-2 border-b border-neutral-100">
                     <div>
-                      <div className="text-xs font-black">╪د┘┘╪▓┘╪د╪ة ╪د┘╪ذ╪د┘╪║┘è┘</div>
-                      <div className="text-[10px] text-neutral-400">12 ╪│┘╪ر ┘╪ث┘â╪س╪▒</div>
+                      <div className="text-xs font-black">النزلاء البالغين</div>
+                      <div className="text-[10px] text-neutral-400">12 سنة فأكثر</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -172,8 +172,8 @@ export default function HeroSearch() {
 
                   <div className="flex items-center justify-between py-2">
                     <div>
-                      <div className="text-xs font-black">╪╣╪»╪» ╪د┘╪║╪▒┘</div>
-                      <div className="text-[10px] text-neutral-400">╪║╪▒┘ ╪د┘╪ح┘é╪د┘à╪ر</div>
+                      <div className="text-xs font-black">عدد الغرف</div>
+                      <div className="text-[10px] text-neutral-400">غرف الإقامة</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -199,7 +199,7 @@ export default function HeroSearch() {
                     onClick={() => setShowGuestsDropdown(false)}
                     className="w-full mt-3 py-2 bg-[var(--brand-primary)] text-white text-xs font-bold rounded-xl shadow-md hover:bg-[var(--brand-secondary)]"
                   >
-                    ╪ز┘à
+                    تم
                   </button>
                 </div>
               )}
@@ -213,7 +213,7 @@ export default function HeroSearch() {
                 className="w-full py-3.5 px-5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-xs sm:text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <Search className="w-4 h-4" />
-                <span>╪ذ╪ص╪س</span>
+                <span>بحث</span>
               </button>
             </div>
 
@@ -222,29 +222,29 @@ export default function HeroSearch() {
           <div className="py-4 text-center space-y-3">
             <p className="text-xs sm:text-sm font-bold text-neutral-600">
               {activeTab === 'flights'
-                ? 'ظ£êي╕ ╪د╪ص╪ش╪▓ ╪ز╪░╪د┘â╪▒ ╪د┘╪╖┘è╪▒╪د┘ ╪ح┘┘ë ┘â╪د┘╪ر ╪د┘┘à╪╖╪د╪▒╪د╪ز ╪د┘┘à╪ص┘┘è╪ر ┘ê╪د┘╪»┘ê┘┘è╪ر ╪ذ╪ث┘╪╢┘ ╪د┘╪ث╪│╪╣╪د╪▒ ╪د┘┘à╪ذ╪د╪┤╪▒╪ر'
-                : '≡اأù ╪«╪»┘à╪د╪ز ╪ز╪ث╪ش┘è╪▒ ╪د┘╪│┘è╪د╪▒╪د╪ز ╪د┘┘╪د╪«╪▒╪ر ┘ê╪د┘┘┘é┘ ╪ذ┘è┘ ╪د┘┘à╪ص╪د┘╪╕╪د╪ز ┘à╪╣ ╪ث┘ê ╪ذ╪»┘ê┘ ╪│╪د╪خ┘é'}
+                ? '✈️ احجز تذاكر الطيران إلى كافة المطارات المحلية والدولية بأفضل الأسعار المباشرة'
+                : '🚗 خدمات تأجير السيارات الفاخرة والنقل بين المحافظات مع أو بدون سائق'}
             </p>
             <button
               type="button"
               onClick={() => handleSearch()}
               className="px-6 sm:px-8 py-2.5 bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black rounded-xl text-xs sm:text-sm shadow-lg transition-all inline-flex items-center gap-2"
             >
-              <span>╪ذ╪ص╪س</span>
+              <span>بحث</span>
             </button>
           </div>
         )}
 
       </div>
 
-      {/* ظ¤ظ¤ MOBILE VIEW: Seamless Unified Notched Hotel Search Card ظ¤ظ¤ */}
+      {/* ── MOBILE VIEW: Seamless Unified Notched Hotel Search Card ── */}
       <div className="md:hidden w-full max-w-sm mx-auto" style={{ direction: 'rtl' }}>
 
         {/* Top Notch Tab: Attached Seamlessly to Card Body */}
         <div className="flex justify-start">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-t-2xl bg-white text-neutral-900 font-black text-xs border-t border-x border-neutral-100 shadow-[-5px_-5px_15px_rgba(0,0,0,0.04)] -mb-[1px] relative z-10">
             <BedDouble className="w-4 h-4 text-[var(--brand-primary)]" />
-            <span>┘┘╪د╪»┘é</span>
+            <span>فنادق</span>
           </div>
         </div>
 
@@ -257,7 +257,7 @@ export default function HeroSearch() {
               <Building2 className="w-5 h-5 text-[var(--brand-primary)] shrink-0" />
               <input
                 type="text"
-                placeholder="╪د┘┘à╪»┘è┘╪ر╪î ╪د┘┘┘╪»┘é"
+                placeholder="المدينة، الفندق"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full bg-transparent text-xs font-semibold text-neutral-800 placeholder:text-neutral-400 placeholder:font-normal outline-none"
@@ -270,7 +270,7 @@ export default function HeroSearch() {
 
             {/* Check-In Date */}
             <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/60 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
-              <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">┘à┘ê╪╣╪» ╪د┘┘ê╪╡┘ê┘</label>
+              <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد الوصول</label>
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
                 <input
@@ -284,7 +284,7 @@ export default function HeroSearch() {
 
             {/* Check-Out Date */}
             <div className="relative rounded-2xl border border-neutral-200/90 p-2.5 bg-neutral-50/60 hover:bg-neutral-50 focus-within:border-[var(--brand-primary)] focus-within:bg-white transition-all text-start">
-              <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">┘à┘ê╪╣╪» ╪د┘┘à╪║╪د╪»╪▒╪ر</label>
+              <label className="block text-[10px] font-bold text-neutral-400 mb-0.5">موعد المغادرة</label>
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
                 <input
@@ -308,7 +308,7 @@ export default function HeroSearch() {
               <div className="flex items-center gap-2.5">
                 <Users className="w-4 h-4 text-[var(--brand-primary)] shrink-0" />
                 <span className="text-xs font-black text-neutral-900">
-                  {rooms} ╪║╪▒┘╪ر, {guests} ╪ذ╪د┘╪║┘è┘{childrenCount > 0 ? `, ${childrenCount} ╪ث╪╖┘╪د┘` : ', 0 ╪╖┘┘'}
+                  {rooms} غرفة, {guests} بالغين{childrenCount > 0 ? `, ${childrenCount} أطفال` : ', 0 طفل'}
                 </span>
               </div>
               <ChevronDown size={14} className={cn('text-neutral-400 transition-transform', showMobileGuestsModal && 'rotate-180')} />
@@ -320,8 +320,8 @@ export default function HeroSearch() {
                 {/* Adults */}
                 <div className="flex items-center justify-between py-1 border-b border-neutral-100">
                   <div>
-                    <div className="text-xs font-black">╪د┘╪ذ╪د┘╪║┘è┘</div>
-                    <div className="text-[9.5px] text-neutral-400">12 ╪│┘╪ر ┘╪ث┘â╪س╪▒</div>
+                    <div className="text-xs font-black">البالغين</div>
+                    <div className="text-[9.5px] text-neutral-400">12 سنة فأكثر</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -345,8 +345,8 @@ export default function HeroSearch() {
                 {/* Children */}
                 <div className="flex items-center justify-between py-1 border-b border-neutral-100">
                   <div>
-                    <div className="text-xs font-black">╪د┘╪ث╪╖┘╪د┘</div>
-                    <div className="text-[9.5px] text-neutral-400">╪ث┘é┘ ┘à┘ 12 ╪│┘╪ر</div>
+                    <div className="text-xs font-black">الأطفال</div>
+                    <div className="text-[9.5px] text-neutral-400">أقل من 12 سنة</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -370,8 +370,8 @@ export default function HeroSearch() {
                 {/* Rooms */}
                 <div className="flex items-center justify-between py-1">
                   <div>
-                    <div className="text-xs font-black">╪د┘╪║╪▒┘</div>
-                    <div className="text-[9.5px] text-neutral-400">╪╣╪»╪» ╪د┘╪║╪▒┘</div>
+                    <div className="text-xs font-black">الغرف</div>
+                    <div className="text-[9.5px] text-neutral-400">عدد الغرف</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -397,7 +397,7 @@ export default function HeroSearch() {
                   onClick={() => setShowMobileGuestsModal(false)}
                   className="w-full py-1.5 bg-[var(--brand-primary)] text-white text-xs font-bold rounded-xl shadow-sm"
                 >
-                  ╪ز┘à
+                  تم
                 </button>
               </div>
             )}
@@ -410,7 +410,7 @@ export default function HeroSearch() {
             className="w-full py-3.5 rounded-2xl bg-[#FF3B30] hover:bg-[#e02d23] text-white font-black text-sm shadow-xl shadow-[#FF3B30]/30 transition-all active:scale-98 flex items-center justify-center gap-2"
           >
             <Search className="w-4 h-4" />
-            <span>╪ذ╪ص╪س</span>
+            <span>بحث</span>
           </button>
 
         </div>
