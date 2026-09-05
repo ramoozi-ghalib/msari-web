@@ -9,6 +9,7 @@ import type { Hotel } from '@/types';
 import { clampLimit } from '@/lib/action-utils';
 import { db } from '@/lib/firebase-admin';
 import { CityService } from '@/services/city.service';
+import { cache } from 'react';
 
 export type GetLocalHotelsParams = {
   limit?:    unknown;
@@ -41,6 +42,187 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
       .get();
 
     const hotelDocs = snapshot.docs.filter(doc => doc.data().isDeleted !== true);
+
+    // B1: مسار الشريحة — عندما لا تدخل أسعار الغرف في الفرز/الفلترة
+    // (الموصى به/التقييم، بلا min/max)، نحدد الشريحة أولاً ثم نجلب الغرف لها فقط.
+    // القيم المستخدمة (isActive/city/q/stars/isFeatured/createdAt/id) لا تتأثر بالغرف،
+    // فيبقى التحديد والترتيب والمجموع مطابقين تماماً للمسار الكامل أدناه.
+    const priceSensitive =
+      params?.sort === 'price_asc' ||
+      params?.sort === 'price_desc' ||
+      params?.minPrice !== undefined ||
+      params?.maxPrice !== undefined;
+
+    if (!priceSensitive) {
+      type SlicePrep = {
+        docId: string;
+        data: FirebaseFirestore.DocumentData;
+        hotel: Hotel;
+      };
+      const buildProbe = (doc: FirebaseFirestore.QueryDocumentSnapshot): SlicePrep | null => {
+        const data = doc.data();
+        const starsCount = Math.max(1, Math.min(5, Number(data.stars) || 3));
+        const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
+        const finalMinPrice = explicitPrice > 0 ? explicitPrice : 30;
+        const apiHotel: any = {
+          id: doc.id,
+          destination: data.destination || '',
+          name: data.name || { ar: '', en: '' },
+          address: data.address || { ar: '', en: '' },
+          overview: data.overview || { ar: '', en: '' },
+          mainImageUrl: data.mainImageUrl || '',
+          images: data.images || [],
+          amenities: mapAmenitiesToDTO(data.amenities),
+          policies: (data.policies || []).map((pol: any) => {
+            if (typeof pol === 'object' && pol !== null) {
+              return pol.ar || pol.en || '';
+            }
+            return String(pol);
+          }),
+          stars: starsCount,
+          price: finalMinPrice,
+          isSpecial: data.isSpecial || false,
+          isPublished: data.isPublished !== false,
+          mapLink: data.mapLink || data.mapUrl || '',
+          lat: data.lat || data.latitude || data.location?.latitude || data.location?._latitude || data.coordinates?.lat,
+          lng: data.lng || data.longitude || data.location?.longitude || data.location?._longitude || data.coordinates?.lng,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || '1970-01-01T00:00:00.000Z',
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          isDeleted: data.isDeleted || false,
+        };
+        return { docId: doc.id, data, hotel: mapApiHotelToHotel(apiHotel, [], apiCities) };
+      };
+
+      const sortSlice = (
+        list: SlicePrep[],
+        cmp: (a: Hotel, b: Hotel, ai: SlicePrep, bi: SlicePrep) => number
+      ): SlicePrep[] => [...list].sort((x, y) => cmp(x.hotel, y.hotel, x, y));
+
+      const byIdTiebreak = (a: SlicePrep, b: SlicePrep): number => {
+        if (a.docId === b.docId) return 0;
+        return a.docId < b.docId ? -1 : 1;
+      };
+
+      let candidates = hotelDocs
+        .map(buildProbe)
+        .filter((p): p is SlicePrep => {
+          if (!p) return false;
+          const hotel = p.hotel;
+          if (!hotel.isActive) return false;
+          if (params?.city) {
+            const cityFilter = params.city.toLowerCase().trim();
+            const matchesCity =
+              (hotel.city && hotel.city.toLowerCase().includes(cityFilter)) ||
+              (hotel.cityEn && hotel.cityEn.toLowerCase().includes(cityFilter)) ||
+              (hotel.cityId && hotel.cityId.toLowerCase() === cityFilter) ||
+              (hotel.governorate && hotel.governorate.toLowerCase().includes(cityFilter));
+            if (!matchesCity) return false;
+          }
+          if (params?.q) {
+            const q = params.q.toLowerCase().trim();
+            const matchesName = hotel.name.toLowerCase().includes(q) || hotel.nameEn.toLowerCase().includes(q);
+            const matchesAddress = hotel.address.toLowerCase().includes(q);
+            if (!matchesName && !matchesAddress) return false;
+          }
+          if (params?.ratings?.length) {
+            if (!params.ratings.includes(hotel.stars)) return false;
+          }
+          return true;
+        });
+
+      if (params?.sort === 'rating') {
+        // rating ثابت (4.5) → الفرز القديم كان اعتباطياً؛ كاسر id يجعله حتمياً.
+        candidates = sortSlice(candidates, (a, b, ai, bi) => {
+          if (b.rating !== a.rating) return b.rating - a.rating;
+          return byIdTiebreak(ai, bi);
+        });
+      } else {
+        // الموصى به: نفس comparator المسار الكامل (مميز → أحدث → id).
+        candidates = sortSlice(candidates, (a, b, ai, bi) => {
+          if (a.isFeatured !== b.isFeatured) {
+            return a.isFeatured ? -1 : 1;
+          }
+          const bt = new Date(b.createdAt).getTime();
+          const at = new Date(a.createdAt).getTime();
+          const safeBt = Number.isNaN(bt) ? 0 : bt;
+          const safeAt = Number.isNaN(at) ? 0 : at;
+          if (safeBt !== safeAt) {
+            return safeBt - safeAt;
+          }
+          return byIdTiebreak(ai, bi);
+        });
+      }
+
+      const total = candidates.length;
+      const slice = candidates.slice(skip, skip + pageSize);
+      // نفس حساب السعر النهائي تماماً، لكن ل فنادق الشريحة فقط (≤pageSize بدل N).
+      const paginatedHotels = await Promise.all(
+        slice.map(async ({ docId, data }) => {
+          let minRoomPrice = 0;
+          try {
+            const roomsSnap = await db.collection("hotels").doc(docId).collection("rooms").get();
+            if (!roomsSnap.empty) {
+              const prices = roomsSnap.docs
+                .filter(rdoc => rdoc.data().isDeleted !== true)
+                .map(rdoc => Number(rdoc.data().price || rdoc.data().pricePerNight || 0))
+                .filter(p => p > 0);
+              if (prices.length > 0) {
+                minRoomPrice = Math.min(...prices);
+              }
+            }
+          } catch {
+            // ignore fallback
+          }
+          const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
+          let finalMinPrice = 0;
+          if (explicitPrice > 0 && minRoomPrice > 0) {
+            finalMinPrice = Math.min(explicitPrice, minRoomPrice);
+          } else if (minRoomPrice > 0) {
+            finalMinPrice = minRoomPrice;
+          } else if (explicitPrice > 0) {
+            finalMinPrice = explicitPrice;
+          } else {
+            finalMinPrice = 30;
+          }
+          const starsCount = Math.max(1, Math.min(5, Number(data.stars) || 3));
+          const apiHotel: any = {
+            id: docId,
+            destination: data.destination || '',
+            name: data.name || { ar: '', en: '' },
+            address: data.address || { ar: '', en: '' },
+            overview: data.overview || { ar: '', en: '' },
+            mainImageUrl: data.mainImageUrl || '',
+            images: data.images || [],
+            amenities: mapAmenitiesToDTO(data.amenities),
+            policies: (data.policies || []).map((pol: any) => {
+              if (typeof pol === 'object' && pol !== null) {
+                return pol.ar || pol.en || '';
+              }
+              return String(pol);
+            }),
+            stars: starsCount,
+            price: finalMinPrice,
+            isSpecial: data.isSpecial || false,
+            isPublished: data.isPublished !== false,
+            mapLink: data.mapLink || data.mapUrl || '',
+            lat: data.lat || data.latitude || data.location?.latitude || data.location?._latitude || data.coordinates?.lat,
+            lng: data.lng || data.longitude || data.location?.longitude || data.location?._longitude || data.coordinates?.lng,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || '1970-01-01T00:00:00.000Z',
+            updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            isDeleted: data.isDeleted || false,
+          };
+          return mapApiHotelToHotel(apiHotel, [], apiCities);
+        })
+      );
+
+      return {
+        data: paginatedHotels,
+        total,
+        page,
+        pageSize,
+      };
+    }
+
     let hotels: Hotel[] = await Promise.all(hotelDocs.map(async (doc) => {
       const data = doc.data();
 
@@ -188,7 +370,9 @@ export async function getHotels(params?: GetLocalHotelsParams) {
   return getLocalHotels(params);
 }
 
-export async function getHotelBySlug(slug: string): Promise<Hotel | null> {
+// B4: per-request dedup — generateMetadata و Page يطلبان نفس الفندق في نفس الطلب.
+// cache() لا يشارك بين الطلبات: لا قيم stale عبر المستخدمين.
+export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> => {
 
   try {
     const snapshot = await db.collection("hotels")
@@ -284,7 +468,7 @@ export async function getHotelBySlug(slug: string): Promise<Hotel | null> {
     console.error('Error fetching hotel by slug:', error);
     return null;
   }
-}
+});
 
 function mapAmenitiesToDTO(rawAmenities: any): any[] {
   if (!Array.isArray(rawAmenities)) return [];
