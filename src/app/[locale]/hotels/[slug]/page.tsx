@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getHotelBySlug, getLocalHotels } from '@/actions/hotels';
+import { getHotelBySlug, getLocalHotels, getHotelsByIds } from '@/actions/hotels';
 import { safeJsonLd } from '@/lib/sanitize';
 import HotelDetailClient from './HotelDetailClient';
 import type { Hotel } from '@/types';
@@ -115,9 +115,11 @@ export default async function HotelDetailPage(props: Props) {
   }
 
   // Fetch all hotels to accurately calculate closest 3 hotels by distance
+  // CLOSURE Phase 2: مرحلتان — قائمة خفيفة بلا أسعار غرف للترتيب الجغرافي،
+  // ثم جلب كامل للثلاثة المختارة فقط (بدل تكرير أسعار الغرف لـ100 فندق).
   let nearbyHotels: Hotel[] = [];
   try {
-    const allRes = await getLocalHotels({ pageSize: 100 });
+    const allRes = await getLocalHotels({ pageSize: 100, skipRoomPrices: true });
     const candidates = (allRes.data || []).filter(h => h.id !== hotel.id && h.slug !== hotel.slug);
 
     const baseCoords = getHotelCoords(hotel);
@@ -138,7 +140,7 @@ export default async function HotelDetailPage(props: Props) {
       return (sameCityA + distA) - (sameCityB + distB);
     });
 
-    nearbyHotels = candidates.slice(0, 3);
+    nearbyHotels = await getHotelsByIds(candidates.slice(0, 3).map(h => h.id));
   } catch {
     // Graceful fallback
   }

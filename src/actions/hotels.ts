@@ -21,6 +21,9 @@ export type GetLocalHotelsParams = {
   sort?:     'recommended' | 'price_asc' | 'price_desc' | 'rating';
   page?:     number;
   pageSize?: number;
+  // CLOSURE Phase 2: تخطّي أسعار الغرف (تُستخدم مع التكرير اللاحق عبر getHotelsByIds).
+  // داخلي فقط — لا يغيّر أي سلوك عام ما لم يُمرَّر صراحةً.
+  skipRoomPrices?: boolean;
 };
 
 export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
@@ -156,9 +159,13 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
       const total = candidates.length;
       const slice = candidates.slice(skip, skip + pageSize);
       // نفس حساب السعر النهائي تماماً، لكن ل فنادق الشريحة فقط (≤pageSize بدل N).
+      // skipRoomPrices: تُستخدم مع التكرير اللاحق عبر getHotelsByIds (nearby) —
+      // لا تُمرَّر من أي مسار عرض مباشر.
+      const skipRooms = params?.skipRoomPrices === true;
       const paginatedHotels = await Promise.all(
         slice.map(async ({ docId, data }) => {
           let minRoomPrice = 0;
+          if (!skipRooms) {
           try {
             const roomsSnap = await db.collection("hotels").doc(docId).collection("rooms").get();
             if (!roomsSnap.empty) {
@@ -172,6 +179,7 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
             }
           } catch {
             // ignore fallback
+          }
           }
           const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
           let finalMinPrice = 0;
@@ -368,6 +376,89 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
 // Admin/Public fetch all hotels using getLocalHotels
 export async function getHotels(params?: GetLocalHotelsParams) {
   return getLocalHotels(params);
+}
+
+// CLOSURE Phase 2 (nearby): جلب فنادق محددة بالمعرفات — قراءات مفردة محدودة
+// (doc.get لكل معرف) بدل مسح المجموعة كاملة. تُطبق نفس فلاتر القائمة
+// (isPublished + غير محذوف) ونفس حساب السعر النهائي تماماً، وتُحفظ رتبة الإدخال.
+export async function getHotelsByIds(ids: string[]): Promise<Hotel[]> {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+  try {
+    const apiCities = await CityService.getActiveCities(100);
+    const results = await Promise.all(
+      uniqueIds.map(async (id) => {
+        try {
+          const doc = await db.collection("hotels").doc(id).get();
+          if (!doc.exists) return null;
+          const data = doc.data() as FirebaseFirestore.DocumentData;
+          if (data.isPublished !== true || data.isDeleted === true) return null;
+
+          let minRoomPrice = 0;
+          try {
+            const roomsSnap = await db.collection("hotels").doc(id).collection("rooms").get();
+            if (!roomsSnap.empty) {
+              const prices = roomsSnap.docs
+                .filter(rdoc => rdoc.data().isDeleted !== true)
+                .map(rdoc => Number(rdoc.data().price || rdoc.data().pricePerNight || 0))
+                .filter(p => p > 0);
+              if (prices.length > 0) {
+                minRoomPrice = Math.min(...prices);
+              }
+            }
+          } catch {
+            // ignore fallback
+          }
+          const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
+          let finalMinPrice = 0;
+          if (explicitPrice > 0 && minRoomPrice > 0) {
+            finalMinPrice = Math.min(explicitPrice, minRoomPrice);
+          } else if (minRoomPrice > 0) {
+            finalMinPrice = minRoomPrice;
+          } else if (explicitPrice > 0) {
+            finalMinPrice = explicitPrice;
+          } else {
+            finalMinPrice = 30;
+          }
+          const starsCount = Math.max(1, Math.min(5, Number(data.stars) || 3));
+          const apiHotel: any = {
+            id: doc.id,
+            destination: data.destination || '',
+            name: data.name || { ar: '', en: '' },
+            address: data.address || { ar: '', en: '' },
+            overview: data.overview || { ar: '', en: '' },
+            mainImageUrl: data.mainImageUrl || '',
+            images: data.images || [],
+            amenities: mapAmenitiesToDTO(data.amenities),
+            policies: (data.policies || []).map((pol: any) => {
+              if (typeof pol === 'object' && pol !== null) {
+                return pol.ar || pol.en || '';
+              }
+              return String(pol);
+            }),
+            stars: starsCount,
+            price: finalMinPrice,
+            isSpecial: data.isSpecial || false,
+            isPublished: data.isPublished !== false,
+            mapLink: data.mapLink || data.mapUrl || '',
+            lat: data.lat || data.latitude || data.location?.latitude || data.location?._latitude || data.coordinates?.lat,
+            lng: data.lng || data.longitude || data.location?.longitude || data.location?._longitude || data.coordinates?.lng,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || '1970-01-01T00:00:00.000Z',
+            updatedAt: data.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            isDeleted: data.isDeleted || false,
+          };
+          return mapApiHotelToHotel(apiHotel, [], apiCities);
+        } catch {
+          return null;
+        }
+      })
+    );
+    const byId = new Map(results.filter((h): h is Hotel => h !== null).map((h) => [h.id, h]));
+    return uniqueIds.map((id) => byId.get(id)).filter((h): h is Hotel => h !== undefined);
+  } catch (error) {
+    console.error('Error fetching hotels by ids:', error);
+    return [];
+  }
 }
 
 // B4: per-request dedup — generateMetadata و Page يطلبان نفس الفندق في نفس الطلب.
