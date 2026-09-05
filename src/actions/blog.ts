@@ -1,5 +1,6 @@
 'use server';
 
+import { cache } from 'react';
 import { db } from '@/lib/firebase-admin';
 import type { BlogPost } from '@/types';
 
@@ -52,7 +53,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
 }
 
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+// B4: per-request dedup — generateMetadata و Page يطلبان نفس المقال. cache() فقط.
+export const getBlogPostBySlug = cache(async (slug: string): Promise<BlogPost | null> => {
   try {
     const cleanSlug = slug.trim().toLowerCase();
     // 1. Direct Document ID lookup
@@ -100,4 +102,4 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     console.error('Error fetching blog post by slug:', error);
     return null;
   }
-}
+});

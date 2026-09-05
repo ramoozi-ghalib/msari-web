@@ -2,64 +2,78 @@ import { apiClient } from '@/lib/api-client';
 import { db } from '@/lib/firebase-admin';
 import type { City } from '@/types';
 import { getDestinationData } from '@/data/destinations';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+
+// B6: كاش شبه ثابت 60s لبيانات المدن (أسماء/صور/عدادات) — تصنيف B.
+// تُبطل عند إنشاء/تعديل/حذف مدينة (actions/cities.ts). عدادات الفنادق قد
+// تتأخر ≤60s بعد نشر فندق (LOW RISK، موثق). الأسعار/التوفر لا تمر هنا إطلاقاً.
+async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
+  try {
+    let cities: City[] = [];
+
+    // Query Firestore destinations directly for fast response
+    const snap = await db.collection("destinations").get();
+    const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
+    if (validDocs.length > 0) {
+      cities = validDocs.map((doc) => {
+        const d = doc.data();
+        return {
+          id: doc.id,
+          name: d.name || d.nameAr || '',
+          nameEn: d.nameEn || '',
+          governorate: d.name || d.nameAr || '',
+          governorateEn: d.nameEn || '',
+          image: d.imageUrl || '',
+          hotelCount: 0,
+          isActive: true,
+        };
+      });
+    } else {
+      cities = await apiClient.getCities();
+    }
+
+    const hotelsSnap = await db.collection('hotels').get();
+    const hotels = hotelsSnap.docs.map((doc) => doc.data());
+
+    const mapped = cities.map((city) => {
+      const hotelCount = hotels.filter((h) => {
+        const dest = (h.destination || '').toLowerCase();
+        const isMatch =
+          dest === city.id.toLowerCase() ||
+          (city.nameEn && dest === city.nameEn.toLowerCase()) ||
+          (city.name && dest === city.name.toLowerCase()) ||
+          h.cityId === city.id ||
+          h.city === city.name ||
+          h.cityEn === city.nameEn;
+        return isMatch && h.isPublished !== false && h.isDeleted !== true;
+      }).length;
+
+      return {
+        ...city,
+        hotelCount,
+      };
+    });
+
+    return mapped.slice(0, limit);
+  } catch (error) {
+    console.error('Error in getActiveCities:', error);
+    return [];
+  }
+}
+
+const getActiveCitiesPersistent = unstable_cache(fetchActiveCitiesFresh, ['cities:active'], {
+  revalidate: 60,
+  tags: ['cities'],
+});
 
 export class CityService {
   /**
-   * Fetch active cities with count of active hotels
+   * Fetch active cities with count of active hotels.
+   * B5: per-request dedup — تُستدعى مرتين في نفس طلب الصفحة
+   * (مباشرة + داخل getLocalHotels). cache() على مستوى الطلب فقط: لا stale.
    */
-  static async getActiveCities(limit: number): Promise<City[]> {
-    try {
-      let cities: City[] = [];
-
-      // Query Firestore destinations directly for fast response
-      const snap = await db.collection("destinations").get();
-      const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
-      if (validDocs.length > 0) {
-        cities = validDocs.map((doc) => {
-          const d = doc.data();
-          return {
-            id: doc.id,
-            name: d.name || d.nameAr || '',
-            nameEn: d.nameEn || '',
-            governorate: d.name || d.nameAr || '',
-            governorateEn: d.nameEn || '',
-            image: d.imageUrl || '',
-            hotelCount: 0,
-            isActive: true,
-          };
-        });
-      } else {
-        cities = await apiClient.getCities();
-      }
-
-      const hotelsSnap = await db.collection('hotels').get();
-      const hotels = hotelsSnap.docs.map((doc) => doc.data());
-
-      const mapped = cities.map((city) => {
-        const hotelCount = hotels.filter((h) => {
-          const dest = (h.destination || '').toLowerCase();
-          const isMatch =
-            dest === city.id.toLowerCase() ||
-            (city.nameEn && dest === city.nameEn.toLowerCase()) ||
-            (city.name && dest === city.name.toLowerCase()) ||
-            h.cityId === city.id ||
-            h.city === city.name ||
-            h.cityEn === city.nameEn;
-          return isMatch && h.isPublished !== false && h.isDeleted !== true;
-        }).length;
-
-        return {
-          ...city,
-          hotelCount,
-        };
-      });
-
-      return mapped.slice(0, limit);
-    } catch (error) {
-      console.error('Error in getActiveCities:', error);
-      return [];
-    }
-  }
+  static getActiveCities = cache((limit: number): Promise<City[]> => getActiveCitiesPersistent(limit));
 
   /**
    * Fetch all cities with count of all hotels
@@ -175,9 +189,10 @@ export class CityService {
   }
 
   /**
-   * Resolves a destination by slug or city name and combines Firestore operational data + CMS editorial guide
+   * Resolves a destination by slug or city name and combines Firestore operational data + CMS editorial guide.
+   * B4: per-request dedup — generateMetadata و Page يطلبانها معاً. cache() فقط.
    */
-  static async getDestinationBySlug(slug: string) {
+  static getDestinationBySlug = cache(async (slug: string) => {
     const cleanSlug = slug.trim().toLowerCase();
 
     // 1. Look up operational city from Firestore destinations collection (Core SoT)
@@ -229,5 +244,5 @@ export class CityService {
       hotelCount: hotels.length,
       rawHotels: hotels,
     };
-  }
+  });
 }
