@@ -71,7 +71,7 @@ export default function DestinationDetailClient({ destination, locale }: Destina
 
             {/* Main Destination Title forced in Pure High-Contrast White via inline style override */}
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold leading-tight tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
-              <span style={{ color: '#FFFFFF' }}>وجهة {destination.name}</span>
+              <span style={{ color: '#FFFFFF' }}>فنادق {destination.name}</span>
             </h1>
 
             <p className="text-xs sm:text-sm lg:text-base text-white max-w-3xl leading-relaxed font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]" style={{ color: '#FFFFFF' }}>
@@ -116,7 +116,58 @@ export default function DestinationDetailClient({ destination, locale }: Destina
         </div>
       </div>
 
-      {/* ─── 2. TRAVEL GUIDE & OVERVIEW SECTION (Distinct Balanced Card) ─ */}
+      {/* ─── 2. CITY HOTELS & BOOKING SECTION (Commercial first — Distinct Standalone Card) ──── */}
+      <section className="container-msari">
+        <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-neutral-200/80">
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-1">
+                🏨 أماكن الإقامة والحجز
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1">
+                فنادق ومقرات الإقامة في {destination.name}
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-medium">
+                احجز فندقك المفضل مباشرة بأفضل الأسعار وأرقى الخدمات
+              </p>
+            </div>
+
+            {/* Quick Filter Search */}
+            <div className="relative min-w-[260px] sm:min-w-[320px]">
+              <Search size={18} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <input
+                type="text"
+                placeholder={`ابحث عن فندق في ${destination.name}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full ps-10 pe-4 py-2.5 rounded-2xl bg-[var(--surface-page)] border border-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Hotels Cards Grid */}
+          {filteredHotels.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredHotels.map((hotel: any) => (
+                <HotelCard key={hotel.id} hotel={hotel} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 px-4 rounded-2xl bg-[var(--surface-page)] border border-dashed border-neutral-300">
+              <Building2 size={48} className="mx-auto text-neutral-400 mb-3" />
+              <h3 className="font-bold text-neutral-800 text-lg mb-1">لا توجد فنادق تطابق بحثك حالياً</h3>
+              <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto mb-4">
+                جرب تغيير البحث أو تصفح جميع الفنادق المتاحة في المدن الأخرى.
+              </p>
+              <Link href={`/${currentLocale}/hotels`} className="btn btn-primary btn-sm px-6 py-2 rounded-xl text-xs font-bold">
+                عرض جميع الفنادق
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ─── 3. TRAVEL GUIDE & OVERVIEW SECTION (Distinct Balanced Card) ─ */}
       <section className="container-msari">
         <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-neutral-200/80">
           {/* Title and Tabs arranged vertically directly under the title */}
@@ -227,7 +278,7 @@ export default function DestinationDetailClient({ destination, locale }: Destina
         </div>
       </section>
 
-      {/* ─── 3. 3D LANDMARK CARDS SECTION (Distinct Balanced Card Block) ─ */}
+      {/* ─── 4. 3D LANDMARK CARDS SECTION (Distinct Balanced Card Block) ─ */}
       {destination.landmarks && destination.landmarks.length > 0 && (
         <section className="container-msari">
           <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-neutral-200/80">
@@ -302,56 +353,6 @@ export default function DestinationDetailClient({ destination, locale }: Destina
         </section>
       )}
 
-      {/* ─── 4. CITY HOTELS & BOOKING SECTION (Distinct Standalone Card) ──── */}
-      <section className="container-msari">
-        <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-neutral-200/80">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-black mb-1">
-                🏨 أماكن الإقامة والحجز
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1">
-                فنادق ومقرات الإقامة في {destination.name}
-              </h2>
-              <p className="text-xs sm:text-sm text-neutral-500 mt-1 font-medium">
-                احجز فندقك المفضل مباشرة بأفضل الأسعار وأرقى الخدمات
-              </p>
-            </div>
-
-            {/* Quick Filter Search */}
-            <div className="relative min-w-[260px] sm:min-w-[320px]">
-              <Search size={18} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
-              <input
-                type="text"
-                placeholder={`ابحث عن فندق في ${destination.name}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full ps-10 pe-4 py-2.5 rounded-2xl bg-[var(--surface-page)] border border-neutral-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Hotels Cards Grid */}
-          {filteredHotels.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredHotels.map((hotel: any) => (
-                <HotelCard key={hotel.id} hotel={hotel} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 px-4 rounded-2xl bg-[var(--surface-page)] border border-dashed border-neutral-300">
-              <Building2 size={48} className="mx-auto text-neutral-400 mb-3" />
-              <h3 className="font-bold text-neutral-800 text-lg mb-1">لا توجد فنادق تطابق بحثك حالياً</h3>
-              <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto mb-4">
-                جرب تغيير البحث أو تصفح جميع الفنادق المتاحة في المدن الأخرى.
-              </p>
-              <Link href={`/${currentLocale}/hotels`} className="btn btn-primary btn-sm px-6 py-2 rounded-xl text-xs font-bold">
-                عرض جميع الفنادق
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   );
 }
