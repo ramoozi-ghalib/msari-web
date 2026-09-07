@@ -53,6 +53,8 @@ const nextConfig: NextConfig = {
     // Arabic is the indexed primary locale (/en is noindexed); legacy traffic → /ar.
     return [
       // ─── Legacy WordPress URL Redirects (301 Permanent SEO Preservation) ───
+      { source: '/st_hotel', destination: '/ar/hotels', permanent: true },
+      { source: '/st_hotel/', destination: '/ar/hotels', permanent: true },
       { source: '/st_hotel/:slug', destination: '/ar/hotels/:slug', permanent: true },
       { source: '/st_hotel/:slug/', destination: '/ar/hotels/:slug', permanent: true },
       // ─── Legacy city URLs → approved commercial city canonicals (1:1) ───
