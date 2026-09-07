@@ -114,6 +114,7 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               sizes="(max-width: 768px) 100vw, 60vw"
+              unoptimized={/firebasestorage|storage\.googleapis/.test(mainFeatured.image || '')}
             />
             {/* Contrast Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
@@ -155,6 +156,7 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   sizes="(max-width: 768px) 50vw, 25vw"
+                  unoptimized={/firebasestorage|storage\.googleapis/.test(city.image || '')}
                 />
                 {/* Contrast Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />

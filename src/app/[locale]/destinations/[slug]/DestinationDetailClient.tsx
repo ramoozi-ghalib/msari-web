@@ -18,6 +18,11 @@ export default function DestinationDetailClient({ destination, locale }: Destina
   const [activeTab, setActiveTab] = useState<'history' | 'climate' | 'culture' | 'bestTime'>('history');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // SEO Phase 2 BATCH 5: bypass Vercel Image Optimization (quota 402) for
+  // Firebase Storage sources only — same proven pattern as hotel images.
+  const isFirebaseStorageUrl = (url: string) =>
+    /firebasestorage|storage\.googleapis/.test(url || '');
+
   const currentLocale = locale || 'ar';
   const hotels = destination.rawHotels || [];
 
@@ -39,6 +44,7 @@ export default function DestinationDetailClient({ destination, locale }: Destina
             fill
             priority
             className="object-cover object-center scale-105 animate-fade-in transition-transform duration-1000"
+            unoptimized={isFirebaseStorageUrl(destination.heroImage)}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-secondary)] to-[var(--brand-dark)]" />
@@ -310,6 +316,7 @@ export default function DestinationDetailClient({ destination, locale }: Destina
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                         sizes="(max-width: 768px) 100vw, 33vw"
+                        unoptimized={isFirebaseStorageUrl(landmark.image)}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[var(--brand-primary)] to-neutral-800" />
