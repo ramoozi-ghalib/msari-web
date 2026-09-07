@@ -215,7 +215,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
           <div className="flex flex-wrap items-center gap-4 pt-2 relative z-10">
             <Link
-              href="/hotels"
+              href={`/${currentLocale}/hotels`}
               className="px-7 py-3.5 rounded-xl bg-white text-[var(--brand-primary)] hover:bg-neutral-100 font-bold text-sm transition-all shadow-md inline-flex items-center gap-2"
             >
               <Hotel size={16} />
@@ -223,7 +223,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             </Link>
 
             <Link
-              href="/contact"
+              href={`/${currentLocale}/contact`}
               className="px-7 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-all inline-flex items-center gap-2"
             >
               <MessageCircle size={16} />
