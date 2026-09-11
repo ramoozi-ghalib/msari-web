@@ -4,10 +4,44 @@ import type { City } from '@/types';
 import { getDestinationData } from '@/data/destinations';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
+import { getPhaseMigrationMode } from '@/lib/api-migration/flags';
+import { shadowCompare } from '@/lib/api-migration/shadow';
 
 // B6: كاش شبه ثابت 60s لبيانات المدن (أسماء/صور/عدادات) — تصنيف B.
 // تُبطل عند إنشاء/تعديل/حذف مدينة (actions/cities.ts). عدادات الفنادق قد
 // تتأخر ≤60s بعد نشر فندق (LOW RISK، موثق). الأسعار/التوفر لا تمر هنا إطلاقاً.
+//
+// Phase A (SHADOW only): عند MSARI_API_CITIES_MODE=shadow تُقارَن النتيجة المباشرة
+// مع GET /v1/cities ويُسجَّل الفرق، مع خدمة المباشر دائماً. الوضع الافتراضي OFF:
+// صفر تغيير سلوكي. مفتاح الخادم المؤقت هو قيمة NEXT_PUBLIC_API_KEY المقروءة
+// خادمياً فقط (لا تعرض جديد؛ الاعتماد server-only لاحقاً عند توفره).
+async function fetchActiveCitiesViaApi(limit: number): Promise<Array<{
+  id: string; name: string; nameEn: string; image: string; hotelCount: number;
+}>> {
+  const base = (
+    process.env.MSARI_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'https://us-central1-msariapp-v2.cloudfunctions.net/api/v1'
+  ).replace(/\/$/, '');
+  const key = process.env.MSARI_API_KEY || process.env.NEXT_PUBLIC_API_KEY || '';
+  const res = await fetch(`${base}/cities`, {
+    headers: key ? { 'x-api-key': key } : {},
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`API /v1/cities -> HTTP ${res.status}`);
+  const body = (await res.json()) as { data?: Array<{
+    id: string; nameAr?: string; name?: string; nameEn?: string;
+    imageUrl?: string; image?: string; hotelCount?: number;
+  }> };
+  const list = Array.isArray(body?.data) ? body.data : [];
+  return list.map((c) => ({
+    id: String(c.id ?? ''),
+    name: String(c.nameAr ?? c.name ?? ''),
+    nameEn: String(c.nameEn ?? ''),
+    image: String(c.imageUrl ?? c.image ?? ''),
+    hotelCount: typeof c.hotelCount === 'number' ? c.hotelCount : -1,
+  })).slice(0, limit);
+}
 async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
   try {
     let cities: City[] = [];
@@ -55,7 +89,41 @@ async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
       };
     });
 
-    return mapped.slice(0, limit);
+    const result = mapped.slice(0, limit);
+
+    // Phase A Production SHADOW (approved): compare silently, ALWAYS serve direct.
+    // Enabled by default for the cities phase; force OFF via MSARI_API_CITIES_MODE=off.
+    // Rollback = set OFF (or revert this commit). Never throws into the request path.
+    // (Outside the main try/catch by design: shadow never touches the error path.)
+    let shadowOn = true;
+    try {
+      shadowOn =
+        process.env.MSARI_API_CITIES_MODE !== undefined
+          ? getPhaseMigrationMode('cities') !== 'OFF'
+          : true;
+    } catch {
+      shadowOn = false;
+    }
+    try {
+      if (shadowOn && result.length > 0) {
+        const directSnapshot = result.map((c: City) => ({
+          id: c.id, name: c.name, nameEn: c.nameEn, image: c.image, hotelCount: c.hotelCount,
+        }));
+        void shadowCompare({
+          phase: 'cities',
+          route: 'getActiveCities',
+          direct: async () => directSnapshot,
+          api: () => fetchActiveCitiesViaApi(limit),
+          normalize: (v) => v,
+        }).catch(() => {
+          // الظل لا يكسر الطلب أبداً.
+        });
+      }
+    } catch {
+      // الظل لا يكسر الطلب أبداً.
+    }
+
+    return result;
   } catch (error) {
     console.error('Error in getActiveCities:', error);
     return [];
