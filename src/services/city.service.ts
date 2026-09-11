@@ -4,8 +4,9 @@ import type { City } from '@/types';
 import { getDestinationData } from '@/data/destinations';
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
-import { getPhaseMigrationMode } from '@/lib/api-migration/flags';
-import { shadowCompare } from '@/lib/api-migration/shadow';
+import { getPhaseMigrationMode, getCanaryRatio, inCanaryBucket } from '@/lib/api-migration/flags';
+import { shadowCompare, diffJson } from '@/lib/api-migration/shadow';
+import { safeLog } from '@/lib/api-migration/log';
 
 // B6: كاش شبه ثابت 60s لبيانات المدن (أسماء/صور/عدادات) — تصنيف B.
 // تُبطل عند إنشاء/تعديل/حذف مدينة (actions/cities.ts). عدادات الفنادق قد
@@ -91,24 +92,74 @@ async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
 
     const result = mapped.slice(0, limit);
 
-    // Phase A Production SHADOW (approved): compare silently, ALWAYS serve direct.
-    // Enabled by default for the cities phase; force OFF via MSARI_API_CITIES_MODE=off.
-    // Rollback = set OFF (or revert this commit). Never throws into the request path.
-    // (Outside the main try/catch by design: shadow never touches the error path.)
-    let shadowOn = true;
+    // Phase A CANARY (approved): bucketed windows may be SERVED from API O1.
+    // Invariants: direct remains default; any API failure/diff falls back to direct;
+    // mode ON is capped to CANARY (100% requires separate approval); OFF disables all.
+    // Rollback = MSARI_API_CITIES_MODE=off (or revert). Never throws into requests.
+    // NOTE: unstable_cache (60s) sits above: canary applies per cache-miss window.
+    let mode: 'OFF' | 'SHADOW' | 'CANARY' | 'ON' = 'CANARY';
     try {
-      shadowOn =
+      mode =
         process.env.MSARI_API_CITIES_MODE !== undefined
-          ? getPhaseMigrationMode('cities') !== 'OFF'
-          : true;
+          ? getPhaseMigrationMode('cities')
+          : 'CANARY';
     } catch {
-      shadowOn = false;
+      mode = 'OFF';
     }
-    try {
-      if (shadowOn && result.length > 0) {
-        const directSnapshot = result.map((c: City) => ({
-          id: c.id, name: c.name, nameEn: c.nameEn, image: c.image, hotelCount: c.hotelCount,
-        }));
+    if (mode === 'ON') {
+      try {
+        safeLog('canary-cap', { phase: 'cities', note: 'ON capped to CANARY pending approval' });
+      } catch { /* never break */ }
+      mode = 'CANARY';
+    }
+
+    const directSnapshot = result.map((c: City) => ({
+      id: c.id, name: c.name, nameEn: c.nameEn, image: c.image, hotelCount: c.hotelCount,
+    }));
+
+    if (mode === 'CANARY' && result.length > 0) {
+      try {
+        const ratio = getCanaryRatio();
+        const bucketKey = `cities:${limit}:${Math.floor(Date.now() / 60000)}`;
+        if (inCanaryBucket(bucketKey, ratio)) {
+          const apiList = await fetchActiveCitiesViaApi(limit);
+          const order = new Map(result.map((c, i) => [c.id, i] as const));
+          const sameSet =
+            apiList.length === result.length && apiList.every((a) => order.has(a.id));
+          if (sameSet) {
+            const ordered = [...apiList].sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+            const diffs = diffJson(directSnapshot, ordered);
+            if (diffs.length === 0) {
+              try {
+                safeLog('canary-serve', {
+                  phase: 'cities', servedFrom: 'api', ratio, count: ordered.length,
+                });
+              } catch { /* never break */ }
+              return ordered.map((a) => ({
+                id: a.id,
+                name: a.name,
+                nameEn: a.nameEn,
+                governorate: a.name,
+                governorateEn: a.nameEn,
+                image: a.image,
+                hotelCount: a.hotelCount,
+                isActive: true,
+              })) as City[];
+            }
+            try {
+              safeLog('canary-fallback', {
+                phase: 'cities', servedFrom: 'direct', reason: 'diff', diffCount: diffs.length,
+              });
+            } catch { /* never break */ }
+          }
+        }
+      } catch {
+        // Any canary failure → serve direct below.
+      }
+    }
+
+    if (mode !== 'OFF' && result.length > 0) {
+      try {
         void shadowCompare({
           phase: 'cities',
           route: 'getActiveCities',
@@ -118,9 +169,9 @@ async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
         }).catch(() => {
           // الظل لا يكسر الطلب أبداً.
         });
+      } catch {
+        // الظل لا يكسر الطلب أبداً.
       }
-    } catch {
-      // الظل لا يكسر الطلب أبداً.
     }
 
     return result;
