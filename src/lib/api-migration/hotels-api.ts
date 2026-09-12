@@ -76,11 +76,28 @@ async function apiGet<T>(path: string, params?: Record<string, string | number>)
       cache: 'no-store',
       signal: controller.signal,
     });
-    if (!res.ok) throw new Error(`API ${path} -> HTTP ${res.status}`);
+    if (!res.ok) {
+      const err = new Error(`API ${path} -> HTTP ${res.status}`) as Error & { statusCode?: number };
+      err.statusCode = res.status;
+      throw err;
+    }
     return (await res.json()) as T;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/**
+ * Totally-missing resources (HTTP 404) resolve to null/[] (data answer).
+ * Anything else — 401/403 auth misconfiguration, 5xx, timeouts, network —
+ * THROWS so callers engage the direct-Firestore fallback. A 401 must NEVER
+ * masquerade as "hotel not found" (that 404s the page instead of falling back).
+ */
+function isNotFound(e: unknown): boolean {
+  return (
+    typeof e === 'object' && e !== null && 'statusCode' in e &&
+    (e as { statusCode?: number }).statusCode === 404
+  );
 }
 
 /** Map one API hotel to the website Hotel type with direct-path-identical semantics.
@@ -166,8 +183,9 @@ export async function apiFetchHotelBySlug(slug: string): Promise<ApiHotelV2 | nu
   try {
     const hotel = await apiGet<ApiHotelV2 | null>(`/hotels/by-slug/${encodeURIComponent(slug)}`);
     return hotel && (hotel as any).id ? hotel : null;
-  } catch {
-    return null;
+  } catch (e) {
+    if (isNotFound(e)) return null;
+    throw e;
   }
 }
 
@@ -175,8 +193,9 @@ export async function apiFetchHotelById(id: string): Promise<ApiHotelV2 | null> 
   try {
     const hotel = await apiGet<ApiHotelV2 | null>(`/hotels/${encodeURIComponent(id)}`);
     return hotel && (hotel as any).id ? hotel : null;
-  } catch {
-    return null;
+  } catch (e) {
+    if (isNotFound(e)) return null;
+    throw e;
   }
 }
 
@@ -189,8 +208,12 @@ export async function apiFetchRooms(hotelId: string): Promise<Room[]> {
     return list
       .filter((r: any) => r && r.isPublished === true && r.isDeleted !== true)
       .map((r: any) => toWebsiteRoom(r, hotelId));
-  } catch {
-    return [];
+  } catch (e) {
+    // A missing rooms collection (404) means "no rooms"; anything else must
+    // throw so the detail page falls back to direct instead of rendering
+    // a room-less hotel.
+    if (isNotFound(e)) return [];
+    throw e;
   }
 }
 
