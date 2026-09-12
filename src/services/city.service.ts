@@ -92,10 +92,12 @@ async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
 
     const result = mapped.slice(0, limit);
 
-    // Phase C3 (SHADOW): serve direct, compare with API in background.
+    // Phase C4 (CANARY 5% deterministic, same time-bucket mechanism as hotels):
+    // in-bucket windows are SERVED from API O1 only on exact-set + zero-diff,
+    // else direct. Any API failure → direct. ON capped to CANARY pending C5.
     // Rollback = MSARI_API_CITIES_MODE=off (or revert). Never throws into requests.
-    // NOTE: unstable_cache (60s) sits above: shadow runs per cache-miss window.
-    let mode: 'OFF' | 'SHADOW' | 'CANARY' | 'ON' = 'SHADOW';
+    // NOTE: unstable_cache (60s) sits above: canary applies per cache-miss window.
+    let mode: 'OFF' | 'SHADOW' | 'CANARY' | 'ON' = 'CANARY';
     try {
       mode =
         process.env.MSARI_API_CITIES_MODE !== undefined
