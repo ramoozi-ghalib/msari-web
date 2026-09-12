@@ -25,11 +25,17 @@ async function fetchActiveCitiesViaApi(limit: number): Promise<Array<{
     'https://us-central1-msariapp-v2.cloudfunctions.net/api/v1'
   ).replace(/\/$/, '');
   const key = process.env.MSARI_API_KEY || process.env.NEXT_PUBLIC_API_KEY || '';
-  const res = await fetch(`${base}/cities`, {
-    headers: key ? { 'x-api-key': key } : {},
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`API /v1/cities -> HTTP ${res.status}`);
+  // Bounded 8s (same rationale as hotels adapter): on serverless timeouts the
+  // caller must retain budget for the direct-Firestore fallback.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(`${base}/cities`, {
+      headers: key ? { 'x-api-key': key } : {},
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`API /v1/cities -> HTTP ${res.status}`);
   const body = (await res.json()) as { data?: Array<{
     id: string; nameAr?: string; name?: string; nameEn?: string;
     imageUrl?: string; image?: string; hotelCount?: number;
@@ -42,14 +48,18 @@ async function fetchActiveCitiesViaApi(limit: number): Promise<Array<{
     image: String(c.imageUrl ?? c.image ?? ''),
     hotelCount: typeof c.hotelCount === 'number' ? c.hotelCount : -1,
   })).slice(0, limit);
+  } finally {
+    clearTimeout(timeout);
+  }
 }
-async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
-  try {
-    let cities: City[] = [];
+/** Direct Firestore fetch (destinations + JS hotel counts). Primary before C5;
+ * explicit resilience fallback from C5 onward. Never deleted (rollback path). */
+async function fetchActiveCitiesDirect(limit: number): Promise<City[]> {
+  let cities: City[] = [];
 
-    // Query Firestore destinations directly for fast response
-    const snap = await db.collection("destinations").get();
-    const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
+  // Query Firestore destinations directly for fast response
+  const snap = await db.collection("destinations").get();
+  const validDocs = snap.docs.filter((doc) => doc.data().isDeleted !== true);
     if (validDocs.length > 0) {
       cities = validDocs.map((doc) => {
         const d = doc.data();
@@ -91,27 +101,53 @@ async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
     });
 
     const result = mapped.slice(0, limit);
+    return result;
+}
 
-    // Phase C4 (CANARY 5% deterministic, same time-bucket mechanism as hotels):
-    // in-bucket windows are SERVED from API O1 only on exact-set + zero-diff,
-    // else direct. Any API failure → direct. ON capped to CANARY pending C5.
-    // Rollback = MSARI_API_CITIES_MODE=off (or revert). Never throws into requests.
-    // NOTE: unstable_cache (60s) sits above: canary applies per cache-miss window.
-    let mode: 'OFF' | 'SHADOW' | 'CANARY' | 'ON' = 'CANARY';
+async function fetchActiveCitiesFresh(limit: number): Promise<City[]> {
+  try {
+    // Phase C5 (CUTOVER): default ON — API is primary, direct is explicit
+    // resilience fallback (logged, never silent). Rollback = MSARI_API_CITIES_MODE=off.
+    // NOTE: unstable_cache (60s) sits above: mode applies per cache-miss window.
+    let mode: 'OFF' | 'SHADOW' | 'CANARY' | 'ON' = 'ON';
     try {
       mode =
         process.env.MSARI_API_CITIES_MODE !== undefined
           ? getPhaseMigrationMode('cities')
-          : 'CANARY';
+          : 'ON';
     } catch {
       mode = 'OFF';
     }
+
     if (mode === 'ON') {
       try {
-        safeLog('canary-cap', { phase: 'cities', note: 'ON capped to CANARY pending approval' });
-      } catch { /* never break */ }
-      mode = 'CANARY';
+        const apiList = await fetchActiveCitiesViaApi(limit);
+        const served = apiList.map((a) => ({
+          id: a.id,
+          name: a.name,
+          nameEn: a.nameEn,
+          governorate: a.name,
+          governorateEn: a.nameEn,
+          image: a.image,
+          hotelCount: a.hotelCount,
+          isActive: true,
+        })) as City[];
+        try {
+          safeLog('cities-serve', { servedFrom: 'api', count: served.length });
+        } catch { /* never break */ }
+        return served;
+      } catch (e) {
+        try {
+          safeLog('cities-serve', {
+            servedFrom: 'direct-fallback',
+            reason: e instanceof Error ? e.message.slice(0, 120) : String(e).slice(0, 120),
+          });
+        } catch { /* never break */ }
+        return fetchActiveCitiesDirect(limit);
+      }
     }
+
+    const result = await fetchActiveCitiesDirect(limit);
 
     const directSnapshot = result.map((c: City) => ({
       id: c.id, name: c.name, nameEn: c.nameEn, image: c.image, hotelCount: c.hotelCount,
@@ -314,21 +350,56 @@ export class CityService {
   static getDestinationBySlug = cache(async (slug: string) => {
     const cleanSlug = slug.trim().toLowerCase();
 
-    // 1. Look up operational city from Firestore destinations collection (Core SoT)
-    const snap = await db.collection("destinations").get();
-    let firestoreCity: any = null;
-
+    // 1. Resolve operational city identity — API-first (C5), direct scan fallback.
+    // Same fuzzy predicate on both paths; API rows carry {id, name, nameEn}.
     const norm = (s: string) => s.replace(/[أإآا]/g, 'ا').replace(/ة/g, 'ه').trim().toLowerCase();
     const slugNorm = norm(cleanSlug);
+    const matchesSlug = (id: string, nameAr: string, nameEn: string) =>
+      id.toLowerCase() === cleanSlug ||
+      (nameAr !== '' && norm(nameAr).includes(slugNorm)) ||
+      (nameEn !== '' && nameEn.toLowerCase().includes(cleanSlug));
 
-    snap.docs.forEach(doc => {
-      const d = doc.data();
-      const nameAr = d.name || d.nameAr || '';
-      const nameEn = d.nameEn || '';
-      if (doc.id.toLowerCase() === cleanSlug || norm(nameAr).includes(slugNorm) || nameEn.toLowerCase().includes(cleanSlug)) {
-        firestoreCity = { id: doc.id, ...d };
+    let citiesMode: string = 'ON';
+    try {
+      citiesMode =
+        process.env.MSARI_API_CITIES_MODE !== undefined
+          ? getPhaseMigrationMode('cities')
+          : 'ON';
+    } catch {
+      citiesMode = 'OFF';
+    }
+
+    let firestoreCity: any = null;
+    if (citiesMode === 'ON') {
+      try {
+        const apiCities = await fetchActiveCitiesViaApi(100);
+        const hit = apiCities.find((c) => matchesSlug(c.id, c.name, c.nameEn));
+        if (hit) {
+          firestoreCity = {
+            id: hit.id, name: hit.name, nameAr: hit.name,
+            nameEn: hit.nameEn, imageUrl: hit.image,
+          };
+          try {
+            safeLog('cities-serve', { route: 'getDestinationBySlug', servedFrom: 'api', id: hit.id });
+          } catch { /* never break */ }
+        }
+      } catch {
+        // Fall through to the direct scan below (explicit fallback).
       }
-    });
+    }
+    if (!firestoreCity) {
+      // Direct Firestore destinations scan (Core SoT read; fallback/resilience path).
+      const snap = await db.collection("destinations").get();
+
+      snap.docs.forEach(doc => {
+        const d = doc.data();
+        const nameAr = d.name || d.nameAr || '';
+        const nameEn = d.nameEn || '';
+        if (matchesSlug(doc.id, nameAr, nameEn)) {
+          firestoreCity = { id: doc.id, ...d };
+        }
+      });
+    }
 
     // 2. Fetch editorial CMS content from website_destinations (Editorial SoT)
     const { DestinationsCmsService } = await import('@/services/cms');
