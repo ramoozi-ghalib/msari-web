@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import { getHotelBySlug } from '@/actions/hotels';
 import { db } from '@/lib/firebase-admin';
 import { getPhaseMigrationMode, getCanaryRatio, inCanaryBucket } from '@/lib/api-migration/flags';
-import { shadowCompare } from '@/lib/api-migration/shadow';
 import { safeLog } from '@/lib/api-migration/log';
 import RoomDetailClient from './RoomDetailClient';
 
