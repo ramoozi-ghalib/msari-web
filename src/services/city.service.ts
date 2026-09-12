@@ -13,25 +13,23 @@ import { safeLog } from '@/lib/api-migration/log';
 // تتأخر ≤60s بعد نشر فندق (LOW RISK، موثق). الأسعار/التوفر لا تمر هنا إطلاقاً.
 //
 // Phase A (SHADOW only): عند MSARI_API_CITIES_MODE=shadow تُقارَن النتيجة المباشرة
-// مع GET /v1/cities ويُسجَّل الفرق، مع خدمة المباشر دائماً. الوضع الافتراضي OFF:
-// صفر تغيير سلوكي. مفتاح الخادم المؤقت هو قيمة NEXT_PUBLIC_API_KEY المقروءة
-// خادمياً فقط (لا تعرض جديد؛ الاعتماد server-only لاحقاً عند توفره).
+// مع GET /v1/cities ويُسجَّل الفرق، مع خدمة المباشر دائماً.
+// SECURITY (Phase C hardening): server-only credential ONLY — process.env.MSARI_API_KEY
+// via getServerApiKey(). No NEXT_PUBLIC_* fallback: a missing server key must fail
+// into the explicit direct fallback, never into a browser-exposed credential.
 async function fetchActiveCitiesViaApi(limit: number): Promise<Array<{
   id: string; name: string; nameEn: string; image: string; hotelCount: number;
 }>> {
-  const base = (
-    process.env.MSARI_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    'https://us-central1-msariapp-v2.cloudfunctions.net/api/v1'
-  ).replace(/\/$/, '');
-  const key = process.env.MSARI_API_KEY || process.env.NEXT_PUBLIC_API_KEY || '';
+  const { getServerApiBaseUrl, getServerApiKey } = await import('@/lib/api-migration/msari-api');
+  const base = getServerApiBaseUrl();
+  const key = getServerApiKey();
   // Bounded 8s (same rationale as hotels adapter): on serverless timeouts the
   // caller must retain budget for the direct-Firestore fallback.
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const res = await fetch(`${base}/cities`, {
-      headers: key ? { 'x-api-key': key } : {},
+      headers: { 'x-api-key': key },
       cache: 'no-store',
       signal: controller.signal,
     });
@@ -43,7 +41,10 @@ async function fetchActiveCitiesViaApi(limit: number): Promise<Array<{
   const list = Array.isArray(body?.data) ? body.data : [];
   return list.map((c) => ({
     id: String(c.id ?? ''),
-    name: String(c.nameAr ?? c.name ?? ''),
+    // Contract-aligned precedence (direct SoT: name || nameAr). The API now
+    // returns an explicit `name` field with direct precedence; older payloads
+    // without it fall back to nameAr (parity-proven on current data).
+    name: String(c.name ?? c.nameAr ?? ''),
     nameEn: String(c.nameEn ?? ''),
     image: String(c.imageUrl ?? c.image ?? ''),
     hotelCount: typeof c.hotelCount === 'number' ? c.hotelCount : -1,
@@ -75,7 +76,23 @@ async function fetchActiveCitiesDirect(limit: number): Promise<City[]> {
         };
       });
     } else {
-      cities = await apiClient.getCities();
+      // Destinations collection empty: try the API with the server-only key
+      // (never the browser-exposed legacy client); empty result if that fails.
+      try {
+        const apiFallback = await fetchActiveCitiesViaApi(limit);
+        cities = apiFallback.map((a) => ({
+          id: a.id,
+          name: a.name,
+          nameEn: a.nameEn,
+          governorate: a.name,
+          governorateEn: a.nameEn,
+          image: a.image,
+          hotelCount: 0,
+          isActive: true,
+        })) as City[];
+      } catch {
+        cities = [];
+      }
     }
 
     const hotelsSnap = await db.collection('hotels').get();
