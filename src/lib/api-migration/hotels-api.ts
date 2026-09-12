@@ -65,8 +65,11 @@ async function apiGet<T>(path: string, params?: Record<string, string | number>)
     for (const [k, v] of Object.entries(params)) qs.set(k, String(v));
   }
   const url = qs.toString() ? `${base}${path}?${qs}` : `${base}${path}`;
+  // Conservative 8s cap (not 15s): on serverless timeouts the caller must still
+  // have budget left for the direct-Firestore fallback. Proven: cold Functions
+  // can take 7s+; hanging the full budget would turn fallback into a 504.
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const res = await fetch(url, {
       headers: { 'x-api-key': getServerApiKey() },

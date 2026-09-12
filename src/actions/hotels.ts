@@ -59,6 +59,17 @@ async function fetchApiCitiesForMapping(): Promise<import('@/types').City[]> {
   return list.map((c: any) => mapApiCityToCity(c, c.hotelCount ?? 0));
 }
 
+/**
+ * Per-request shared API fetches (React cache — same request only, no staleness).
+ * A detail render needs list+cities+rooms; without sharing, each ViaApi helper
+ * would refetch the same payloads (latency amplification on serverless timeouts).
+ */
+const getApiHotelListCached = cache(async () => {
+  const { apiFetchAllHotels } = await import('@/lib/api-migration/hotels-api');
+  return apiFetchAllHotels();
+});
+const getApiCitiesCached = cache(async () => fetchApiCitiesForMapping());
+
 export type GetLocalHotelsParams = {
   limit?:    unknown;
   city?:     string;   // nameAr للمدينة
@@ -372,8 +383,8 @@ async function getLocalHotelsViaApi(params?: GetLocalHotelsParams): Promise<{
   const page = Math.max(1, params?.page ?? 1);
   const pageSize = clampLimit(params?.pageSize, 12, 100);
   const [{ hotels }, apiCities] = await Promise.all([
-    apiFetchAllHotels(),
-    fetchApiCitiesForMapping(),
+    getApiHotelListCached(),
+    getApiCitiesCached(),
   ]);
   return { ...applyWebsiteListSemantics(hotels, apiCities, params, page, pageSize), page, pageSize };
 }
@@ -532,25 +543,28 @@ export async function getHotelsByIdsDirect(ids: string[]): Promise<Hotel[]> {
   }
 }
 
-/** API equivalent of getHotelsByIdsDirect (bounded :id fetches, order preserved). */
+/** API equivalent of getHotelsByIdsDirect — resolved from the shared bounded list
+ * (zero extra fetches when the list is already cached for this request). */
 async function getHotelsByIdsViaApi(ids: string[]): Promise<Hotel[]> {
-  const { apiFetchHotelById, toWebsiteHotel } = await import('@/lib/api-migration/hotels-api');
+  const { toWebsiteHotel } = await import('@/lib/api-migration/hotels-api');
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (uniqueIds.length === 0) return [];
-  const apiCities = await CityService.getActiveCities(100);
-  const results = await Promise.all(
-    uniqueIds.map(async (id) => {
-      try {
-        const apiH = await apiFetchHotelById(id);
-        if (!apiH || (apiH as any).isPublished === false || (apiH as any).isDeleted === true) return null;
-        return toWebsiteHotel(apiH, apiCities, [], 'display');
-      } catch {
-        return null;
-      }
-    })
-  );
-  const byId = new Map(results.filter((h): h is Hotel => h !== null).map((h) => [h.id, h]));
-  return uniqueIds.map((id) => byId.get(id)).filter((h): h is Hotel => h !== undefined);
+  const [{ hotels }, apiCities] = await Promise.all([
+    getApiHotelListCached(),
+    getApiCitiesCached(),
+  ]);
+  const byId = new Map(hotels.map((h: any) => [h.id, h]));
+  const results: (Hotel | null)[] = uniqueIds.map((id) => {
+    const apiH = byId.get(id) as any;
+    if (!apiH || apiH.isPublished === false || apiH.isDeleted === true) return null;
+    try {
+      return toWebsiteHotel(apiH, apiCities, [], 'display');
+    } catch {
+      return null;
+    }
+  });
+  const found = new Map(results.filter((h): h is Hotel => h !== null).map((h) => [h.id, h]));
+  return uniqueIds.map((id) => found.get(id)).filter((h): h is Hotel => h !== undefined);
 }
 
 /** Phase B router for id-batches (nearby). Same OFF/SHADOW/CANARY/ON semantics. */
@@ -714,9 +728,11 @@ async function getHotelBySlugViaApi(slug: string): Promise<Hotel | null> {
   }
   if (!apiH || (apiH as any).isPublished === false) return null;
   if ((apiH as any).isDeleted === true) return null;
-  const apiCities = await CityService.getActiveCities(100);
-  const { apiFetchRooms } = await import('@/lib/api-migration/hotels-api');
-  const rooms = await apiFetchRooms((apiH as any).id);
+  // Parallel: cities (shared cached) + rooms. Same mapping inputs as direct.
+  const [apiCities, rooms] = await Promise.all([
+    getApiCitiesCached(),
+    apiFetchRooms((apiH as any).id),
+  ]);
   return toWebsiteHotel(apiH, apiCities, rooms, 'explicit');
 }
 
