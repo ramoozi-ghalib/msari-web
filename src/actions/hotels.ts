@@ -10,6 +10,54 @@ import { clampLimit } from '@/lib/action-utils';
 import { db } from '@/lib/firebase-admin';
 import { CityService } from '@/services/city.service';
 import { cache } from 'react';
+import { filterHotels, sortHotels, mapAmenitiesToDTO } from '@/lib/hotel-utils';
+import { getPhaseMigrationMode, getCanaryRatio, inCanaryBucket } from '@/lib/api-migration/flags';
+import { safeLog } from '@/lib/api-migration/log';
+import { diffJson } from '@/lib/api-migration/shadow';
+import {
+  apiFetchAllHotels,
+  apiFetchHotelBySlug,
+  apiFetchHotelById,
+  apiFetchRooms,
+  toWebsiteHotel,
+  applyWebsiteListSemantics,
+} from '@/lib/api-migration/hotels-api';
+import { mapApiCityToCity } from '@/lib/api-client';
+
+type HotelsApiMode = 'OFF' | 'SHADOW' | 'CANARY' | 'ON';
+
+/** Phase B migration flag (default SHADOW). ON is capped to CANARY until cutover approval. */
+function getHotelsApiMode(): HotelsApiMode {
+  try {
+    if (process.env.MSARI_API_HOTELS_MODE !== undefined) {
+      const m = getPhaseMigrationMode('hotels' as never);
+      return m === 'ON' ? 'CANARY' : m;
+    }
+    return 'SHADOW';
+  } catch {
+    return 'OFF';
+  }
+}
+
+function stripVolatile(hotel: Hotel): unknown {
+  const { updatedAt: _u, ...rest } = hotel as unknown as Record<string, unknown>;
+  void _u;
+  return rest;
+}
+
+/** API cities for mapping (transitional: direct getActiveCities stays authoritative elsewhere). */
+async function fetchApiCitiesForMapping(): Promise<import('@/types').City[]> {
+  const { getServerApiBaseUrl, getServerApiKey } = await import('@/lib/api-migration/msari-api');
+  const base = getServerApiBaseUrl();
+  const res = await fetch(`${base}/cities`, {
+    headers: { 'x-api-key': getServerApiKey() },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`API /v1/cities -> HTTP ${res.status}`);
+  const body = (await res.json()) as { data?: any[] };
+  const list = Array.isArray(body?.data) ? body.data : [];
+  return list.map((c: any) => mapApiCityToCity(c, c.hotelCount ?? 0));
+}
 
 export type GetLocalHotelsParams = {
   limit?:    unknown;
@@ -26,13 +74,12 @@ export type GetLocalHotelsParams = {
   skipRoomPrices?: boolean;
 };
 
-export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
+export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promise<{
   data:     Hotel[];
   total:    number;
   page:     number;
   pageSize: number;
-}> {
-  const page      = Math.max(1, params?.page ?? 1);
+}> {  const page      = Math.max(1, params?.page ?? 1);
   const pageSize  = clampLimit(params?.pageSize, 12, 100);
   const skip      = (page - 1) * pageSize;
 
@@ -296,70 +343,12 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
       return mapApiHotelToHotel(apiHotel, [], apiCities);
     }));
 
-    // 4. تطبيق الفلترة في الذاكرة خادمياً
-    hotels = hotels.filter((hotel) => {
-      if (!hotel.isActive) return false;
+    // 4+5. فلترة وفرز مشتركان مع مسار API (نفس الدلالة حرفياً — hotel-utils).
+    hotels = filterHotels(hotels, params);
+    const sortedHotels = sortHotels(hotels, params?.sort);
 
-      if (params?.city) {
-        const cityFilter = params.city.toLowerCase().trim();
-        const matchesCity = 
-          (hotel.city && hotel.city.toLowerCase().includes(cityFilter)) || 
-          (hotel.cityEn && hotel.cityEn.toLowerCase().includes(cityFilter)) ||
-          (hotel.cityId && hotel.cityId.toLowerCase() === cityFilter) ||
-          (hotel.governorate && hotel.governorate.toLowerCase().includes(cityFilter));
-        if (!matchesCity) return false;
-      }
-
-      if (params?.q) {
-        const q = params.q.toLowerCase().trim();
-        const matchesName = hotel.name.toLowerCase().includes(q) || hotel.nameEn.toLowerCase().includes(q);
-        const matchesAddress = hotel.address.toLowerCase().includes(q);
-        if (!matchesName && !matchesAddress) return false;
-      }
-
-      if (params?.minPrice !== undefined && params?.maxPrice !== undefined) {
-        if (hotel.priceFrom < params.minPrice || hotel.priceFrom > params.maxPrice) {
-          return false;
-        }
-      }
-
-      if (params?.ratings?.length) {
-        if (!params.ratings.includes(hotel.stars)) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // 5. تطبيق الترتيب
-    if (params?.sort === 'price_asc') {
-      hotels.sort((a, b) => a.priceFrom - b.priceFrom);
-    } else if (params?.sort === 'price_desc') {
-      hotels.sort((a, b) => b.priceFrom - a.priceFrom);
-    } else if (params?.sort === 'rating') {
-      hotels.sort((a, b) => b.rating - a.rating);
-    } else {
-      // الترتيب الافتراضي: المميز أولاً، ثم الأحدث، ثم معرّف الوثيقة ككاسر
-      // تعادل حتمي (P1: يمنع انزياح نوافذ slice بين الطلبات).
-      hotels.sort((a, b) => {
-        if (a.isFeatured !== b.isFeatured) {
-          return a.isFeatured ? -1 : 1;
-        }
-        const bt = new Date(b.createdAt).getTime();
-        const at = new Date(a.createdAt).getTime();
-        const safeBt = Number.isNaN(bt) ? 0 : bt;
-        const safeAt = Number.isNaN(at) ? 0 : at;
-        if (safeBt !== safeAt) {
-          return safeBt - safeAt;
-        }
-        if (a.id === b.id) return 0;
-        return a.id < b.id ? -1 : 1;
-      });
-    }
-
-    const total = hotels.length;
-    const paginatedHotels = hotels.slice(skip, skip + pageSize);
+    const total = sortedHotels.length;
+    const paginatedHotels = sortedHotels.slice(skip, skip + pageSize);
 
     return {
       data: paginatedHotels,
@@ -373,6 +362,88 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
   }
 }
 
+/** API equivalent of getLocalHotelsDirect (single bounded call, no rooms fan-out). */
+async function getLocalHotelsViaApi(params?: GetLocalHotelsParams): Promise<{
+  data: Hotel[];
+  total: number;
+  page: number;
+  pageSize: number;
+}> {
+  const page = Math.max(1, params?.page ?? 1);
+  const pageSize = clampLimit(params?.pageSize, 12, 100);
+  const [{ hotels }, apiCities] = await Promise.all([
+    apiFetchAllHotels(),
+    fetchApiCitiesForMapping(),
+  ]);
+  return { ...applyWebsiteListSemantics(hotels, apiCities, params, page, pageSize), page, pageSize };
+}
+
+function compareHotelLists(a: Hotel[], b: Hotel[]): number {
+  return diffJson(a.map(stripVolatile), b.map(stripVolatile)).length;
+}
+
+/**
+ * Phase B router: OFF → direct only; SHADOW → serve direct + background compare;
+ * CANARY → bucketed API serving with diff-gate fallback; ON → API with error fallback.
+ * Default SHADOW. Rollback = MSARI_API_HOTELS_MODE=off (or revert).
+ */
+export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
+  data:     Hotel[];
+  total:    number;
+  page:     number;
+  pageSize: number;
+}> {
+  const mode = getHotelsApiMode();
+  if (mode === 'OFF') {
+    return getLocalHotelsDirect(params);
+  }
+  if (mode === 'SHADOW') {
+    const res = await getLocalHotelsDirect(params);
+    void (async () => {
+      try {
+        const apiRes = await getLocalHotelsViaApi(params);
+        const diffs = compareHotelLists(res.data, apiRes.data);
+        safeLog('hotels-shadow', {
+          route: 'getLocalHotels', params: params ?? null,
+          match: diffs === 0 && res.total === apiRes.total, diffCount: diffs,
+          totalDirect: res.total, totalApi: apiRes.total,
+        });
+      } catch (e) {
+        safeLog('hotels-shadow', { route: 'getLocalHotels', error: e instanceof Error ? e.message : String(e) });
+      }
+    })().catch(() => undefined);
+    return res;
+  }
+  if (mode === 'CANARY') {
+    const ratio = getCanaryRatio();
+    const key = `hotels:${JSON.stringify(params ?? {})}:${Math.floor(Date.now() / 60000)}`;
+    if (inCanaryBucket(key, ratio)) {
+      try {
+        const [apiRes, directRes] = await Promise.all([
+          getLocalHotelsViaApi(params),
+          getLocalHotelsDirect(params),
+        ]);
+        const diffs = compareHotelLists(directRes.data, apiRes.data);
+        safeLog('hotels-canary', {
+          route: 'getLocalHotels', servedFrom: diffs === 0 && directRes.total === apiRes.total ? 'api' : 'direct',
+          diffCount: diffs, ratio,
+        });
+        if (diffs === 0 && directRes.total === apiRes.total) return apiRes;
+        return directRes;
+      } catch {
+        return getLocalHotelsDirect(params);
+      }
+    }
+    return getLocalHotelsDirect(params);
+  }
+  // ON (post-cutover approval only): serve API, fallback direct on error.
+  try {
+    return await getLocalHotelsViaApi(params);
+  } catch {
+    return getLocalHotelsDirect(params);
+  }
+}
+
 // Admin/Public fetch all hotels using getLocalHotels
 export async function getHotels(params?: GetLocalHotelsParams) {
   return getLocalHotels(params);
@@ -381,7 +452,7 @@ export async function getHotels(params?: GetLocalHotelsParams) {
 // CLOSURE Phase 2 (nearby): جلب فنادق محددة بالمعرفات — قراءات مفردة محدودة
 // (doc.get لكل معرف) بدل مسح المجموعة كاملة. تُطبق نفس فلاتر القائمة
 // (isPublished + غير محذوف) ونفس حساب السعر النهائي تماماً، وتُحفظ رتبة الإدخال.
-export async function getHotelsByIds(ids: string[]): Promise<Hotel[]> {
+export async function getHotelsByIdsDirect(ids: string[]): Promise<Hotel[]> {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (uniqueIds.length === 0) return [];
   try {
@@ -461,9 +532,75 @@ export async function getHotelsByIds(ids: string[]): Promise<Hotel[]> {
   }
 }
 
+/** API equivalent of getHotelsByIdsDirect (bounded :id fetches, order preserved). */
+async function getHotelsByIdsViaApi(ids: string[]): Promise<Hotel[]> {
+  const { apiFetchHotelById, toWebsiteHotel } = await import('@/lib/api-migration/hotels-api');
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+  const apiCities = await CityService.getActiveCities(100);
+  const results = await Promise.all(
+    uniqueIds.map(async (id) => {
+      try {
+        const apiH = await apiFetchHotelById(id);
+        if (!apiH || (apiH as any).isPublished === false || (apiH as any).isDeleted === true) return null;
+        return toWebsiteHotel(apiH, apiCities, [], 'display');
+      } catch {
+        return null;
+      }
+    })
+  );
+  const byId = new Map(results.filter((h): h is Hotel => h !== null).map((h) => [h.id, h]));
+  return uniqueIds.map((id) => byId.get(id)).filter((h): h is Hotel => h !== undefined);
+}
+
+/** Phase B router for id-batches (nearby). Same OFF/SHADOW/CANARY/ON semantics. */
+export async function getHotelsByIds(ids: string[]): Promise<Hotel[]> {
+  const mode = getHotelsApiMode();
+  if (mode === 'OFF') {
+    return getHotelsByIdsDirect(ids);
+  }
+  if (mode === 'SHADOW') {
+    const res = await getHotelsByIdsDirect(ids);
+    void (async () => {
+      try {
+        const apiRes = await getHotelsByIdsViaApi(ids);
+        const diffs = compareHotelLists(res, apiRes);
+        safeLog('hotels-shadow', { route: 'getHotelsByIds', count: ids.length, match: diffs === 0, diffCount: diffs });
+      } catch (e) {
+        safeLog('hotels-shadow', { route: 'getHotelsByIds', error: e instanceof Error ? e.message : String(e) });
+      }
+    })().catch(() => undefined);
+    return res;
+  }
+  if (mode === 'CANARY') {
+    const ratio = getCanaryRatio();
+    const key = `ids:${ids.join(',')}:${Math.floor(Date.now() / 60000)}`;
+    if (inCanaryBucket(key, ratio)) {
+      try {
+        const [apiRes, directRes] = await Promise.all([
+          getHotelsByIdsViaApi(ids),
+          getHotelsByIdsDirect(ids),
+        ]);
+        const diffs = compareHotelLists(directRes, apiRes);
+        safeLog('hotels-canary', { route: 'getHotelsByIds', servedFrom: diffs === 0 ? 'api' : 'direct', diffCount: diffs, ratio });
+        if (diffs === 0) return apiRes;
+        return directRes;
+      } catch {
+        return getHotelsByIdsDirect(ids);
+      }
+    }
+    return getHotelsByIdsDirect(ids);
+  }
+  try {
+    return await getHotelsByIdsViaApi(ids);
+  } catch {
+    return getHotelsByIdsDirect(ids);
+  }
+}
+
 // B4: per-request dedup — generateMetadata و Page يطلبان نفس الفندق في نفس الطلب.
 // cache() لا يشارك بين الطلبات: لا قيم stale عبر المستخدمين.
-export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> => {
+export const getHotelBySlugDirect = async (slug: string): Promise<Hotel | null> => {
 
   try {
     const snapshot = await db.collection("hotels")
@@ -520,11 +657,11 @@ export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> 
           features: mapAmenitiesToDTO(rawFeatures),
           isPublished: rdata.isPublished !== false,
           updatedAt: rdata.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-          isDeleted: rdata.isDeleted || false,
+  isDeleted: rdata.isDeleted || false,
         }));
       });
     } catch (e) {
-      console.warn('Error fetching room subcollection for hotel:', foundDoc.id, e);
+      console.error('Error fetching room subcollection for hotel:', foundDoc.id, e);
     }
 
     const apiHotel: any = {
@@ -547,9 +684,12 @@ export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> 
       isSpecial: foundDoc.isSpecial || false,
       isPublished: foundDoc.isPublished !== false,
       mapLink: foundDoc.mapLink || foundDoc.mapUrl || '',
-      lat: foundDoc.lat || foundDoc.latitude || foundDoc.location?.latitude || foundDoc.location?._latitude || foundDoc.coordinates?.lat,
-      lng: foundDoc.lng || foundDoc.longitude || foundDoc.location?.longitude || foundDoc.location?._longitude || foundDoc.coordinates?.lng,
-      createdAt: foundDoc.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        lat: foundDoc.lat || foundDoc.latitude || foundDoc.location?.latitude || foundDoc.location?._latitude || foundDoc.coordinates?.lat,
+        lng: foundDoc.lng || foundDoc.longitude || foundDoc.location?.longitude || foundDoc.location?._longitude || foundDoc.coordinates?.lng,
+        // Deterministic fallback (matches getLocalHotels + API adapter): createdAt is
+        // absent on all docs and never rendered in UI — only sort-ties on it (all tie).
+        // The previous new-Date() fallback made every render differ; behavior identical.
+        createdAt: foundDoc.createdAt?.toDate?.()?.toISOString() || '1970-01-01T00:00:00.000Z',
       updatedAt: foundDoc.updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
       isDeleted: foundDoc.isDeleted || false,
     };
@@ -559,35 +699,85 @@ export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> 
     console.error('Error fetching hotel by slug:', error);
     return null;
   }
-});
+};
 
-function mapAmenitiesToDTO(rawAmenities: any): any[] {
-  if (!Array.isArray(rawAmenities)) return [];
-  return rawAmenities.map((a: any, idx: number) => {
-    if (typeof a === 'string') {
-      return {
-        id: `amenity-${idx}`,
-        name: { ar: a, en: a },
-        iconKey: a.toLowerCase(),
-        isFeatured: true
-      };
-    }
-    if (typeof a === 'object' && a !== null) {
-      const arName = a.ar || a.nameAr || a.name || '';
-      const enName = a.en || a.nameEn || a.name || '';
-      const iconKey = a.icon || a.key || a.iconKey || '';
-      return {
-        id: a.id || `amenity-${idx}`,
-        name: { ar: arName, en: enName },
-        iconKey: iconKey,
-        isFeatured: true
-      };
-    }
-    return {
-      id: `amenity-${idx}`,
-      name: { ar: '', en: '' },
-      iconKey: '',
-      isFeatured: false
-    };
-  });
+/** API equivalent of getHotelBySlugDirect (by-slug + rooms, explicit price). */
+async function getHotelBySlugViaApi(slug: string): Promise<Hotel | null> {
+  const { apiFetchHotelBySlug, apiFetchHotelById, toWebsiteHotel } = await import(
+    '@/lib/api-migration/hotels-api'
+  );
+  const clean = slug.trim().toLowerCase();
+  let apiH = await apiFetchHotelBySlug(clean);
+  if (!apiH) {
+    // Mirror direct fallbacks (doc.id / generated slugs): single-doc fetch by id.
+    apiH = await apiFetchHotelById(slug);
+  }
+  if (!apiH || (apiH as any).isPublished === false) return null;
+  if ((apiH as any).isDeleted === true) return null;
+  const apiCities = await CityService.getActiveCities(100);
+  const { apiFetchRooms } = await import('@/lib/api-migration/hotels-api');
+  const rooms = await apiFetchRooms((apiH as any).id);
+  return toWebsiteHotel(apiH, apiCities, rooms, 'explicit');
 }
+
+/**
+ * Phase B router (cached per request): OFF → direct; SHADOW → serve direct +
+ * background compare; CANARY → bucketed API with diff-gate fallback; ON → API.
+ * Default SHADOW. Rollback = MSARI_API_HOTELS_MODE=off (or revert).
+ */
+export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> => {
+  const mode = getHotelsApiMode();
+  if (mode === 'OFF') {
+    return getHotelBySlugDirect(slug);
+  }
+  if (mode === 'SHADOW') {
+    const res = await getHotelBySlugDirect(slug);
+    void (async () => {
+      try {
+        const apiRes = await getHotelBySlugViaApi(slug);
+        const diffArr = diffJson(
+          res ? [stripVolatile(res)] : [],
+          apiRes ? [stripVolatile(apiRes)] : []
+        );
+        safeLog('hotels-shadow', {
+          route: 'getHotelBySlug', slug,
+          match: diffArr.length === 0, diffCount: diffArr.length,
+          diffs: diffArr.slice(0, 5),
+        });
+      } catch (e) {
+        safeLog('hotels-shadow', { route: 'getHotelBySlug', slug, error: e instanceof Error ? e.message : String(e) });
+      }
+    })().catch(() => undefined);
+    return res;
+  }
+  if (mode === 'CANARY') {
+    const ratio = getCanaryRatio();
+    const key = `hotel:${slug}:${Math.floor(Date.now() / 60000)}`;
+    if (inCanaryBucket(key, ratio)) {
+      try {
+        const [apiRes, directRes] = await Promise.all([
+          getHotelBySlugViaApi(slug),
+          getHotelBySlugDirect(slug),
+        ]);
+        const diffs = compareHotelLists(
+          directRes ? [directRes] : [],
+          apiRes ? [apiRes] : []
+        );
+        safeLog('hotels-canary', {
+          route: 'getHotelBySlug', slug,
+          servedFrom: diffs === 0 ? 'api' : 'direct', diffCount: diffs, ratio,
+        });
+        if (diffs === 0) return apiRes;
+        return directRes;
+      } catch {
+        return getHotelBySlugDirect(slug);
+      }
+    }
+    return getHotelBySlugDirect(slug);
+  }
+  try {
+    return await getHotelBySlugViaApi(slug);
+  } catch {
+    return getHotelBySlugDirect(slug);
+  }
+});
