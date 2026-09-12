@@ -68,7 +68,7 @@ function getRoomsApiMode(): RoomsApiMode {
   try {
     return process.env.MSARI_API_ROOMS_MODE !== undefined
       ? getPhaseMigrationMode('rooms')
-      : 'CANARY';
+      : 'ON';
   } catch {
     return 'OFF';
   }
