@@ -26,15 +26,14 @@ import { mapApiCityToCity } from '@/lib/api-client';
 
 type HotelsApiMode = 'OFF' | 'SHADOW' | 'CANARY' | 'ON';
 
-/** Phase B migration flag (default CANARY 5%: diff-gated API serving with direct fallback).
- * ON is capped to CANARY until cutover approval. Rollback = MSARI_API_HOTELS_MODE=off. */
+/** Phase B migration flag (CUTOVER: default ON with error-fallback to direct).
+ * Rollback = MSARI_API_HOTELS_MODE=off (or revert). */
 function getHotelsApiMode(): HotelsApiMode {
   try {
     if (process.env.MSARI_API_HOTELS_MODE !== undefined) {
-      const m = getPhaseMigrationMode('hotels' as never);
-      return m === 'ON' ? 'CANARY' : m;
+      return getPhaseMigrationMode('hotels' as never);
     }
-    return 'CANARY';
+    return 'ON';
   } catch {
     return 'OFF';
   }
