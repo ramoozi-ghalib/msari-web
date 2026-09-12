@@ -436,20 +436,9 @@ export async function getLocalHotels(params?: GetLocalHotelsParams): Promise<{
     return getLocalHotelsDirect(params);
   }
   // ON (post-cutover approval only): serve API, fallback direct on error.
-  // TEMP-PROOF (evidence gate only — remove after): serve-path logging, no behavior change.
   try {
-    const apiRes = await getLocalHotelsViaApi(params);
-    try {
-      safeLog('hotels-serve-proof', { route: 'getLocalHotels', servedFrom: 'api', total: apiRes.total });
-    } catch { /* never break */ }
-    return apiRes;
-  } catch (e) {
-    try {
-      safeLog('hotels-serve-proof', {
-        route: 'getLocalHotels', servedFrom: 'direct-fallback',
-        reason: e instanceof Error ? e.message.slice(0, 120) : String(e).slice(0, 120),
-      });
-    } catch { /* never break */ }
+    return await getLocalHotelsViaApi(params);
+  } catch {
     return getLocalHotelsDirect(params);
   }
 }
@@ -604,20 +593,9 @@ export async function getHotelsByIds(ids: string[]): Promise<Hotel[]> {
     }
     return getHotelsByIdsDirect(ids);
   }
-  // TEMP-PROOF (evidence gate only — remove after): serve-path logging, no behavior change.
   try {
-    const apiRes = await getHotelsByIdsViaApi(ids);
-    try {
-      safeLog('hotels-serve-proof', { route: 'getHotelsByIds', servedFrom: 'api', count: apiRes.length });
-    } catch { /* never break */ }
-    return apiRes;
-  } catch (e) {
-    try {
-      safeLog('hotels-serve-proof', {
-        route: 'getHotelsByIds', servedFrom: 'direct-fallback',
-        reason: e instanceof Error ? e.message.slice(0, 120) : String(e).slice(0, 120),
-      });
-    } catch { /* never break */ }
+    return await getHotelsByIdsViaApi(ids);
+  } catch {
     return getHotelsByIdsDirect(ids);
   }
 }
@@ -801,22 +779,9 @@ export const getHotelBySlug = cache(async (slug: string): Promise<Hotel | null> 
     }
     return getHotelBySlugDirect(slug);
   }
-  // TEMP-PROOF (evidence gate only — remove after): serve-path logging, no behavior change.
-  // NOTE: getHotelBySlugViaApi fetches hotel + rooms (/v1/rooms?hotelId=) from the API,
-  // so servedFrom=api here also proves rooms-from-API for detail renders.
   try {
-    const apiRes = await getHotelBySlugViaApi(slug);
-    try {
-      safeLog('hotels-serve-proof', { route: 'getHotelBySlug', servedFrom: 'api', slug, found: apiRes !== null });
-    } catch { /* never break */ }
-    return apiRes;
-  } catch (e) {
-    try {
-      safeLog('hotels-serve-proof', {
-        route: 'getHotelBySlug', servedFrom: 'direct-fallback', slug,
-        reason: e instanceof Error ? e.message.slice(0, 120) : String(e).slice(0, 120),
-      });
-    } catch { /* never break */ }
+    return await getHotelBySlugViaApi(slug);
+  } catch {
     return getHotelBySlugDirect(slug);
   }
 });
