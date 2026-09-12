@@ -11,7 +11,7 @@
  *   exactly like the direct path fallback).
  * - slug := api.slug (persisted, backfilled 57/57) — same generator either way.
  * - amenities/policies mapped with mapAmenitiesToDTO (same as direct path).
- * - city join uses direct getActiveCities (transitional; cities full migration later).
+ * - city join uses CityService.getActiveCities (Phase C: API-first + fallback).
  */
 import { getServerApiBaseUrl, getServerApiKey } from './msari-api';
 import {

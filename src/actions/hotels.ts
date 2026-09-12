@@ -22,7 +22,6 @@ import {
   toWebsiteHotel,
   applyWebsiteListSemantics,
 } from '@/lib/api-migration/hotels-api';
-import { mapApiCityToCity } from '@/lib/api-client';
 
 type HotelsApiMode = 'OFF' | 'SHADOW' | 'CANARY' | 'ON';
 
@@ -47,30 +46,17 @@ function stripVolatile(hotel: Hotel): unknown {
   return rest;
 }
 
-/** API cities for mapping (transitional: direct getActiveCities stays authoritative elsewhere). */
-async function fetchApiCitiesForMapping(): Promise<import('@/types').City[]> {
-  const { getServerApiBaseUrl, getServerApiKey } = await import('@/lib/api-migration/msari-api');
-  const base = getServerApiBaseUrl();
-  const res = await fetch(`${base}/cities`, {
-    headers: { 'x-api-key': getServerApiKey() },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`API /v1/cities -> HTTP ${res.status}`);
-  const body = (await res.json()) as { data?: any[] };
-  const list = Array.isArray(body?.data) ? body.data : [];
-  return list.map((c: any) => mapApiCityToCity(c, c.hotelCount ?? 0));
-}
-
 /**
  * Per-request shared API fetches (React cache — same request only, no staleness).
  * A detail render needs list+cities+rooms; without sharing, each ViaApi helper
  * would refetch the same payloads (latency amplification on serverless timeouts).
+ * Cities come from CityService.getActiveCities (Phase C: API-first + fallback,
+ * per-request react cache + 60s persistent cache) — no duplicate /cities fetch.
  */
 const getApiHotelListCached = cache(async () => {
   const { apiFetchAllHotels } = await import('@/lib/api-migration/hotels-api');
   return apiFetchAllHotels();
 });
-const getApiCitiesCached = cache(async () => fetchApiCitiesForMapping());
 
 export type GetLocalHotelsParams = {
   limit?:    unknown;
@@ -386,7 +372,7 @@ async function getLocalHotelsViaApi(params?: GetLocalHotelsParams): Promise<{
   const pageSize = clampLimit(params?.pageSize, 12, 100);
   const [{ hotels }, apiCities] = await Promise.all([
     getApiHotelListCached(),
-    getApiCitiesCached(),
+    CityService.getActiveCities(100),
   ]);
   return { ...applyWebsiteListSemantics(hotels, apiCities, params, page, pageSize), page, pageSize };
 }
@@ -553,7 +539,7 @@ async function getHotelsByIdsViaApi(ids: string[]): Promise<Hotel[]> {
   if (uniqueIds.length === 0) return [];
   const [{ hotels }, apiCities] = await Promise.all([
     getApiHotelListCached(),
-    getApiCitiesCached(),
+    CityService.getActiveCities(100),
   ]);
   const byId = new Map(hotels.map((h: any) => [h.id, h]));
   const results: (Hotel | null)[] = uniqueIds.map((id) => {
@@ -732,7 +718,7 @@ async function getHotelBySlugViaApi(slug: string): Promise<Hotel | null> {
   if ((apiH as any).isDeleted === true) return null;
   // Parallel: cities (shared cached) + rooms. Same mapping inputs as direct.
   const [apiCities, rooms] = await Promise.all([
-    getApiCitiesCached(),
+    CityService.getActiveCities(100),
     apiFetchRooms((apiH as any).id),
   ]);
   return toWebsiteHotel(apiH, apiCities, rooms, 'explicit');
