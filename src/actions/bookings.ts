@@ -281,6 +281,7 @@ export async function previewBookingPrice(rawData: unknown) {
     roomId:   z.string().regex(/^[a-zA-Z0-9_-]{3,50}$/, 'معرف الغرفة غير صالح').optional(),
     checkIn:  z.string().datetime(),
     checkOut: z.string().datetime(),
+    guestsCount: z.number().int().min(1).max(20).optional().default(1),
     currency: z.string().optional(),
   }).strict();
 
@@ -289,7 +290,7 @@ export async function previewBookingPrice(rawData: unknown) {
     return { success: false as const, error: 'بيانات غير صالحة' };
   }
 
-  const { hotelId, roomId, checkIn: ciStr, checkOut: coStr, currency } = parsed.data;
+  const { hotelId, roomId, checkIn: ciStr, checkOut: coStr, currency, guestsCount } = parsed.data;
 
   // ── API-First Path (Phase 4) ──────────────────────────────────────────
   if (USE_BOOKING_API) {
@@ -299,7 +300,7 @@ export async function previewBookingPrice(rawData: unknown) {
     if (firebaseToken && roomId) {
       try {
         const apiRes = await apiClient.previewBooking(
-          { hotelId, roomId, fromDate: ciStr, toDate: coStr, currency },
+          { hotelId, roomId, fromDate: ciStr, toDate: coStr, currency, guestsCount },
           firebaseToken
         );
         if (apiRes.success && apiRes.data) {
