@@ -20,6 +20,98 @@ export interface ApiResponse<T> {
 
 // ─── API DTOs (Data Transfer Objects) ─────────────────────────────────────────
 
+// Booking DTOs (Phase 4 — Booking API-First)
+export interface ApiBookingPreview {
+  available: boolean;
+  hotelId: string;
+  roomId: string;
+  nights: number;
+  totalUsd: number;
+  totalInSelectedCurrency: number;
+  currency: string;
+  displayPrice: number;
+  pricePerNightUsd: number;
+  soldOut: boolean;
+  activeOverlaps: number;
+  totalRooms: number;
+}
+
+export interface ApiBookingCreateResponse {
+  id: string;
+  bookingNumber: string;
+  status: string;
+  customerId: string;
+  hotel: any;
+  room: any;
+  stay: {
+    fromDate: string;
+    toDate: string;
+    nightsCount: number;
+    guestsCount: number;
+  };
+  pricing: {
+    totalUsd: number;
+    selectedCurrencyCode: string;
+    totalInSelectedCurrency: number;
+  };
+  payment: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiBookingHistoryItem {
+  id: string;
+  bookingNumber: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  hotel: any;
+  room: any;
+  stay: any;
+  pricing: any;
+  payment: any;
+  channel: {
+    type: string;
+    name: string;
+    platform: string;
+    partnerId: string | null;
+  };
+  source: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
+}
+
+export interface ApiBookingHistoryResponse {
+  success: boolean;
+  count: number;
+  nextCursor: string | null;
+  data: ApiBookingHistoryItem[];
+}
+
+export interface ApiBookingDetail {
+  id: string;
+  bookingNumber: string;
+  status: string;
+  customerId: string;
+  hotel: any;
+  room: any;
+  stay: {
+    fromDate: string;
+    toDate: string;
+    nightsCount: number;
+    guestsCount: number;
+  };
+  pricing: any;
+  payment: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Legacy API DTOs (for backward compat)
 export interface ApiCity {
   id: string;
   nameAr: string;
@@ -467,6 +559,129 @@ class ApiClient {
     const res = await this.get<ApiHotel>(`/hotels/${id}`);
     if (!res.success || !res.data) return null;
     return res.data;
+  }
+
+  // ─── Bookings API (Phase 4 — Booking API-First) ────────────────────────────
+
+  /**
+   * Preview booking price and availability before creating.
+   * Calls POST /v1/bookings/preview
+   */
+  public async previewBooking(input: {
+    hotelId: string;
+    roomId: string;
+    fromDate: string;
+    toDate: string;
+    guestsCount: number;
+    currency?: string;
+  }, authToken: string): Promise<ApiResponse<ApiBookingPreview>> {
+    const res = await this.post<ApiBookingPreview>('/bookings/preview', input, {
+      Authorization: `Bearer ${authToken}`,
+    });
+    return res;
+  }
+
+  /**
+   * Create a new booking.
+   * Calls POST /v1/bookings
+   */
+  public async createBooking(input: {
+    hotelId: string;
+    roomId: string;
+    fromDate: string;
+    toDate: string;
+    guestsCount: number;
+    nightsCount: number;
+    bookingOwnerName: string;
+    bookingOwnerPhone: string;
+    paymentMethod: string;
+    selectedCurrencyCode: string;
+    isForAnotherGuest?: boolean;
+    anotherGuestName?: string;
+    anotherGuestPhone?: string;
+    senderNumber?: string;
+    senderName?: string;
+    transferAmount?: number;
+    transferCurrencyCode?: string;
+    transferToNumber?: string;
+  }, authToken: string, idempotencyKey?: string): Promise<ApiResponse<ApiBookingCreateResponse>> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    if (idempotencyKey) {
+      headers['Idempotency-Key'] = idempotencyKey;
+    }
+    const res = await this.post<ApiBookingCreateResponse>('/bookings', input, headers);
+    return res;
+  }
+
+/**
+    * Get booking history for current user.
+    * Calls GET /v1/bookings with cursor pagination support.
+    */
+   public async getMyBookings(params: {
+     page?: number;
+     pageSize?: number;
+     status?: string;
+     fromDate?: string;
+     toDate?: string;
+     hotelId?: string;
+     cursor?: string | null;
+   }, authToken: string): Promise<ApiResponse<ApiBookingHistoryResponse>> {
+     const query = new URLSearchParams();
+     if (params.page) query.set('limit', String(params.pageSize || 20));
+     if (params.status) query.set('status', params.status);
+     if (params.fromDate) query.set('fromDate', params.fromDate);
+     if (params.toDate) query.set('toDate', params.toDate);
+     if (params.hotelId) query.set('hotelId', params.hotelId);
+     if (params.cursor) query.set('cursor', params.cursor);
+     
+     const path = `/bookings${query.toString() ? `?${query.toString()}` : ''}`;
+     const res = await this.get<ApiBookingHistoryResponse>(path, {
+       Authorization: `Bearer ${authToken}`,
+     });
+     return res;
+   }
+
+  /**
+   * Get single booking by ID.
+   * Calls GET /v1/bookings/:id
+   */
+  public async getBookingById(id: string, authToken: string): Promise<ApiResponse<ApiBookingDetail>> {
+    const res = await this.get<ApiBookingDetail>(`/bookings/${id}`, {
+      Authorization: `Bearer ${authToken}`,
+    });
+    return res;
+  }
+
+  /**
+   * Update booking status (cancel, etc).
+   * Calls PATCH /v1/bookings/:id
+   */
+  public async updateBookingStatus(id: string, status: string, authToken: string, idempotencyKey?: string): Promise<ApiResponse<ApiBookingDetail>> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    if (idempotencyKey) {
+      headers['Idempotency-Key'] = idempotencyKey;
+    }
+    const res = await this.patch<ApiBookingDetail>(`/bookings/${id}`, { status }, headers);
+    return res;
+  }
+
+  /**
+   * Upload payment receipt.
+   * Calls POST /v1/bookings/:id/payment
+   */
+  public async uploadReceipt(id: string, receiptUrl: string, authToken: string, idempotencyKey?: string): Promise<ApiResponse<{ success: boolean; receiptUrl: string }>> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    if (idempotencyKey) {
+      headers['Idempotency-Key'] = idempotencyKey;
+    }
+    const res = await this.post<{ success: boolean; receiptUrl: string }>(`/bookings/${id}/payment`, { receiptUrl }, headers);
+    return res;
   }
 }
 

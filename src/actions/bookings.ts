@@ -31,6 +31,10 @@ import { clampLimit } from '@/lib/action-utils';
 import { bookingLimiter, RATE_LIMIT_RESPONSE } from '@/lib/rate-limiter';
 import { validateReceiptDataUrl, RECEIPT_MAX_BASE64_CHARS } from '@/lib/receipt-validation';
 
+// Feature flag for API-first booking migration
+// Defaults to true (API-first). Set to 'false' to disable.
+const USE_BOOKING_API = process.env.USE_BOOKING_API !== 'false';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,314 +192,78 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
     return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: 'تأكد من صحة تواريخ الحجز' } };
   }
 
-  const nights = calculateNights(checkIn, checkOut);
-  if (nights < 1 || nights > MAX_NIGHTS) {
-    await releaseLockSafely();
-    return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: `مدة الإقامة بين 1 و ${MAX_NIGHTS} ليلة` } };
-  }
+   const nights = calculateNights(checkIn, checkOut);
+   if (nights < 1 || nights > MAX_NIGHTS) {
+     await releaseLockSafely();
+     return { success: false as const, error: { code: 'VALIDATION_ERROR' as const, message: `مدة الإقامة بين 1 و ${MAX_NIGHTS} ليلة` } };
+   }
 
-  try {
-    // ── 4. Map payment method to API expectations ──
-    let mappedPaymentMethod = input.paymentMethod;
-    if (input.paymentMethod === 'BANK_TRANSFER' || input.paymentMethod === 'transfer') {
-      mappedPaymentMethod = 'transfer';
-    } else if (input.paymentMethod === 'WHATSAPP' || input.paymentMethod === 'whatsapp') {
-      mappedPaymentMethod = 'whatsapp';
-    } else if (input.paymentMethod === 'CASH' || input.paymentMethod === 'cash') {
-      mappedPaymentMethod = 'cash';
-    } else if (input.paymentMethod === 'CREDIT_CARD') {
-      mappedPaymentMethod = 'credit_card';
-    }
+   // ── Map payment method to API expectations ──
+   let mappedPaymentMethod = input.paymentMethod;
+   if (input.paymentMethod === 'BANK_TRANSFER' || input.paymentMethod === 'transfer') {
+     mappedPaymentMethod = 'transfer';
+   } else if (input.paymentMethod === 'WHATSAPP' || input.paymentMethod === 'whatsapp') {
+     mappedPaymentMethod = 'whatsapp';
+   } else if (input.paymentMethod === 'CASH' || input.paymentMethod === 'cash') {
+     mappedPaymentMethod = 'cash';
+   } else if (input.paymentMethod === 'CREDIT_CARD') {
+     mappedPaymentMethod = 'credit_card';
+   }
 
-    // ── 5. Execute Atomic Firestore Transaction for Website Booking ──
-    logger('info', 'Executing direct Firebase Admin atomic transaction for booking creation');
+   // ── API-First Path (Phase 4) ──────────────────────────────────────────────
+   if (USE_BOOKING_API && callerUser?.id && (callerUser as any).firebaseToken) {
+     const firebaseToken = (callerUser as any).firebaseToken;
+     
+     try {
+       const apiRes = await apiClient.createBooking(
+         {
+           hotelId: input.hotelId,
+           roomId: input.roomId || '',
+           fromDate: input.checkIn,
+           toDate: input.checkOut,
+           guestsCount: input.guests,
+           nightsCount: nights,
+           bookingOwnerName: input.guestName,
+           bookingOwnerPhone: input.guestPhone,
+           paymentMethod: mappedPaymentMethod,
+           selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
+           isForAnotherGuest: input.isForAnotherGuest || false,
+           anotherGuestName: input.anotherGuestName || '',
+           anotherGuestPhone: input.anotherGuestPhone || '',
+           senderNumber: input.senderNumber || '',
+           senderName: input.senderName || '',
+           transferAmount: input.transferAmount,
+           transferCurrencyCode: input.transferCurrencyCode,
+           transferToNumber: input.transferToNumber,
+         },
+         firebaseToken,
+         idempotencyKey
+       );
+       
+       await releaseLockSafely();
+       
+       if (!apiRes.success) {
+         logger('warn', 'API Booking Creation Failed', { error: apiRes.error });
+         return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Booking creation failed via API' } };
+       }
+       
+       logger('info', 'Booking Created via API', { bookingId: apiRes.data?.id });
+       return { 
+         success: true as const, 
+         code: apiRes.data?.bookingNumber || apiRes.data?.id,
+         id: apiRes.data?.id,
+         totalPrice: apiRes.data?.pricing?.totalInSelectedCurrency || 0,
+         currency: apiRes.data?.pricing?.selectedCurrencyCode || 'USD',
+       };
+     } catch (apiError) {
+       await releaseLockSafely();
+       logger('warn', 'API Booking Error', { error: String(apiError) });
+       return { success: false as const, error: { code: 'API_ERROR', message: 'Booking creation failed via API' } };
+     }
+   }
 
-    const userId = callerUser?.id || (session?.user?.id as string) || 'guest_user';
-    const fromDateTime = new Date(input.checkIn);
-    const toDateTime = new Date(input.checkOut);
-
-    // 1. Generate standard Booking Number
-    const part1 = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const part2 = crypto.randomBytes(2).toString('hex').toUpperCase();
-    const bookingNumber = `BK-MS${part1}-${part2}`;
-
-    // 2. Upload Receipt to Firebase Storage if provided
-      let receiptUrl = '';
-      let receiptStoragePath = '';
-
-      if (mappedPaymentMethod === 'transfer' && !input.receiptDataUrl) {
-        logger('warn', 'Transfer booking submitted without receiptDataUrl');
-        await releaseLockSafely();
-        return {
-          success: false as const,
-          error: {
-            code: 'VALIDATION_ERROR' as const,
-            message: 'إشعار التحويل البنكي مطلوب لإتمام حجز التحويل.',
-          },
-        };
-      }
-
-      if (input.receiptDataUrl) {
-        // [F4 CLOSURE] Deep validation before any Storage write:
-        // format -> MIME allowlist -> size limit -> magic bytes.
-        const receipt = validateReceiptDataUrl(input.receiptDataUrl);
-        if (!receipt.ok) {
-          logger('warn', 'Receipt validation failed', { reason: receipt.reason });
-          await releaseLockSafely();
-          return {
-            success: false as const,
-            error: {
-              code: 'VALIDATION_ERROR' as const,
-              message: 'ملف الإيصال غير صالح — يجب أن يكون صورة (JPG/PNG/WEBP) بحجم لا يتجاوز 5MB',
-            },
-          };
-        }
-        try {
-          const rawBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '';
-          const bucketName = (!rawBucket || rawBucket.includes('appspot.com'))
-            ? 'msariapp-v2.firebasestorage.app'
-            : rawBucket;
-          const bucket = storage.bucket(bucketName);
-          const ext = receipt.contentType === 'image/png' ? 'png' : receipt.contentType === 'image/webp' ? 'webp' : 'jpg';
-          const filePath = `booking_receipts/${userId}/${bookingNumber}.${ext}`;
-          const file = bucket.file(filePath);
-          const downloadToken = crypto.randomUUID();
-
-          await file.save(receipt.buffer, {
-            resumable: false,
-            validation: false,
-            metadata: {
-              contentType: receipt.contentType,
-              metadata: {
-                firebaseStorageDownloadTokens: downloadToken,
-                bookingNumber,
-                userId,
-                paymentMethod: mappedPaymentMethod,
-              },
-            },
-          });
-
-          receiptStoragePath = filePath;
-          receiptUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${downloadToken}`;
-        } catch (uploadErr) {
-          const errorMsg = uploadErr instanceof Error ? uploadErr.message : String(uploadErr);
-          logger('error', 'Failed to upload receipt to Firebase Storage:', { error: errorMsg });
-        }
-
-        if (mappedPaymentMethod === 'transfer' && !receiptUrl) {
-          logger('error', 'Transfer booking receipt upload failed');
-          await releaseLockSafely();
-          return {
-            success: false as const,
-            error: {
-              code: 'RECEIPT_UPLOAD_FAILED' as const,
-              message: 'تعذر رفع إشعار التحويل البنكي إلى الخادم. يرجى إعادة المحاولة.',
-            },
-          };
-        }
-      }
-
-      // 3. Run atomic Firestore transaction
-      const transactionResult = await db.runTransaction(async (transaction) => {
-        // Read Room
-        let roomData: any = null;
-        let roomPriceUsd = 0;
-        if (input.roomId) {
-          const roomRef = db.collection('hotels').doc(input.hotelId).collection('rooms').doc(input.roomId);
-          const roomDoc = await transaction.get(roomRef);
-          if (roomDoc.exists) {
-            roomData = roomDoc.data();
-            roomPriceUsd = roomData?.price || roomData?.pricePerNight || 0;
-          }
-        }
-
-        // Read Hotel
-        const hotelRef = db.collection('hotels').doc(input.hotelId);
-        const hotelDoc = await transaction.get(hotelRef);
-        if (!hotelDoc.exists) {
-          throw new Error('not-found');
-        }
-        const hotelData = hotelDoc.data() || {};
-        if (!roomPriceUsd) {
-          roomPriceUsd = hotelData.price || hotelData.priceFrom || 0;
-        }
-
-        // Read Rates
-        const ratesRef = db.collection('rates').doc('global');
-        const ratesDoc = await transaction.get(ratesRef);
-        const ratesData = ratesDoc.exists ? ratesDoc.data() : { usd: 1.0, sar: 3.8, yerNorth: 535, yerSouth: 1561 };
-        
-        const currencyKey = input.selectedCurrencyCode || 'USD';
-        const rate = (ratesData as any)?.[currencyKey] || (ratesData as any)?.[currencyKey.toLowerCase()] || 1.0;
-        const totalUsd = roomPriceUsd * nights;
-        const totalInSelectedCurrency = totalUsd * rate;
-
-        const customerDocRef = db.collection('bookings').doc(userId);
-        const bookingEntryRef = customerDocRef.collection('entries').doc(bookingNumber);
-        const notificationRef = db.collection('admin_notifications').doc();
-
-        // Merge customer booking index
-        transaction.set(customerDocRef, {
-          userId,
-          userName: input.guestName,
-          userEmail: callerUser?.email || input.guestEmail,
-          userPhone: input.guestPhone,
-          lastBookingNumber: bookingNumber,
-          lastBookingCreatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
-
-        // Helper to extract clean single-string Arabic or localized text matching Flutter model
-        const resolvePlainString = (val: any): string => {
-          if (!val) return '';
-          if (typeof val === 'string') return val.trim();
-          if (typeof val === 'object') {
-            if (typeof val.ar === 'string' && val.ar.trim().length > 0) return val.ar.trim();
-            if (typeof val.name === 'string' && val.name.trim().length > 0) return val.name.trim();
-            if (typeof val.en === 'string' && val.en.trim().length > 0) return val.en.trim();
-            if (typeof val.title === 'string' && val.title.trim().length > 0) return val.title.trim();
-          }
-          return String(val).trim();
-        };
-
-        const resolvedHotelName = resolvePlainString(hotelData.name || hotelData.nameAr || hotelData.title || 'فندق');
-        const resolvedHotelAddress = resolvePlainString(hotelData.address || hotelData.location || hotelData.city || '');
-        const resolvedRoomName = resolvePlainString(roomData?.name || roomData?.nameAr || roomData?.title || 'غرفة');
-
-        // Set booking entry snapshot
-        transaction.set(bookingEntryRef, {
-          id: bookingNumber,
-          bookingNumber,
-          bookingType: 'hotel',
-          channel: {
-            type: 'website',
-            name: 'الموقع الإلكتروني الرسمي',
-            platform: 'web',
-            partnerId: null,
-          },
-          source: 'website',
-          platform: 'web',
-          bookingSource: 'website',
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          customerId: userId,
-          userName: input.guestName,
-          userEmail: callerUser?.email || input.guestEmail || '',
-          userPhone: input.guestPhone || '',
-          customer: {
-            id: userId,
-            name: input.guestName,
-            email: callerUser?.email || input.guestEmail || '',
-            phone: input.guestPhone || '',
-          },
-          bookingOwner: {
-            name: input.guestName,
-            phone: input.guestPhone || '',
-            email: callerUser?.email || input.guestEmail || '',
-          },
-          otherGuest: {
-            enabled: input.isForAnotherGuest || false,
-            name: input.anotherGuestName || '',
-            phone: input.anotherGuestPhone || '',
-          },
-          hotel: {
-            id: input.hotelId,
-            name: resolvedHotelName,
-            location: resolvedHotelAddress,
-            imageUrl: hotelData.images?.[0] || hotelData.thumbnail || hotelData.imageUrl || '',
-          },
-          room: {
-            id: input.roomId || '',
-            name: resolvedRoomName,
-            priceUsd: roomPriceUsd,
-          },
-          stay: {
-            fromDate: admin.firestore.Timestamp.fromDate(fromDateTime),
-            toDate: admin.firestore.Timestamp.fromDate(toDateTime),
-            nightsCount: nights,
-            guestsCount: input.guests,
-          },
-          pricing: {
-            totalUsd,
-            selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
-            totalInSelectedCurrency,
-          },
-          payment: {
-            method: mappedPaymentMethod,
-            senderNumber: input.senderNumber || null,
-            senderName: input.senderName || null,
-            transferAmount: input.transferAmount || null,
-            transferCurrencyCode: input.transferCurrencyCode || null,
-            transferToNumber: input.transferToNumber || '',
-            receiptUrl: receiptUrl || '',
-            receiptStoragePath: receiptStoragePath || '',
-          },
-          receipt: {
-            required: mappedPaymentMethod === 'transfer',
-            uploaded: !!receiptUrl,
-            url: receiptUrl || '',
-            storagePath: receiptStoragePath || '',
-          },
-          specialRequests: input.notes || '',
-        });
-
-        // Write Admin Notification
-        transaction.set(notificationRef, {
-          id: notificationRef.id,
-          type: 'hotel_booking',
-          bookingNumber,
-          bookingPath: bookingEntryRef.path,
-          customerId: userId,
-          hotelId: input.hotelId,
-          roomId: input.roomId || '',
-          channel: 'website',
-          source: 'website',
-          platform: 'web',
-          titleAr: `🌐 حجز جديد من الموقع الإلكتروني (${bookingNumber})`,
-          titleEn: `New booking from website (${bookingNumber})`,
-          messageAr: `تم إرسال حجز فندقي جديد عبر الموقع الإلكتروني رقم ${bookingNumber}`,
-          messageEn: `A new hotel booking #${bookingNumber} has been received from the website`,
-          isRead: false,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          createdAtClient: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        return {
-          id: bookingNumber,
-          bookingNumber,
-          pricing: {
-            totalUsd,
-            selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
-            totalInSelectedCurrency,
-          },
-        };
-      });
-
-      const bookingData = transactionResult;
-
-    const finalResponse = {
-      success: true as const,
-      code: bookingData.bookingNumber,
-      id: bookingData.id,
-      totalPrice: bookingData.pricing?.totalInSelectedCurrency || bookingData.pricing?.totalUsd || 0,
-      currency: bookingData.pricing?.selectedCurrencyCode || 'USD',
-    };
-
-    // ── 6. Cache Idempotency Success & Release ──
-    if (redis && acquiredLock) {
-      await redis.set(redisCacheKey, finalResponse, { ex: 86400 });
-      await releaseLockSafely();
-    }
-
-    logger('info', 'Booking Created Successfully', { bookingId: bookingData.id });
-    return finalResponse;
-
-  } catch (error: any) {
-    await releaseLockSafely();
-    logger('error', 'Critical Action Exception', { error: error.message });
-    return handleActionSafe('createBooking', error);
-  }
-}
+   return { success: false as const, error: { code: 'AUTH_REQUIRED', message: 'Authentication required for booking' } };
+ }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // USE CASE B: previewBookingPrice
@@ -505,6 +273,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
  * [NEW — M-8] يحسب السعر الفعلي server-side قبل إتمام الحجز.
  * يُستخدم في واجهة الحجز لعرض السعر الحقيقي للمستخدم.
  * لا يكتب أي بيانات — قراءة فقط.
+ * API-First: يستخدم POST /v1/bookings/preview فقط بدون fallback لـ Firestore.
  */
 export async function previewBookingPrice(rawData: unknown) {
   const schema = z.object({
@@ -512,6 +281,7 @@ export async function previewBookingPrice(rawData: unknown) {
     roomId:   z.string().regex(/^[a-zA-Z0-9_-]{3,50}$/, 'معرف الغرفة غير صالح').optional(),
     checkIn:  z.string().datetime(),
     checkOut: z.string().datetime(),
+    currency: z.string().optional(),
   }).strict();
 
   const parsed = schema.safeParse(rawData);
@@ -519,48 +289,38 @@ export async function previewBookingPrice(rawData: unknown) {
     return { success: false as const, error: 'بيانات غير صالحة' };
   }
 
-  const { hotelId, roomId, checkIn: ciStr, checkOut: coStr } = parsed.data;
-  const checkIn  = new Date(ciStr);
-  const checkOut = new Date(coStr);
-  const nights   = calculateNights(checkIn, checkOut);
+  const { hotelId, roomId, checkIn: ciStr, checkOut: coStr, currency } = parsed.data;
 
-  if (nights < 1 || nights > MAX_NIGHTS) {
-    return { success: false as const, error: 'مدة الإقامة غير صالحة' };
-  }
-
-  try {
-    const hotelDoc = await db.collection('hotels').doc(hotelId).get();
-    if (!hotelDoc.exists || hotelDoc.data()?.isDeleted) {
-      return { success: false as const, error: 'الفندق غير موجود' };
-    }
-    const hotelData = hotelDoc.data()!;
-    let pricePerNight = hotelData.price || hotelData.priceFrom || 0;
-    const currency = 'USD'; // All prices in Firestore are USD
-
-    if (roomId) {
-      const roomDoc = await hotelDoc.ref.collection('rooms').doc(roomId).get();
-      if (roomDoc.exists && !roomDoc.data()?.isDeleted) {
-        pricePerNight = roomDoc.data()?.price || roomDoc.data()?.pricePerNight || 0;
+  // ── API-First Path (Phase 4) ──────────────────────────────────────────
+  if (USE_BOOKING_API) {
+    const session = await auth();
+    const firebaseToken = (session?.user as any)?.firebaseToken;
+    
+    if (firebaseToken && roomId) {
+      try {
+        const apiRes = await apiClient.previewBooking(
+          { hotelId, roomId, fromDate: ciStr, toDate: coStr, currency },
+          firebaseToken
+        );
+        if (apiRes.success && apiRes.data) {
+          return { 
+            success: true as const, 
+            pricePerNight: apiRes.data.pricePerNightUsd,
+            nights: apiRes.data.nights,
+            baseTotal: apiRes.data.totalUsd,
+            discountAmount: 0,
+            finalTotal: apiRes.data.totalInSelectedCurrency,
+            currency: apiRes.data.currency,
+          };
+        }
+      } catch (apiError) {
+        console.warn('API Preview Error:', apiError);
       }
     }
-
-    const baseTotal  = parseFloat((pricePerNight * nights).toFixed(2));
-    const finalTotal = baseTotal;
-
-    return {
-      success: true as const,
-      pricePerNight,
-      nights,
-      baseTotal,
-      discountAmount: 0,
-      finalTotal,
-      currency,
-    };
-  } catch (error) {
-    return handleActionSafe('previewBookingPrice', error);
   }
+  // ── API is required. No Firestore fallback. ──
+  return { success: false as const, error: 'API unavailable or missing firebaseToken' };
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // USE CASE E: getMyBookings
@@ -600,7 +360,8 @@ function generateSlugFromHotel(id: string, name: any): string {
 }
 
 /**
- * [FIX M-7] يجلب حجوزات المستخدم الحالي من Firestore مع دعم pagination.
+ * [FIX M-7] يجلب حجوزات المستخدم الحالي عبر API مع دعم cursor pagination.
+ * API-First only — لا يوجد fallback لـ Firestore.
  */
 export async function getMyBookings(rawParams: unknown = {}) {
   const session = await auth();
@@ -620,81 +381,58 @@ export async function getMyBookings(rawParams: unknown = {}) {
   const { page, pageSize } = parsed.data;
   const safePageSize = clampLimit(pageSize, 10, 50);
   const safePage     = Math.max(1, page);
-  const skip         = (safePage - 1) * safePageSize;
 
-  try {
-    const entriesSnapshot = await db.collection('bookings')
-      .doc(session.user.id)
-      .collection('entries')
-      .orderBy('createdAt', 'desc')
-      .get();
-
-    const allDocs = entriesSnapshot.docs;
-    const total = allDocs.length;
-    const paginatedDocs = allDocs.slice(skip, skip + safePageSize);
-
-    const bookings = paginatedDocs.map(doc => {
-      const data = doc.data();
-
-      const rawHotelName = data.hotel?.name;
-      const hotelNameAr = typeof rawHotelName === 'object' && rawHotelName !== null 
-        ? (rawHotelName.ar || rawHotelName.en || 'فندق') 
-        : (rawHotelName || 'فندق');
-      const hotelNameEn = typeof rawHotelName === 'object' && rawHotelName !== null 
-        ? (rawHotelName.en || rawHotelName.ar || 'Hotel') 
-        : (rawHotelName || 'Hotel');
-
-      const rawRoomName = data.room?.name;
-      const roomNameAr = typeof rawRoomName === 'object' && rawRoomName !== null
-        ? (rawRoomName.ar || rawRoomName.en || 'غرفة')
-        : (rawRoomName || 'غرفة');
-
-      const checkInDate = data.stay?.fromDate?.toDate 
-        ? data.stay.fromDate.toDate() 
-        : (data.stay?.fromDate?._seconds ? new Date(data.stay.fromDate._seconds * 1000) : (data.stay?.fromDate ? new Date(data.stay.fromDate) : new Date()));
-      const checkOutDate = data.stay?.toDate?.toDate 
-        ? data.stay.toDate.toDate() 
-        : (data.stay?.toDate?._seconds ? new Date(data.stay.toDate._seconds * 1000) : (data.stay?.toDate ? new Date(data.stay.toDate) : new Date()));
-      const createdDate = data.createdAt?.toDate 
-        ? data.createdAt.toDate() 
-        : (data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000) : (data.createdAt ? new Date(data.createdAt) : new Date()));
-
-      return {
-        id: doc.id,
-        code: data.bookingNumber || doc.id,
-        status: (data.status || 'PENDING').toUpperCase(),
-        paymentStatus: (data.payment?.status || 'PENDING').toUpperCase(),
-        paymentMethod: data.payment?.method || 'CASH',
-        checkIn: checkInDate.toISOString(),
-        checkOut: checkOutDate.toISOString(),
-        nights: data.stay?.nightsCount || 1,
-        guests: data.stay?.guestsCount || 1,
-        totalPrice: data.pricing?.totalInSelectedCurrency || data.pricing?.totalUsd || 0,
-        currency: (data.pricing?.selectedCurrencyCode || 'USD').toUpperCase(),
-        createdAt: createdDate.toISOString(),
-        hotel: {
-          id: data.hotel?.id || '',
-          nameAr: hotelNameAr,
-          nameEn: hotelNameEn,
-          slug: generateSlugFromHotel(data.hotel?.id, data.hotel?.name),
-          thumbnailUrl: data.hotel?.imageUrl || null,
-        },
-        room: {
-          id: data.room?.id || '',
-          nameAr: roomNameAr,
-        },
-      };
-    });
-
-    return {
-      success:  true as const,
-      data:     bookings,
-      total,
-      page:     safePage,
-      pageSize: safePageSize,
-    };
-
-  } catch (error) {
-    return handleActionSafe('getMyBookings', error);
+  // ── API-First Path (Phase 4) ──────────────────────────────────────────
+  const firebaseToken = (session.user as any)?.firebaseToken;
+    
+  if (firebaseToken) {
+    try {
+      const apiRes = await apiClient.getMyBookings(
+        { page: safePage, pageSize: safePageSize },
+        firebaseToken
+      );
+      if (apiRes.success && apiRes.data) {
+        const bookings = apiRes.data.data.map((b: any) => ({
+          id: b.id,
+          code: b.bookingNumber,
+          status: (b.status || 'PENDING').toUpperCase(),
+          paymentStatus: (b.payment?.status || 'PENDING').toUpperCase(),
+          paymentMethod: b.payment?.method || 'CASH',
+          checkIn: b.stay?.fromDate,
+          checkOut: b.stay?.toDate,
+          nights: b.stay?.nightsCount || 1,
+          guests: b.stay?.guestsCount || 1,
+          totalPrice: b.pricing?.totalInSelectedCurrency || b.pricing?.totalUsd || 0,
+          currency: (b.pricing?.selectedCurrencyCode || 'USD').toUpperCase(),
+          createdAt: b.createdAt,
+          hotel: {
+            id: b.hotel?.id || '',
+            nameAr: typeof b.hotel?.name === 'object' ? (b.hotel.name.ar || b.hotel.name.en || 'فندق') : (b.hotel?.name || 'فندق'),
+            nameEn: typeof b.hotel?.name === 'object' ? (b.hotel.name.en || b.hotel.name.ar || 'Hotel') : (b.hotel?.name || 'Hotel'),
+            slug: generateSlugFromHotel(b.hotel?.id, typeof b.hotel?.name === 'object' ? b.hotel.name.en : b.hotel?.name),
+            thumbnailUrl: b.hotel?.imageUrl || null,
+          },
+          room: {
+            id: b.room?.id || '',
+            nameAr: typeof b.room?.name === 'object' ? (b.room.name.ar || b.room.name.en || 'غرفة') : (b.room?.name || 'غرفة'),
+          },
+        }));
+        
+        return {
+          success: true as const,
+          data: bookings,
+          total: apiRes.data.count,
+          nextCursor: apiRes.data.nextCursor,
+          page: safePage,
+          pageSize: safePageSize,
+        };
+      }
+      return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Failed to fetch bookings' } };
+    } catch (apiError) {
+      console.warn('API getMyBookings Error:', apiError);
+      return { success: false as const, error: { code: 'API_ERROR', message: 'Failed to fetch bookings via API' } };
+    }
   }
+
+  return { success: false as const, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } };
 }
