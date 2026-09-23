@@ -17,6 +17,7 @@ declare module 'next-auth' {
   interface User {
     role?: UserRole;
     token?: string;
+    refreshToken?: string;
     phone?: string;
   }
 
@@ -35,6 +36,7 @@ declare module 'next-auth' {
       image?: string | null;
       role: UserRole;
       firebaseToken?: string;
+      refreshToken?: string;
     };
   }
 }

@@ -42,8 +42,10 @@ export const RegisterSchema = z.object({
     .min(10, 'كلمة المرور يجب أن تكون 10 أحرف على الأقل')
     .max(128, 'كلمة المرور طويلة جداً'),
   phone: z
+    // Loose input shape (allows spaces/dashes); the server action normalizes
+    // strictly to E.164 and fails closed with a clear message if unparseable.
     .string()
-    .regex(/^\+?[0-9]{7,15}$/, 'رقم الهاتف غير صالح')
+    .regex(/^[+\d][\d\s\-.()]{6,19}$/, 'رقم الهاتف غير صالح')
     .optional(),
 });
 

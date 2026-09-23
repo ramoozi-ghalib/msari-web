@@ -157,8 +157,13 @@ export default function BookingPage({
 
       if (result && 'success' in result && result.success) {
         setPricePreview(result as PricePreview);
+        setBookingError(null);
       } else {
-        setBookingError('تعذر حساب السعر النهائي الآن. يرجى المحاولة لاحقًا.');
+        const msg =
+          result && 'error' in result && typeof result.error === 'string'
+            ? result.error
+            : 'تعذر حساب السعر النهائي الآن. يرجى المحاولة لاحقًا.';
+        setBookingError(msg);
       }
       setLoadingPrice(false);
     })();
@@ -285,13 +290,25 @@ export default function BookingPage({
                   </p>
                 </div>
 
+                {bookingError && (
+                  <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
+                    {bookingError}
+                    {bookingError.includes('الجلسة') && (
+                      <span className="block mt-1 text-xs text-red-500">
+                        سجّل الدخول مجددًا ثم أعد تحميل الصفحة لإعادة حساب السعر.
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="w-full text-white font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-md cursor-pointer"
+                  disabled={loadingPrice || !pricePreview}
+                  className="w-full text-white font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ background: 'linear-gradient(135deg,#23096e,#3A1C8F)' }}
                 >
-                  متابعة الحجز
+                  {loadingPrice ? 'جارٍ حساب السعر...' : pricePreview ? 'متابعة الحجز' : 'تعذر حساب السعر — تحقق من الخطأ أعلاه'}
                 </button>
               </div>
             )}

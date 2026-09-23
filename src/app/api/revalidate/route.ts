@@ -52,33 +52,15 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * GET kept for backward-compatibility with dashboard revalidation calls,
- * but secret is required and validated identically to POST.
+ * GET removed (security hardening 2026-09-21): the secret must never travel
+ * in query parameters (URLs land in logs/history). The only caller
+ * (dashboard WebsiteRevalidationService) uses POST with a JSON body, which
+ * remains the sole contract. Callers sending GET now receive 405.
  */
-export async function GET(req: NextRequest) {
-  try {
-    if (!REVALIDATE_SECRET) {
-      console.error('[revalidate] REVALIDATE_SECRET_TOKEN environment variable is not set');
-      return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const tag = searchParams.get('tag') || undefined;
-    const path = searchParams.get('path') || undefined;
-    const secret = searchParams.get('secret') || undefined;
-
-    if (!secret || secret !== REVALIDATE_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized: Invalid secret token' }, { status: 401 });
-    }
-
-    const res = triggerRevalidation(tag, path);
-    if (!res) {
-      return NextResponse.json({ error: 'Missing tag or path' }, { status: 400 });
-    }
-
-    return NextResponse.json(res);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Method Not Allowed: use POST with JSON body {tag|path, secret}' },
+    { status: 405 }
+  );
 }
 

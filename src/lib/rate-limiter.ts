@@ -16,9 +16,9 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
 // ─── Upstash جاهز؟ ────────────────────────────────────────────────────────────
-// إذا لم تُضبط المتغيرات — نستخدم Fallback يمرر الطلبات (بمعنى لا تحديد).
-// هذا يمنع تعطل التطبيق في بيئة التطوير قبل إعداد Upstash.
-// في الإنتاج: تأكد أن UPSTASH_REDIS_REST_URL و TOKEN موجودان دائماً.
+// Without Upstash the module falls back to a per-instance in-memory sliding
+// window (DEGRADED: isolates don't share counters — configure Upstash for
+// full distributed enforcement). Nothing passes through unthrottled anymore.
 const upstashConfigured =
   !!process.env.UPSTASH_REDIS_REST_URL &&
   !process.env.UPSTASH_REDIS_REST_URL.startsWith('REPLACE_ME') &&
@@ -26,18 +26,58 @@ const upstashConfigured =
   !process.env.UPSTASH_REDIS_REST_TOKEN.startsWith('REPLACE_ME');
 
 if (!upstashConfigured && process.env.NODE_ENV === 'production') {
-  // في الإنتاج: غياب Upstash يعني غياب الحماية من DoS — هذا خطر
+  // Production without Upstash = per-instance memory limiting only. Log once
+  // at boot so the degraded mode is visible in Vercel logs.
   console.error(
-    '[rate-limiter] ⚠️  UPSTASH_REDIS_REST_URL or TOKEN not set in production! ' +
-    'Rate limiting is DISABLED. Configure Upstash immediately.'
+    '[rate-limiter] UPSTASH_REDIS_REST_URL or TOKEN not set in production — ' +
+    'using DEGRADED in-memory limiting (per-isolate). Configure Upstash for full protection.'
   );
 }
 
-// ─── Fallback Limiter (يمرر كل الطلبات) ──────────────────────────────────────
-// يُستخدم عند غياب Upstash — يتيح العمل الطبيعي في التطوير.
-class PassthroughLimiter {
-  async limit(_key: string) {
-    return { success: true, limit: 0, remaining: 999, reset: 0, pending: Promise.resolve() };
+// ─── Fallback Limiter (in-memory sliding window) ────────────────────────────
+// Used ONLY when Upstash is not configured. Per-instance memory: on Vercel
+// serverless each isolate tracks its own counters, so this is strictly weaker
+// than the shared Redis limiter — but it FAILS CLOSED (throttles abuse)
+// instead of passing everything through. DEGRADED MODE: configure Upstash
+// (UPSTASH_REDIS_REST_URL/TOKEN) for full distributed enforcement.
+// NOTE: counters live in module scope; serverless isolates do not share them.
+function windowMs(window: `${number} ${'s' | 'm' | 'h' | 'd'}`): number {
+  const [n, unit] = window.split(' ');
+  const mult = unit === 's' ? 1000 : unit === 'm' ? 60000 : unit === 'h' ? 3600000 : 86400000;
+  return Number(n) * mult;
+}
+
+class MemorySlidingWindowLimiter {
+  private readonly hits = new Map<string, number[]>();
+  constructor(
+    private readonly window: `${number} ${'s' | 'm' | 'h' | 'd'}`,
+    private readonly max: number,
+    private readonly prefix: string,
+  ) {}
+
+  async limit(key: string) {
+    const now = Date.now();
+    const span = windowMs(this.window);
+    const fullKey = `msari:${this.prefix}:${key}`;
+    const arr = this.hits.get(fullKey) ?? [];
+    const fresh = arr.filter((t) => now - t < span);
+    if (fresh.length >= this.max) {
+      this.hits.set(fullKey, fresh);
+      // Observable enforcement signal (Vercel logs) — same shape as Upstash path consumers expect (success flag).
+      console.warn(
+        `[rate-limit] throttled prefix=${this.prefix} key=${key.slice(0, 32)} window=${this.window} max=${this.max}`
+      );
+      return { success: false, limit: this.max, remaining: 0, reset: 0, pending: Promise.resolve() };
+    }
+    fresh.push(now);
+    // Bound memory: prune idle keys opportunistically.
+    if (this.hits.size > 5000) {
+      for (const [k, v] of this.hits) {
+        if (v.length === 0 || now - v[v.length - 1] > span) this.hits.delete(k);
+      }
+    }
+    this.hits.set(fullKey, fresh);
+    return { success: true, limit: this.max, remaining: this.max - fresh.length, reset: 0, pending: Promise.resolve() };
   }
 }
 
@@ -56,7 +96,7 @@ function makeLimiter(
   max: number,
   prefix: string
 ): { limit: (key: string) => Promise<{ success: boolean; remaining: number }> } {
-  if (!redis) return new PassthroughLimiter();
+  if (!redis) return new MemorySlidingWindowLimiter(window, max, prefix);
 
   return new Ratelimit({
     redis,

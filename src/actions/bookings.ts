@@ -19,7 +19,7 @@ import { revalidatePath } from 'next/cache';
 
 import crypto from 'crypto';
 import { auth } from '@/auth';
-import { apiClient } from '@/lib/api-client';
+import { apiClient, type ApiResponse } from '@/lib/api-client';
 import { db, admin, storage } from '@/lib/firebase-admin';
 import {
   adminGuard,
@@ -102,6 +102,50 @@ const GetMyBookingsSchema = z.object({
 function calculateNights(checkIn: Date, checkOut: Date): number {
   const msPerDay = 1000 * 60 * 60 * 24;
   return Math.round((checkOut.getTime() - checkIn.getTime()) / msPerDay);
+}
+
+/** Session token pair (refreshToken present only for logins after the fix). */
+type SessionTokenPair = { idToken: string; refreshToken?: string };
+
+async function resolveSessionTokens(): Promise<SessionTokenPair | null> {
+  const session = await auth();
+  const u = session?.user as any;
+  if (!u?.firebaseToken) return null;
+  return { idToken: u.firebaseToken, refreshToken: u.refreshToken || undefined };
+}
+
+function isAuthFailure<T>(res: ApiResponse<T>): boolean {
+  const code = res.error?.code || '';
+  return code === 'unauthenticated' || code === 'HTTP_401';
+}
+
+/**
+ * Runs an authenticated API call with transparent recovery:
+ * - 401 (stale Firebase ID token, sessions outlive the 1h token) →
+ *   refresh via POST /v1/auth/refresh and retry ONCE with the new token.
+ * - TIMEOUT_ERROR on read-only calls → single retry (caller opts in).
+ * Never throws; never logs tokens. Session JWT is not mutated (retry-scoped).
+ */
+async function callWithFreshToken<T>(
+  fn: (token: string) => Promise<ApiResponse<T>>,
+  pair: SessionTokenPair,
+  opts: { retryTimeoutOnce?: boolean } = {}
+): Promise<ApiResponse<T>> {
+  const first = await fn(pair.idToken);
+  if (first.success) return first;
+  if (isAuthFailure(first) && pair.refreshToken) {
+    try {
+      const ref = await apiClient.refreshFirebaseToken(pair.refreshToken);
+      if (ref.success && ref.data?.token) {
+        return await fn(ref.data.token);
+      }
+    } catch {
+      // fall through to original failure
+    }
+  } else if (first.error?.code === 'TIMEOUT_ERROR' && opts.retryTimeoutOnce) {
+    return await fn(pair.idToken);
+  }
+  return first;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -210,42 +254,51 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
      mappedPaymentMethod = 'credit_card';
    }
 
-   // ── API-First Path (Phase 4) ──────────────────────────────────────────────
-   if (USE_BOOKING_API && callerUser?.id && (callerUser as any).firebaseToken) {
-     const firebaseToken = (callerUser as any).firebaseToken;
-     
-     try {
-       const apiRes = await apiClient.createBooking(
-         {
-           hotelId: input.hotelId,
-           roomId: input.roomId || '',
-           fromDate: input.checkIn,
-           toDate: input.checkOut,
-           guestsCount: input.guests,
-           nightsCount: nights,
-           bookingOwnerName: input.guestName,
-           bookingOwnerPhone: input.guestPhone,
-           paymentMethod: mappedPaymentMethod,
-           selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
-           isForAnotherGuest: input.isForAnotherGuest || false,
-           anotherGuestName: input.anotherGuestName || '',
-           anotherGuestPhone: input.anotherGuestPhone || '',
-           senderNumber: input.senderNumber || '',
-           senderName: input.senderName || '',
-           transferAmount: input.transferAmount,
-           transferCurrencyCode: input.transferCurrencyCode,
-           transferToNumber: input.transferToNumber,
-         },
-         firebaseToken,
-         idempotencyKey
-       );
+    // ── API-First Path (Phase 4) ──────────────────────────────────────────────
+    if (USE_BOOKING_API && callerUser?.id && (callerUser as any).firebaseToken) {
+      const pair: SessionTokenPair = {
+        idToken: (callerUser as any).firebaseToken,
+        refreshToken: (callerUser as any).refreshToken || undefined,
+      };
+
+      try {
+        const apiRes = await callWithFreshToken(
+          (token) => apiClient.createBooking(
+            {
+              hotelId: input.hotelId,
+              roomId: input.roomId || '',
+              fromDate: input.checkIn,
+              toDate: input.checkOut,
+              guestsCount: input.guests,
+              nightsCount: nights,
+              bookingOwnerName: input.guestName,
+              bookingOwnerPhone: input.guestPhone,
+              paymentMethod: mappedPaymentMethod,
+              selectedCurrencyCode: input.selectedCurrencyCode || 'USD',
+              isForAnotherGuest: input.isForAnotherGuest || false,
+              anotherGuestName: input.anotherGuestName || '',
+              anotherGuestPhone: input.anotherGuestPhone || '',
+              senderNumber: input.senderNumber || '',
+              senderName: input.senderName || '',
+              transferAmount: input.transferAmount,
+              transferCurrencyCode: input.transferCurrencyCode,
+              transferToNumber: input.transferToNumber,
+            },
+            token,
+            idempotencyKey
+          ),
+          pair
+        );
        
        await releaseLockSafely();
        
-       if (!apiRes.success) {
-         logger('warn', 'API Booking Creation Failed', { error: apiRes.error });
-         return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Booking creation failed via API' } };
-       }
+        if (!apiRes.success) {
+          logger('warn', 'API Booking Creation Failed', { error: apiRes.error });
+          if (isAuthFailure(apiRes)) {
+            return { success: false as const, error: { code: 'SESSION_EXPIRED', message: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا ثم إعادة المحاولة.' } };
+          }
+          return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Booking creation failed via API' } };
+        }
        
        logger('info', 'Booking Created via API', { bookingId: apiRes.data?.id });
        return { 
@@ -294,33 +347,50 @@ export async function previewBookingPrice(rawData: unknown) {
 
   // ── API-First Path (Phase 4) ──────────────────────────────────────────
   if (USE_BOOKING_API) {
-    const session = await auth();
-    const firebaseToken = (session?.user as any)?.firebaseToken;
-    
-    if (firebaseToken && roomId) {
+    const pair = await resolveSessionTokens();
+
+    if (pair) {
       try {
-        const apiRes = await apiClient.previewBooking(
-          { hotelId, roomId, fromDate: ciStr, toDate: coStr, currency, guestsCount },
-          firebaseToken
+        const apiRes = await callWithFreshToken(
+          (token) => apiClient.previewBooking(
+            { hotelId, roomId: roomId || '', fromDate: ciStr, toDate: coStr, currency, guestsCount },
+            token
+          ),
+          pair,
+          { retryTimeoutOnce: true }
         );
         if (apiRes.success && apiRes.data) {
-          return { 
-            success: true as const, 
+          // USD is the display SoT: formatPrice(usdAmount) converts per user
+          // currency client-side. totalInSelectedCurrency is backend-default
+          // SAR here (no currency sent) and must NOT be displayed as-is.
+          return {
+            success: true as const,
             pricePerNight: apiRes.data.pricePerNightUsd,
             nights: apiRes.data.nights,
             baseTotal: apiRes.data.totalUsd,
             discountAmount: 0,
-            finalTotal: apiRes.data.totalInSelectedCurrency,
-            currency: apiRes.data.currency,
+            finalTotal: apiRes.data.totalUsd,
+            currency: 'USD',
           };
         }
+        if (apiRes.error && isAuthFailure(apiRes)) {
+          return { success: false as const, code: 'SESSION_EXPIRED' as const, error: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا.' };
+        }
+        // Production tripwire (no tokens, no PII): records the exact backend
+        // failure behind a $0/spinner outcome in Vercel logs.
+        console.warn('[booking-preview-failed]', JSON.stringify({
+          code: (apiRes.error as any)?.code || 'UNKNOWN',
+          message: (apiRes.error as any)?.message || 'unknown',
+          hotelId, roomIdPresent: !!roomId, hasRefresh: !!pair.refreshToken,
+        }));
       } catch (apiError) {
         console.warn('API Preview Error:', apiError);
       }
+      return { success: false as const, code: 'PREVIEW_FAILED' as const, error: 'تعذر حساب السعر النهائي الآن. يرجى المحاولة لاحقًا.' };
     }
   }
   // ── API is required. No Firestore fallback. ──
-  return { success: false as const, error: 'API unavailable or missing firebaseToken' };
+  return { success: false as const, code: 'PREVIEW_FAILED' as const, error: 'API unavailable or missing firebaseToken' };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -384,16 +454,27 @@ export async function getMyBookings(rawParams: unknown = {}) {
   const safePage     = Math.max(1, page);
 
   // ── API-First Path (Phase 4) ──────────────────────────────────────────
-  const firebaseToken = (session.user as any)?.firebaseToken;
-    
-  if (firebaseToken) {
+  const pair = await resolveSessionTokens();
+
+  if (pair) {
     try {
-      const apiRes = await apiClient.getMyBookings(
-        { page: safePage, pageSize: safePageSize },
-        firebaseToken
+      const apiRes = await callWithFreshToken(
+        (token) => apiClient.getMyBookings(
+          { page: safePage, pageSize: safePageSize },
+          token
+        ),
+        pair,
+        { retryTimeoutOnce: true }
       );
-      if (apiRes.success && apiRes.data) {
-        const bookings = apiRes.data.data.map((b: any) => ({
+    if (apiRes.success && apiRes.data) {
+        const bookings = apiRes.data.data.map((b: any) => {
+        // USD SoT for display: backend totalInSelectedCurrency is unreliable
+        // (case-sensitive rate lookup degrades to the SAR rate, e.g. USD
+        // snapshots stored as 105*3.8). For USD-coded bookings show totalUsd;
+        // genuinely foreign-coded snapshots pass through untouched.
+        const storedCode = String(b.pricing?.selectedCurrencyCode || 'USD').toUpperCase();
+        const isUsd = storedCode === 'USD';
+        return {
           id: b.id,
           code: b.bookingNumber,
           status: (b.status || 'PENDING').toUpperCase(),
@@ -403,8 +484,10 @@ export async function getMyBookings(rawParams: unknown = {}) {
           checkOut: b.stay?.toDate,
           nights: b.stay?.nightsCount || 1,
           guests: b.stay?.guestsCount || 1,
-          totalPrice: b.pricing?.totalInSelectedCurrency || b.pricing?.totalUsd || 0,
-          currency: (b.pricing?.selectedCurrencyCode || 'USD').toUpperCase(),
+          totalPrice: isUsd
+            ? (b.pricing?.totalUsd ?? b.pricing?.totalInSelectedCurrency ?? 0)
+            : (b.pricing?.totalInSelectedCurrency ?? b.pricing?.totalUsd ?? 0),
+          currency: isUsd ? 'USD' : storedCode,
           createdAt: b.createdAt,
           hotel: {
             id: b.hotel?.id || '',
@@ -417,7 +500,8 @@ export async function getMyBookings(rawParams: unknown = {}) {
             id: b.room?.id || '',
             nameAr: typeof b.room?.name === 'object' ? (b.room.name.ar || b.room.name.en || 'غرفة') : (b.room?.name || 'غرفة'),
           },
-        }));
+        };
+        });
         
         return {
           success: true as const,
@@ -428,6 +512,14 @@ export async function getMyBookings(rawParams: unknown = {}) {
           pageSize: safePageSize,
         };
       }
+      if (isAuthFailure(apiRes)) {
+        return { success: false as const, error: { code: 'SESSION_EXPIRED' as const, message: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا.' } };
+      }
+      console.warn('[bookings-history-failed]', JSON.stringify({
+        code: (apiRes.error as any)?.code || 'UNKNOWN',
+        message: (apiRes.error as any)?.message || 'unknown',
+        hasRefresh: !!pair.refreshToken,
+      }));
       return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Failed to fetch bookings' } };
     } catch (apiError) {
       console.warn('API getMyBookings Error:', apiError);
