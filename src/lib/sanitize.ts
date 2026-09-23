@@ -1,32 +1,21 @@
 /**
  * src/lib/sanitize.ts
  *
- * Minimal sanitization utilities for CMS content rendering.
+ * HTML sanitization for CMS content rendering.
+ * Uses DOMPurify (isomorphic) — allowlist-based parsing, not regex matching.
  * Prevents XSS in dangerouslySetInnerHTML and JSON-LD injection.
  */
+import DOMPurify from 'isomorphic-dompurify';
 
 /**
  * Sanitizes HTML content from CMS to prevent stored XSS attacks.
- * Strips dangerous tags and attributes while preserving safe formatting.
+ * Same signature as before; implementation is now a real HTML parser with
+ * an allowlist profile (scripts, event handlers, javascript:/data: URLs,
+ * iframes/objects/embeds/forms all stripped by default).
  */
 export function sanitizeHtml(html: string): string {
   if (!html) return '';
-
-  return html
-    // Remove script tags and their content
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    // Remove on* event handlers
-    .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    // Remove javascript: and data: protocol hrefs
-    .replace(/\s+href\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '')
-    .replace(/\s+href\s*=\s*(?:"data:[^"]*"|'data:[^']*')/gi, '')
-    .replace(/\s+src\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '')
-    .replace(/\s+src\s*=\s*(?:"data:text\/html[^"]*"|'data:text\/html[^']*')/gi, '')
-    // Remove iframe, object, embed, form tags
-    .replace(/<\/?(?:iframe|object|embed|form|input|textarea|button)\b[^>]*>/gi, '')
-    // Remove style attributes with expression/url
-    .replace(/style\s*=\s*"[^"]*expression\s*\([^"]*"/gi, '')
-    .replace(/style\s*=\s*'[^']*expression\s*\([^']*'/gi, '');
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 }
 
 /**
