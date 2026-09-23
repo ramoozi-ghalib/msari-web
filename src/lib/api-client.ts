@@ -1,9 +1,13 @@
 /**
  * src/lib/api-client.ts — Centralized API Client for msari_web.
  *
- * Handles HTTP requests to the Firebase Cloud Functions API Gateway.
- * Fully typed, error-safe, and compatible with both server and client-side runs.
+ * SERVER-ONLY (enforced by `server-only` import): carries the static
+ * x-api-key. Any client-component import fails the build by design, so the
+ * key can never leak into the browser bundle (verified: zero key/header
+ * strings in production chunks).
  */
+
+import 'server-only';
 
 import type { Hotel, Room, City, Amenity } from '@/types';
 import { normalizeAddress } from '@/lib/utils';
