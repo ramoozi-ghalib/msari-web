@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { Policies } from '@/lib/policies';
+import { getSafeRedirect } from '@/lib/safeRedirect';
 
 /**
  * GET /api/auth/redirect?fallback=/ar
@@ -11,11 +12,14 @@ import { Policies } from '@/lib/policies';
  * - يُوجّه الـ admin إلى /ar تلقائياً وبأمان
  * - يُوجّه بقية المستخدمين إلى fallback URL
  *
+ * SECURITY (MED-2026-01 fix): fallback sanitized to same-origin relative
+ * path — absolute/external/protocol-relative/malformed collapse to '/ar'.
+ *
  * يُستدعى من صفحة تسجيل الدخول بعد نجاح signIn()
  */
 export async function GET(req: NextRequest) {
   const { origin, searchParams } = new URL(req.url);
-  const fallback = searchParams.get('fallback') || '/ar';
+  const fallback = getSafeRedirect(searchParams.get('fallback') || '/ar');
 
   try {
     const session = await auth();

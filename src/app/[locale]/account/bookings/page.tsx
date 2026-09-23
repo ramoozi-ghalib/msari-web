@@ -4,6 +4,7 @@ import { BookOpen, Hotel, Clock, ArrowRight } from 'lucide-react';
 import { auth } from '@/auth';
 import { getMyBookings } from '@/actions/bookings';
 import { Button } from '@/components/ui/Button';
+import BookingTotal from '@/components/booking/BookingTotal';
 import { whatsappLink } from '@/lib/site-config';
 import type { Metadata } from 'next';
 
@@ -24,6 +25,10 @@ export default async function AccountBookingsPage(props: {
 
   const res = await getMyBookings();
   const bookings = res.success ? (res.data || []) : [];
+  const loadError = !res.success
+    ? ((res as any)?.error?.message || 'تعذر تحميل الحجوزات. يرجى المحاولة لاحقًا.')
+    : null;
+  const sessionExpired = !res.success && (res as any)?.error?.code === 'SESSION_EXPIRED';
 
   const statusColors: Record<string, string> = {
     CONFIRMED: 'bg-green-100 text-green-700',
@@ -78,7 +83,19 @@ export default async function AccountBookingsPage(props: {
 
           {/* Bookings List */}
           <div className="space-y-4">
-            {bookings.length === 0 ? (
+            {loadError ? (
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-red-200 text-center py-12">
+                <h3 className="text-lg font-black text-red-700 mb-2">
+                  {sessionExpired ? 'انتهت الجلسة' : 'تعذر تحميل الحجوزات'}
+                </h3>
+                <p className="text-neutral-500 text-sm mb-6">{loadError}</p>
+                {sessionExpired && (
+                  <Link href={`/${locale}/login?redirect=${encodeURIComponent('/account/bookings')}`}>
+                    <Button variant="primary">تسجيل الدخول مجددًا</Button>
+                  </Link>
+                )}
+              </div>
+            ) : bookings.length === 0 ? (
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-neutral-100 text-center py-12">
                 <div className="w-14 h-14 bg-neutral-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BookOpen size={28} className="text-neutral-400" />
@@ -144,9 +161,7 @@ export default async function AccountBookingsPage(props: {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-xs text-neutral-400">إجمالي الحجز: </span>
-                      <span className="font-black text-[var(--brand-primary)] text-lg">
-                        {booking.currency === 'USD' ? `$${booking.totalPrice}` : `${booking.totalPrice} ${booking.currency}`}
-                      </span>
+                      <BookingTotal amount={booking.totalPrice} currency={booking.currency} />
                     </div>
                     <a
                       href={whatsappLink('أريد الاستفسار عن حجزي رقم ' + booking.code)}

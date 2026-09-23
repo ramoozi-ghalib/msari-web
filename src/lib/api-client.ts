@@ -360,19 +360,28 @@ class ApiClient {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     path: string,
     body?: unknown,
-    headers: Record<string, string> = {}
+    headers: Record<string, string> = {},
+    timeoutMs = 3500
   ): Promise<ApiResponse<T>> {
     const url = `${this.getBaseUrl()}/${path.replace(/^\//, '')}`;
-    
+
+    // User-authenticated calls (explicit Bearer) must NOT carry the static
+    // x-api-key: backend treats a PRESENT-but-invalid key as fatal
+    // (optionalPartnerCredential rejects), while an ABSENT key is a clean
+    // skip. The static key is only for server-to-server sync routes
+    // (hotels/cities/rooms), which never send a Bearer token.
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
-      'x-api-key': this.getApiKey(),
       ...headers,
     };
+    if (!requestHeaders['Authorization']) {
+      requestHeaders['x-api-key'] = this.getApiKey();
+    }
 
-    // 3.5 seconds timeout to prevent hanging the Next.js dev server/client
+    // Default 3.5s timeout; auth calls pass a longer budget (cold starts +
+    // sequential Firebase ops). Prevents hanging the Next.js server/client.
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     const config: RequestInit = {
       method,
@@ -396,12 +405,39 @@ class ApiClient {
         } catch {
           // No JSON body
         }
-        
+
+        // Backend error shapes:
+        //  (a) legacy { error: { code, message } }
+        //  (b) flat RFC7807 { type: '.../errors/<code>', title, detail }
+        // Support both so server diagnostics (and duplicate-email detection)
+        // are never silently swallowed into a generic HTTP_xxx.
+        const rfcCode =
+          typeof errData?.type === 'string'
+            ? errData.type.split('/').pop()
+            : undefined;
+        let code: string =
+          errData?.error?.code || rfcCode || `HTTP_${response.status}`;
+        const message: string =
+          errData?.error?.message ||
+          errData?.detail ||
+          errData?.title ||
+          `Request failed with status ${response.status}`;
+
+        // Normalize duplicate-email variants so callers can branch on one code.
+        if (
+          code !== 'DUPLICATE_EMAIL' &&
+          /already in use|EMAIL_EXISTS|DUPLICATE|P2002|email-already/i.test(
+            `${code} ${message}`
+          )
+        ) {
+          code = 'DUPLICATE_EMAIL';
+        }
+
         return {
           success: false,
           error: {
-            code: errData?.error?.code || `HTTP_${response.status}`,
-            message: errData?.error?.message || `Request failed with status ${response.status}`,
+            code,
+            message,
             fieldErrors: errData?.error?.fieldErrors,
           },
         };
@@ -429,16 +465,16 @@ class ApiClient {
     }
   }
 
-  public get<T>(path: string, headers?: Record<string, string>) {
-    return this.request<T>('GET', path, undefined, headers);
+  public get<T>(path: string, headers?: Record<string, string>, timeoutMs = 3500) {
+    return this.request<T>('GET', path, undefined, headers, timeoutMs);
   }
 
-  public post<T>(path: string, body?: unknown, headers?: Record<string, string>) {
-    return this.request<T>('POST', path, body, headers);
+  public post<T>(path: string, body?: unknown, headers?: Record<string, string>, timeoutMs = 3500) {
+    return this.request<T>('POST', path, body, headers, timeoutMs);
   }
 
-  public patch<T>(path: string, body?: unknown, headers?: Record<string, string>) {
-    return this.request<T>('PATCH', path, body, headers);
+  public patch<T>(path: string, body?: unknown, headers?: Record<string, string>, timeoutMs = 3500) {
+    return this.request<T>('PATCH', path, body, headers, timeoutMs);
   }
 
   // ─── Authentication API ─────────────────────────────────────────────────────
@@ -450,12 +486,14 @@ class ApiClient {
     phone?: string;
     image?: string;
     token?: string;
+    refreshToken?: string;
   }>> {
     const res = await this.post<{
       uid: string;
       email: string;
       token: string;
-    }>('/auth/login', { email, password: passwordHash });
+      refreshToken?: string;
+    }>('/auth/login', { email, password: passwordHash }, undefined, 15000);
 
     if (!res.success || !res.data) {
       return { success: false, error: res.error };
@@ -497,27 +535,42 @@ class ApiClient {
         phone,
         image,
         token: res.data.token,
+        refreshToken: res.data.refreshToken,
       },
     };
+  }
+
+  /**
+   * Refresh an expired Firebase ID token.
+   * Calls POST /v1/auth/refresh — read-only, safe to retry.
+   */
+  public async refreshFirebaseToken(refreshToken: string): Promise<ApiResponse<{
+    uid: string;
+    token: string;
+    refreshToken: string;
+  }>> {
+    return this.post('/auth/refresh', { refreshToken }, undefined, 15000);
   }
 
   public async registerUser(data: {
     name: string;
     email: string;
-    passwordHash: string;
+    password: string;
     phone?: string | null;
   }): Promise<ApiResponse<{ id: string }>> {
     const parts = data.name.split(' ');
     const firstName = parts[0] || 'User';
     const lastName = parts.slice(1).join(' ') || 'User';
 
+    // 25s budget: backend runs createUser + Firestore write + IdentityToolkit
+    // login sequentially (cold starts exceed the default 3.5s).
     const res = await this.post<{ uid: string }>('/auth/register', {
       email: data.email,
-      password: data.passwordHash,
+      password: data.password,
       firstName,
       lastName,
       phoneNumber: data.phone || undefined,
-    });
+    }, undefined, 25000);
 
     if (!res.success || !res.data) {
       return { success: false, error: res.error };
@@ -575,9 +628,11 @@ class ApiClient {
     guestsCount: number;
     currency?: string;
   }, authToken: string): Promise<ApiResponse<ApiBookingPreview>> {
+    // 25s budget: backend runs a collection-group transaction (cold starts +
+    // scans exceed the default 3.5s). Preview is read-only — safe to retry.
     const res = await this.post<ApiBookingPreview>('/bookings/preview', input, {
       Authorization: `Bearer ${authToken}`,
-    });
+    }, 25000);
     return res;
   }
 
@@ -604,6 +659,7 @@ class ApiClient {
     transferAmount?: number;
     transferCurrencyCode?: string;
     transferToNumber?: string;
+    platform?: string;
   }, authToken: string, idempotencyKey?: string): Promise<ApiResponse<ApiBookingCreateResponse>> {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${authToken}`,
@@ -611,7 +667,8 @@ class ApiClient {
     if (idempotencyKey) {
       headers['Idempotency-Key'] = idempotencyKey;
     }
-    const res = await this.post<ApiBookingCreateResponse>('/bookings', input, headers);
+    // Origin stamp (backend-validated whitelist; anything else → legacy default).
+    const res = await this.post<ApiBookingCreateResponse>('/bookings', { ...input, platform: input.platform || 'website' }, headers);
     return res;
   }
 
@@ -636,12 +693,13 @@ class ApiClient {
      if (params.hotelId) query.set('hotelId', params.hotelId);
      if (params.cursor) query.set('cursor', params.cursor);
      
-     const path = `/bookings${query.toString() ? `?${query.toString()}` : ''}`;
-     const res = await this.get<ApiBookingHistoryResponse>(path, {
-       Authorization: `Bearer ${authToken}`,
-     });
-     return res;
-   }
+      const path = `/bookings${query.toString() ? `?${query.toString()}` : ''}`;
+      // 15s budget + Bearer-only (no x-api-key): history is read-only.
+      const res = await this.get<ApiBookingHistoryResponse>(path, {
+        Authorization: `Bearer ${authToken}`,
+      }, 15000);
+      return res;
+    }
 
   /**
    * Get single booking by ID.

@@ -13,6 +13,58 @@ import AuthVisualSide from '@/components/auth/AuthVisualSide';
 
 type RegisterActionResult = Awaited<ReturnType<typeof registerUser>>;
 
+// Country dial codes — parity with the mobile app picker (default Yemen).
+// The form always submits full E.164; manual "+<cc>..." entry overrides.
+const COUNTRY_DIAL_CODES: Array<{ code: string; name: string }> = [
+  { code: '+967', name: 'اليمن' },
+  { code: '+966', name: 'السعودية' },
+  { code: '+971', name: 'الإمارات' },
+  { code: '+974', name: 'قطر' },
+  { code: '+965', name: 'الكويت' },
+  { code: '+973', name: 'البحرين' },
+  { code: '+968', name: 'عُمان' },
+  { code: '+20', name: 'مصر' },
+  { code: '+962', name: 'الأردن' },
+  { code: '+961', name: 'لبنان' },
+  { code: '+963', name: 'سوريا' },
+  { code: '+964', name: 'العراق' },
+  { code: '+970', name: 'فلسطين' },
+  { code: '+249', name: 'السودان' },
+  { code: '+218', name: 'ليبيا' },
+  { code: '+216', name: 'تونس' },
+  { code: '+213', name: 'الجزائر' },
+  { code: '+212', name: 'المغرب' },
+  { code: '+222', name: 'موريتانيا' },
+  { code: '+252', name: 'الصومال' },
+  { code: '+253', name: 'جيبوتي' },
+  { code: '+269', name: 'جزر القمر' },
+  { code: '+251', name: 'إثيوبيا' },
+  { code: '+291', name: 'إريتريا' },
+  { code: '+254', name: 'كينيا' },
+  { code: '+90', name: 'تركيا' },
+  { code: '+98', name: 'إيران' },
+  { code: '+91', name: 'الهند' },
+  { code: '+92', name: 'باكستان' },
+  { code: '+880', name: 'بنغلاديش' },
+  { code: '+63', name: 'الفلبين' },
+  { code: '+62', name: 'إندونيسيا' },
+  { code: '+60', name: 'ماليزيا' },
+  { code: '+66', name: 'تايلند' },
+  { code: '+86', name: 'الصين' },
+  { code: '+1', name: 'أمريكا / كندا' },
+  { code: '+44', name: 'بريطانيا' },
+  { code: '+33', name: 'فرنسا' },
+  { code: '+49', name: 'ألمانيا' },
+  { code: '+31', name: 'هولندا' },
+  { code: '+46', name: 'السويد' },
+  { code: '+34', name: 'إسبانيا' },
+  { code: '+39', name: 'إيطاليا' },
+  { code: '+7', name: 'روسيا' },
+  { code: '+61', name: 'أستراليا' },
+  { code: '+27', name: 'جنوب أفريقيا' },
+  { code: '+234', name: 'نيجيريا' },
+];
+
 function RegisterForm() {
   const params = useSearchParams();
   const redirect = params.get('redirect') || '/';
@@ -22,6 +74,7 @@ function RegisterForm() {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    dialCode: '+967',
     phone: '',
     password: '',
     confirm: '',
@@ -71,10 +124,18 @@ function RegisterForm() {
 
     setLoading(true);
     try {
+      // Combine country dial code + national number into full E.164.
+      // A manually typed full international number ("+<cc>...") overrides.
+      // Leading trunk zero(s) stripped when combining (e.g. 05... +966).
+      const national = form.phone.trim();
+      const fullPhone = national.startsWith('+')
+        ? national
+        : `${form.dialCode}${national.replace(/^0+/, '')}`;
+
       const result = await registerUser({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
-        phone: form.phone.trim(),
+        phone: fullPhone,
         password: form.password,
       });
 
@@ -85,13 +146,21 @@ function RegisterForm() {
         return;
       }
 
-      // Auto-login after successful registration
-      await signIn('credentials', {
+      // Auto-login after successful registration.
+      // redirect:false + same-host navigation (mirrors login page): immune to
+      // any AUTH_URL/baseUrl misconfiguration — never leaves msari.net.
+      const signInRes = await signIn('credentials', {
         email: form.email.trim().toLowerCase(),
         password: form.password,
-        redirect: true,
-        callbackUrl: safeRedirect,
+        redirect: false,
       });
+
+      if (signInRes?.error) {
+        setError('تم إنشاء الحساب بنجاح، يرجى تسجيل الدخول.');
+        setLoading(false);
+        return;
+      }
+      window.location.href = safeRedirect;
 
     } catch {
       setError('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.');
@@ -187,28 +256,45 @@ function RegisterForm() {
               </div>
             </div>
 
-            {/* Phone Number Field */}
+            {/* Phone Number Field — country dial code + national number */}
             <div>
               <label htmlFor="phone" className="block text-xs sm:text-sm font-bold text-neutral-800 mb-1.5">
                 رقم الهاتف
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <Phone size={18} />
+              <div className="flex gap-2" dir="ltr">
+                <select
+                  value={form.dialCode}
+                  onChange={e => set('dialCode', e.target.value)}
+                  aria-label="رمز الدولة"
+                  className="rounded-xl border border-neutral-200 bg-neutral-50/50 px-2 py-3 text-sm text-neutral-900 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none max-w-36"
+                >
+                  {COUNTRY_DIAL_CODES.map(c => (
+                    <option key={c.code} value={c.code}>
+                      {c.name} ({c.code})
+                    </option>
+                  ))}
+                </select>
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <Phone size={18} />
+                  </div>
+                  <input
+                    id="phone"
+                    type="tel"
+                    value={form.phone}
+                    onChange={e => set('phone', e.target.value)}
+                    placeholder="7XX XXX XXX"
+                    required
+                    autoComplete="tel"
+                    inputMode="tel"
+                    dir="ltr"
+                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 ps-10 pe-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none"
+                  />
                 </div>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={e => set('phone', e.target.value)}
-                  placeholder="+967 7XX XXX XXX"
-                  required
-                  autoComplete="tel"
-                  inputMode="tel"
-                  dir="ltr"
-                  className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 ps-10 pe-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none"
-                />
               </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-400">
+                اختر رمز الدولة ثم أدخل رقمك الوطني (بدون الصفر الأول). يمكن أيضًا كتابة الرقم كاملًا بصيغة +...
+              </p>
             </div>
 
             {/* Password Field */}

@@ -124,6 +124,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               phone: apiRes.data.phone || '',
               role,
               token: apiRes.data.token,
+              refreshToken: apiRes.data.refreshToken || '',
               image: apiRes.data.image || '',
             };
           }
@@ -150,6 +151,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.name = user.name;
         token.email = user.email;
         token.firebaseToken = user.token;
+        token.refreshToken = (user as any).refreshToken || '';
         token.phone = user.phone;
         token.picture = user.image;
         token.image = user.image;
@@ -166,6 +168,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         if (token.name) session.user.name = token.name as string;
         if (token.email) session.user.email = token.email as string;
         session.user.firebaseToken = token.firebaseToken as string;
+        session.user.refreshToken = (token.refreshToken as string) || '';
         session.user.phone = (token.phone as string) || '';
         session.user.image = (token.image as string) || (token.picture as string) || '';
       }

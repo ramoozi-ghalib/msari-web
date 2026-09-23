@@ -1,35 +1,80 @@
 'use server';
 
-import bcrypt from 'bcryptjs';
 import { RegisterSchema } from '@/schemas/auth.schema';
 
 import { apiClient } from '@/lib/api-client';
 
+/**
+ * Normalize user-entered phone to E.164 (UI-layer only).
+ *
+ * Backend `POST /v1/auth/register` passes phoneNumber straight to
+ * `admin.auth().createUser`, which enforces E.164 strictly. This helper only
+ * reshapes input — no backend/schema/rules change:
+ * - strips spaces, dashes, dots, parentheses
+ * - '00...' (IDD prefix) -> '+...'
+ * - bare '967XXXXXXXXX' -> '+967XXXXXXXXX'
+ * - bare Yemeni national '7XXXXXXXX' (9 digits) -> '+9677XXXXXXXX'
+ *   (Yemen default matches site placeholder +967, WhatsApp 967, YER default)
+ * - leading '+' kept as-is
+ * Returns null when unparseable; caller fails closed with a clear message.
+ */
+function normalizePhoneE164(raw: string | undefined): string | null {
+  if (!raw) return null;
+  let p = raw.trim().replace(/[\s\-.()]/g, '');
+  if (!p) return null;
+  if (p.startsWith('00')) p = '+' + p.slice(2);
+  if (p.startsWith('+')) return /^\+\d{7,15}$/.test(p) ? p : null;
+  const digits = p.replace(/\D/g, '');
+  if (/^967\d{9}$/.test(digits)) return '+' + digits;
+  if (/^7\d{8}$/.test(digits)) return '+967' + digits;
+  return null;
+}
+
 export async function registerUser(rawData: unknown) {
   const parsed = RegisterSchema.safeParse(rawData);
   if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
+    const firstField = (Object.keys(fieldErrors) as Array<keyof typeof fieldErrors>)[0];
+    const firstMsg = firstField ? fieldErrors[firstField]?.[0] : undefined;
     return {
       success: false as const,
       error: {
         code: 'VALIDATION_ERROR',
-        message: 'بيانات غير صالحة',
-        fieldErrors: parsed.error.flatten().fieldErrors,
+        message: firstMsg || 'بيانات غير صالحة',
+        fieldErrors,
       },
     };
   }
 
   const { name, email, password, phone } = parsed.data;
 
+  // Phone is required by the signup UI. Backend accepts omission but enforces
+  // E.164 strictly — fail closed here with a clear Arabic message instead of
+  // letting the whole signup fail with a generic server error.
+  const phoneE164 = normalizePhoneE164(phone);
+  if (!phoneE164) {
+    return {
+      success: false as const,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'رقم الهاتف غير صالح — أدخله بالصيغة الدولية (مثال: +9677XXXXXXXX)',
+        fieldErrors: { phone: ['رقم الهاتف غير صالح'] },
+      },
+    };
+  }
+
   try {
-    // 12 rounds for bcrypt is extremely secure against timing/brute force
-    const passwordHash = await bcrypt.hash(password, 12);
-    
-    // Call Cloud Functions API Gateway
+    // NOTE: password is intentionally forwarded as entered (over TLS).
+    // The API / Firebase Auth is the password hasher (scrypt, server-side) —
+    // exactly what the mobile app does via the client SDK. Pre-hashing here
+    // (bcrypt) would store the hash AS the password and break every later
+    // plaintext login (web auto-login, web login, app login). This value is
+    // never stored in Firestore and never logged.
     const apiRes = await apiClient.registerUser({
       name,
       email,
-      passwordHash,
-      phone: phone || null,
+      password,
+      phone: phoneE164,
     });
 
     if (!apiRes.success) {
