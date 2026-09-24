@@ -11,19 +11,23 @@
 - All 26 matches for `msari-eb18a` are in historical Markdown reports only,
   where it was labeled "intended staging" Firebase project for Cloud Functions
   (Phase 4/5 backend staging gate).
-- Website truth: frontend deploys on **Vercel** (`msari-web`); production API is
-  **Cloud Functions `api` on `msariapp-v2`**. `msari-eb18a` is not wired anywhere
-  in this repo and is not a dependency of any serving path (Hotels/Cities/Rooms
-  API-first, auth, booking).
+- Website truth (CORRECTED 2026-09-24 — an earlier revision of this file wrongly
+  said "Vercel"; that was stale info from the Step 2 era): production is the
+  **Hostinger Node.js app** serving **`https://msari.net`** via custom
+  `server.js` (`HOSTNAME 127.0.0.1`, `PORT 3000`, Nginx proxy — see
+  `docs/deployment/HOSTINGER_ENVIRONMENT.md` and merge `f02d527`
+  release/hostinger-proof). The Vercel project is **cancelled/retired** and plays
+  no role. `msari-eb18a` is not wired anywhere in this repo and is not a
+  dependency of any serving path (Hotels/Cities/Rooms API-first, auth, booking).
 
 ## 2. Resolution
 - `msari-eb18a` (Spark plan, cannot deploy Functions v2) is **removed as a blocker**
   for `msari_web`. Historical report mentions (Master Plan §2/§4, Phase 4 final,
   Phase 4/5 correction + syntax cleanup, Staging Gate, Phase 6 gate, Remaining
   Data Matrix) are **frozen evidence** — not edited — and superseded by this file.
-- Website staging discipline going forward: **Vercel Preview deployments +
-  production smoke** (already proven: 7×200 + genuine 404). No Firebase staging
-  project required for `msari_web`.
+- Website staging discipline going forward: **Hostinger TEMP subdomain
+  (`*.hostingersite.com`) + production smoke on `msari.net`**. No Firebase
+  staging project required for `msari_web`.
 - Backend (separate `functions/` repo on `msariapp-v2`) keeps its own staging
   policy outside this repo; if it ever needs one, it will be tracked there —
   never again as a `msari_web` blocker.

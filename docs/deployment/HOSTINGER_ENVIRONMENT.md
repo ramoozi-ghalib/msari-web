@@ -21,8 +21,8 @@
 | **`NEXT_PUBLIC_APP_URL`** | 🔴 نعم | `https://salmon-alligator-771699.hostingersite.com` | رابط النطاق المعتمد للموقع لربط استدعاءات الـ APIs والـ Canonical SEO. |
 | **`NEXTAUTH_URL`** | 🔴 نعم | `https://salmon-alligator-771699.hostingersite.com` | الرابط المعتمد لمنظومة المصادقة وتأمين جلسات تسجيل الدخول بـ NextAuth. |
 | **`AUTH_URL`** | 🔴 نعم | `https://salmon-alligator-771699.hostingersite.com` | رابط الخادم المصرح لـ Auth.js v5. |
-| **`AUTH_SECRET`** | 🔴 نعم | `PASTE_64_HEX_SECRET_FROM_VERCEL_DASHBOARD_ONLY` | مفتاح التشفير والسر الأساسي لتوليد وتأمين رموز جلسات الـ JWT. |
-| **`NEXTAUTH_SECRET`** | 🔴 نعم | `PASTE_64_HEX_SECRET_FROM_VERCEL_DASHBOARD_ONLY` | مفتاح سر متوافق تراجعياً لتوليد الـ Cookies بـ NextAuth. |
+| **`AUTH_SECRET`** | 🔴 نعم | `PASTE_64_HEX_SECRET_FROM_HOSTINGER_PANEL_ONLY` | مفتاح التشفير والسر الأساسي لتوليد وتأمين رموز جلسات الـ JWT. |
+| **`NEXTAUTH_SECRET`** | 🔴 نعم | `PASTE_64_HEX_SECRET_FROM_HOSTINGER_PANEL_ONLY` | مفتاح سر متوافق تراجعياً لتوليد الـ Cookies بـ NextAuth. |
 | **`NODE_OPTIONS`** | 🔴 نعم | `--dns-result-order=ipv4first` | **مهم جداً**: توجيه محرك Node لإعطاء الأسبقية لـ IPv4 لمنع تعثر Proxy هوستنجر مع `localhost`. |
 | **`HOSTNAME`** | 🔴 نعم | `127.0.0.1` | عنوان الاستماع الداخلي لخادم Next.js للربط مع موجه Nginx Proxy. |
 | **`PORT`** | 🔴 نعم | `3000` | رقم المنفذ المخصص لاستماع التطبيق بـ بيئة الاستضافة. |
