@@ -1,0 +1,6 @@
+# Never upload local env files to Vercel deployments.
+# Production uses project Environment Variables (incl. AUTH_URL=https://msari.net).
+# Uploading local .env would leak dev values (e.g. AUTH_URL=http://localhost:3000)
+# into the production runtime.
+.env
+.env.local

@@ -77,7 +77,3 @@ next-env.d.ts
 # Testing
 # ======================
 /coverage
-.env
-.env.local
-.env.*
-node_modules
