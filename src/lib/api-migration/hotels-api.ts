@@ -55,7 +55,14 @@ export interface ApiHotelV2 {
   isDeleted?: boolean;
 }
 
-async function apiGet<T>(path: string, params?: Record<string, string | number>): Promise<T> {
+async function apiGet<T>(
+  path: string,
+  params?: Record<string, string | number>,
+  // F-02 fix: public catalog endpoints use time-bounded Data Cache instead of
+  // no-store. 300s TTL + `api:catalog` tag (purged via /api/revalidate).
+  // NEVER use for user/booking/payment/session data (fail-closed no-store there).
+  cacheOpts: { revalidate: number; tags: string[] } = { revalidate: 300, tags: ['api:catalog'] },
+): Promise<T> {
   if (typeof window !== 'undefined') {
     throw new Error('[hotels-api] server-only: must never run in the browser.');
   }
@@ -73,7 +80,7 @@ async function apiGet<T>(path: string, params?: Record<string, string | number>)
   try {
     const res = await fetch(url, {
       headers: { 'x-api-key': getServerApiKey() },
-      cache: 'no-store',
+      next: { revalidate: cacheOpts.revalidate, tags: cacheOpts.tags },
       signal: controller.signal,
     });
     if (!res.ok) {

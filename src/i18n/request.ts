@@ -10,7 +10,6 @@ const messagesMap: Record<string, any> = {
 
 export default getRequestConfig(async ({requestLocale}) => {
   let locale = await requestLocale;
-  console.log('[BOOT-2] Executing src/i18n/request.ts -> Locale:', locale);
  
   if (!locale || !routing.locales.includes(locale as any)) {
     locale = routing.defaultLocale;

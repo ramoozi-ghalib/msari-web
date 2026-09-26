@@ -714,6 +714,12 @@ async function getHotelBySlugViaApi(slug: string): Promise<Hotel | null> {
     // Mirror direct fallbacks (doc.id / generated slugs): single-doc fetch by id.
     apiH = await apiFetchHotelById(slug);
   }
+  if (!apiH) {
+    // F-01 fix: an API-side miss is NOT proof of absence (transient API failure
+    // must never become a page 404). Verify against direct Firestore before
+    // returning null; genuine absence returns null on both paths.
+    return getHotelBySlugDirect(slug);
+  }
   if (!apiH || (apiH as any).isPublished === false) return null;
   if ((apiH as any).isDeleted === true) return null;
   // Parallel: cities (shared cached) + rooms. Same mapping inputs as direct.
