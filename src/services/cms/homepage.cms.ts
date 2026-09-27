@@ -134,7 +134,8 @@ async function fetchHomepageInternal(): Promise<HomepageContentData> {
   };
 }
 
-const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 10;
+// F-02: editorial TTL 10s→300s (purge via /api/revalidate tag cms:homepage).
+const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 300;
 
 export class HomepageCmsService {
   /**

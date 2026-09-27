@@ -827,7 +827,8 @@ async function fetchFlightsPageInternal(): Promise<FlightsPageData> {
   };
 }
 
-const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 10;
+// F-02: editorial TTL 10s→300s (purge via /api/revalidate tags cms:pages/*).
+const CMS_REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 300;
 
 export class PagesCmsService {
   static getAboutPage = unstable_cache(

@@ -95,7 +95,7 @@ export class DestinationsCmsService {
     return unstable_cache(
       () => fetchEditorialGuideInternal(slug),
       [`website_destination_${slug}`],
-      { revalidate: process.env.NODE_ENV === 'development' ? 1 : 10, tags: ['cms:destinations', `cms:dest:${slug}`] }
+      { revalidate: process.env.NODE_ENV === 'development' ? 1 : 120, tags: ['cms:destinations', `cms:dest:${slug}`] }
     )();
   }
 }
