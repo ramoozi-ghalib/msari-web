@@ -14,6 +14,7 @@
  * - city join uses CityService.getActiveCities (Phase C: API-first + fallback).
  */
 import { getServerApiBaseUrl, getServerApiKey } from './msari-api';
+import { unstable_cache } from 'next/cache';
 import {
   mapApiHotelToHotel,
   mapApiRoomToRoom,
@@ -182,11 +183,27 @@ export interface ApiListResponse {
 
 /** Single bounded API call — full hotel list, NO rooms fan-out (prices come from displayPrice). */
 export async function apiFetchAllHotels(): Promise<{ hotels: ApiHotelV2[] }> {
-  const res = await apiGet<ApiListResponse>('/hotels', { limit: 100, sort: 'recommended' });
-  return { hotels: Array.isArray(res.data) ? res.data : [] };
+  return fetchAllHotelsCached();
 }
 
-export async function apiFetchHotelBySlug(slug: string): Promise<ApiHotelV2 | null> {
+// F-02: fetch() Data Cache is NOT honored inside Server Actions, so the
+// per-request react cache alone refetched /hotels on every HTTP hit (the
+// measured 3–6s TTFB). Persistent unstable_cache here (public catalog only,
+// 300s + `api:catalog` tag, purged via /api/revalidate). Rejections are
+// never cached by Next, so transient failures always fall through to the
+// direct-Firestore fallback instead of poisoning the cache.
+const fetchAllHotelsCached = unstable_cache(
+  async (): Promise<{ hotels: ApiHotelV2[] }> => {
+    const res = await apiGet<ApiListResponse>('/hotels', { limit: 100, sort: 'recommended' });
+    return { hotels: Array.isArray(res.data) ? res.data : [] };
+  },
+  ['api:hotels-list'],
+  { revalidate: 300, tags: ['api:catalog'] },
+);
+
+class ApiAbsentError extends Error {}
+
+async function apiFetchHotelBySlugUncached(slug: string): Promise<ApiHotelV2 | null> {
   try {
     const hotel = await apiGet<ApiHotelV2 | null>(`/hotels/by-slug/${encodeURIComponent(slug)}`);
     return hotel && (hotel as any).id ? hotel : null;
@@ -196,7 +213,44 @@ export async function apiFetchHotelBySlug(slug: string): Promise<ApiHotelV2 | nu
   }
 }
 
+const fetchHotelBySlugCached = unstable_cache(
+  async (slug: string): Promise<ApiHotelV2> => {
+    const hotel = await apiFetchHotelBySlugUncached(slug);
+    if (!hotel) throw new ApiAbsentError(`api hotel absent: ${slug}`);
+    return hotel;
+  },
+  ['api:hotel-by-slug'],
+  { revalidate: 300, tags: ['api:catalog'] },
+);
+
+export async function apiFetchHotelBySlug(slug: string): Promise<ApiHotelV2 | null> {
+  try {
+    return await fetchHotelBySlugCached(slug);
+  } catch (e) {
+    if (e instanceof ApiAbsentError || isNotFound(e)) return null;
+    throw e;
+  }
+}
 export async function apiFetchHotelById(id: string): Promise<ApiHotelV2 | null> {
+  try {
+    return await fetchHotelByIdCached(id);
+  } catch (e) {
+    if (e instanceof ApiAbsentError || isNotFound(e)) return null;
+    throw e;
+  }
+}
+
+const fetchHotelByIdCached = unstable_cache(
+  async (id: string): Promise<ApiHotelV2> => {
+    const hotel = await apiFetchHotelByIdUncached(id);
+    if (!hotel) throw new ApiAbsentError(`api hotel absent: ${id}`);
+    return hotel;
+  },
+  ['api:hotel-by-id'],
+  { revalidate: 300, tags: ['api:catalog'] },
+);
+
+async function apiFetchHotelByIdUncached(id: string): Promise<ApiHotelV2 | null> {
   try {
     const hotel = await apiGet<ApiHotelV2 | null>(`/hotels/${encodeURIComponent(id)}`);
     return hotel && (hotel as any).id ? hotel : null;
@@ -207,8 +261,16 @@ export async function apiFetchHotelById(id: string): Promise<ApiHotelV2 | null> 
 }
 
 export async function apiFetchRooms(hotelId: string): Promise<Room[]> {
-  try {
-    const res = await apiGet<{ data?: any[] }>(`/rooms`, { hotelId });
+  return fetchRoomsCached(hotelId);
+}
+
+// [] (room-less hotel) is a valid answer and safe to cache; errors throw
+// (uncached) so the detail page falls back to direct instead of rendering
+// a room-less hotel on transient failure.
+const fetchRoomsCached = unstable_cache(
+  async (hotelId: string): Promise<Room[]> => {
+    try {
+      const res = await apiGet<{ data?: any[] }>(`/rooms`, { hotelId });
     const list = Array.isArray(res.data) ? res.data : [];
     // Mirror the direct path's query-level filter (rooms where isPublished==true).
     // Docs missing the field are excluded on both paths.
@@ -222,7 +284,10 @@ export async function apiFetchRooms(hotelId: string): Promise<Room[]> {
     if (isNotFound(e)) return [];
     throw e;
   }
-}
+  },
+  ['api:rooms-by-hotel'],
+  { revalidate: 300, tags: ['api:catalog'] },
+);
 
 /**
  * Map one API room with DIRECT-path-identical semantics (mirrors the
