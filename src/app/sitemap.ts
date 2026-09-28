@@ -56,8 +56,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     hotelsSnap.docs.forEach((doc) => {
       const d = doc.data();
       if (d.isPublished !== false && d.isDeleted !== true) {
+        // Prefer the explicit slug field (curated Latin slugs); fall back to
+        // generator only for docs without one.
         const nameEn = typeof d.name === 'object' ? (d.name?.en || d.name?.ar) : (d.nameEn || d.name || '');
-        const slug = generateSlugFromHotel(doc.id, nameEn);
+        const slug = (typeof d.slug === 'string' && d.slug.trim())
+          ? d.slug.trim().toLowerCase()
+          : generateSlugFromHotel(doc.id, nameEn);
         const lastMod = d.updatedAt?.toDate ? d.updatedAt.toDate() : new Date();
 
         for (const locale of locales) {
