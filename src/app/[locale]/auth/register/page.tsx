@@ -1,6 +1,11 @@
 import { redirect } from 'next/navigation';
 
-export default function OldRegisterPage({ searchParams }: { searchParams: { redirect?: string } }) {
-  const redirectParam = searchParams.redirect ? `?redirect=${encodeURIComponent(searchParams.redirect)}` : '';
+export default async function OldRegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
+  const { redirect: redirectTo } = await searchParams;
+  const redirectParam = redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : '';
   redirect(`/register${redirectParam}`);
 }
