@@ -27,7 +27,17 @@ channels, infrastructure strips it).
 - `7487b1e`: editorial TTLs 10s→300s (homepage/settings/pages),
   destinations 120s (offers kept 60s).
 
-## 3. FINDINGS BEFORE/AFTER
+## 3. FINDINGS BEFORE/AFTER (updated post-activation)
+- **F-02 TTFB (HIGH): PROVEN CLOSED.** Final warm measurements (2026-09-27,
+  post key-activation + webpack rebuild): home **0.89s**, hotels **0.85s**,
+  detail **1.07s** (first-hit cold ≤1.9s). Target ~1.5s p50 MET.
+  Activation chain: real `MSARI_API_KEY` provisioned in hPanel (prior value
+  was placeholder `NOT-CONFIGURED` ⇒ 100% direct fallback, proven by 185×401
+  log forensics) → API 200s in logs (37×200, 0×401) → persistent catalog
+  caches engage. Deploy saga note: Turbopack build crashes on Hostinger
+  (CSS worker, env-specific; local green) ⇒ production build switched to
+  `next build --webpack` (documented flag) + fixed a latent `searchParams`
+  type error it exposed; Node pinned `20.x` in engines.
 - **F-04 (was HIGH): PROVEN FIXED.** Before: `MOCK_FLIGHTS` (Qatar/Emirates/
   EgyptAir + prices + dead select buttons + "3 رحلات متاحة"). After: live page
   shows "حجز الطيران غير متاح حالياً" + WhatsApp CTA, zero airline/price
@@ -147,7 +157,7 @@ serving share in prod (inferred, not instrumented).
     MEDIUM? None (F-03/R2 justified residual with path forward).
 16. Every claim evidenced? Yes — probes, logs, file:lines, QA table above.
 
-## FINAL DECISION: **CONDITIONAL PASS (unchanged)**
-Production serving approved to continue. Final Delivery stays OPEN pending:
-TTFB target (R1), CSP delivery (R2), owner checklist (§13). No re-audit needed —
-targeted re-gate on R1/R2 only.
+## FINAL DECISION: **CONDITIONAL PASS → see below**
+F-02 closed numerically; F-01/F-04/redirects closed; CSP delivery + Hostinger
+checklist (Node now pinned 20.x — owner to confirm panel) remain as light
+residuals. No re-audit needed — targeted re-gate on CSP only.
