@@ -119,8 +119,10 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
   const isFirebaseStorageUrl = (url: string) =>
     /firebasestorage|storage\.googleapis/.test(url || '');
   const validImages = hotel.images?.filter(isValidUrl) || [];
+  // SEO: descriptive per-image alt (invisible change — code only).
+  const galleryAltBase = `${hotel.name}${hotel.city ? ` ${hotel.city}` : ''}`;
   const slides = validImages.length
-    ? validImages.map(src => ({ src, alt: hotel.name }))
+    ? validImages.map((src, i) => ({ src, alt: `${galleryAltBase} - صورة ${i + 1}` }))
     : DEFAULT_SLIDES;
   const total = slides.length;
   const go = useCallback((n: number) => setSlide((n + total) % total), [total]);
@@ -336,7 +338,7 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                     {room.images && room.images.length > 0 && room.images[0]?.startsWith('http') ? (
                       <Image
                         src={room.images[0]}
-                        alt={room.name}
+                        alt={`${room.name} - ${hotel.name}${hotel.city ? ` ${hotel.city}` : ''}`}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, 224px"

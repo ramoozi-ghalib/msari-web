@@ -19,17 +19,49 @@ export async function generateMetadata(props: Props) {
   }
 
   const isEn = locale === 'en';
+
+  // ── SEO title (Arabic): `فندق {name} - {city} | مساري` ──
+  // Smart assembly: strip a leading فندق to avoid duplication, and append the
+  // city only when the name doesn't already contain it. Hotel display names
+  // elsewhere are untouched — this affects the SEO title only.
+  const rawName = (hotel.name || '').trim();
+  const cleanName = rawName.replace(/^\s*فندق\s+/, '').trim() || rawName;
+  const cityName = (hotel.city || '').trim();
+  const nameHasCity = !!cityName && cleanName.includes(cityName);
+  const seoHotelName = `فندق ${cleanName}${nameHasCity || !cityName ? '' : ` - ${cityName}`}`;
+
+  // ── Sales meta description, composed from real fields only ──
+  // (price/stars/top amenities) so every hotel gets a unique description.
+  const topAmenities = (hotel.amenities || [])
+    .map(a => (typeof a?.name === 'string' ? a.name.trim() : ''))
+    .filter(Boolean)
+    .slice(0, 2);
+  const priceBit = hotel.priceFrom > 0 ? ` ابتداءً من $${hotel.priceFrom} لليلة،` : '';
+  const starsBit = hotel.stars ? ` ${hotel.stars} نجوم،` : '';
+  const amenBit = topAmenities.length > 0 ? ` ${topAmenities.join('، ')}،` : '';
   const pageTitle = isEn
     ? `${hotel.name} - Hotels in ${hotel.city || 'Yemen'} | Msari`
-    : `${hotel.name} - فنادق ${hotel.city || 'اليمن'} | مساري`;
-  const pageDesc = hotel.description || (isEn
+    : `${seoHotelName} | مساري`;
+  const pageDesc = isEn
     ? `Book your stay at ${hotel.name} in ${hotel.city || 'Yemen'} via Msari platform at the best available rates with instant confirmation.`
-    : `احجز إقامتك في ${hotel.name} بمدينة ${hotel.city || 'اليمن'} عبر منصة مساري بأفضل الأسعار المتاحة مع تأكيد حجز فوري.`);
+    : `احجز ${seoHotelName} عبر مساري:${priceBit}${starsBit}${amenBit} تأكيد حجز فوري وأفضل الأسعار المتاحة.`;
   const mainImage = hotel.images && hotel.images.length > 0 ? hotel.images[0] : 'https://msari.net/logo.png';
+
+  const keywords = isEn
+    ? undefined
+    : [
+        seoHotelName,
+        cityName ? `فنادق ${cityName}` : '',
+        cityName ? `أفضل فنادق ${cityName}` : '',
+        cityName ? `حجز فنادق ${cityName}` : '',
+        cleanName ? `أسعار ${cleanName}` : '',
+        cleanName && cityName && !nameHasCity ? `${cleanName} ${cityName}` : '',
+      ].filter(Boolean);
 
   return {
     title: pageTitle,
     description: pageDesc,
+    ...(keywords ? { keywords } : {}),
     alternates: getLocalizedAlternates(`/hotels/${slug}`, locale),
     openGraph: {
       title: pageTitle,
@@ -145,7 +177,16 @@ export default async function HotelDetailPage(props: Props) {
     // Graceful fallback
   }
 
-  const hotelSchema = {
+  // Real coordinates only — never assert a fallback city as the hotel's location.
+  const hasRealCoords =
+    typeof hotel.lat === 'number' && typeof hotel.lng === 'number' &&
+    !isNaN(hotel.lat) && !isNaN(hotel.lng);
+  const schemaAmenities = (hotel.amenities || [])
+    .map(a => (typeof a?.name === 'string' ? a.name.trim() : ''))
+    .filter(Boolean)
+    .slice(0, 8);
+
+  const hotelSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Hotel',
     name: hotel.name,
@@ -159,10 +200,18 @@ export default async function HotelDetailPage(props: Props) {
       addressCountry: 'YE',
     },
     priceRange: hotel.priceFrom ? `$${hotel.priceFrom}` : '$$',
+    // starRating = official category classification (NOT guest reviews).
+    // Never emit aggregateRating: rating/reviewCount in our data are placeholders.
     starRating: {
       '@type': 'Rating',
-      ratingValue: hotel.stars || 4,
+      ratingValue: hotel.stars || 3,
     },
+    ...(hasRealCoords
+      ? { geo: { '@type': 'GeoCoordinates', latitude: hotel.lat, longitude: hotel.lng } }
+      : {}),
+    ...(schemaAmenities.length > 0
+      ? { amenityFeature: schemaAmenities.map(n => ({ '@type': 'LocationFeatureSpecification', name: n })) }
+      : {}),
   };
 
   const breadcrumbs = isEn
