@@ -203,7 +203,8 @@ export interface AppPageData {
     title: string;
     subtitle: string;
     downloads: string;
-    rating: string;
+    // rating removed — no fabricated reviews. Kept optional for legacy CMS docs.
+    rating?: string;
     mockupImage1?: string;
     mockupImage2?: string;
   };

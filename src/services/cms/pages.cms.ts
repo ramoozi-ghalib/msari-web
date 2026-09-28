@@ -270,13 +270,11 @@ export const FALLBACK_APP_PAGE: AppPageData = {
     title: 'سفرك وفنادقك في جيبك — حمّل تطبيق مساري الآن',
     subtitle: 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (المحافظ الإلكترونية، تحويل بنكي، كاش عند الوصول)، وقارن أسعار الفنادق وتذاكر الطيران والسيارات بضغطة زر.',
     downloads: '5000+',
-    rating: '4.8★',
     mockupImage1: '/images/app-screen.png',
     mockupImage2: '/images/app-screen.png',
   },
   stats: [
     { value: '5000+', label: 'تحميل' },
-    { value: '4.8★', label: 'تقييم المسافرين' },
     { value: '100+', label: 'فندق' },
     { value: '24/7', label: 'خدمة عملاء' },
   ],

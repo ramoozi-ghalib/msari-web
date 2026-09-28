@@ -292,8 +292,10 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
     lat: coords.lat,
     lng: coords.lng,
     stars: Math.max(1, Math.min(5, api.stars)) as 1 | 2 | 3 | 4 | 5,
-    rating: 4.5, // Fallback rating since API does not return a rating
-    reviewCount: 12, // Fallback count
+    // No fabricated ratings: API returns no guest reviews, so both stay 0
+    // until a real reviews system exists. Never display as social proof.
+    rating: 0,
+    reviewCount: 0,
     priceFrom: api.price,
     currency: 'USD',
     images: api.images && api.images.length > 0 ? api.images : [api.mainImageUrl].filter(Boolean),

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Star, ShieldCheck, Hotel, Sparkles, MapPin, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Hotel, Sparkles, MapPin, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   headline?: string;
@@ -63,17 +63,6 @@ export default function AuthVisualSide({
             <div>
               <div className="font-black text-base text-white">+500 فندق</div>
               <div className="text-xs text-white/70">حجز فوري ومؤكد</div>
-            </div>
-          </div>
-
-          {/* Card 2: Ratings */}
-          <div className="rounded-2xl bg-white/10 backdrop-blur-md p-4 border border-white/15 shadow-lg flex items-start gap-3.5 hover:bg-white/15 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
-              <Star size={20} className="fill-emerald-300" />
-            </div>
-            <div>
-              <div className="font-black text-base text-white">4.9 / 5 تقييم</div>
-              <div className="text-xs text-white/70">رضا وثقة العملاء</div>
             </div>
           </div>
 

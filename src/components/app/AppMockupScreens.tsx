@@ -102,9 +102,6 @@ export function SearchAppScreen({ isEn = false }: { isEn?: boolean }) {
         <div className="bg-white/10 border border-white/15 rounded-2xl p-2 sm:p-2.5 flex gap-2 sm:gap-2.5 items-center">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-tr from-[#23096E] to-[#3A1C8F] overflow-hidden shrink-0 flex items-center justify-center">
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://firebasestorage.googleapis.com/v0/b/msariapp-v2.firebasestorage.app/o/hotels%2FBmS2C5c4z23UfUv3T0oG%2Fimg_0.jpg?alt=media&token=7fa51dd1-b3b3-4f05-8968-3f596a77d542')" }} />
-            <span className="absolute top-1 start-1 px-1 py-0.5 rounded bg-black/60 text-amber-300 text-[8px] sm:text-[9px] font-black flex items-center gap-0.5 backdrop-blur-xs">
-              ★ 4.9
-            </span>
           </div>
           <div className="flex-1 min-w-0">
             <h5 className="text-[11px] sm:text-xs font-black text-white truncate">{isEn ? 'Horizon Aden Luxury' : 'فندق هورايزن الفاخر'}</h5>
@@ -172,10 +169,6 @@ export function HotelDetailsAppScreen({ isEn = false }: { isEn?: boolean }) {
         </div>
 
         <div className="absolute bottom-2 inset-x-2.5">
-          <div className="flex items-center gap-1 text-amber-400 text-[9px] sm:text-[10px] font-black">
-            <span>★★★★★</span>
-            <span className="text-white text-[9px] sm:text-[10px]">4.9 (128 {isEn ? 'Reviews' : 'تقييم'})</span>
-          </div>
           <h4 className="text-xs sm:text-sm font-black text-white mt-0.5 truncate">{isEn ? 'Horizon Royal Suite' : 'جناح هورايزن الملكي'}</h4>
         </div>
       </div>

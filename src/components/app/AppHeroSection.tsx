@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { 
   Sparkles, 
-  Star, 
   ShieldCheck, 
   Smartphone, 
   Download, 
@@ -40,7 +39,6 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
     ? 'Book the best hotels in Yemen with instant confirmation, flexible local payments, and compare global hotels, flights, and car rentals effortlessly.'
     : 'احجز أفضل فنادق اليمن بتأكيد فوري ودفع محلي ميسر (المحافظ الإلكترونية، تحويل بنكي، كاش عند الوصول)، وقارن أسعار الفنادق وتذاكر الطيران والسيارات بضغطة زر.');
   
-  const ratingVal = data?.rating ? data.rating.replace('★', '').trim() : '4.8';
   const downloadsVal = data?.downloads
     ? data.downloads.replace('تحميل', '').replace('Downloads', '').replace('مستخدم', '').replace('Users', '').trim() 
     : '5000+';
@@ -85,17 +83,8 @@ export default function AppHeroSection({ isEn = false, data }: Props) {
               {subtitle}
             </p>
 
-            {/* Ratings & Downloads Social Proof Row */}
+            {/* Downloads Social Proof Row (ratings removed — no fabricated reviews) */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-4 pt-1">
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-slate-200 shadow-sm">
-                <div className="flex items-center gap-0.5 text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <span className="text-[#23096E] text-xs font-black">{ratingVal}</span>
-              </div>
-
               <div className="flex items-center gap-1.5 text-xs font-black text-[#23096E] bg-[#23096E]/10 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-[#23096E]/20">
                 <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#FF3B30]" />
                 <span>{downloadsVal}</span>

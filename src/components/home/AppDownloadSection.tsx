@@ -227,7 +227,6 @@ export default function AppDownloadSection({ appDownload }: AppDownloadSectionPr
                             <div className="p-1.5 sm:p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 sm:space-y-1 backdrop-blur-sm">
                               <div className="flex items-center justify-between text-[7px] sm:text-[7.5px] font-black text-white">
                                 <span className="truncate">فندق القصر - عدن</span>
-                                <span className="text-amber-400">★ 4.9</span>
                               </div>
                               <div className="text-[6px] sm:text-[6.5px] text-white/60 flex items-center gap-1">
                                 <MapPin size={6} />
