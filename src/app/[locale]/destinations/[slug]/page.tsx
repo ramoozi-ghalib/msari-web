@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageDesc = destination.tagline || (isEn
     ? `Discover and book top hotels in ${destination.nameEn || destination.name}, Yemen. Exclusive offers, tourist attractions, and instant booking on Msari.`
     : `اكتشف واحجز أفضل فنادق ${destination.name} اليمنية بأقل الأسعار وحسومات حصرية مع تأكيد حجز فوري عبر منصة مساري.`);
-  const mainImage = destination.heroImage || 'https://msari.net/logo.png';
+  const mainImage = destination.heroImage || 'https://msari.net/icon.png';
 
   return {
     title: pageTitle,

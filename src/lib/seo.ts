@@ -44,11 +44,11 @@ export function generateOrganizationSchema() {
     url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_URL}/logo.png`,
+      url: `${SITE_URL}/icon.png`,
       caption: 'مساري',
       inLanguage: 'ar',
     },
-    image: `${SITE_URL}/logo.png`,
+    image: `${SITE_URL}/icon.png`,
     description: 'منصة مساري لحجز أفضل الفنادق في اليمن بأقل الأسعار وتوفير خدمات الطيران والنقل المساندة.',
     telephone: '+967733644466',
     email: 'info@msari.net',

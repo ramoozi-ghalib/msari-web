@@ -38,11 +38,13 @@ export async function generateMetadata(props: {
       siteName: 'مساري',
       locale: isEn ? 'en_US' : 'ar_YE',
       type: 'website',
+      images: [{ url: 'https://msari.net/icon.png', alt: 'مساري' }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ['https://msari.net/icon.png'],
     },
   };
 }

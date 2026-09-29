@@ -45,7 +45,7 @@ export async function generateMetadata(props: Props) {
   const pageDesc = isEn
     ? `Book your stay at ${hotel.name} in ${hotel.city || 'Yemen'} via Msari platform at the best available rates with instant confirmation.`
     : `احجز ${seoHotelName} عبر مساري:${priceBit}${starsBit}${amenBit} تأكيد حجز فوري وأفضل الأسعار المتاحة.`;
-  const mainImage = hotel.images && hotel.images.length > 0 ? hotel.images[0] : 'https://msari.net/logo.png';
+  const mainImage = hotel.images && hotel.images.length > 0 ? hotel.images[0] : 'https://msari.net/icon.png';
 
   const keywords = isEn
     ? undefined

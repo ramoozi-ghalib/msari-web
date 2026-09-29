@@ -74,7 +74,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       url: 'https://msari.net',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://msari.net/logo.png',
+        url: 'https://msari.net/icon.png',
       },
     },
     mainEntityOfPage: {
