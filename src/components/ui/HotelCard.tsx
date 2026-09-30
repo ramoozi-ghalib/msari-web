@@ -109,7 +109,7 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
     <Link 
       href={cardHref} 
       className={cn(
-        'group block bg-white rounded-2xl overflow-hidden border border-neutral-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#23096E]/30 transition-all duration-300 ease-out flex flex-col justify-between',
+        'group block bg-white rounded-2xl overflow-hidden border border-neutral-200/90 shadow-sm hover:shadow-xl hover:border-[#23096E]/30 transition-all duration-300 ease-out flex flex-col justify-between active:scale-[0.98] cursor-pointer [@media(hover:hover)]:hover:-translate-y-1',
         className
       )}
     >

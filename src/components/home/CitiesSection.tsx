@@ -106,7 +106,7 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
           {/* Main Large Hero Card (عدن - 7 cols) */}
           <Link
             href={`/ar/destinations/${mainFeatured.slug}`}
-            className="md:col-span-7 group relative rounded-3xl overflow-hidden min-h-[300px] sm:min-h-[400px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-neutral-900"
+            className="md:col-span-7 group relative rounded-3xl overflow-hidden min-h-[300px] sm:min-h-[400px] block shadow-md hover:shadow-2xl transition-all duration-500 [@media(hover:hover)]:hover:-translate-y-1 active:scale-[0.99] bg-neutral-900"
           >
             <Image
               src={mainFeatured.image}
@@ -148,7 +148,7 @@ export default function CitiesSection({ cities }: CitiesSectionProps) {
               <Link
                 key={city.id}
                 href={`/ar/destinations/${city.slug}`}
-                className="group relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[145px] sm:min-h-[190px] block shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 bg-neutral-900"
+                className="group relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[145px] sm:min-h-[190px] block shadow-md hover:shadow-2xl transition-all duration-500 [@media(hover:hover)]:hover:-translate-y-1 active:scale-[0.99] bg-neutral-900"
               >
                 <Image
                   src={city.image}

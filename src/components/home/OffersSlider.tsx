@@ -182,7 +182,7 @@ export default function OffersSlider({ offers = [] }: OffersSliderProps) {
               >
                 <Link
                   href={offer.link || '/hotels'}
-                  className="group block relative rounded-3xl overflow-hidden shadow-md border border-neutral-200/80 aspect-[16/9] sm:aspect-[2.1/1] p-5 sm:p-7 bg-neutral-950 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  className="group block relative rounded-3xl overflow-hidden shadow-md border border-neutral-200/80 aspect-[16/9] sm:aspect-[2.1/1] p-5 sm:p-7 bg-neutral-950 transition-all duration-300 hover:shadow-xl [@media(hover:hover)]:hover:-translate-y-1 active:scale-[0.99]"
                 >
                   {/* Banner Image */}
                   {offer.image ? (
