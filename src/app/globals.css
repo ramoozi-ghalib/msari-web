@@ -325,7 +325,7 @@ img {
 /* Page-enter transition: faster variant applied by [locale]/template.tsx on
    every navigation (fade + subtle rise). Pure CSS — no JS, no SEO impact. */
 .animate-page-enter {
-  animation: fadeIn 0.32s ease-out both;
+  animation: fadeIn 0.55s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
