@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: 'تسجيل الدخول',
   description: 'سجّل دخولك إلى حسابك في مساري لمتابعة حجوزاتك وإدارة رحلاتك بسهولة.',
   alternates: { canonical: 'https://msari.net/ar/login' },
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function LoginLayout({ children }: { children: ReactNode }) {
-  return children;
+  return <div className="min-h-screen bg-white">{children}</div>;
 }
