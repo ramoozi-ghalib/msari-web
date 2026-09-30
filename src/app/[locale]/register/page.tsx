@@ -225,7 +225,6 @@ function RegisterForm() {
                   onChange={e => set('name', e.target.value)}
                   placeholder="محمد أحمد علي"
                   required
-                  autoFocus
                   autoComplete="name"
                   className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 ps-10 pe-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none"
                 />

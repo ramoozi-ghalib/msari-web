@@ -101,7 +101,6 @@ function ForgotPasswordForm() {
                       onChange={e => setEmail(e.target.value)}
                       placeholder="name@example.com"
                       required
-                      autoFocus
                       autoComplete="email"
                       inputMode="email"
                       dir="ltr"

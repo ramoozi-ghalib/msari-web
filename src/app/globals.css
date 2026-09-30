@@ -69,7 +69,12 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* NOTE (PROVEN 2026-09-30): NEVER set scroll-behavior:smooth globally.
+     It turns every programmatic scroll reset (Next's own navigation scroll
+     + template reset) into a visible animated glide from the old position
+     to the top — reported as "page opens from bottom then yanks up".
+     Smooth scrolling stays available opt-in via Tailwind `scroll-smooth`
+     on specific scrollers (e.g. the hotel rail). */
   overflow-x: hidden;
   max-width: 100%;
   width: 100%;
