@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
@@ -22,7 +22,10 @@ export default function LocaleTemplate({
 }) {
   const pathname = usePathname();
 
-  useEffect(() => {
+  // useLayoutEffect (not useEffect): runs synchronously BEFORE the browser
+  // paints, so the page never flashes at the previous scroll position —
+  // it opens at the very top on the first visible frame.
+  useLayoutEffect(() => {
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.has('_rsc')) {
