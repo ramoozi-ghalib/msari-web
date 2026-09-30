@@ -6,13 +6,11 @@ import { usePathname } from 'next/navigation';
 /**
  * LocaleTemplate — page-transition wrapper + navigation polish.
  *
- * 1. Enter animation (.animate-page-enter): soft slow pop-in, CSS-only.
- * 2. `_rsc` cleanup (PROVEN 2026-09-30): strips a stuck flight-token after
- *    navigation completes (replaceState, no history/scroll side effects).
- * 3. Guaranteed top-open: the wrapper stays invisible (opacity-0) until —
- *    synchronously before paint — scroll is forced to top AND one frame is
- *    painted. Only then does the pop-in play. This eliminates the
- *    bottom-flash-then-yank entirely: the first visible frame IS the top.
+ * PROVEN 2026-09-30: Next does NOT reliably remount this template on every
+ * navigation, so state-based hiding arrives one frame late (bottom flash
+ * when coming from mid/low scroll). The `key={pathname}` on <Inner/>
+ * FORCES a true remount per route: fresh `ready=false` → first paint is
+ * hidden → scroll locked to top pre-paint → pop-in plays from the header.
  */
 export default function LocaleTemplate({
   children,
@@ -20,11 +18,14 @@ export default function LocaleTemplate({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  return <Inner key={pathname}>{children}</Inner>;
+}
+
+function Inner({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
-  // Runs synchronously BEFORE paint on every navigation (template remounts).
+  // Runs synchronously BEFORE first paint of every fresh mount.
   useLayoutEffect(() => {
-    setReady(false);
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.has('_rsc')) {
@@ -57,7 +58,7 @@ export default function LocaleTemplate({
       cancelAnimationFrame(raf2);
       clearTimeout(fallback);
     };
-  }, [pathname]);
+  }, []);
 
   return (
     <div className={ready ? 'animate-page-enter' : 'opacity-0'}>{children}</div>
