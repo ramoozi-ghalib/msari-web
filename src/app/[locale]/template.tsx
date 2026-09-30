@@ -1,19 +1,18 @@
 'use client';
 
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
  * LocaleTemplate — page-transition wrapper + navigation polish.
  *
- * 1. Enter animation: Next re-mounts templates on every navigation, so each
- *    incoming page automatically plays .animate-page-enter (CSS-only).
- * 2. `_rsc` cleanup (PROVEN 2026-09-30): strips a stuck flight-token from the
- *    address bar after navigation completes (replaceState, no history/​scroll
- *    side effects).
- * 3. Scroll reset: every completed navigation opens at the very top
- *    (instant). Next's default top-scroll can be defeated by restoration
- *    edge cases on this stack — this makes "open from top" explicit.
+ * 1. Enter animation (.animate-page-enter): soft slow pop-in, CSS-only.
+ * 2. `_rsc` cleanup (PROVEN 2026-09-30): strips a stuck flight-token after
+ *    navigation completes (replaceState, no history/scroll side effects).
+ * 3. Guaranteed top-open: the wrapper stays invisible (opacity-0) until —
+ *    synchronously before paint — scroll is forced to top AND one frame is
+ *    painted. Only then does the pop-in play. This eliminates the
+ *    bottom-flash-then-yank entirely: the first visible frame IS the top.
  */
 export default function LocaleTemplate({
   children,
@@ -21,11 +20,11 @@ export default function LocaleTemplate({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [ready, setReady] = useState(false);
 
-  // useLayoutEffect (not useEffect): runs synchronously BEFORE the browser
-  // paints, so the page never flashes at the previous scroll position —
-  // it opens at the very top on the first visible frame.
+  // Runs synchronously BEFORE paint on every navigation (template remounts).
   useLayoutEffect(() => {
+    setReady(false);
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.has('_rsc')) {
@@ -40,11 +39,27 @@ export default function LocaleTemplate({
       // Never break rendering over URL cosmetics.
     }
     try {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
       window.scrollTo(0, 0);
     } catch {
       // Never break rendering over scrolling.
     }
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setReady(true));
+    });
+    // Safety net (e.g. background tab throttling rAF): never trap content.
+    const fallback = setTimeout(() => setReady(true), 400);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      clearTimeout(fallback);
+    };
   }, [pathname]);
 
-  return <div className="animate-page-enter">{children}</div>;
+  return (
+    <div className={ready ? 'animate-page-enter' : 'opacity-0'}>{children}</div>
+  );
 }
