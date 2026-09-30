@@ -1,25 +1,27 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 /**
- * LocaleTemplate — page-transition wrapper + flight-param cleanup.
+ * LocaleTemplate — page-transition wrapper + navigation polish.
  *
  * 1. Enter animation: Next re-mounts templates on every navigation, so each
  *    incoming page automatically plays .animate-page-enter (CSS-only).
- * 2. `_rsc` cleanup (PROVEN 2026-09-30): RSC flight requests can answer 307
- *    to the same URL, and in some flows (refresh mid-navigation, proxy
- *    normalization) the `_rsc` token sticks in the address bar AFTER the
- *    page fully loads. The server ignores it and canonicals are clean, so it
- *    is safe to strip here: this effect runs only on template (re)mount,
- *    i.e. after a navigation has completed — never mid-flight — and uses
- *    replaceState (no history entry, no scroll jump).
+ * 2. `_rsc` cleanup (PROVEN 2026-09-30): strips a stuck flight-token from the
+ *    address bar after navigation completes (replaceState, no history/​scroll
+ *    side effects).
+ * 3. Scroll reset: every completed navigation opens at the very top
+ *    (instant). Next's default top-scroll can be defeated by restoration
+ *    edge cases on this stack — this makes "open from top" explicit.
  */
 export default function LocaleTemplate({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
@@ -34,7 +36,12 @@ export default function LocaleTemplate({
     } catch {
       // Never break rendering over URL cosmetics.
     }
-  }, []);
+    try {
+      window.scrollTo(0, 0);
+    } catch {
+      // Never break rendering over scrolling.
+    }
+  }, [pathname]);
 
   return <div className="animate-page-enter">{children}</div>;
 }

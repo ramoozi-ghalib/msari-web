@@ -85,14 +85,17 @@ export default function Header() {
     if (href === '/') {
       return pathname === '/' || pathname === '/ar' || pathname === '/en';
     }
-    return (
-      pathname === href ||
-      pathname === `/ar${href}` ||
-      pathname === `/en${href}` ||
-      pathname.startsWith(`/ar${href}/`) ||
-      pathname.startsWith(`/en${href}/`) ||
-      pathname.startsWith(`${href}/`)
-    );
+    const candidates = [href, `/ar${href}`, `/en${href}`];
+    if (candidates.includes(pathname)) return true;
+    // Child pages keep the parent active (e.g. hotel detail → local hotels),
+    // EXCEPT the international section which owns its own button.
+    if (
+      href === '/hotels' &&
+      /^\/(ar|en)\/hotels\/international(\/|$)/.test(pathname)
+    ) {
+      return false;
+    }
+    return candidates.some((p) => pathname.startsWith(`${p}/`));
   };
 
   return (
