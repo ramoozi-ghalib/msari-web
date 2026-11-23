@@ -7,6 +7,7 @@
 import { apiClient, mapApiHotelToHotel, mapApiRoomToRoom, generateSlugFromHotel } from '@/lib/api-client';
 import type { Hotel } from '@/types';
 import { clampLimit } from '@/lib/action-utils';
+import type { DocumentData, QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { db } from '@/lib/firebase-admin';
 import { CityService } from '@/services/city.service';
 import { cache } from 'react';
@@ -105,10 +106,10 @@ export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promi
     if (!priceSensitive) {
       type SlicePrep = {
         docId: string;
-        data: FirebaseFirestore.DocumentData;
+        data: DocumentData;
         hotel: Hotel;
       };
-      const buildProbe = (doc: FirebaseFirestore.QueryDocumentSnapshot): SlicePrep | null => {
+      const buildProbe = (doc: QueryDocumentSnapshot): SlicePrep | null => {
         const data = doc.data();
         const starsCount = Math.max(1, Math.min(5, Number(data.stars) || 3));
         const explicitPrice = Number(data.price || data.priceFrom || data.minPrice || data.startingPrice || 0);
@@ -461,7 +462,7 @@ export async function getHotelsByIdsDirect(ids: string[]): Promise<Hotel[]> {
         try {
           const doc = await db.collection("hotels").doc(id).get();
           if (!doc.exists) return null;
-          const data = doc.data() as FirebaseFirestore.DocumentData;
+          const data = doc.data() as DocumentData;
           if (data.isPublished !== true || data.isDeleted === true) return null;
 
           let minRoomPrice = 0;

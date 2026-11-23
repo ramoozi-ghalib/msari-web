@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache';
+import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { db } from '@/lib/firebase-admin';
 import type { Offer } from '@/types';
 
@@ -7,7 +8,7 @@ import type { Offer } from '@/types';
 // الأسعار/التوفر لا تمر هنا إطلاقاً.
 const OFFERS_REVALIDATE = 60;
 
-function mapAdDoc(doc: FirebaseFirestore.QueryDocumentSnapshot): Offer {
+function mapAdDoc(doc: QueryDocumentSnapshot): Offer {
   const data = doc.data();
   return {
     id: doc.id,
