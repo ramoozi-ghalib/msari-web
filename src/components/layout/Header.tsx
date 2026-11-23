@@ -105,12 +105,17 @@ export default function Header() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300 text-white',
           isSolidHeader
-            ? 'bg-[#1D065C]/95 backdrop-blur-xl border-b border-white/10 shadow-lg py-2 sm:py-2.5'
-            : 'bg-transparent border-b border-transparent py-3 sm:py-4'
+            ? 'bg-[#1D065C]/95 backdrop-blur-xl border-b border-white/10 shadow-lg'
+            : 'bg-transparent border-b border-transparent'
         )}
-        style={{ direction: 'rtl' }}
+        style={{ direction: 'rtl', paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className={cn(
+            'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+            isSolidHeader ? 'py-2 sm:py-2.5' : 'py-3 sm:py-4'
+          )}
+        >
           
           {/* ── 1. DESKTOP VIEW (Classic Full Standard Layout) ── */}
           <div className="hidden lg:flex items-center justify-between h-14 w-full">
@@ -323,7 +328,11 @@ export default function Header() {
         >
           <div
             className="absolute top-0 right-0 bottom-0 w-[85%] max-w-xs bg-gradient-to-b from-[#23096E] via-[#2A0E78] to-[#3A1C8F] text-white p-5 shadow-2xl flex flex-col justify-between overflow-y-auto"
-            style={{ direction: 'rtl' }}
+            style={{
+              direction: 'rtl',
+              paddingTop: 'calc(1.25rem + env(safe-area-inset-top, 0px))',
+              paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div>

@@ -78,6 +78,8 @@ html {
   overflow-x: hidden;
   max-width: 100%;
   width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -179,37 +181,36 @@ footer h1, footer h2, footer h3, footer h4, footer h5, footer h6 {
 /* =================== INTERACTIVE CARDS & ANIMATIONS =================== */
 .card, .surface-card, .interactive-card, .why-card {
   transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1), border-color 400ms ease !important;
-  will-change: transform, box-shadow;
-}
-
-.card:hover, .surface-card:hover, .interactive-card:hover {
-  transform: translateY(-6px) !important;
-  box-shadow: 0 20px 35px -10px rgba(35, 9, 110, 0.16), 0 10px 15px -5px rgba(35, 9, 110, 0.08) !important;
-  border-color: rgba(35, 9, 110, 0.25) !important;
-}
-
-.why-card:hover {
-  transform: translateY(-8px) !important;
-  box-shadow: 0 25px 50px -12px rgba(35, 9, 110, 0.18) !important;
-  border-color: rgba(35, 9, 110, 0.3) !important;
-}
-
-.why-card:hover .why-icon {
-  transform: scale(1.15) rotate(4deg) !important;
 }
 
 .why-icon {
   transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: transform;
 }
 
-.group:hover img, .group:hover .img-zoom {
-  transform: scale(1.06) !important;
+.img-zoom {
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-img {
-  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: transform;
+@media (hover: hover) and (pointer: fine) {
+  .card:hover, .surface-card:hover, .interactive-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 20px 35px -10px rgba(35, 9, 110, 0.16), 0 10px 15px -5px rgba(35, 9, 110, 0.08) !important;
+    border-color: rgba(35, 9, 110, 0.25) !important;
+  }
+
+  .why-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 25px 50px -12px rgba(35, 9, 110, 0.18) !important;
+    border-color: rgba(35, 9, 110, 0.3) !important;
+  }
+
+  .why-card:hover .why-icon {
+    transform: scale(1.15) rotate(4deg) !important;
+  }
+
+  .group:hover img, .group:hover .img-zoom {
+    transform: scale(1.06);
+  }
 }
 
 .surface-hero {
@@ -498,6 +499,38 @@ img {
 .no-scrollbar {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
+}
+
+/* =================== iOS STANDALONE PWA POLISH =================== */
+a, button, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
+@media (display-mode: standalone) {
+  html, body {
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+  }
+
+  header, nav {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Safe-area inset utility helpers (for viewport-fit=cover on iOS notch/home bar) */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.px-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 

@@ -22,11 +22,26 @@ import { SEO_VERIFICATIONS } from '@/lib/seo';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://msari.net'),
+  applicationName: 'مساري',
   verification: SEO_VERIFICATIONS,
   title: 'مساري | بوابتك لحجز أفضل الفنادق في اليمن',
   description: 'احجز أفضل الفنادق في اليمن بسهولة مع مساري، استمتع بعروض حصرية وخيارات متعددة تناسب ميزانيتك في عدن، صنعاء، تعز، والمكلا.',
   authors: [{ name: 'مساري', url: 'https://msari.net' }],
   formatDetection: { email: false, address: false, telephone: false },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'مساري',
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     siteName: 'مساري',
     locale: 'ar_YE',
@@ -47,12 +62,18 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#23096E',
+};
 
 // Root layout — required by Next.js 16 to contain <html> and <body>.
 // The [locale] layout handles Header/Footer as a nested content wrapper.
 // lang and dir default to Arabic (RTL) since this is the primary language.
 import AuthProvider from '@/components/providers/AuthProvider';
+import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -64,6 +85,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

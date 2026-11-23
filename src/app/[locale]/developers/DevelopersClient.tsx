@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { DevelopersPageData } from '@/services/cms';
+import { whatsappLink, openWhatsAppLink } from '@/lib/site-config';
 
 interface DevelopersClientProps {
   data: DevelopersPageData;
@@ -47,7 +48,7 @@ export default function DevelopersClient({ data, whatsappNumber }: DevelopersCli
 
   const openWhatsApp = (planName?: string) => {
     const text = `مرحباً فريق مساري، نود طلب مفتاح الربط البرمجي (API Key) والاشتراك في ${planName || 'خطة الشراكة والربط البرمجي'}.`;
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
+    openWhatsAppLink(whatsappLink(text, whatsappNumber));
   };
 
   const toggleFaq = (index: number) => {

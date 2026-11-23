@@ -6,6 +6,12 @@ import {
   ChevronDown, ArrowUpRight, Sparkles
 } from 'lucide-react';
 import type { WebsiteSettingsData } from '@/services/cms';
+import {
+  WHATSAPP_NUMBER,
+  WHATSAPP_DISPLAY,
+  whatsappLink,
+  openWhatsAppLink,
+} from '@/lib/site-config';
 
 interface ContactClientProps {
   settings: WebsiteSettingsData;
@@ -26,9 +32,9 @@ export default function ContactClient({ settings }: ContactClientProps) {
   const [message, setMessage] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const whatsappNum = settings?.whatsappNumber || '967777000000';
-  const whatsappUrl = `https://wa.me/${whatsappNum}`;
-  const supportPhone = settings?.supportPhone || '+967 777 000 000';
+  const whatsappNum = settings?.whatsappNumber || WHATSAPP_NUMBER;
+  const whatsappUrl = whatsappLink(undefined, whatsappNum);
+  const supportPhone = settings?.supportPhone || WHATSAPP_DISPLAY;
   const infoEmail = settings?.infoEmail || 'info@msari.net';
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,7 +44,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
     msg += `📱 *الهاتف:* ${phone.trim()}\n\n`;
     msg += `💬 *الرسالة:*\n${message.trim()}\n`;
 
-    window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`, '_blank');
+    openWhatsAppLink(whatsappLink(msg, whatsappNum));
   };
 
   return (

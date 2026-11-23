@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useParams } from 'next/navigation';
@@ -78,6 +79,8 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
   const { locale } = useParams();
   const currentLocale = locale || 'ar';
   const { formatPrice } = useCurrency();
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const cardParams = new URLSearchParams();
   const city = searchParams.get('city');
@@ -116,16 +119,29 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
       <div>
         {/* ── Hotel Image ── */}
         <div className="relative aspect-[16/10] bg-neutral-100 overflow-hidden">
-          {hotel.thumbnail && hotel.thumbnail.startsWith('http') ? (
+          {hotel.thumbnail && hotel.thumbnail.startsWith('http') && !imgError ? (
+            <>
+              {!imgLoaded && (
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-r from-[#ede9f5] via-[#f7f5fc] to-[#ede9f5] animate-pulse"
+                />
+              )}
             <Image
               src={hotel.thumbnail}
               alt={hotel.name}
               fill
               loading="lazy"
-              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+              className={cn(
+                'object-cover group-hover:scale-105 transition-[opacity,transform] duration-500 ease-out',
+                imgLoaded ? 'opacity-100' : 'opacity-0'
+              )}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 384px"
               unoptimized={/firebasestorage|storage\.googleapis/.test(hotel.thumbnail || '')}
             />
+            </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#23096E]/10 to-[#FF3B30]/10 flex items-center justify-center">
               <span className="text-xs font-bold text-neutral-400">مساري</span>

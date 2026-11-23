@@ -12,10 +12,24 @@ const RAW_WHATSAPP_NUMBER =
 /** Digits only, no leading +, ready for wa.me links (e.g. "967733644466") */
 export const WHATSAPP_NUMBER = RAW_WHATSAPP_NUMBER.replace(/\D/g, '');
 
-/** wa.me deep link, optionally with a prefilled message */
-export function whatsappLink(message?: string) {
-  const base = `https://wa.me/${WHATSAPP_NUMBER}`;
+/** wa.me deep link, optionally with a prefilled message and custom number override */
+export function whatsappLink(message?: string, customNumber?: string) {
+  const num = (customNumber || WHATSAPP_NUMBER).replace(/\D/g, '') || WHATSAPP_NUMBER;
+  const base = `https://wa.me/${num}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
+}
+
+/**
+ * Opens a WhatsApp Universal Link safely across iOS Standalone PWA and browsers.
+ * Uses `noopener,noreferrer` and falls back to same-window navigation if
+ * iOS Safari / Standalone blocks `window.open`.
+ */
+export function openWhatsAppLink(url: string): void {
+  if (typeof window === 'undefined') return;
+  const opened = window.open(url, '_blank', 'noopener,noreferrer');
+  if (!opened) {
+    window.location.href = url;
+  }
 }
 
 /** tel: link for click-to-call */

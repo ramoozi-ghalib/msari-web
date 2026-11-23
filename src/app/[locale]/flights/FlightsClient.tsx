@@ -6,6 +6,7 @@ import {
   Search, Globe, ShieldCheck, Clock, CreditCard, Tag
 } from 'lucide-react';
 import Image from 'next/image';
+import { WHATSAPP_NUMBER, whatsappLink, openWhatsAppLink } from '@/lib/site-config';
 
 const DEFAULT_FEATURES = [
   { title: 'أفضل أسعار التذاكر', desc: 'مقارنة شاملة لجميع خطوط الطيران لضمان أوفر سعر.', icon: Tag },
@@ -38,7 +39,7 @@ export default function FlightsClient({
     e.preventDefault();
     if (!from || !to || !departDate) return;
 
-    const waNum = whatsappNumber || '967777000000';
+    const waNum = whatsappNumber || WHATSAPP_NUMBER;
 
     if (flightScope === 'yemen') {
       let msg = `مرحباً، أرغب في الاستفسار عن حجز طيران:\n\n`;
@@ -50,11 +51,11 @@ export default function FlightsClient({
       msg += `المسافرون: ${passengers}\n`;
       msg += `الدرجة: ${flightClass}\n`;
 
-      window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+      openWhatsAppLink(whatsappLink(msg, waNum));
     } else {
       let msg = `مرحباً، أرغب في الاستفسار عن حجز طيران دولي:\n\n`;
       msg += `من: ${from}\nإلى: ${to}\nتاريخ السفر: ${departDate}\n`;
-      window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+      openWhatsAppLink(whatsappLink(msg, waNum));
     }
   };
 

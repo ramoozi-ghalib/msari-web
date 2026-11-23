@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { openWhatsAppLink } from '@/lib/site-config';
 import { 
   ArrowRight, PlaneTakeoff, Clock, CheckCircle2, 
   ShieldCheck, CreditCard, User, Users, Mail, Phone,
@@ -49,7 +50,7 @@ export default function FlightBooking() {
       const bankMsg = payment === 'transfer' ? `\n(تم السداد عبر حوالة بنكية وسيتم إرفاق السند)\nرقم الحجز المرجعي: ${code}` : `\nرقم الحجز المرجعي: ${code}`;
       const text = `أهلاً مساري،\nأرغب في الاعتماد النهائي لحجز طيران:\nالمسار: رحلة من ${flight.fromCity} (${flight.fromCode}) إلى ${flight.toCity} (${flight.toCode})\nتاريخ المغادرة: ${flight.date}\nإجمالي التكلفة: $${totalPrice}${bankMsg}`;
       const url = `https://wa.me/967735333552?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      openWhatsAppLink(url);
       return;
     }
 

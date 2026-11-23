@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 import ConditionalLayout from '@/components/layout/ConditionalLayout';
+import InstallPromptBanner from '@/components/pwa/InstallPromptBanner';
 import { whatsappLink, WHATSAPP_DISPLAY } from '@/lib/site-config';
 import { safeJsonLd } from '@/lib/sanitize';
 import { generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
@@ -69,7 +70,7 @@ export default async function LocaleLayout(
             href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-20 lg:bottom-6 end-4 sm:end-6 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+            className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6 end-4 sm:end-6 z-50 w-11 h-11 sm:w-12 sm:h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
             aria-label="تواصل عبر واتساب"
           >
             <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -80,6 +81,7 @@ export default async function LocaleLayout(
       >
         {props.children}
       </ConditionalLayout>
+      <InstallPromptBanner />
     </NextIntlClientProvider>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { openWhatsAppLink } from '@/lib/site-config';
 import { 
   ArrowRight, Clock, CheckCircle2, ShieldCheck, 
   CreditCard, User, Users, Mail, Phone, Luggage, 
@@ -47,7 +48,7 @@ export default function CarBooking() {
       const bankMsg = payment === 'transfer' ? `\n(تم السداد عبر حوالة بنكية بقيمة $${totalPrice} وسيتم إرفاق السند)\nرقم الحجز المرجعي: ${code}` : `\nالإجمالي: $${totalPrice}\nرقم الحجز: ${code}`;
       const text = `أهلاً مساري،\nأرغب في إتمام الاعتماد لحجز سيارة:\nنوع الخدمة: ${ride.serviceType}\nالسيارة: ${ride.carType}\nمن/إلى: ${ride.pickupLocation} -> ${ride.dropoffLocation}\nالتاريخ: ${ride.date} - ${ride.time}${bankMsg}`;
       const url = `https://wa.me/967735333552?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      openWhatsAppLink(url);
       return;
     } else if (payment === 'card') {
       alert('تم تحويلك إلى صفحة بوابات الدفع لإدخال تفاصيل البطاقة!');
