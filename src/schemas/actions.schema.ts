@@ -97,9 +97,9 @@ export const GetUploadUrlSchema = z.object({
   fileName: ShortString,
   fileSize: z.number().max(MAX_FILE_SIZE_BYTES, 'حجم الملف يتجاوز الحد الأقصى (5 ميغابايت)'),
   mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp'], {
-    errorMap: () => ({ message: 'نوع الملف غير مدعوم. المسموح: JPG, PNG, WebP فقط' }),
+    error: 'نوع الملف غير مدعوم. المسموح: JPG, PNG, WebP فقط',
   }),
   bucket: z.enum(['hotels', 'rooms', 'destinations'], {
-    errorMap: () => ({ message: 'المستودع غير مسموح به' }),
+    error: 'المستودع غير مسموح به',
   }),
 }).strict();

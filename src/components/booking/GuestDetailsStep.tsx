@@ -9,7 +9,7 @@ const guestSchema = z
     name: z.string().min(2, { message: 'الاسم يجب أن يكون حرفين على الأقل' }),
     email: z.string().email({ message: 'البريد الإلكتروني غير صحيح' }),
     phone: z.string().min(7, { message: 'رقم الهاتف يجب أن يكون 7 أرقام على الأقل' }),
-    isForAnotherGuest: z.boolean().default(false),
+    isForAnotherGuest: z.boolean(),
     anotherGuestName: z.string().optional(),
     anotherGuestPhone: z.string().optional(),
     requests: z.string().optional(),
@@ -18,14 +18,14 @@ const guestSchema = z
     if (data.isForAnotherGuest) {
       if (!data.anotherGuestName || data.anotherGuestName.trim().length < 2) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'يرجى إدخال اسم النزيل الآخر الكامل (حرفين على الأقل)',
           path: ['anotherGuestName'],
         });
       }
       if (!data.anotherGuestPhone || data.anotherGuestPhone.trim().length < 7) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'يرجى إدخال رقم هاتف النزيل الآخر (7 أرقام على الأقل)',
           path: ['anotherGuestPhone'],
         });

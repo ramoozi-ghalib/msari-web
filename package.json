@@ -12,24 +12,24 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.10.0",
+    "@hookform/resolvers": "^7.0.8",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
     "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
-    "firebase-admin": "^13.10.0",
+    "firebase-admin": "^14.5.1",
     "isomorphic-dompurify": "^3.19.0",
     "lucide-react": "^1.6.0",
-    "next": "16.3.6",
+    "next": "16.4.6",
     "next-auth": "^5.0.0-beta.32",
     "next-intl": "^4.9.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-hook-form": "^7.54.2",
+    "react-hook-form": "^7.55.0",
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.5.0",
-    "zod": "^3.24.2"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -37,9 +37,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "16.4.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "websocket-driver": ">=0.8.0"
   }
 }

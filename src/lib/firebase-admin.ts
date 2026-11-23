@@ -1,7 +1,10 @@
-import * as admin from 'firebase-admin';
+import { getApps, initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore, FieldValue, type Firestore } from 'firebase-admin/firestore';
+import { getStorage, type Storage } from 'firebase-admin/storage';
+import { getAuth } from 'firebase-admin/auth';
 import * as fs from 'fs';
 
-if (!admin.apps.length) {
+if (!getApps().length) {
   const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY
@@ -14,8 +17,8 @@ if (!admin.apps.length) {
 
   if (projectId && clientEmail && privateKey) {
     try {
-      admin.initializeApp({
-        credential: admin.credential.cert({
+      initializeApp({
+        credential: cert({
           projectId,
           clientEmail,
           privateKey,
@@ -28,8 +31,8 @@ if (!admin.apps.length) {
   } else if (fs.existsSync(/*turbopackIgnore: true*/ keyPath)) {
     try {
       const serviceAccount = JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ keyPath, 'utf8'));
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+      initializeApp({
+        credential: cert(serviceAccount),
         storageBucket,
       });
 
@@ -78,9 +81,9 @@ function makeUninitializedWriteGuard(target: object): object {
 }
 
 // Proxy wrapper for db (Firestore) to prevent startup crash if uninitialized
-export const db: admin.firestore.Firestore = new Proxy({} as admin.firestore.Firestore, {
+export const db: Firestore = new Proxy({} as Firestore, {
   get(_target, prop, receiver) {
-    if (!admin.apps.length) {
+    if (!getApps().length) {
       const propStr = String(prop);
       if (WRITE_METHODS.has(propStr)) {
         return () => rejectUninitializedWrite(propStr);
@@ -102,22 +105,32 @@ export const db: admin.firestore.Firestore = new Proxy({} as admin.firestore.Fir
       };
       return typeof dummyChain[prop] === 'function' ? dummyChain[prop] : dummyChain;
     }
-    const realDb = admin.firestore();
+    const realDb = getFirestore();
     const value = Reflect.get(realDb, prop, receiver);
     return typeof value === 'function' ? value.bind(realDb) : value;
   },
 });
 
 // Proxy wrapper for storage (Cloud Storage)
-export const storage: admin.storage.Storage = new Proxy({} as admin.storage.Storage, {
+export const storage: Storage = new Proxy({} as Storage, {
   get(_target, prop, receiver) {
-    if (!admin.apps.length) {
+    if (!getApps().length) {
       return makeUninitializedWriteGuard({});
     }
-    const realStorage = admin.storage();
+    const realStorage = getStorage();
     const value = Reflect.get(realStorage, prop, receiver);
     return typeof value === 'function' ? value.bind(realStorage) : value;
   },
 });
 
-export { admin };
+// Modular compatibility facade for existing `admin.*` call-sites (firebase-admin v14+)
+export const admin = {
+  get apps() {
+    return getApps();
+  },
+  auth: getAuth,
+  firestore: Object.assign(getFirestore, { FieldValue }),
+  storage: getStorage,
+};
+
+export { FieldValue, getAuth, getApps };
