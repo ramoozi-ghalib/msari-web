@@ -11,6 +11,7 @@ import { registerUser } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';
 import AuthVisualSide from '@/components/auth/AuthVisualSide';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 type RegisterActionResult = Awaited<ReturnType<typeof registerUser>>;
 
@@ -418,6 +419,13 @@ function RegisterForm() {
               </Button>
             </div>
           </form>
+
+          {/* Google Sign-In */}
+          <GoogleSignInButton
+            locale={locale}
+            redirectTo={safeRedirect}
+            disabled={loading}
+          />
 
           {/* Login Link */}
           <div className="mt-8 pt-6 border-t border-neutral-100 text-center">

@@ -26,6 +26,7 @@ import AuthVisualSide from '@/components/auth/AuthVisualSide';
 export interface VerifyAccountClientProps {
   email: string;
   pendingPhone?: string;
+  needsPhone?: boolean;
   redirectTo: string;
   autoSend: boolean;
   locale: string;
@@ -34,6 +35,36 @@ export interface VerifyAccountClientProps {
 
 const OTP_LENGTH = 6;
 const DEFAULT_COOLDOWN_SEC = 60;
+
+const COUNTRY_DIAL_CODES: Array<{ code: string; nameAr: string; nameEn: string }> = [
+  { code: '+967', nameAr: 'اليمن', nameEn: 'Yemen' },
+  { code: '+966', nameAr: 'السعودية', nameEn: 'Saudi Arabia' },
+  { code: '+971', nameAr: 'الإمارات', nameEn: 'UAE' },
+  { code: '+974', nameAr: 'قطر', nameEn: 'Qatar' },
+  { code: '+965', nameAr: 'الكويت', nameEn: 'Kuwait' },
+  { code: '+973', nameAr: 'البحرين', nameEn: 'Bahrain' },
+  { code: '+968', nameAr: 'عُمان', nameEn: 'Oman' },
+  { code: '+20', nameAr: 'مصر', nameEn: 'Egypt' },
+  { code: '+962', nameAr: 'الأردن', nameEn: 'Jordan' },
+  { code: '+961', nameAr: 'لبنان', nameEn: 'Lebanon' },
+  { code: '+963', nameAr: 'سوريا', nameEn: 'Syria' },
+  { code: '+964', nameAr: 'العراق', nameEn: 'Iraq' },
+  { code: '+970', nameAr: 'فلسطين', nameEn: 'Palestine' },
+  { code: '+249', nameAr: 'السودان', nameEn: 'Sudan' },
+  { code: '+218', nameAr: 'ليبيا', nameEn: 'Libya' },
+  { code: '+216', nameAr: 'تونس', nameEn: 'Tunisia' },
+  { code: '+213', nameAr: 'الجزائر', nameEn: 'Algeria' },
+  { code: '+212', nameAr: 'المغرب', nameEn: 'Morocco' },
+  { code: '+90', nameAr: 'تركيا', nameEn: 'Turkey' },
+  { code: '+91', nameAr: 'الهند', nameEn: 'India' },
+  { code: '+92', nameAr: 'باكستان', nameEn: 'Pakistan' },
+  { code: '+60', nameAr: 'ماليزيا', nameEn: 'Malaysia' },
+  { code: '+62', nameAr: 'إندونيسيا', nameEn: 'Indonesia' },
+  { code: '+1', nameAr: 'أمريكا / كندا', nameEn: 'US / Canada' },
+  { code: '+44', nameAr: 'بريطانيا', nameEn: 'UK' },
+  { code: '+33', nameAr: 'فرنسا', nameEn: 'France' },
+  { code: '+49', nameAr: 'ألمانيا', nameEn: 'Germany' },
+];
 
 /**
  * Normalize Arabic-Indic (٠-٩) and Extended Arabic-Indic (۰-۹) digits to ASCII 0-9
@@ -90,6 +121,7 @@ function clearCooldownExpiry(key: string): void {
 export default function VerifyAccountClient({
   email,
   pendingPhone,
+  needsPhone = false,
   redirectTo,
   autoSend,
   locale,
@@ -102,6 +134,12 @@ export default function VerifyAccountClient({
 
   const { update, status: sessionStatus } = useSession();
 
+  const [step, setStep] = useState<'phone' | 'otp'>(
+    needsPhone && !alreadyVerifiedOnServer ? 'phone' : 'otp'
+  );
+  const [dialCode, setDialCode] = useState<string>('+967');
+  const [nationalPhone, setNationalPhone] = useState<string>('');
+  const [activePhone, setActivePhone] = useState<string>(pendingPhone || '');
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [maskedEmail, setMaskedEmail] = useState<string>(() => maskEmailFallback(email));
   const [sending, setSending] = useState<boolean>(false);
@@ -236,14 +274,15 @@ export default function VerifyAccountClient({
     }, 650);
   }, [safeRedirect, storageKey]);
 
-  const sendOtp = useCallback(async () => {
-    if (sendingRef.current || verified) return;
+  const sendOtp = useCallback(async (phoneOverride?: string): Promise<boolean> => {
+    if (sendingRef.current || verified) return false;
     sendingRef.current = true;
     setSending(true);
     setError('');
 
     try {
-      const res = await requestEmailVerificationOtp();
+      const phoneArg = phoneOverride ?? (activePhone || undefined);
+      const res = await requestEmailVerificationOtp(phoneArg);
       if (res.success) {
         const targetEmail = res.data.maskedEmail || maskEmailFallback(email);
         setMaskedEmail(targetEmail);
@@ -252,8 +291,10 @@ export default function VerifyAccountClient({
         window.setTimeout(() => {
           inputRefs.current[0]?.focus();
         }, 50);
+        return true;
       } else if (res.error.code === 'ALREADY_VERIFIED') {
         await completeVerificationAndRedirect();
+        return true;
       } else if (res.error.code === 'COOLDOWN') {
         const retrySec =
           typeof res.error.retryAfterSec === 'number' && res.error.retryAfterSec > 0
@@ -262,21 +303,25 @@ export default function VerifyAccountClient({
         startCooldown(retrySec);
         setError('');
         setInfo(copy.activeCodeInfo);
+        return true;
       } else {
         setInfo('');
         setError(res.error.message || copy.genericSendError);
         if (typeof res.error.retryAfterSec === 'number' && res.error.retryAfterSec > 0) {
           startCooldown(res.error.retryAfterSec);
         }
+        return false;
       }
     } catch {
       setInfo('');
       setError(copy.genericSendError);
+      return false;
     } finally {
       sendingRef.current = false;
       setSending(false);
     }
   }, [
+    activePhone,
     completeVerificationAndRedirect,
     copy.activeCodeInfo,
     copy.codeSentInfo,
@@ -316,7 +361,7 @@ export default function VerifyAccountClient({
 
   // Initial mount effect with StrictMode double-mount guard
   useEffect(() => {
-    if (alreadyVerifiedOnServer) return;
+    if (alreadyVerifiedOnServer || step === 'phone') return;
     if (didInitSendRef.current) return;
     didInitSendRef.current = true;
 
@@ -339,8 +384,45 @@ export default function VerifyAccountClient({
     autoSend,
     copy.activeCodeInfo,
     sendOtp,
+    step,
     storageKey,
   ]);
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (sending || verified) return;
+    setError('');
+    setInfo('');
+
+    const rawTrimmed = nationalPhone
+      .trim()
+      .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+      .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+      .replace(/[\s\-.()]/g, '');
+
+    let fullPhone = rawTrimmed;
+    if (fullPhone.startsWith('00')) {
+      fullPhone = '+' + fullPhone.slice(2);
+    } else if (!fullPhone.startsWith('+')) {
+      fullPhone = `${dialCode}${fullPhone.replace(/^0+/, '')}`;
+    }
+
+    if (!/^\+[1-9]\d{7,14}$/.test(fullPhone)) {
+      setError(
+        isEn
+          ? 'Please enter a valid phone number (e.g. +9677XXXXXXXX).'
+          : 'رقم الهاتف غير صالح — أدخله بالصيغة الدولية (مثال: +9677XXXXXXXX).'
+      );
+      return;
+    }
+
+    setActivePhone(fullPhone);
+    didInitSendRef.current = true;
+    const sent = await sendOtp(fullPhone);
+    if (sent) {
+      setStep('otp');
+    }
+  };
 
   const verifyCode = useCallback(
     async (codeOverride?: string) => {
@@ -359,7 +441,7 @@ export default function VerifyAccountClient({
       setError('');
 
       try {
-        const res = await verifyEmailVerificationOtp(code);
+        const res = await verifyEmailVerificationOtp(code, activePhone || undefined);
         if (res.success || (!res.success && res.error.code === 'ALREADY_VERIFIED')) {
           await completeVerificationAndRedirect();
           return;
@@ -373,6 +455,7 @@ export default function VerifyAccountClient({
       }
     },
     [
+      activePhone,
       completeVerificationAndRedirect,
       copy.genericVerifyError,
       copy.incompleteError,
@@ -536,12 +619,22 @@ export default function VerifyAccountClient({
           {/* Header Badge & Title */}
           <div className="mb-7">
             <div className="w-14 h-14 rounded-2xl bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/15 text-[var(--brand-primary)] flex items-center justify-center mb-5 shadow-sm">
-              <Mail size={26} />
+              {step === 'phone' ? <Phone size={26} /> : <Mail size={26} />}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight mb-2.5">
-              {copy.title}
+              {step === 'phone'
+                ? isEn
+                  ? 'Add Your Phone Number'
+                  : 'أضف رقم هاتفك لإكمال التفعيل'
+                : copy.title}
             </h1>
-            <p className="text-neutral-500 text-sm leading-relaxed">{copy.subtitle}</p>
+            <p className="text-neutral-500 text-sm leading-relaxed">
+              {step === 'phone'
+                ? isEn
+                  ? 'Enter your phone number so hotels can reach you for bookings, then verify with a 6-digit code sent to your email.'
+                  : 'أدخل رقم هاتفك للتواصل وتأكيد الحجوزات، ثم أكمل التفعيل عبر رمز التحقق المكوّن من 6 أرقام المرسل إلى بريدك الإلكتروني.'
+                : copy.subtitle}
+            </p>
           </div>
 
           {/* Target Email & Optional Pending Phone Summary */}
@@ -549,24 +642,43 @@ export default function VerifyAccountClient({
             <div className="rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-4 mb-6 space-y-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <span className="text-xs font-semibold text-neutral-500">
-                  {copy.emailLabel}
+                  {step === 'phone'
+                    ? isEn
+                      ? 'Signed in as'
+                      : 'البريد الإلكتروني المرتبط'
+                    : copy.emailLabel}
                 </span>
                 <span
                   dir="ltr"
                   className="text-sm font-black text-neutral-900 break-all"
                 >
-                  {maskedEmail || email}
+                  {step === 'phone' ? email : maskedEmail || email}
                 </span>
               </div>
-              {pendingPhone && (
+              {activePhone && step === 'otp' && (
                 <div className="pt-2 border-t border-neutral-200/60 flex items-center justify-between gap-2 flex-wrap text-xs text-neutral-500">
                   <span className="inline-flex items-center gap-1.5">
                     <Phone size={13} className="text-[var(--brand-primary)] shrink-0" />
                     {copy.pendingPhoneNote}
                   </span>
-                  <span dir="ltr" className="font-bold text-neutral-700">
-                    {pendingPhone}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span dir="ltr" className="font-bold text-neutral-700">
+                      {activePhone}
+                    </span>
+                    {needsPhone && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError('');
+                          setInfo('');
+                          setStep('phone');
+                        }}
+                        className="text-[var(--brand-primary)] font-bold hover:underline cursor-pointer"
+                      >
+                        {isEn ? 'Change' : 'تعديل'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -616,8 +728,78 @@ export default function VerifyAccountClient({
             </div>
           )}
 
-          {/* 6-Digit OTP Form */}
-          {!verified && (
+          {/* Step 1: Phone Entry Form (for Google Sign-In users without a phone number) */}
+          {!verified && step === 'phone' && (
+            <form onSubmit={handlePhoneSubmit} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="verify-phone"
+                  className="block text-xs sm:text-sm font-bold text-neutral-800 mb-1.5"
+                >
+                  {isEn ? 'Phone Number' : 'رقم الهاتف'}
+                </label>
+                <div className="flex gap-2" dir="ltr">
+                  <select
+                    value={dialCode}
+                    onChange={(e) => setDialCode(e.target.value)}
+                    aria-label={isEn ? 'Country dial code' : 'رمز الدولة'}
+                    className="rounded-xl border border-neutral-200 bg-neutral-50/50 px-2 py-3 text-sm text-neutral-900 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none max-w-36"
+                  >
+                    {COUNTRY_DIAL_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {isEn ? c.nameEn : c.nameAr} ({c.code})
+                      </option>
+                    ))}
+                  </select>
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <Phone size={18} />
+                    </div>
+                    <input
+                      id="verify-phone"
+                      type="tel"
+                      value={nationalPhone}
+                      onChange={(e) => {
+                        setError('');
+                        setNationalPhone(e.target.value);
+                      }}
+                      placeholder="7XX XXX XXX"
+                      required
+                      autoComplete="tel"
+                      inputMode="tel"
+                      dir="ltr"
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 ps-10 pe-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:border-[var(--brand-primary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 transition-all outline-none"
+                    />
+                  </div>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-400">
+                  {isEn
+                    ? 'Select your country code and enter your local number without the leading zero.'
+                    : 'اختر رمز الدولة ثم أدخل رقمك بدون الصفر الأول (أو اكتبه كاملاً بصيغة +...).'}
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={sending}
+                disabled={sending || !nationalPhone.trim()}
+                icon={<ShieldCheck size={18} />}
+                className="py-3.5 shadow-lg shadow-[var(--brand-primary)]/20 hover:shadow-[var(--brand-primary)]/30 font-bold"
+              >
+                {sending
+                  ? copy.sendingBtn
+                  : isEn
+                    ? 'Continue & Send Verification Code'
+                    : 'متابعة وإرسال رمز التحقق'}
+              </Button>
+            </form>
+          )}
+
+          {/* Step 2: 6-Digit OTP Form */}
+          {!verified && step === 'otp' && (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-neutral-800 mb-3 text-center">

@@ -22,7 +22,7 @@ const securityHeaders = [
       "worker-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
-      "form-action 'self'",
+      "form-action 'self' https://accounts.google.com",
       "frame-ancestors 'none'",
     ].join('; '),
   },

@@ -30,23 +30,26 @@ export default async function VerifyAccountPage(props: {
   }
 
   const liveStatus = await checkAccountVerificationStatus();
-  const isVerifiedOnServer = liveStatus.authenticated && liveStatus.isVerified;
+  const email = (liveStatus.authenticated && liveStatus.email) || session.user.email || '';
+  const verifiedPhone = (liveStatus.authenticated && liveStatus.phone) || session.user.phone || '';
+  const pendingPhone =
+    (liveStatus.authenticated && liveStatus.pendingPhone) ||
+    session.user.pendingPhone ||
+    undefined;
+  const hasAnyPhone = Boolean(verifiedPhone || pendingPhone);
+  const isVerifiedOnServer = liveStatus.authenticated && liveStatus.isVerified && Boolean(verifiedPhone);
 
   if (isVerifiedOnServer && session.user.isVerified) {
     redirect(safeRedirect);
   }
 
   const alreadyVerifiedOnServer = isVerifiedOnServer && !session.user.isVerified;
-  const email = (liveStatus.authenticated && liveStatus.email) || session.user.email || '';
-  const pendingPhone =
-    (liveStatus.authenticated && liveStatus.pendingPhone) ||
-    session.user.pendingPhone ||
-    undefined;
 
   return (
     <VerifyAccountClient
       email={email}
-      pendingPhone={pendingPhone}
+      pendingPhone={pendingPhone || verifiedPhone || undefined}
+      needsPhone={!hasAnyPhone}
       redirectTo={safeRedirect}
       autoSend={autoSend}
       locale={locale}

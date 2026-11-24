@@ -12,6 +12,7 @@
  */
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { headers } from 'next/headers';
 
@@ -61,6 +62,15 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
   // ─── Providers ───────────────────────────────────────────────────────────
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+        },
+      },
+    }),
     Credentials({
       // The `credentials` object defines what fields the form sends.
       // Auth.js uses this for the built-in sign-in form (not used here),
@@ -143,10 +153,65 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
   // ─── Callbacks ───────────────────────────────────────────────────────────
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        if (!account.id_token) {
+          console.error('[auth] Google sign-in missing id_token');
+          return false;
+        }
+        try {
+          const apiRes = await apiClient.loginWithGoogle(account.id_token);
+          if (!apiRes.success || !apiRes.data) {
+            console.error('[auth] Google backend exchange failed:', apiRes.error?.code);
+            return false;
+          }
+          const role = await resolveUserRole(apiRes.data.id);
+          user.id = apiRes.data.id;
+          user.email = apiRes.data.email;
+          user.name = apiRes.data.name || user.name || '';
+          user.image = apiRes.data.image || user.image || '';
+          user.phone = apiRes.data.phone || '';
+          user.pendingPhone = apiRes.data.pendingPhone || '';
+          user.isVerified = apiRes.data.isVerified;
+          user.token = apiRes.data.token;
+          user.refreshToken = apiRes.data.refreshToken || '';
+          user.role = role;
+          return true;
+        } catch (error) {
+          console.error('[auth] Google sign-in exchange error:', error);
+          return false;
+        }
+      }
+      return true;
+    },
+
     // When using JWT strategy, the `jwt` callback is called first on every request.
     // The `user` object is ONLY passed on the initial sign-in.
     // We attach `id` and `role` to the token here so they persist.
-    async jwt({ token, user, trigger, session: _session }) {
+    async jwt({ token, user, account, trigger, session: _session }) {
+      if (account?.provider === 'google' && !user?.token && account.id_token) {
+        try {
+          const apiRes = await apiClient.loginWithGoogle(account.id_token);
+          if (apiRes.success && apiRes.data) {
+            const role = await resolveUserRole(apiRes.data.id);
+            token.id = apiRes.data.id;
+            token.role = role;
+            token.name = apiRes.data.name || user?.name || '';
+            token.email = apiRes.data.email;
+            token.firebaseToken = apiRes.data.token;
+            token.refreshToken = apiRes.data.refreshToken || '';
+            token.phone = apiRes.data.phone || '';
+            token.picture = apiRes.data.image || user?.image || '';
+            token.image = apiRes.data.image || user?.image || '';
+            token.isVerified = apiRes.data.isVerified;
+            token.pendingPhone = apiRes.data.pendingPhone || '';
+            return token;
+          }
+        } catch (error) {
+          console.error('[auth] Google jwt fallback exchange failed:', error);
+        }
+      }
+
       if (user) {
         token.id = user.id;
         token.role = user.role;

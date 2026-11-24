@@ -11,6 +11,7 @@ import { checkAccountVerificationStatus } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';
 import AuthVisualSide from '@/components/auth/AuthVisualSide';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 function LoginForm() {
   const params = useSearchParams();
@@ -201,6 +202,13 @@ function LoginForm() {
               </Button>
             </div>
           </form>
+
+          {/* Google Sign-In */}
+          <GoogleSignInButton
+            locale={locale}
+            redirectTo={safeRedirect}
+            disabled={loading}
+          />
 
           {/* Registration Link */}
           <div className="mt-8 pt-6 border-t border-neutral-100 text-center">

@@ -584,12 +584,72 @@ class ApiClient {
   }
 
   /**
+   * Authenticate with Google OAuth id_token via Firebase Auth (same uid as Flutter app).
+   * Calls POST /v1/auth/google with a 15s cold-start budget.
+   */
+  public async loginWithGoogle(idToken: string): Promise<ApiResponse<{
+    id: string;
+    email: string;
+    name: string;
+    phone?: string;
+    pendingPhone?: string;
+    image?: string;
+    token?: string;
+    refreshToken?: string;
+    isVerified: boolean;
+  }>> {
+    const res = await this.post<{
+      uid: string;
+      email: string;
+      firstName?: string;
+      lastName?: string;
+      phoneNumber?: string;
+      pendingPhone?: string;
+      profileImageUrl?: string;
+      token: string;
+      refreshToken?: string;
+      isVerified?: boolean;
+      otpPending?: boolean;
+    }>('/auth/google', { idToken }, undefined, 15000);
+
+    if (!res.success || !res.data) {
+      return { success: false, error: res.error };
+    }
+
+    const d = res.data;
+    const fullName = `${d.firstName || ''} ${d.lastName || ''}`.trim();
+    const name = fullName || d.email?.split('@')[0] || 'المستخدم';
+    const isVerified =
+      typeof d.isVerified === 'boolean'
+        ? d.isVerified
+        : d.otpPending === true
+          ? false
+          : Boolean(d.phoneNumber);
+
+    return {
+      success: true,
+      data: {
+        id: d.uid,
+        email: d.email,
+        name,
+        phone: d.phoneNumber || '',
+        pendingPhone: d.pendingPhone || '',
+        image: d.profileImageUrl || '',
+        token: d.token,
+        refreshToken: d.refreshToken || '',
+        isVerified,
+      },
+    };
+  }
+
+  /**
    * Request a 6-digit Email OTP verification code for the signed-in user.
    * Calls POST /v1/auth/email-otp/request with a 25s SMTP budget.
    */
   public async requestEmailOtp(
     authToken: string,
-    email?: string
+    email?: string,
+    phoneNumber?: string
   ): Promise<ApiResponse<{
     ok: boolean;
     email: string;
@@ -598,7 +658,7 @@ class ApiClient {
   }>> {
     return this.post(
       '/auth/email-otp/request',
-      { email },
+      { email, ...(phoneNumber ? { phoneNumber } : {}) },
       { Authorization: `Bearer ${authToken}` },
       25000
     );

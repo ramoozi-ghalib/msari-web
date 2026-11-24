@@ -186,7 +186,7 @@ async function callAuthApiWithRefresh<T>(
   return { session, res: first };
 }
 
-export async function requestEmailVerificationOtp(): Promise<
+export async function requestEmailVerificationOtp(rawPhone?: string): Promise<
   | {
       success: true;
       data: {
@@ -215,9 +215,24 @@ export async function requestEmailVerificationOtp(): Promise<
     };
   }
 
+  let phoneE164: string | undefined;
+  if (rawPhone !== undefined && rawPhone.trim() !== '') {
+    const normalized = normalizePhoneE164(rawPhone);
+    if (!normalized) {
+      return {
+        success: false as const,
+        error: {
+          code: 'INVALID_PHONE',
+          message: 'رقم الهاتف غير صالح — أدخله بالصيغة الدولية (مثال: +9677XXXXXXXX)',
+        },
+      };
+    }
+    phoneE164 = normalized;
+  }
+
   try {
     const { res } = await callAuthApiWithRefresh(
-      (token) => apiClient.requestEmailOtp(token, session.user.email || undefined),
+      (token) => apiClient.requestEmailOtp(token, session.user.email || undefined, phoneE164),
       session
     );
 
@@ -297,7 +312,7 @@ export async function requestEmailVerificationOtp(): Promise<
   }
 }
 
-export async function verifyEmailVerificationOtp(rawCode: string): Promise<
+export async function verifyEmailVerificationOtp(rawCode: string, rawPhone?: string): Promise<
   | {
       success: true;
       data: {
@@ -340,8 +355,23 @@ export async function verifyEmailVerificationOtp(rawCode: string): Promise<
     };
   }
 
+  let explicitPhone: string | undefined;
+  if (rawPhone !== undefined && rawPhone.trim() !== '') {
+    const normalized = normalizePhoneE164(rawPhone);
+    if (!normalized) {
+      return {
+        success: false as const,
+        error: {
+          code: 'INVALID_PHONE',
+          message: 'رقم الهاتف غير صالح — أدخله بالصيغة الدولية (مثال: +9677XXXXXXXX)',
+        },
+      };
+    }
+    explicitPhone = normalized;
+  }
+
   try {
-    const phoneToVerify = session.user.pendingPhone || session.user.phone || undefined;
+    const phoneToVerify = explicitPhone || session.user.pendingPhone || session.user.phone || undefined;
     const { res } = await callAuthApiWithRefresh(
       (token) => apiClient.verifyEmailOtp(token, code, phoneToVerify),
       session
