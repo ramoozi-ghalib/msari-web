@@ -119,6 +119,13 @@ function isAuthFailure<T>(res: ApiResponse<T>): boolean {
   return code === 'unauthenticated' || code === 'HTTP_401';
 }
 
+function isVerificationRequired<T>(res: ApiResponse<T>): boolean {
+  const code = res.error?.code || '';
+  if (code === 'phone-verification-required') return true;
+  const combined = `${code} ${res.error?.message || ''}`;
+  return /phone-verification-required|verified phone number is required/i.test(combined);
+}
+
 /**
  * Runs an authenticated API call with transparent recovery:
  * - 401 (stale Firebase ID token, sessions outlive the 1h token) →
@@ -297,6 +304,15 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           if (isAuthFailure(apiRes)) {
             return { success: false as const, error: { code: 'SESSION_EXPIRED', message: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا ثم إعادة المحاولة.' } };
           }
+          if (isVerificationRequired(apiRes)) {
+            return {
+              success: false as const,
+              error: {
+                code: 'VERIFICATION_REQUIRED' as const,
+                message: 'يرجى تفعيل حسابك أولاً عبر رمز التحقق المرسل لبريدك الإلكتروني لإتمام الحجز.',
+              },
+            };
+          }
           return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Booking creation failed via API' } };
         }
        
@@ -375,6 +391,13 @@ export async function previewBookingPrice(rawData: unknown) {
         }
         if (apiRes.error && isAuthFailure(apiRes)) {
           return { success: false as const, code: 'SESSION_EXPIRED' as const, error: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا.' };
+        }
+        if (apiRes.error && isVerificationRequired(apiRes)) {
+          return {
+            success: false as const,
+            code: 'VERIFICATION_REQUIRED' as const,
+            error: 'يرجى تفعيل حسابك أولاً عبر رمز التحقق لإتمام الحجز.',
+          };
         }
         // Production tripwire (no tokens, no PII): records the exact backend
         // failure behind a $0/spinner outcome in Vercel logs.

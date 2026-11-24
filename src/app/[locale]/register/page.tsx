@@ -4,6 +4,7 @@ import { useState, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Mail, Lock, Eye, EyeOff, User, Phone, AlertCircle, UserPlus, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { registerUser } from '@/actions/auth';
@@ -67,6 +68,7 @@ const COUNTRY_DIAL_CODES: Array<{ code: string; name: string }> = [
 
 function RegisterForm() {
   const params = useSearchParams();
+  const locale = useLocale() || 'ar';
   const redirect = params.get('redirect') || '/';
   const safeRedirect = getSafeRedirect(redirect);
   const encodedRedirect = encodeURIComponent(safeRedirect);
@@ -160,7 +162,7 @@ function RegisterForm() {
         setLoading(false);
         return;
       }
-      window.location.href = safeRedirect;
+      window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodedRedirect}`;
 
     } catch {
       setError('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.');

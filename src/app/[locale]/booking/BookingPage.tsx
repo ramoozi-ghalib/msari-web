@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { CheckCircle2 } from 'lucide-react';
 import type { Hotel, BankAccount } from '@/types';
 
@@ -117,6 +118,7 @@ export default function BookingPage({
   bankAccounts = [],
   initialUser,
 }: BookingPageProps) {
+  const locale = useLocale() || 'ar';
   const [step, setStep] = useState<Step>('review');
   const [code, setCode] = useState<string>('');
   const { formatPrice } = useCurrency();
@@ -158,6 +160,9 @@ export default function BookingPage({
       if (result && 'success' in result && result.success) {
         setPricePreview(result as PricePreview);
         setBookingError(null);
+      } else if (result && 'code' in result && result.code === 'VERIFICATION_REQUIRED') {
+        window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        return;
       } else {
         const msg =
           result && 'error' in result && typeof result.error === 'string'
@@ -171,7 +176,7 @@ export default function BookingPage({
     return () => {
       cancelled = true;
     };
-  }, [hotel.id, roomId, checkIn, checkOut]);
+  }, [hotel.id, roomId, checkIn, checkOut, locale]);
 
   async function handleConfirm(paymentData: PaymentSubmitData) {
     if (!guestData) return;
@@ -207,6 +212,9 @@ export default function BookingPage({
       setCode(result.code);
       setConfirmedPaymentMethod(paymentData.paymentMethod);
       setStep('confirm');
+    } else if (result.error?.code === 'VERIFICATION_REQUIRED') {
+      window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      return;
     } else {
       setBookingError(result.error.message);
     }

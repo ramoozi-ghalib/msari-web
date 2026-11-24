@@ -116,6 +116,20 @@ export default async function Page(props: {
     );
   }
 
+  if (session.user.isVerified === false) {
+    const bookingParams = new URLSearchParams();
+    if (city) bookingParams.set('city', city);
+    if (hotelSlug) bookingParams.set('hotel', hotelSlug);
+    if (hotelIdParam) bookingParams.set('hotelId', hotelIdParam);
+    if (roomId) bookingParams.set('room', roomId);
+    if (checkIn) bookingParams.set('checkIn', checkIn);
+    if (checkOut) bookingParams.set('checkOut', checkOut);
+    if (Number.isFinite(guests)) bookingParams.set('guests', String(guests));
+
+    const currentPath = `/booking?${bookingParams.toString()}`;
+    redirect(`/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(currentPath)}`);
+  }
+
   if (!hotelSlug || !checkIn || !checkOut || !Number.isFinite(guests) || guests < 1) {
     redirect(
       buildBackUrl({

@@ -16,7 +16,8 @@ export default function ConditionalLayout({ children, header, footer, whatsapp }
   const isAuthPage =
     pathname?.includes('/login') ||
     pathname?.includes('/register') ||
-    pathname?.includes('/forgot-password');
+    pathname?.includes('/forgot-password') ||
+    pathname?.includes('/verify-account');
   const isAdminPage = pathname?.includes('/admin');
 
   if (isAuthPage || isAdminPage) {

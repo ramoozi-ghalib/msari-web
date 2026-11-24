@@ -19,6 +19,8 @@ declare module 'next-auth' {
     token?: string;
     refreshToken?: string;
     phone?: string;
+    isVerified?: boolean;
+    pendingPhone?: string;
   }
 
   /**
@@ -33,6 +35,8 @@ declare module 'next-auth' {
       email: string;
       name: string;
       phone?: string;
+      pendingPhone?: string;
+      isVerified: boolean;
       image?: string | null;
       role: UserRole;
       firebaseToken?: string;

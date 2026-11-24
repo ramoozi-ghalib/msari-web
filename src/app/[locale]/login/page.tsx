@@ -4,14 +4,17 @@ import { useState, Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowRight, Check } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { checkAccountVerificationStatus } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';
 import AuthVisualSide from '@/components/auth/AuthVisualSide';
 
 function LoginForm() {
   const params = useSearchParams();
+  const locale = useLocale() || 'ar';
   const redirect = params.get('redirect') || '/';
   const safeRedirect = getSafeRedirect(redirect);
   const encodedRedirect = encodeURIComponent(safeRedirect);
@@ -49,6 +52,15 @@ function LoginForm() {
         setLoading(false);
       } else {
         const targetUrl = (redirect && redirect !== '/') ? safeRedirect : '/';
+        try {
+          const status = await checkAccountVerificationStatus();
+          if (status.authenticated && !status.isVerified) {
+            window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodedRedirect}`;
+            return;
+          }
+        } catch {
+          // Fall back to targetUrl if verification status check fails transiently
+        }
         window.location.href = targetUrl;
       }
     } catch {

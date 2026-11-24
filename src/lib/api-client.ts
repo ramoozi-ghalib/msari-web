@@ -19,6 +19,7 @@ export interface ApiResponse<T> {
     code: string;
     message: string;
     fieldErrors?: Record<string, string[]>;
+    retryAfterSec?: number;
   };
 }
 
@@ -445,6 +446,10 @@ class ApiClient {
             code,
             message,
             fieldErrors: errData?.error?.fieldErrors,
+            retryAfterSec:
+              typeof errData?.retryAfterSec === 'number'
+                ? errData.retryAfterSec
+                : undefined,
           },
         };
       }
@@ -457,7 +462,7 @@ class ApiClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        console.warn(`[API CLIENT TIMEOUT] ${method} ${url}: Request timed out after 3.5s.`);
+        console.warn(`[API CLIENT TIMEOUT] ${method} ${url}: Request timed out after ${timeoutMs}ms.`);
       } else {
         console.error(`[API CLIENT ERROR] ${method} ${url}:`, error);
       }
@@ -493,6 +498,8 @@ class ApiClient {
     image?: string;
     token?: string;
     refreshToken?: string;
+    isVerified: boolean;
+    pendingPhone?: string;
   }>> {
     const res = await this.post<{
       uid: string;
@@ -505,7 +512,7 @@ class ApiClient {
       return { success: false, error: res.error };
     }
 
-    // Call /me to get name, photo and Firestore user details
+    // Call /me to get name, photo, verification state and Firestore user details
     const meRes = await this.get<{
       uid: string;
       firstName?: string;
@@ -513,13 +520,16 @@ class ApiClient {
       name?: string;
       email?: string;
       phoneNumber?: string;
+      pendingPhone?: string;
+      isVerified?: boolean;
+      otpPending?: boolean;
       photoUrl?: string;
       photoURL?: string;
       profileImageUrl?: string;
       avatarUrl?: string;
       image?: string;
       profilePicture?: string;
-    }>('/me', { Authorization: `Bearer ${res.data.token}` });
+    }>('/me', { Authorization: `Bearer ${res.data.token}` }, 10000);
 
     // Deep unwrap for /me response structure (whether nested under data, user, customer, profile or flat)
     const rawMe = meRes.success && meRes.data ? (meRes.data as any) : null;
@@ -531,6 +541,13 @@ class ApiClient {
     const name = me ? (me.name || me.displayName || (fullName.length > 0 ? fullName : '') || me.email?.split('@')[0] || 'المستخدم') : 'المستخدم';
     const phone = me ? (me.phoneNumber || me.phone_number || me.phone || me.mobile || '') : '';
     const image = me ? (me.profileImageUrl || me.profile_image_url || me.photoURL || me.photoUrl || me.avatarUrl || me.avatar_url || me.image || me.profilePicture || me.avatar || me.picture || '') : '';
+    const isVerified =
+      typeof me?.isVerified === 'boolean'
+        ? me.isVerified
+        : me?.otpPending === true
+          ? false
+          : true;
+    const pendingPhone = me?.pendingPhone || '';
 
     return {
       success: true,
@@ -542,8 +559,70 @@ class ApiClient {
         image,
         token: res.data.token,
         refreshToken: res.data.refreshToken,
+        isVerified,
+        pendingPhone,
       },
     };
+  }
+
+  /**
+   * Fetch authoritative profile and verification state for the signed-in user.
+   * Calls GET /v1/me with a 10s cold-start budget.
+   */
+  public async getMe(authToken: string): Promise<ApiResponse<{
+    uid: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phoneNumber?: string;
+    pendingPhone?: string;
+    isVerified?: boolean;
+    otpPending?: boolean;
+    profileImageUrl?: string;
+  }>> {
+    return this.get('/me', { Authorization: `Bearer ${authToken}` }, 10000);
+  }
+
+  /**
+   * Request a 6-digit Email OTP verification code for the signed-in user.
+   * Calls POST /v1/auth/email-otp/request with a 25s SMTP budget.
+   */
+  public async requestEmailOtp(
+    authToken: string,
+    email?: string
+  ): Promise<ApiResponse<{
+    ok: boolean;
+    email: string;
+    expiresAtMs: number;
+    cooldownSec?: number;
+  }>> {
+    return this.post(
+      '/auth/email-otp/request',
+      { email },
+      { Authorization: `Bearer ${authToken}` },
+      25000
+    );
+  }
+
+  /**
+   * Verify a 6-digit Email OTP code and promote verified phone/claims.
+   * Calls POST /v1/auth/email-otp/verify with a 15s budget.
+   */
+  public async verifyEmailOtp(
+    authToken: string,
+    code: string,
+    phoneNumber?: string
+  ): Promise<ApiResponse<{
+    ok: boolean;
+    verified: boolean;
+    phoneNumber?: string;
+  }>> {
+    return this.post(
+      '/auth/email-otp/verify',
+      { code, ...(phoneNumber ? { phoneNumber } : {}) },
+      { Authorization: `Bearer ${authToken}` },
+      15000
+    );
   }
 
   /**

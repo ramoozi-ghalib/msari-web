@@ -126,6 +126,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               token: apiRes.data.token,
               refreshToken: apiRes.data.refreshToken || '',
               image: apiRes.data.image || '',
+              isVerified: apiRes.data.isVerified,
+              pendingPhone: apiRes.data.pendingPhone || '',
             };
           }
           await bcrypt.compare(password, DUMMY_HASH);
@@ -144,7 +146,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     // When using JWT strategy, the `jwt` callback is called first on every request.
     // The `user` object is ONLY passed on the initial sign-in.
     // We attach `id` and `role` to the token here so they persist.
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session: _session }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -155,7 +157,47 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.phone = user.phone;
         token.picture = user.image;
         token.image = user.image;
+        token.isVerified = user.isVerified ?? true;
+        token.pendingPhone = user.pendingPhone || '';
       }
+
+      // Server-verified session refresh (e.g. after Email OTP verification).
+      // NEVER trust raw `session.isVerified` from the client — always re-verify
+      // against the backend using a refreshed Firebase ID token.
+      if (trigger === 'update') {
+        try {
+          if (token.refreshToken) {
+            const refreshed = await apiClient.refreshFirebaseToken(String(token.refreshToken));
+            if (refreshed.success && refreshed.data?.token) {
+              token.firebaseToken = refreshed.data.token;
+              if (refreshed.data.refreshToken) {
+                token.refreshToken = refreshed.data.refreshToken;
+              }
+            }
+          }
+
+          const activeToken = (token.firebaseToken as string) || '';
+          if (activeToken) {
+            const meRes = await apiClient.getMe(activeToken);
+            if (meRes.success && meRes.data) {
+              const rawMe = meRes.data as any;
+              const me = rawMe?.user || rawMe?.customer || rawMe?.profile || rawMe?.data || rawMe;
+              token.isVerified =
+                typeof me?.isVerified === 'boolean'
+                  ? me.isVerified
+                  : me?.otpPending === true
+                    ? false
+                    : Boolean(token.isVerified);
+              token.phone = me?.phoneNumber || (token.phone as string) || '';
+              token.pendingPhone = me?.pendingPhone || '';
+            }
+          }
+        } catch (error) {
+          // Never wipe an existing valid session on a transient refresh error
+          console.warn('[auth] Session verification refresh failed:', error);
+        }
+      }
+
       return token;
     },
 
@@ -171,6 +213,8 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         session.user.refreshToken = (token.refreshToken as string) || '';
         session.user.phone = (token.phone as string) || '';
         session.user.image = (token.image as string) || (token.picture as string) || '';
+        session.user.isVerified = typeof token.isVerified === 'boolean' ? token.isVerified : true;
+        session.user.pendingPhone = (token.pendingPhone as string) || '';
       }
       return session;
     },

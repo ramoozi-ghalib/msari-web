@@ -45,6 +45,8 @@ export const authConfig: NextAuthConfig = {
         token.role = user.role;
         token.name = user.name;
         token.email = user.email;
+        token.isVerified = user.isVerified ?? true;
+        token.pendingPhone = user.pendingPhone || '';
       }
       return token;
     },
@@ -54,6 +56,8 @@ export const authConfig: NextAuthConfig = {
         session.user.role = token.role as any;
         if (token.name) session.user.name = token.name as string;
         if (token.email) session.user.email = token.email as string;
+        session.user.isVerified = typeof token.isVerified === 'boolean' ? token.isVerified : true;
+        session.user.pendingPhone = (token.pendingPhone as string) || '';
       }
       return session;
     },

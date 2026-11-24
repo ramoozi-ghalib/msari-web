@@ -110,8 +110,392 @@ export async function registerUser(rawData: unknown) {
   }
 }
 
+import type { Session } from 'next-auth';
 import { auth, signOut } from '@/auth';
 import { admin } from '@/lib/firebase-admin';
+import type { ApiResponse } from '@/lib/api-client';
+
+function isAuthFailure<T>(res: ApiResponse<T>): boolean {
+  const code = res.error?.code || '';
+  return code === 'unauthenticated' || code === 'HTTP_401';
+}
+
+/**
+ * Runs an authenticated backend API call using the signed-in user's Firebase ID token.
+ * On 401 (`unauthenticated` / `HTTP_401`), refreshes via `refreshFirebaseToken` and retries once.
+ */
+async function callAuthApiWithRefresh<T>(
+  fn: (idToken: string) => Promise<ApiResponse<T>>,
+  existingSession?: Session | null
+): Promise<{
+  session: Session | null;
+  res: ApiResponse<T>;
+}> {
+  const session: Session | null = existingSession !== undefined ? existingSession : await auth();
+  if (!session?.user) {
+    return {
+      session: null,
+      res: {
+        success: false,
+        error: { code: 'unauthenticated', message: 'Unauthenticated' },
+      },
+    };
+  }
+
+  let idToken = session.user.firebaseToken || '';
+  const refreshToken = session.user.refreshToken || '';
+
+  if (!idToken && refreshToken) {
+    try {
+      const ref = await apiClient.refreshFirebaseToken(refreshToken);
+      if (ref.success && ref.data?.token) {
+        idToken = ref.data.token;
+      }
+    } catch {
+      // Fall through to unauthenticated response
+    }
+  }
+
+  if (!idToken) {
+    return {
+      session,
+      res: {
+        success: false,
+        error: { code: 'unauthenticated', message: 'Unauthenticated' },
+      },
+    };
+  }
+
+  const first = await fn(idToken);
+  if (first.success) {
+    return { session, res: first };
+  }
+
+  if (isAuthFailure(first) && refreshToken) {
+    try {
+      const ref = await apiClient.refreshFirebaseToken(refreshToken);
+      if (ref.success && ref.data?.token) {
+        const retry = await fn(ref.data.token);
+        return { session, res: retry };
+      }
+    } catch {
+      // Fall through to original auth error
+    }
+  }
+
+  return { session, res: first };
+}
+
+export async function requestEmailVerificationOtp(): Promise<
+  | {
+      success: true;
+      data: {
+        maskedEmail: string;
+        expiresAtMs: number;
+        cooldownSec: number;
+      };
+    }
+  | {
+      success: false;
+      error: {
+        code: string;
+        message: string;
+        retryAfterSec?: number;
+      };
+    }
+> {
+  const session = await auth();
+  if (!session?.user) {
+    return {
+      success: false as const,
+      error: {
+        code: 'UNAUTHENTICATED',
+        message: 'يرجى تسجيل الدخول أولاً.',
+      },
+    };
+  }
+
+  try {
+    const { res } = await callAuthApiWithRefresh(
+      (token) => apiClient.requestEmailOtp(token, session.user.email || undefined),
+      session
+    );
+
+    if (res.success && res.data) {
+      return {
+        success: true as const,
+        data: {
+          maskedEmail: res.data.email || session.user.email || '',
+          expiresAtMs: res.data.expiresAtMs,
+          cooldownSec: typeof res.data.cooldownSec === 'number' ? res.data.cooldownSec : 60,
+        },
+      };
+    }
+
+    if (isAuthFailure(res)) {
+      return {
+        success: false as const,
+        error: {
+          code: 'UNAUTHENTICATED',
+          message: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.',
+        },
+      };
+    }
+
+    const errCode = res.error?.code || '';
+    if (errCode === 'cooldown') {
+      const retryAfterSec =
+        typeof res.error?.retryAfterSec === 'number' ? res.error.retryAfterSec : undefined;
+      return {
+        success: false as const,
+        error: {
+          code: 'COOLDOWN',
+          message: retryAfterSec
+            ? `تم إرسال رمز تحقق مسبقاً. يمكنك طلب رمز جديد بعد ${retryAfterSec} ثانية.`
+            : 'تم إرسال رمز تحقق مسبقاً. يرجى الانتظار قليلاً قبل إعادة الإرسال.',
+          retryAfterSec,
+        },
+      };
+    }
+
+    if (errCode === 'limit') {
+      return {
+        success: false as const,
+        error: {
+          code: 'DAILY_LIMIT',
+          message: 'تجاوزت الحد اليومي المسموح لطلبات رمز التحقق. يرجى المحاولة غداً.',
+        },
+      };
+    }
+
+    if (errCode === 'email-mismatch') {
+      return {
+        success: false as const,
+        error: {
+          code: 'EMAIL_MISMATCH',
+          message: 'البريد الإلكتروني غير مطابق لحسابك المسجل.',
+        },
+      };
+    }
+
+    return {
+      success: false as const,
+      error: {
+        code: errCode || 'SERVER_ERROR',
+        message: res.error?.message || 'تعذر إرسال رمز التحقق حالياً، يرجى المحاولة لاحقاً.',
+      },
+    };
+  } catch (error) {
+    console.error('Error in requestEmailVerificationOtp:', error);
+    return {
+      success: false as const,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.',
+      },
+    };
+  }
+}
+
+export async function verifyEmailVerificationOtp(rawCode: string): Promise<
+  | {
+      success: true;
+      data: {
+        verified: true;
+        phoneNumber: string;
+      };
+    }
+  | {
+      success: false;
+      error: {
+        code: string;
+        message: string;
+      };
+    }
+> {
+  const code = String(rawCode || '')
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/\s+/g, '')
+    .trim();
+
+  if (!/^\d{6}$/.test(code)) {
+    return {
+      success: false as const,
+      error: {
+        code: 'INVALID_CODE',
+        message: 'يرجى إدخال رمز مكون من 6 أرقام',
+      },
+    };
+  }
+
+  const session = await auth();
+  if (!session?.user) {
+    return {
+      success: false as const,
+      error: {
+        code: 'UNAUTHENTICATED',
+        message: 'يرجى تسجيل الدخول أولاً.',
+      },
+    };
+  }
+
+  try {
+    const phoneToVerify = session.user.pendingPhone || session.user.phone || undefined;
+    const { res } = await callAuthApiWithRefresh(
+      (token) => apiClient.verifyEmailOtp(token, code, phoneToVerify),
+      session
+    );
+
+    if (res.success && res.data?.verified) {
+      // Best-effort proactive token refresh so Firebase picks up newly stamped custom claims.
+      if (session.user.refreshToken) {
+        try {
+          await apiClient.refreshFirebaseToken(session.user.refreshToken);
+        } catch {
+          // Non-fatal: NextAuth `update({ refreshVerification: true })` will also refresh.
+        }
+      }
+
+      return {
+        success: true as const,
+        data: {
+          verified: true as const,
+          phoneNumber: res.data?.phoneNumber || '',
+        },
+      };
+    }
+
+    if (isAuthFailure(res)) {
+      return {
+        success: false as const,
+        error: {
+          code: 'UNAUTHENTICATED',
+          message: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.',
+        },
+      };
+    }
+
+    const errCode = res.error?.code || '';
+    if (errCode === 'invalid-verification-code') {
+      return {
+        success: false as const,
+        error: {
+          code: 'INVALID_CODE',
+          message: 'رمز التحقق غير صحيح، يرجى التأكد والمحاولة مرة أخرى.',
+        },
+      };
+    }
+
+    if (errCode === 'otp-expired') {
+      return {
+        success: false as const,
+        error: {
+          code: 'OTP_EXPIRED',
+          message: 'انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد.',
+        },
+      };
+    }
+
+    if (errCode === 'too-many-attempts') {
+      return {
+        success: false as const,
+        error: {
+          code: 'TOO_MANY_ATTEMPTS',
+          message: 'تجاوزت عدد المحاولات المسموحة، يرجى طلب رمز تحقق جديد.',
+        },
+      };
+    }
+
+    if (errCode === 'uid-mismatch' || errCode === 'email-mismatch') {
+      return {
+        success: false as const,
+        error: {
+          code: 'PERMISSION_DENIED',
+          message: 'لا يمكن التحقق من هذا الحساب. يرجى تسجيل الدخول مجدداً.',
+        },
+      };
+    }
+
+    return {
+      success: false as const,
+      error: {
+        code: errCode || 'VERIFY_FAILED',
+        message: res.error?.message || 'تعذر التحقق من الرمز حالياً، يرجى المحاولة لاحقاً.',
+      },
+    };
+  } catch (error) {
+    console.error('Error in verifyEmailVerificationOtp:', error);
+    return {
+      success: false as const,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.',
+      },
+    };
+  }
+}
+
+export async function checkAccountVerificationStatus(): Promise<
+  | {
+      authenticated: false;
+      isVerified: false;
+    }
+  | {
+      authenticated: true;
+      isVerified: boolean;
+      email: string;
+      phone: string;
+      pendingPhone: string;
+    }
+> {
+  const session = await auth();
+  if (!session?.user) {
+    return {
+      authenticated: false as const,
+      isVerified: false as const,
+    };
+  }
+
+  try {
+    const { res } = await callAuthApiWithRefresh(
+      (token) => apiClient.getMe(token),
+      session
+    );
+
+    if (res.success && res.data) {
+      const rawMe = res.data as any;
+      const me = rawMe?.user || rawMe?.customer || rawMe?.profile || rawMe?.data || rawMe;
+      const isVerified =
+        typeof me?.isVerified === 'boolean'
+          ? me.isVerified
+          : me?.otpPending === true
+            ? false
+            : typeof session.user.isVerified === 'boolean'
+              ? session.user.isVerified
+              : true;
+
+      return {
+        authenticated: true as const,
+        isVerified,
+        email: session.user.email || me?.email || '',
+        phone: me?.phoneNumber || session.user.phone || '',
+        pendingPhone: me?.pendingPhone || session.user.pendingPhone || '',
+      };
+    }
+  } catch (error) {
+    console.warn('Error in checkAccountVerificationStatus:', error);
+  }
+
+  // Fallback to session state only if the live /me request failed
+  return {
+    authenticated: true as const,
+    isVerified: typeof session.user.isVerified === 'boolean' ? session.user.isVerified : true,
+    email: session.user.email || '',
+    phone: session.user.phone || '',
+    pendingPhone: session.user.pendingPhone || '',
+  };
+}
 
 export async function getProfile() {
   const session = await auth();

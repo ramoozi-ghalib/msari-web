@@ -1,4 +1,4 @@
-const CACHE_NAME = 'msari-pwa-v2';
+const CACHE_NAME = 'msari-pwa-v3';
 
 const PRECACHE_URLS = [
   '/offline.html',
@@ -25,6 +25,9 @@ const BYPASS_ROUTE_SEGMENTS = [
   '/register',
   '/ar/register',
   '/en/register',
+  '/verify-account',
+  '/ar/verify-account',
+  '/en/verify-account',
   '/account',
   '/ar/account',
   '/en/account',
