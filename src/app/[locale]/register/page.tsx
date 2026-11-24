@@ -8,64 +8,11 @@ import { useLocale } from 'next-intl';
 import { Mail, Lock, Eye, EyeOff, User, Phone, AlertCircle, UserPlus, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { registerUser } from '@/actions/auth';
+import { COUNTRY_DIAL_CODES, composeE164Phone } from '@/lib/phone';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';
 import AuthVisualSide from '@/components/auth/AuthVisualSide';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
-
-type RegisterActionResult = Awaited<ReturnType<typeof registerUser>>;
-
-// Country dial codes — parity with the mobile app picker (default Yemen).
-// The form always submits full E.164; manual "+<cc>..." entry overrides.
-const COUNTRY_DIAL_CODES: Array<{ code: string; name: string }> = [
-  { code: '+967', name: 'اليمن' },
-  { code: '+966', name: 'السعودية' },
-  { code: '+971', name: 'الإمارات' },
-  { code: '+974', name: 'قطر' },
-  { code: '+965', name: 'الكويت' },
-  { code: '+973', name: 'البحرين' },
-  { code: '+968', name: 'عُمان' },
-  { code: '+20', name: 'مصر' },
-  { code: '+962', name: 'الأردن' },
-  { code: '+961', name: 'لبنان' },
-  { code: '+963', name: 'سوريا' },
-  { code: '+964', name: 'العراق' },
-  { code: '+970', name: 'فلسطين' },
-  { code: '+249', name: 'السودان' },
-  { code: '+218', name: 'ليبيا' },
-  { code: '+216', name: 'تونس' },
-  { code: '+213', name: 'الجزائر' },
-  { code: '+212', name: 'المغرب' },
-  { code: '+222', name: 'موريتانيا' },
-  { code: '+252', name: 'الصومال' },
-  { code: '+253', name: 'جيبوتي' },
-  { code: '+269', name: 'جزر القمر' },
-  { code: '+251', name: 'إثيوبيا' },
-  { code: '+291', name: 'إريتريا' },
-  { code: '+254', name: 'كينيا' },
-  { code: '+90', name: 'تركيا' },
-  { code: '+98', name: 'إيران' },
-  { code: '+91', name: 'الهند' },
-  { code: '+92', name: 'باكستان' },
-  { code: '+880', name: 'بنغلاديش' },
-  { code: '+63', name: 'الفلبين' },
-  { code: '+62', name: 'إندونيسيا' },
-  { code: '+60', name: 'ماليزيا' },
-  { code: '+66', name: 'تايلند' },
-  { code: '+86', name: 'الصين' },
-  { code: '+1', name: 'أمريكا / كندا' },
-  { code: '+44', name: 'بريطانيا' },
-  { code: '+33', name: 'فرنسا' },
-  { code: '+49', name: 'ألمانيا' },
-  { code: '+31', name: 'هولندا' },
-  { code: '+46', name: 'السويد' },
-  { code: '+34', name: 'إسبانيا' },
-  { code: '+39', name: 'إيطاليا' },
-  { code: '+7', name: 'روسيا' },
-  { code: '+61', name: 'أستراليا' },
-  { code: '+27', name: 'جنوب أفريقيا' },
-  { code: '+234', name: 'نيجيريا' },
-];
 
 function RegisterForm() {
   const params = useSearchParams();
@@ -127,13 +74,7 @@ function RegisterForm() {
 
     setLoading(true);
     try {
-      // Combine country dial code + national number into full E.164.
-      // A manually typed full international number ("+<cc>...") overrides.
-      // Leading trunk zero(s) stripped when combining (e.g. 05... +966).
-      const national = form.phone.trim();
-      const fullPhone = national.startsWith('+')
-        ? national
-        : `${form.dialCode}${national.replace(/^0+/, '')}`;
+      const fullPhone = composeE164Phone(form.dialCode, form.phone);
 
       const result = await registerUser({
         name: form.name.trim(),
@@ -143,7 +84,7 @@ function RegisterForm() {
       });
 
       if (!result.success) {
-        const errMsg = (result as RegisterActionResult).error?.message || 'حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة مرة أخرى.';
+        const errMsg = result.error?.message || 'حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة مرة أخرى.';
         setError(errMsg);
         setLoading(false);
         return;
@@ -163,7 +104,7 @@ function RegisterForm() {
         setLoading(false);
         return;
       }
-      window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodedRedirect}`;
+      window.location.href = `/${locale}/verify-account?redirect=${encodedRedirect}`;
 
     } catch {
       setError('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.');
@@ -272,7 +213,7 @@ function RegisterForm() {
                 >
                   {COUNTRY_DIAL_CODES.map(c => (
                     <option key={c.code} value={c.code}>
-                      {c.name} ({c.code})
+                      {c.nameAr} ({c.code})
                     </option>
                   ))}
                 </select>

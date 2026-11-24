@@ -71,8 +71,7 @@ export default async function Page(props: {
   const guests = typeof params.guests === 'string' ? Number(params.guests) : NaN;
 
   // ── Auth User Verification Check ──
-  const session = await auth();
-  if (!session?.user) {
+  const buildCurrentBookingPath = () => {
     const bookingParams = new URLSearchParams();
     if (city) bookingParams.set('city', city);
     if (hotelSlug) bookingParams.set('hotel', hotelSlug);
@@ -81,8 +80,12 @@ export default async function Page(props: {
     if (checkIn) bookingParams.set('checkIn', checkIn);
     if (checkOut) bookingParams.set('checkOut', checkOut);
     if (Number.isFinite(guests)) bookingParams.set('guests', String(guests));
+    return `/booking?${bookingParams.toString()}`;
+  };
 
-    const currentPath = `/booking?${bookingParams.toString()}`;
+  const session = await auth();
+  if (!session?.user) {
+    const currentPath = buildCurrentBookingPath();
     const loginUrl = `/${locale}/login?redirect=${encodeURIComponent(currentPath)}`;
     const registerUrl = `/${locale}/register?redirect=${encodeURIComponent(currentPath)}`;
 
@@ -117,17 +120,8 @@ export default async function Page(props: {
   }
 
   if (session.user.isVerified === false) {
-    const bookingParams = new URLSearchParams();
-    if (city) bookingParams.set('city', city);
-    if (hotelSlug) bookingParams.set('hotel', hotelSlug);
-    if (hotelIdParam) bookingParams.set('hotelId', hotelIdParam);
-    if (roomId) bookingParams.set('room', roomId);
-    if (checkIn) bookingParams.set('checkIn', checkIn);
-    if (checkOut) bookingParams.set('checkOut', checkOut);
-    if (Number.isFinite(guests)) bookingParams.set('guests', String(guests));
-
-    const currentPath = `/booking?${bookingParams.toString()}`;
-    redirect(`/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(currentPath)}`);
+    const currentPath = buildCurrentBookingPath();
+    redirect(`/${locale}/verify-account?redirect=${encodeURIComponent(currentPath)}`);
   }
 
   if (!hotelSlug || !checkIn || !checkOut || !Number.isFinite(guests) || guests < 1) {
@@ -252,8 +246,6 @@ export default async function Page(props: {
   return (
     <BookingPage
       hotel={hotel}
-      city={city || hotel.city}
-      hotelId={hotel.id}
       roomId={selectedRoom?.id}
       roomName={selectedRoom?.name}
       checkIn={checkIn}

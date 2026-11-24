@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Mail, ArrowRight, AlertCircle, CheckCircle2, Send, KeyRound, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowRight, AlertCircle, CheckCircle2, Send, KeyRound } from 'lucide-react';
 import { requestPasswordReset } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';

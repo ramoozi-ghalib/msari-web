@@ -19,6 +19,11 @@ import {
   requestEmailVerificationOtp,
   verifyEmailVerificationOtp,
 } from '@/actions/auth';
+import {
+  COUNTRY_DIAL_CODES,
+  composeE164Phone,
+  normalizeArabicDigits,
+} from '@/lib/phone';
 import { getSafeRedirect } from '@/lib/safeRedirect';
 import { Button } from '@/components/ui/Button';
 import AuthVisualSide from '@/components/auth/AuthVisualSide';
@@ -28,7 +33,6 @@ export interface VerifyAccountClientProps {
   pendingPhone?: string;
   needsPhone?: boolean;
   redirectTo: string;
-  autoSend: boolean;
   locale: string;
   alreadyVerifiedOnServer?: boolean;
 }
@@ -36,45 +40,12 @@ export interface VerifyAccountClientProps {
 const OTP_LENGTH = 6;
 const DEFAULT_COOLDOWN_SEC = 60;
 
-const COUNTRY_DIAL_CODES: Array<{ code: string; nameAr: string; nameEn: string }> = [
-  { code: '+967', nameAr: 'اليمن', nameEn: 'Yemen' },
-  { code: '+966', nameAr: 'السعودية', nameEn: 'Saudi Arabia' },
-  { code: '+971', nameAr: 'الإمارات', nameEn: 'UAE' },
-  { code: '+974', nameAr: 'قطر', nameEn: 'Qatar' },
-  { code: '+965', nameAr: 'الكويت', nameEn: 'Kuwait' },
-  { code: '+973', nameAr: 'البحرين', nameEn: 'Bahrain' },
-  { code: '+968', nameAr: 'عُمان', nameEn: 'Oman' },
-  { code: '+20', nameAr: 'مصر', nameEn: 'Egypt' },
-  { code: '+962', nameAr: 'الأردن', nameEn: 'Jordan' },
-  { code: '+961', nameAr: 'لبنان', nameEn: 'Lebanon' },
-  { code: '+963', nameAr: 'سوريا', nameEn: 'Syria' },
-  { code: '+964', nameAr: 'العراق', nameEn: 'Iraq' },
-  { code: '+970', nameAr: 'فلسطين', nameEn: 'Palestine' },
-  { code: '+249', nameAr: 'السودان', nameEn: 'Sudan' },
-  { code: '+218', nameAr: 'ليبيا', nameEn: 'Libya' },
-  { code: '+216', nameAr: 'تونس', nameEn: 'Tunisia' },
-  { code: '+213', nameAr: 'الجزائر', nameEn: 'Algeria' },
-  { code: '+212', nameAr: 'المغرب', nameEn: 'Morocco' },
-  { code: '+90', nameAr: 'تركيا', nameEn: 'Turkey' },
-  { code: '+91', nameAr: 'الهند', nameEn: 'India' },
-  { code: '+92', nameAr: 'باكستان', nameEn: 'Pakistan' },
-  { code: '+60', nameAr: 'ماليزيا', nameEn: 'Malaysia' },
-  { code: '+62', nameAr: 'إندونيسيا', nameEn: 'Indonesia' },
-  { code: '+1', nameAr: 'أمريكا / كندا', nameEn: 'US / Canada' },
-  { code: '+44', nameAr: 'بريطانيا', nameEn: 'UK' },
-  { code: '+33', nameAr: 'فرنسا', nameEn: 'France' },
-  { code: '+49', nameAr: 'ألمانيا', nameEn: 'Germany' },
-];
-
 /**
  * Normalize Arabic-Indic (٠-٩) and Extended Arabic-Indic (۰-۹) digits to ASCII 0-9
  * and strip any non-digit characters.
  */
 function normalizeDigits(input: string): string {
-  return input
-    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
-    .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
-    .replace(/\D/g, '');
+  return normalizeArabicDigits(input).replace(/\D/g, '');
 }
 
 function maskEmailFallback(email: string): string {
@@ -123,7 +94,6 @@ export default function VerifyAccountClient({
   pendingPhone,
   needsPhone = false,
   redirectTo,
-  autoSend,
   locale,
   alreadyVerifiedOnServer = false,
 }: VerifyAccountClientProps) {
@@ -377,11 +347,10 @@ export default function VerifyAccountClient({
       return;
     }
 
-    // Whether autoSend is true or user landed here to finish verification, send once
+    // Send OTP once automatically on mount when no active cooldown exists
     void sendOtp();
   }, [
     alreadyVerifiedOnServer,
-    autoSend,
     copy.activeCodeInfo,
     sendOtp,
     step,
@@ -394,18 +363,7 @@ export default function VerifyAccountClient({
     setError('');
     setInfo('');
 
-    const rawTrimmed = nationalPhone
-      .trim()
-      .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
-      .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
-      .replace(/[\s\-.()]/g, '');
-
-    let fullPhone = rawTrimmed;
-    if (fullPhone.startsWith('00')) {
-      fullPhone = '+' + fullPhone.slice(2);
-    } else if (!fullPhone.startsWith('+')) {
-      fullPhone = `${dialCode}${fullPhone.replace(/^0+/, '')}`;
-    }
+    const fullPhone = composeE164Phone(dialCode, nationalPhone);
 
     if (!/^\+[1-9]\d{7,14}$/.test(fullPhone)) {
       setError(

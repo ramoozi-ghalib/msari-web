@@ -22,8 +22,6 @@ export default async function VerifyAccountPage(props: {
     safeRedirect = `/${locale}`;
   }
 
-  const autoSend = params.autoSend === '1' || params.autoSend === 'true';
-
   const session = await auth();
   if (!session?.user) {
     redirect(`/${locale}/login?redirect=${encodeURIComponent(safeRedirect)}`);
@@ -51,7 +49,6 @@ export default async function VerifyAccountPage(props: {
       pendingPhone={pendingPhone || verifiedPhone || undefined}
       needsPhone={!hasAnyPhone}
       redirectTo={safeRedirect}
-      autoSend={autoSend}
       locale={locale}
       alreadyVerifiedOnServer={alreadyVerifiedOnServer}
     />

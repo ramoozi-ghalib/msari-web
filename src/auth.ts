@@ -1,7 +1,7 @@
 /**
  * auth.ts — Full Auth.js (NextAuth v5) configuration.
  *
- * This file uses Node.js-only imports (Prisma, bcrypt) and must NEVER be
+ * This file uses Node.js-only imports (firebase-admin, bcryptjs) and must NEVER be
  * imported in middleware or any edge runtime code.
  *
  * Exports:
@@ -35,29 +35,13 @@ const DUMMY_HASH =
 
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
-  // Merge edge-safe config (pages, base callbacks)
+  // Merge edge-safe config (cookies, pages, base callbacks)
   ...authConfig,
-
-  // ─── Adapter & Session Strategy ──────────────────────────────────────────
-  // adapter: PrismaAdapter(prisma),
 
   // JWT sessions are strictly required when using the Credentials provider.
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours
-  },
-
-  // ─── Cookie Security ─────────────────────────────────────────────────────
-  cookies: {
-    sessionToken: {
-      name: 'msari.session-token',
-      options: {
-        httpOnly: true,       // JS cannot read this cookie
-        sameSite: 'lax',      // CSRF protection
-        path: '/',
-        secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-      },
-    },
   },
 
   // ─── Providers ───────────────────────────────────────────────────────────
@@ -103,9 +87,9 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         ]);
 
         if (!emailIpResult.success || !ipResult.success) {
-          // سجّل التجاوز خادمياً مع IP للمتابعة الأمنية
+          // سجّل التجاوز خادمياً مع IP للمتابعة الأمنية (بدون تسجيل البريد الإلكتروني)
           console.warn(
-            `[auth] Rate limit exceeded — email: ${rawEmail}, ip: ${ip}, ` +
+            `[auth] Rate limit exceeded — ip: ${ip}, ` +
             `remaining: email-ip=${emailIpResult.remaining}, ip=${ipResult.remaining}`
           );
           // نُرجع null فقط — لا نكشف سبب الرفض للعميل
@@ -113,7 +97,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         }
 
         // ── Step 3: التحقق من شكل البيانات بـ Zod ─────────────────────────
-        // يرفض البيانات المشوّهة قبل أي استعلام على DB
+        // يرفض البيانات المشوّهة قبل أي استعلام على الـ API
         const parsed = LoginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
@@ -188,7 +172,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     // When using JWT strategy, the `jwt` callback is called first on every request.
     // The `user` object is ONLY passed on the initial sign-in.
     // We attach `id` and `role` to the token here so they persist.
-    async jwt({ token, user, account, trigger, session: _session }) {
+    async jwt({ token, user, account, trigger }) {
       if (account?.provider === 'google' && !user?.token && account.id_token) {
         try {
           const apiRes = await apiClient.loginWithGoogle(account.id_token);
@@ -218,7 +202,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.name = user.name;
         token.email = user.email;
         token.firebaseToken = user.token;
-        token.refreshToken = (user as any).refreshToken || '';
+        token.refreshToken = user.refreshToken || '';
         token.phone = user.phone;
         token.picture = user.image;
         token.image = user.image;

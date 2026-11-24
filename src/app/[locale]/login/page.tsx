@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, LogIn, ArrowRight } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { checkAccountVerificationStatus } from '@/actions/auth';
 import { getSafeRedirect } from '@/lib/safeRedirect';
@@ -52,17 +52,16 @@ function LoginForm() {
         setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
         setLoading(false);
       } else {
-        const targetUrl = (redirect && redirect !== '/') ? safeRedirect : '/';
         try {
           const status = await checkAccountVerificationStatus();
           if (status.authenticated && !status.isVerified) {
-            window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodedRedirect}`;
+            window.location.href = `/${locale}/verify-account?redirect=${encodedRedirect}`;
             return;
           }
         } catch {
-          // Fall back to targetUrl if verification status check fails transiently
+          // Fall back to safeRedirect if verification status check fails transiently
         }
-        window.location.href = targetUrl;
+        window.location.href = safeRedirect;
       }
     } catch {
       setError('حدث خطأ أثناء تسجيل الدخول، يرجى المحاولة مرة أخرى');

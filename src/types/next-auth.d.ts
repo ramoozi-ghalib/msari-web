@@ -11,8 +11,8 @@ import type { UserRole } from '@/lib/user-roles';
 
 declare module 'next-auth' {
   /**
-   * Extends the User object returned from `authorize()` and stored by the adapter.
-   * Adding `role` here makes it available in the `session` callback's `user` param.
+   * Extends the User object returned from `authorize()` and OAuth `signIn`.
+   * Adding custom fields here makes them available in `jwt` and `session` callbacks.
    */
   interface User {
     role?: UserRole;

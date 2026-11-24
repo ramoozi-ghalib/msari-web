@@ -490,7 +490,7 @@ class ApiClient {
 
   // ─── Authentication API ─────────────────────────────────────────────────────
 
-  public async loginUser(email: string, passwordHash: string): Promise<ApiResponse<{
+  public async loginUser(email: string, password: string): Promise<ApiResponse<{
     id: string;
     email: string;
     name: string;
@@ -506,7 +506,7 @@ class ApiClient {
       email: string;
       token: string;
       refreshToken?: string;
-    }>('/auth/login', { email, password: passwordHash }, undefined, 15000);
+    }>('/auth/login', { email, password }, undefined, 15000);
 
     if (!res.success || !res.data) {
       return { success: false, error: res.error };

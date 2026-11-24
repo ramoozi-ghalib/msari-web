@@ -88,9 +88,7 @@ function StepBar({ step }: { step: Step }) {
 }
 
 interface BookingPageProps {
-  city: string;
   hotel: Hotel;
-  hotelId: string;
   roomId?: string;
   roomName?: string;
   checkIn: string;
@@ -106,9 +104,7 @@ interface BookingPageProps {
 }
 
 export default function BookingPage({
-  city,
   hotel,
-  hotelId,
   roomId,
   roomName,
   checkIn,
@@ -161,7 +157,7 @@ export default function BookingPage({
         setPricePreview(result as PricePreview);
         setBookingError(null);
       } else if (result && 'code' in result && result.code === 'VERIFICATION_REQUIRED') {
-        window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        window.location.href = `/${locale}/verify-account?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
         return;
       } else {
         const msg =
@@ -213,7 +209,7 @@ export default function BookingPage({
       setConfirmedPaymentMethod(paymentData.paymentMethod);
       setStep('confirm');
     } else if (result.error?.code === 'VERIFICATION_REQUIRED') {
-      window.location.href = `/${locale}/verify-account?autoSend=1&redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+      window.location.href = `/${locale}/verify-account?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
       return;
     } else {
       setBookingError(result.error.message);

@@ -1,34 +1,11 @@
 'use server';
 
+import type { Session } from 'next-auth';
+import { auth } from '@/auth';
 import { RegisterSchema } from '@/schemas/auth.schema';
-
-import { apiClient } from '@/lib/api-client';
-
-/**
- * Normalize user-entered phone to E.164 (UI-layer only).
- *
- * Backend `POST /v1/auth/register` passes phoneNumber straight to
- * `admin.auth().createUser`, which enforces E.164 strictly. This helper only
- * reshapes input — no backend/schema/rules change:
- * - strips spaces, dashes, dots, parentheses
- * - '00...' (IDD prefix) -> '+...'
- * - bare '967XXXXXXXXX' -> '+967XXXXXXXXX'
- * - bare Yemeni national '7XXXXXXXX' (9 digits) -> '+9677XXXXXXXX'
- *   (Yemen default matches site placeholder +967, WhatsApp 967, YER default)
- * - leading '+' kept as-is
- * Returns null when unparseable; caller fails closed with a clear message.
- */
-function normalizePhoneE164(raw: string | undefined): string | null {
-  if (!raw) return null;
-  let p = raw.trim().replace(/[\s\-.()]/g, '');
-  if (!p) return null;
-  if (p.startsWith('00')) p = '+' + p.slice(2);
-  if (p.startsWith('+')) return /^\+\d{7,15}$/.test(p) ? p : null;
-  const digits = p.replace(/\D/g, '');
-  if (/^967\d{9}$/.test(digits)) return '+' + digits;
-  if (/^7\d{8}$/.test(digits)) return '+967' + digits;
-  return null;
-}
+import { apiClient, type ApiResponse } from '@/lib/api-client';
+import { admin } from '@/lib/firebase-admin';
+import { normalizeArabicDigits, normalizePhoneE164 } from '@/lib/phone';
 
 export async function registerUser(rawData: unknown) {
   const parsed = RegisterSchema.safeParse(rawData);
@@ -109,11 +86,6 @@ export async function registerUser(rawData: unknown) {
     };
   }
 }
-
-import type { Session } from 'next-auth';
-import { auth, signOut } from '@/auth';
-import { admin } from '@/lib/firebase-admin';
-import type { ApiResponse } from '@/lib/api-client';
 
 function isAuthFailure<T>(res: ApiResponse<T>): boolean {
   const code = res.error?.code || '';
@@ -328,9 +300,7 @@ export async function verifyEmailVerificationOtp(rawCode: string, rawPhone?: str
       };
     }
 > {
-  const code = String(rawCode || '')
-    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
-    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+  const code = normalizeArabicDigits(String(rawCode || ''))
     .replace(/\s+/g, '')
     .trim();
 
@@ -378,15 +348,6 @@ export async function verifyEmailVerificationOtp(rawCode: string, rawPhone?: str
     );
 
     if (res.success && res.data?.verified) {
-      // Best-effort proactive token refresh so Firebase picks up newly stamped custom claims.
-      if (session.user.refreshToken) {
-        try {
-          await apiClient.refreshFirebaseToken(session.user.refreshToken);
-        } catch {
-          // Non-fatal: NextAuth `update({ refreshVerification: true })` will also refresh.
-        }
-      }
-
       return {
         success: true as const,
         data: {
@@ -525,18 +486,6 @@ export async function checkAccountVerificationStatus(): Promise<
     phone: session.user.phone || '',
     pendingPhone: session.user.pendingPhone || '',
   };
-}
-
-export async function getProfile() {
-  const session = await auth();
-  if (!session?.user) {
-    return { success: false as const, error: 'غير مصرح' };
-  }
-  return { success: true as const, data: session.user };
-}
-
-export async function logoutUser() {
-  await signOut({ redirectTo: '/' });
 }
 
 export async function requestPasswordReset(rawEmail: string) {

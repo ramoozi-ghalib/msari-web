@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import { ShieldCheck, Hotel, Sparkles, MapPin, CheckCircle2 } from 'lucide-react';
 

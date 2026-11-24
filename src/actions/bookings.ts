@@ -1,35 +1,23 @@
 'use server';
 
 /**
- * actions/bookings.ts — Server Actions للحجوزات
+ * actions/bookings.ts — Server Actions للحجوزات (API-First)
  *
  * Security model:
- *  - adminGuard() يجب أن يكون أول سطر في كل mutation للأدمن
- *  - totalPrice و nights و code لا تُقبل من الـ Client أبداً — تُحسب هنا
- *  - الـ Transaction تضمن عدم التعارض في التواريخ (no dirty reads)
- *
- * Fixes applied:
- *  - H-1: Math.random() → crypto.getRandomValues() (Cryptographically Secure)
- *  - H-5: updateBookingStatus مُغلَّف بـ $transaction لمنع Race Condition
- *  - M-7: getMyBookings يدعم pagination بدلاً من take: 50 الثابت
+ *  - totalPrice و nights و code لا تُقبل من الـ Client أبداً — تُحسب على الخادم عبر الـ API
+ *  - Idempotency lock (Redis SETNX) و rate limiting لمنع الحجوزات المكررة
  */
 
-import { z } from 'zod';
-import { revalidatePath } from 'next/cache';
-
 import crypto from 'crypto';
+import { z } from 'zod';
+import { Redis } from '@upstash/redis';
+
 import { auth } from '@/auth';
-import { apiClient, type ApiResponse } from '@/lib/api-client';
-import { db, admin, storage } from '@/lib/firebase-admin';
-import {
-  adminGuard,
-  handleActionSafe,
-  SERVER_ERROR_RESPONSE,
-} from '@/lib/action-guard';
-import { Policies } from '@/lib/policies';
+import { apiClient, generateSlugFromHotel, type ApiResponse } from '@/lib/api-client';
+import { SERVER_ERROR_RESPONSE } from '@/lib/action-guard';
 import { clampLimit } from '@/lib/action-utils';
 import { bookingLimiter, RATE_LIMIT_RESPONSE } from '@/lib/rate-limiter';
-import { validateReceiptDataUrl, RECEIPT_MAX_BASE64_CHARS } from '@/lib/receipt-validation';
+import { RECEIPT_MAX_BASE64_CHARS } from '@/lib/receipt-validation';
 
 // Feature flag for API-first booking migration
 // Defaults to true (API-first). Set to 'false' to disable.
@@ -41,21 +29,6 @@ const USE_BOOKING_API = process.env.USE_BOOKING_API !== 'false';
 
 /** الحد الأقصى لليالي المسموح بها في حجز واحد */
 const MAX_NIGHTS = 90;
-
-/** حالات الحجز — مطابقة لنموذج التطبيق التشغيلي في Firestore */
-type BookingStatusKey = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
-
-/**
- * الانتقالات المسموح بها بين حالات الحجز.
- * لا يمكن الانتقال إلا عبر هذه الخريطة — أي حالة غير مدرجة هي خطأ.
- */
-const ALLOWED_TRANSITIONS: Readonly<
-  Partial<Record<BookingStatusKey, BookingStatusKey[]>>
-> = {
-  PENDING:   ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['COMPLETED', 'CANCELLED', 'NO_SHOW'],
-  // CANCELLED, COMPLETED, NO_SHOW → terminal, no transitions allowed
-} as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ZOD SCHEMAS
@@ -159,10 +132,8 @@ async function callWithFreshToken<T>(
 // USE CASE A: createBooking
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Redis } from '@upstash/redis';
-
 const getRedisClient = () => {
-  try { return Redis.fromEnv(); } catch (err) { return null; }
+  try { return Redis.fromEnv(); } catch { return null; }
 };
 
 /**
@@ -420,39 +391,6 @@ export async function previewBookingPrice(rawData: unknown) {
 // USE CASE E: getMyBookings
 // ─────────────────────────────────────────────────────────────────────────────
 
-function generateSlugFromHotel(id: string, name: any): string {
-  const idMap: Record<string, string> = {
-    'h_movenpick': 'movenpick-hotel-sanaa',
-    'h_hilton': 'hilton-sanaa',
-    'h_sheraton': 'sheraton-sanaa-resort',
-    'h_qamar': 'qamar-aden-hotel',
-    'h_saif': 'saif-aden-hotel',
-    'h_seyun': 'seyun-almukalla-hotel',
-    'h_eastern': 'eastern-taiz-hotel',
-    'h_seashore': 'hudaydah-seashore-hotel',
-  };
-
-  if (!id) return '';
-  if (idMap[id]) return idMap[id];
-  if (idMap[id.toLowerCase()]) return idMap[id.toLowerCase()];
-  
-  if (id.includes('-')) return id;
-
-  const rawStr = typeof name === 'object' && name !== null 
-    ? (name.en || name.ar || id) 
-    : String(name || id);
-
-  const slug = rawStr
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '');
-
-  if (!slug || slug === '-') {
-    return id;
-  }
-  return slug;
-}
-
 /**
  * [FIX M-7] يجلب حجوزات المستخدم الحالي عبر API مع دعم cursor pagination.
  * API-First only — لا يوجد fallback لـ Firestore.
@@ -516,7 +454,14 @@ export async function getMyBookings(rawParams: unknown = {}) {
             id: b.hotel?.id || '',
             nameAr: typeof b.hotel?.name === 'object' ? (b.hotel.name.ar || b.hotel.name.en || 'فندق') : (b.hotel?.name || 'فندق'),
             nameEn: typeof b.hotel?.name === 'object' ? (b.hotel.name.en || b.hotel.name.ar || 'Hotel') : (b.hotel?.name || 'Hotel'),
-            slug: generateSlugFromHotel(b.hotel?.id, typeof b.hotel?.name === 'object' ? b.hotel.name.en : b.hotel?.name),
+            slug: b.hotel?.id
+              ? generateSlugFromHotel(
+                  b.hotel.id,
+                  typeof b.hotel?.name === 'object'
+                    ? (b.hotel.name.en || b.hotel.name.ar || '')
+                    : String(b.hotel?.name || '')
+                )
+              : '',
             thumbnailUrl: b.hotel?.imageUrl || null,
           },
           room: {

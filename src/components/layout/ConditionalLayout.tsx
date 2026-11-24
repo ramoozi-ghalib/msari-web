@@ -25,18 +25,16 @@ export default function ConditionalLayout({ children, header, footer, whatsapp }
     return <>{children}</>;
   }
 
-  // Bottom tab bar replaces most mobile navigation, so it's hidden on admin and auth pages
-  const showBottomNav = !isAdminPage;
-
+  // Bottom tab bar replaces most mobile navigation on customer pages
   return (
     <>
       {header}
-      <main className={showBottomNav ? 'min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0 w-full max-w-full overflow-x-clip' : 'min-h-screen w-full max-w-full overflow-x-clip'}>
+      <main className="min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0 w-full max-w-full overflow-x-clip">
         {children}
       </main>
       {footer}
       {whatsapp}
-      {showBottomNav && <BottomNav />}
+      <BottomNav />
     </>
   );
 }
