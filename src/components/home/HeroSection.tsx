@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { 
   Hotel, Plane, Car, Search, MapPin, Calendar, Users, Building2, ChevronDown, BedDouble
@@ -101,11 +102,18 @@ export default function HeroSection({ hero }: HeroSectionProps) {
       {/* ── 1. Grand Atmospheric Hero Section ── */}
       <section className="relative overflow-hidden w-full text-white min-h-[360px] sm:min-h-[500px] lg:min-h-[560px] pt-24 sm:pt-36 lg:pt-40 pb-36 sm:pb-44 lg:pb-48 flex flex-col items-center justify-center">
         
-        {/* Panoramic 5-Star Luxury Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
-          style={{ backgroundImage: `url('${bgImage}')` }}
-        >
+        {/* Panoramic 5-Star Luxury Background (optimized LCP image) */}
+        <div className="absolute inset-0 overflow-hidden bg-[#120336]">
+          <Image
+            src={bgImage}
+            alt={heroTitle}
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            quality={75}
+            className="object-cover object-center"
+          />
           {/* Royal Ambient Gradient Overlay */}
           <div 
             className="absolute inset-0"

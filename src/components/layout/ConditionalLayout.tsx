@@ -29,7 +29,7 @@ export default function ConditionalLayout({ children, header, footer, whatsapp }
   return (
     <>
       {header}
-      <main className={showBottomNav ? 'min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0 w-full max-w-full overflow-x-hidden' : 'min-h-screen w-full max-w-full overflow-x-hidden'}>
+      <main className={showBottomNav ? 'min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0 w-full max-w-full overflow-x-clip' : 'min-h-screen w-full max-w-full overflow-x-clip'}>
         {children}
       </main>
       {footer}

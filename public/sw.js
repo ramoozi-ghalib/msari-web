@@ -1,4 +1,4 @@
-const CACHE_NAME = 'msari-pwa-v1';
+const CACHE_NAME = 'msari-pwa-v2';
 
 const PRECACHE_URLS = [
   '/offline.html',

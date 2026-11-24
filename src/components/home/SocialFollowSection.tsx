@@ -1,5 +1,3 @@
-'use client';
-
 import { whatsappLink } from '@/lib/site-config';
 import type { HomepageContentData } from '@/services/cms';
 

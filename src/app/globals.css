@@ -75,7 +75,7 @@ html {
      to the top — reported as "page opens from bottom then yanks up".
      Smooth scrolling stays available opt-in via Tailwind `scroll-smooth`
      on specific scrollers (e.g. the hotel rail). */
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
   width: 100%;
   -webkit-tap-highlight-color: transparent;
@@ -89,7 +89,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
   width: 100%;
   position: relative;
@@ -507,8 +507,7 @@ a, button, input, select, textarea, [role="button"] {
 }
 
 @media (display-mode: standalone) {
-  html, body {
-    overscroll-behavior-y: none;
+  html {
     overscroll-behavior-x: none;
   }
 

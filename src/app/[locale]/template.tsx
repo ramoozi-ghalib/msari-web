@@ -21,11 +21,22 @@ export default function LocaleTemplate({
   return <Inner key={pathname}>{children}</Inner>;
 }
 
+// Tracks whether initial SSR hydration has completed.
+// On the first load (SSR + initial hydration), content stays immediately visible
+// (`ready = true`) so First Contentful Paint and LCP are never blocked behind
+// `opacity-0` while client JS downloads and hydrates on mobile networks.
+// On subsequent client-side navigations, `key={pathname}` remounts <Inner/>
+// with `ready = false` so scroll locks to top pre-paint and plays the pop-in.
+let hasHydratedOnce = false;
+
 function Inner({ children }: { children: React.ReactNode }) {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => !hasHydratedOnce);
 
   // Runs synchronously BEFORE first paint of every fresh mount.
   useLayoutEffect(() => {
+    const isInitialLoad = !hasHydratedOnce;
+    hasHydratedOnce = true;
+
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.has('_rsc')) {
@@ -43,9 +54,14 @@ function Inner({ children }: { children: React.ReactNode }) {
       if ('scrollRestoration' in window.history) {
         window.history.scrollRestoration = 'manual';
       }
-      window.scrollTo(0, 0);
+      if (!isInitialLoad) {
+        window.scrollTo(0, 0);
+      }
     } catch {
       // Never break rendering over scrolling.
+    }
+    if (isInitialLoad) {
+      return;
     }
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
