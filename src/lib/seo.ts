@@ -6,6 +6,7 @@ export const SEO_VERIFICATIONS = {
   other: {
     'msvalidate.01': 'FA9C2AB7AE1B1D81344C938B8A9FFC29',
     'yandex-verification': 'a2836217dc31fa3a',
+    'facebook-domain-verification': 'al1wn9apotq14tjmmsq2hjkxdn5fxq',
   },
 };
 
