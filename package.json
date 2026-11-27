@@ -43,6 +43,6 @@
     "typescript": "^5"
   },
   "overrides": {
-    "websocket-driver": ">=0.8.0"
+    "websocket-driver": ">=0.8.1"
   }
 }
