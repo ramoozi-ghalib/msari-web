@@ -7,9 +7,9 @@ function triggerRevalidation(tag?: string, path?: string) {
   if (tag === 'all') {
     const allTags = ['cms:pages', 'cms:destinations', 'cms:homepage', 'cms:settings', 'cms:blog', 'cities', 'offers', 'api:catalog'];
     for (const t of allTags) {
-      try { (revalidateTag as any)(t); } catch (_) {}
+      try { (revalidateTag as any)(t); } catch {}
     }
-    try { (revalidatePath as any)('/', 'layout'); } catch (_) {}
+    try { (revalidatePath as any)('/', 'layout'); } catch {}
     return { revalidated: true, all: true, now: Date.now() };
   }
 

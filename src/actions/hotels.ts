@@ -4,7 +4,7 @@
  * actions/hotels.ts — Server Actions لجلب بيانات الفنادق من Firestore و Cloud Functions.
  */
 
-import { apiClient, mapApiHotelToHotel, mapApiRoomToRoom, generateSlugFromHotel } from '@/lib/api-client';
+import { mapApiHotelToHotel, mapApiRoomToRoom, generateSlugFromHotel } from '@/lib/api-client';
 import type { Hotel } from '@/types';
 import { clampLimit } from '@/lib/action-utils';
 import type { DocumentData, QueryDocumentSnapshot } from 'firebase-admin/firestore';
@@ -17,11 +17,7 @@ import { getPhaseMigrationMode, getCanaryRatio, inCanaryBucket } from '@/lib/api
 import { safeLog } from '@/lib/api-migration/log';
 import { diffJson } from '@/lib/api-migration/shadow';
 import {
-  apiFetchAllHotels,
-  apiFetchHotelBySlug,
-  apiFetchHotelById,
   apiFetchRooms,
-  toWebsiteHotel,
   applyWebsiteListSemantics,
 } from '@/lib/api-migration/hotels-api';
 
@@ -328,7 +324,7 @@ export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promi
             minRoomPrice = Math.min(...prices);
           }
         }
-      } catch (e) {
+      } catch {
         // ignore fallback
       }
 
