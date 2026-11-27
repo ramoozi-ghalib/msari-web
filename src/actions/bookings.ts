@@ -350,13 +350,26 @@ export async function previewBookingPrice(rawData: unknown) {
           // USD is the display SoT: formatPrice(usdAmount) converts per user
           // currency client-side. totalInSelectedCurrency is backend-default
           // SAR here (no currency sent) and must NOT be displayed as-is.
+          const finalTotal = apiRes.data.totalUsd;
+          const originalTotal =
+            typeof apiRes.data.originalTotalUsd === 'number' && apiRes.data.originalTotalUsd > finalTotal
+              ? apiRes.data.originalTotalUsd
+              : finalTotal;
+          const discountPercent =
+            typeof apiRes.data.discountPercent === 'number' && apiRes.data.discountPercent > 0
+              ? apiRes.data.discountPercent
+              : 0;
+          const discountUsd = Math.max(0, Math.round((originalTotal - finalTotal) * 100) / 100);
           return {
             success: true as const,
             pricePerNight: apiRes.data.pricePerNightUsd,
+            originalPricePerNight: apiRes.data.originalPricePerNightUsd ?? apiRes.data.pricePerNightUsd,
             nights: apiRes.data.nights,
-            baseTotal: apiRes.data.totalUsd,
-            discountAmount: 0,
-            finalTotal: apiRes.data.totalUsd,
+            baseTotal: originalTotal,
+            discountPercent,
+            discountAmount: discountUsd,
+            discountSource: apiRes.data.discountSource ?? null,
+            finalTotal,
             currency: 'USD',
           };
         }

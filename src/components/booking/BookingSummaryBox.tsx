@@ -1,5 +1,6 @@
 import { BedDouble, Calendar, Users, Zap, Star, MapPin, Loader2 } from 'lucide-react';
 import type { Hotel } from '@/types';
+import { formatDiscountPercent } from '@/lib/discounts';
 import { useCurrency } from '@/hooks/use-currency';
 
 interface BookingSummaryBoxProps {
@@ -11,8 +12,10 @@ interface BookingSummaryBoxProps {
   nights:          number;
   // [FIX M-8] السعر يأتي من server action — لا حساب client-side
   serverTotal?:    number; // undefined = جارٍ التحميل
+  originalTotal?:  number; // الإجمالي الأصلي قبل الخصم بالـ USD
   serverCurrency?: string;
-  discountAmount?: number; // نسبة الخصم بالـ % إذا وُجدت
+  discountPercent?: number; // نسبة الخصم بالـ %
+  discountAmount?: number; // قيمة الخصم بالـ USD
 }
 
 export default function BookingSummaryBox({
@@ -23,7 +26,8 @@ export default function BookingSummaryBox({
   guests,
   nights,
   serverTotal,
-  serverCurrency = 'USD',
+  originalTotal,
+  discountPercent = 0,
   discountAmount = 0,
 }: BookingSummaryBoxProps) {
   const isLoadingPrice = serverTotal === undefined;
@@ -100,10 +104,17 @@ export default function BookingSummaryBox({
             </div>
           ) : (
             <>
-              {discountAmount > 0 && (
-                <div className="flex justify-between text-green-600 text-xs">
-                  <span>خصم {discountAmount}% مُطبَّق</span>
-                </div>
+              {discountPercent > 0 && originalTotal !== undefined && serverTotal !== undefined && originalTotal > serverTotal && (
+                <>
+                  <div className="flex justify-between text-neutral-500 text-xs">
+                    <span>السعر الأصلي</span>
+                    <span className="line-through font-semibold">{formatPrice(originalTotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-green-600 text-xs font-bold">
+                    <span>خصم {formatDiscountPercent(discountPercent)}%</span>
+                    <span>− {formatPrice(discountAmount > 0 ? discountAmount : originalTotal - serverTotal)}</span>
+                  </div>
+                </>
               )}
               <div className="flex justify-between font-black text-base pt-2 border-t border-neutral-100">
                 <span className="text-neutral-900">الإجمالي</span>

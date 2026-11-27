@@ -20,7 +20,8 @@ export interface Hotel {
   stars: 1 | 2 | 3 | 4 | 5;
   rating: number;
   reviewCount: number;
-  priceFrom: number; // in USD
+  priceFrom: number; // in USD (effective price after discount if active)
+  originalPriceFrom?: number; // in USD (base price before discount when discounted)
   currency: Currency;
   images: string[];
   thumbnail: string;
@@ -49,6 +50,9 @@ export interface Room {
   numberOfRooms?: number;
   area?: number | string;
   pricePerNight: number;
+  originalPricePerNight?: number;
+  discountPercent?: number;
+  discountSource?: 'hotel' | 'global';
   images: string[];
   amenities: Amenity[];
   isAvailable: boolean;
@@ -69,6 +73,7 @@ export interface Discount {
   validFrom: string;
   validTo: string;
   code?: string;
+  source?: 'hotel' | 'global';
 }
 
 // =================== CITY ===================

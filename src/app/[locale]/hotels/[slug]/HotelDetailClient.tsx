@@ -12,6 +12,7 @@ import {
   Navigation
 } from 'lucide-react';
 import type { Hotel } from '@/types';
+import { formatDiscountPercent } from '@/lib/discounts';
 import { useCurrency } from '@/hooks/use-currency';
 import HotelCard from '@/components/ui/HotelCard';
 
@@ -325,7 +326,18 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
 
           {hotel.rooms && hotel.rooms.length > 0 ? (
             <div className="space-y-4">
-              {hotel.rooms.map(room => (
+              {hotel.rooms.map(room => {
+                const roomDiscountPct =
+                  room.discountPercent && room.discountPercent > 0
+                    ? room.discountPercent
+                    : (room.originalPricePerNight && room.originalPricePerNight > room.pricePerNight && hotel.discount
+                        ? hotel.discount.percentage
+                        : 0);
+                const hasRoomDiscount =
+                  roomDiscountPct > 0 &&
+                  Boolean(room.originalPricePerNight && room.originalPricePerNight > room.pricePerNight);
+
+                return (
                 <div
                   key={room.id}
                   className="rounded-2xl border border-neutral-200 overflow-hidden flex flex-col sm:flex-row bg-white hover:border-[#23096e]/30 transition-colors"
@@ -348,6 +360,13 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#23096e]/5 to-[#3A1C8F]/10">
                         <BedDouble size={36} className="text-[#23096e]/30" />
                       </div>
+                    )}
+                    {hasRoomDiscount && (
+                      <span className="absolute top-2.5 start-2.5 z-10 inline-flex items-center px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[11px] font-black shadow-md">
+                        {currentLocale === 'en'
+                          ? `${formatDiscountPercent(roomDiscountPct)}% OFF`
+                          : `خصم ${formatDiscountPercent(roomDiscountPct)}%`}
+                      </span>
                     )}
                   </Link>
 
@@ -381,9 +400,16 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                     <div className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-3">
                       <div>
                         <span className="text-[10px] text-neutral-400 block font-medium">السعر / ليلة</span>
-                        <span className="text-xl sm:text-2xl font-black text-[#FF3B30]">
-                          {formatPrice(room.pricePerNight)}
-                        </span>
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-xl sm:text-2xl font-black text-[#FF3B30]">
+                            {formatPrice(room.pricePerNight)}
+                          </span>
+                          {hasRoomDiscount && room.originalPricePerNight && (
+                            <span className="text-xs sm:text-sm text-neutral-400 line-through font-semibold">
+                              {formatPrice(room.originalPricePerNight)}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Room Booking Button */}
@@ -396,7 +422,8 @@ export default function HotelDetailClient({ hotel, nearbyHotels = [] }: Props) {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-10 bg-neutral-50 rounded-xl border border-neutral-100">

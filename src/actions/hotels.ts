@@ -12,6 +12,7 @@ import { db } from '@/lib/firebase-admin';
 import { CityService } from '@/services/city.service';
 import { cache } from 'react';
 import { filterHotels, sortHotels, mapAmenitiesToDTO } from '@/lib/hotel-utils';
+import { applyPercentageDiscountUsd, resolveEffectiveDiscount } from '@/lib/discounts';
 import { getPhaseMigrationMode, getCanaryRatio, inCanaryBucket } from '@/lib/api-migration/flags';
 import { safeLog } from '@/lib/api-migration/log';
 import { diffJson } from '@/lib/api-migration/shadow';
@@ -59,6 +60,33 @@ const getApiHotelListCached = cache(async () => {
   return apiFetchAllHotels();
 });
 
+const getGlobalDiscountDirectCached = cache(async (): Promise<Record<string, unknown> | null> => {
+  try {
+    const snap = await db.collection('app_settings').doc('discounts').get();
+    return snap.exists ? ((snap.data() as Record<string, unknown>) ?? null) : null;
+  } catch {
+    return null;
+  }
+});
+
+function buildDirectHotelDiscountFields(
+  hotelDiscount: unknown,
+  globalDiscount: Record<string, unknown> | null,
+  basePrice: number
+) {
+  const eff = resolveEffectiveDiscount(hotelDiscount, globalDiscount);
+  const discountedDisplayPrice =
+    eff.percent > 0 && basePrice > 0
+      ? applyPercentageDiscountUsd(basePrice, eff.percent)
+      : null;
+  return {
+    discount: eff.percent > 0 ? { enabled: true, percent: eff.percent, startAt: eff.startAt, endAt: eff.endAt } : null,
+    discountPercent: eff.percent,
+    discountSource: eff.source,
+    discountedDisplayPrice,
+  };
+}
+
 export type GetLocalHotelsParams = {
   limit?:    unknown;
   city?:     string;   // nameAr للمدينة
@@ -84,7 +112,10 @@ export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promi
   const skip      = (page - 1) * pageSize;
 
   try {
-    const apiCities = await CityService.getActiveCities(100);
+    const [apiCities, globalDiscount] = await Promise.all([
+      CityService.getActiveCities(100),
+      getGlobalDiscountDirectCached(),
+    ]);
 
     // جلب الوثائق المنشورة من Firestore دون استبعاد الوثائق التي تفتقر لحقل isDeleted: false
     const snapshot = await db.collection("hotels")
@@ -257,6 +288,7 @@ export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promi
             }),
             stars: starsCount,
             price: finalMinPrice,
+            ...buildDirectHotelDiscountFields(data.discount, globalDiscount, finalMinPrice),
             isSpecial: data.isSpecial || false,
             isPublished: data.isPublished !== false,
             mapLink: data.mapLink || data.mapUrl || '',
@@ -328,6 +360,7 @@ export async function getLocalHotelsDirect(params?: GetLocalHotelsParams): Promi
         }),
         stars: starsCount,
         price: finalMinPrice,
+        ...buildDirectHotelDiscountFields(data.discount, globalDiscount, finalMinPrice),
         isSpecial: data.isSpecial || false,
         isPublished: data.isPublished !== false,
         mapLink: data.mapLink || data.mapUrl || '',
@@ -456,7 +489,10 @@ export async function getHotelsByIdsDirect(ids: string[]): Promise<Hotel[]> {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (uniqueIds.length === 0) return [];
   try {
-    const apiCities = await CityService.getActiveCities(100);
+    const [apiCities, globalDiscount] = await Promise.all([
+      CityService.getActiveCities(100),
+      getGlobalDiscountDirectCached(),
+    ]);
     const results = await Promise.all(
       uniqueIds.map(async (id) => {
         try {
@@ -509,6 +545,7 @@ export async function getHotelsByIdsDirect(ids: string[]): Promise<Hotel[]> {
             }),
             stars: starsCount,
             price: finalMinPrice,
+            ...buildDirectHotelDiscountFields(data.discount, globalDiscount, finalMinPrice),
             isSpecial: data.isSpecial || false,
             isPublished: data.isPublished !== false,
             mapLink: data.mapLink || data.mapUrl || '',
@@ -631,7 +668,11 @@ export const getHotelBySlugDirect = async (slug: string): Promise<Hotel | null> 
       return null;
     }
 
-    const apiCities = await CityService.getActiveCities(100);
+    const [apiCities, globalDiscount] = await Promise.all([
+      CityService.getActiveCities(100),
+      getGlobalDiscountDirectCached(),
+    ]);
+    const effDiscount = resolveEffectiveDiscount(foundDoc.discount, globalDiscount);
 
     const rooms: any[] = [];
     try {
@@ -644,12 +685,20 @@ export const getHotelBySlugDirect = async (slug: string): Promise<Hotel | null> 
       roomsSnapshot.docs.filter(rdoc => rdoc.data().isDeleted !== true).forEach(rdoc => {
         const rdata = rdoc.data();
         const rawFeatures = rdata.features || rdata.amenities || [];
+        const baseRoomPrice = Number(rdata.price || rdata.pricePerNight || 0);
+        const finalRoomPrice = effDiscount.percent > 0 && baseRoomPrice > 0
+          ? applyPercentageDiscountUsd(baseRoomPrice, effDiscount.percent)
+          : baseRoomPrice;
         rooms.push(mapApiRoomToRoom({
           id: rdoc.id,
           hotelId: foundDoc.id,
           name: rdata.name || { ar: '', en: '' },
           description: rdata.description || { ar: '', en: '' },
-          price: Number(rdata.price || rdata.pricePerNight || 0),
+          price: baseRoomPrice,
+          originalPriceUsd: baseRoomPrice,
+          priceUsd: finalRoomPrice,
+          discountPercent: effDiscount.percent,
+          discountSource: effDiscount.source,
           numberOfPersons: Number(rdata.numberOfPersons || rdata.capacity || rdata.maxGuests || 2),
           numberOfBeds: Number(rdata.numberOfBeds || 1),
           numberOfBathrooms: Number(rdata.numberOfBathrooms || 1),
@@ -684,6 +733,7 @@ export const getHotelBySlugDirect = async (slug: string): Promise<Hotel | null> 
       }),
       stars: Math.max(1, Math.min(5, Number(foundDoc.stars) || 3)),
       price: Number(foundDoc.price || foundDoc.priceFrom || 0),
+      ...buildDirectHotelDiscountFields(foundDoc.discount, globalDiscount, Number(foundDoc.price || foundDoc.priceFrom || 0)),
       isSpecial: foundDoc.isSpecial || false,
       isPublished: foundDoc.isPublished !== false,
       mapLink: foundDoc.mapLink || foundDoc.mapUrl || '',

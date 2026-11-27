@@ -4,11 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useParams } from 'next/navigation';
-import { 
+import {
   MapPin, Wifi, Coffee, Car, Waves, Heart, Shield, Tv, Dumbbell, Bell, Check,
   ShoppingCart, Shirt, ArrowUpDown, Presentation, Home, Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDiscountPercent } from '@/lib/discounts';
 import type { Hotel } from '@/types';
 import { useCurrency } from '@/hooks/use-currency';
 
@@ -100,17 +101,22 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
   // Get top 4 amenities
   const topAmenities = (hotel.amenities || []).slice(0, 4);
 
-  // Calculate base price
+  // Calculate effective & original price
   const roomPrices = (hotel.rooms || []).map(r => r.pricePerNight).filter(p => typeof p === 'number' && p > 0);
   const basePrice = (hotel.priceFrom && hotel.priceFrom > 0)
     ? hotel.priceFrom
     : (roomPrices.length > 0 ? Math.min(...roomPrices) : 35);
+  const discountPct = hotel.discount && hotel.discount.percentage > 0 ? hotel.discount.percentage : 0;
+  const hasDiscount = discountPct > 0;
+  const originalPrice = hasDiscount && hotel.originalPriceFrom && hotel.originalPriceFrom > basePrice
+    ? hotel.originalPriceFrom
+    : null;
 
   const starsCount = Math.min(Math.max(Number(hotel.stars) || 0, 0), 5);
 
   return (
-    <Link 
-      href={cardHref} 
+    <Link
+      href={cardHref}
       className={cn(
         'group block bg-white rounded-2xl overflow-hidden border border-neutral-200/90 shadow-sm hover:shadow-xl hover:border-[#23096E]/30 transition-all duration-300 ease-out flex flex-col justify-between active:scale-[0.98] cursor-pointer [@media(hover:hover)]:hover:-translate-y-1',
         className
@@ -127,20 +133,20 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
                   className="absolute inset-0 bg-gradient-to-r from-[#ede9f5] via-[#f7f5fc] to-[#ede9f5] animate-pulse"
                 />
               )}
-            <Image
-              src={hotel.thumbnail}
-              alt={hotel.name}
-              fill
-              loading="lazy"
-              onLoad={() => setImgLoaded(true)}
-              onError={() => setImgError(true)}
-              className={cn(
-                'object-cover group-hover:scale-105 transition-[opacity,transform] duration-500 ease-out',
-                imgLoaded ? 'opacity-100' : 'opacity-0'
-              )}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 384px"
-              unoptimized={/firebasestorage|storage\.googleapis/.test(hotel.thumbnail || '')}
-            />
+              <Image
+                src={hotel.thumbnail}
+                alt={hotel.name}
+                fill
+                loading="lazy"
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+                className={cn(
+                  'object-cover group-hover:scale-105 transition-[opacity,transform] duration-500 ease-out',
+                  imgLoaded ? 'opacity-100' : 'opacity-0'
+                )}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 384px"
+                unoptimized={/firebasestorage|storage\.googleapis/.test(hotel.thumbnail || '')}
+              />
             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#23096E]/10 to-[#FF3B30]/10 flex items-center justify-center">
@@ -150,6 +156,15 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
 
           {/* Subtle bottom shadow overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+          {/* Discount Badge */}
+          {hasDiscount && (
+            <span className="absolute top-2.5 start-2.5 z-10 inline-flex items-center px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[11px] font-black shadow-md">
+              {currentLocale === 'en'
+                ? `${formatDiscountPercent(discountPct)}% OFF`
+                : `خصم ${formatDiscountPercent(discountPct)}%`}
+            </span>
+          )}
 
           {/* Wishlist Button */}
           <button
@@ -213,6 +228,11 @@ export default function HotelCard({ hotel, className }: HotelCardProps) {
         {/* Price in official red */}
         <div className="flex flex-col">
           <span className="text-[10px] text-neutral-400 font-bold leading-none mb-0.5">تبدأ من</span>
+          {originalPrice !== null && (
+            <span className="text-[11px] text-neutral-400 line-through font-semibold leading-tight">
+              {formatPrice(originalPrice)}
+            </span>
+          )}
           <div className="flex items-baseline gap-1">
             <span className="text-base sm:text-lg font-black text-[#FF3B30]">
               {formatPrice(basePrice)}

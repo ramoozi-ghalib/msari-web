@@ -11,6 +11,7 @@ import 'server-only';
 
 import type { Hotel, Room, City, Amenity } from '@/types';
 import { normalizeAddress } from '@/lib/utils';
+import { applyPercentageDiscountUsd, buildWebsiteDiscount } from '@/lib/discounts';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -32,10 +33,15 @@ export interface ApiBookingPreview {
   roomId: string;
   nights: number;
   totalUsd: number;
+  originalTotalUsd?: number;
   totalInSelectedCurrency: number;
   currency: string;
   displayPrice: number;
   pricePerNightUsd: number;
+  originalPricePerNightUsd?: number;
+  discountPercent?: number;
+  discountAmount?: number;
+  discountSource?: 'hotel' | 'global' | null;
   soldOut: boolean;
   activeOverlaps: number;
   totalRooms: number;
@@ -143,6 +149,16 @@ export interface ApiHotel {
   policies: string[];
   stars: number;
   price: number;
+  discount?: {
+    enabled?: boolean;
+    percent?: number;
+    excludeGlobal?: boolean;
+    startAt?: string | null;
+    endAt?: string | null;
+  } | null;
+  discountPercent?: number;
+  discountSource?: 'hotel' | 'global' | null;
+  discountedDisplayPrice?: number | null;
   isSpecial: boolean;
   isPublished: boolean;
   mapLink: string;
@@ -164,6 +180,10 @@ export interface ApiRoom {
   numberOfBathrooms: number;
   numberOfRooms: number;
   price: number;
+  priceUsd?: number;
+  originalPriceUsd?: number;
+  discountPercent?: number;
+  discountSource?: 'hotel' | 'global' | null;
   isPublished: boolean;
   updatedAt: string;
   isDeleted: boolean;
@@ -238,6 +258,20 @@ export function mapApiRoomToRoom(api: any): Room {
   const rawFeatures = Array.isArray(api.features) ? api.features : (Array.isArray(api.amenities) ? api.amenities : []);
   const amenities = rawFeatures.map((f: any) => mapApiAmenityToAmenity(f, 'room'));
 
+  const discountPercent = typeof api.discountPercent === 'number' && api.discountPercent > 0
+    ? Math.min(90, Math.round(api.discountPercent * 100) / 100)
+    : 0;
+  const discountSource = api.discountSource === 'hotel' || api.discountSource === 'global'
+    ? api.discountSource
+    : undefined;
+  const rawBasePrice = Number(api.originalPriceUsd ?? api.price ?? api.pricePerNight ?? 0);
+  const rawFinalPrice = typeof api.priceUsd === 'number' && api.priceUsd > 0
+    ? api.priceUsd
+    : (discountPercent > 0 && rawBasePrice > 0
+        ? applyPercentageDiscountUsd(rawBasePrice, discountPercent)
+        : rawBasePrice);
+  const hasDiscount = discountPercent > 0 && rawBasePrice > 0 && rawFinalPrice < rawBasePrice;
+
   return {
     id: api.id,
     hotelId: api.hotelId,
@@ -249,7 +283,14 @@ export function mapApiRoomToRoom(api: any): Room {
     numberOfBathrooms: Number(api.numberOfBathrooms || 1),
     numberOfRooms: Number(api.numberOfRooms || 1),
     area: api.area || api.roomArea || api.space || undefined,
-    pricePerNight: Number(api.price || api.pricePerNight || 0),
+    pricePerNight: rawFinalPrice,
+    ...(hasDiscount
+      ? {
+          originalPricePerNight: rawBasePrice,
+          discountPercent,
+          discountSource,
+        }
+      : {}),
     images: api.images && api.images.length > 0 ? api.images : [api.mainImageUrl].filter(Boolean),
     amenities,
     isAvailable: !api.isDeleted && api.isPublished !== false,
@@ -275,6 +316,14 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
   const addressEn = typeof api.address === 'object' && api.address !== null ? (api.address.en || api.address.ar || '') : String(api.address || '');
 
   const coords = extractCoordinates(api);
+  const hotelDiscount = buildWebsiteDiscount(api.discountPercent, api.discountSource, api.discount);
+  const basePriceFrom = Number(api.price || 0);
+  const discountedPriceFrom = hotelDiscount && basePriceFrom > 0
+    ? (typeof api.discountedDisplayPrice === 'number' && api.discountedDisplayPrice > 0 && api.discountedDisplayPrice < basePriceFrom
+        ? api.discountedDisplayPrice
+        : applyPercentageDiscountUsd(basePriceFrom, hotelDiscount.percentage))
+    : basePriceFrom;
+  const hasPriceDiscount = Boolean(hotelDiscount && basePriceFrom > 0 && discountedPriceFrom < basePriceFrom);
 
   return {
     id: api.id,
@@ -297,12 +346,14 @@ export function mapApiHotelToHotel(api: ApiHotel, rooms: Room[] = [], cities: Ci
     // until a real reviews system exists. Never display as social proof.
     rating: 0,
     reviewCount: 0,
-    priceFrom: api.price,
+    priceFrom: hasPriceDiscount ? discountedPriceFrom : basePriceFrom,
+    ...(hasPriceDiscount ? { originalPriceFrom: basePriceFrom } : {}),
     currency: 'USD',
     images: api.images && api.images.length > 0 ? api.images : [api.mainImageUrl].filter(Boolean),
     thumbnail: api.mainImageUrl,
     amenities: (api.amenities || []).map((a) => mapApiAmenityToAmenity(a, 'general')),
     rooms,
+    ...(hotelDiscount ? { discount: hotelDiscount } : {}),
     isFeatured: api.isSpecial || false,
     isActive: !api.isDeleted && api.isPublished,
     cityId: cityDoc?.id || api.destination,

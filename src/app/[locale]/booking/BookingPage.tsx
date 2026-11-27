@@ -18,15 +18,19 @@ import PaymentStep, { PaymentSubmitData } from '@/components/booking/PaymentStep
 import ConfirmationStep from '@/components/booking/ConfirmationStep';
 import BookingSummaryBox from '@/components/booking/BookingSummaryBox';
 import { createBooking, previewBookingPrice } from '@/actions/bookings';
+import { formatDiscountPercent } from '@/lib/discounts';
 import { useCurrency } from '@/hooks/use-currency';
 
 type Step = 'review' | 'details' | 'payment' | 'confirm';
 
 type PricePreview = {
   pricePerNight: number;
+  originalPricePerNight?: number;
   nights: number;
   baseTotal: number;
+  discountPercent?: number;
   discountAmount: number;
+  discountSource?: 'hotel' | 'global' | null;
   finalTotal: number;
   currency: string;
 };
@@ -288,10 +292,24 @@ export default function BookingPage({
                 </div>
 
                 <div className="rounded-xl border border-[#23096e]/20 bg-[#23096e]/5 p-4">
-                  <p className="text-sm text-neutral-600">الإجمالي المتوقع</p>
-                  <p className="text-2xl font-black text-[#23096e] mt-1">
-                    {loadingPrice ? '...' : formatPrice(pricePreview?.finalTotal ?? 0)}
-                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm text-neutral-600">الإجمالي المتوقع</p>
+                    {!loadingPrice && pricePreview && (pricePreview.discountPercent ?? 0) > 0 && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#FF3B30] text-white text-xs font-black">
+                        خصم {formatDiscountPercent(pricePreview.discountPercent!)}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-2.5 mt-1 flex-wrap">
+                    <p className="text-2xl font-black text-[#23096e]">
+                      {loadingPrice ? '...' : formatPrice(pricePreview?.finalTotal ?? 0)}
+                    </p>
+                    {!loadingPrice && pricePreview && pricePreview.baseTotal > pricePreview.finalTotal && (
+                      <p className="text-sm text-neutral-400 line-through font-semibold">
+                        {formatPrice(pricePreview.baseTotal)}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {bookingError && (
@@ -348,7 +366,9 @@ export default function BookingPage({
               guests={guests}
               nights={pricePreview?.nights ?? nights}
               serverTotal={loadingPrice ? undefined : pricePreview?.finalTotal}
+              originalTotal={loadingPrice ? undefined : pricePreview?.baseTotal}
               serverCurrency={pricePreview?.currency || 'USD'}
+              discountPercent={pricePreview?.discountPercent || 0}
               discountAmount={pricePreview?.discountAmount || 0}
             />
           </div>

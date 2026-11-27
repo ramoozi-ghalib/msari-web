@@ -41,6 +41,16 @@ export interface ApiHotelV2 {
   stars?: number;
   price?: number;
   displayPrice?: number | null;
+  discount?: {
+    enabled?: boolean;
+    percent?: number;
+    excludeGlobal?: boolean;
+    startAt?: string | null;
+    endAt?: string | null;
+  } | null;
+  discountPercent?: number;
+  discountSource?: 'hotel' | 'global' | null;
+  discountedDisplayPrice?: number | null;
   featured?: boolean;
   isSpecial?: boolean;
   isPublished?: boolean;
@@ -148,6 +158,13 @@ export function toWebsiteHotel(
       }
       return typeof apiH.displayPrice === 'number' ? apiH.displayPrice : explicit;
     })(),
+    discount: apiH.discount ?? null,
+    discountPercent: typeof apiH.discountPercent === 'number' ? apiH.discountPercent : 0,
+    discountSource: apiH.discountSource ?? null,
+    discountedDisplayPrice:
+      priceSource === 'display' && typeof apiH.discountedDisplayPrice === 'number'
+        ? apiH.discountedDisplayPrice
+        : null,
     isSpecial: apiH.isSpecial || apiH.featured || false,
     isPublished: apiH.isPublished !== false,
     mapLink: (apiH as any).mapLink || (apiH as any).mapUrl || '',
@@ -303,6 +320,10 @@ export function toWebsiteRoom(apiRoom: any, hotelId: string): Room {
     name: apiRoom.name || { ar: '', en: '' },
     description: apiRoom.description || { ar: '', en: '' },
     price: Number(apiRoom.price || apiRoom.pricePerNight || 0),
+    priceUsd: typeof apiRoom.priceUsd === 'number' ? apiRoom.priceUsd : undefined,
+    originalPriceUsd: typeof apiRoom.originalPriceUsd === 'number' ? apiRoom.originalPriceUsd : undefined,
+    discountPercent: typeof apiRoom.discountPercent === 'number' ? apiRoom.discountPercent : 0,
+    discountSource: apiRoom.discountSource ?? null,
     numberOfPersons: Number(apiRoom.numberOfPersons || apiRoom.capacity || apiRoom.maxGuests || 2),
     numberOfBeds: Number(apiRoom.numberOfBeds || 1),
     numberOfBathrooms: Number(apiRoom.numberOfBathrooms || 1),

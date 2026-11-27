@@ -11,6 +11,7 @@ import {
   Bath, Maximize2, DoorOpen
 } from 'lucide-react';
 import type { Hotel, Room } from '@/types';
+import { applyPercentageDiscountUsd, formatDiscountPercent } from '@/lib/discounts';
 import { useCurrency } from '@/hooks/use-currency';
 
 const toIconRecord = LucideIcons as unknown as Record<string, ComponentType<{ size?: number; className?: string; style?: CSSProperties; color?: string }>>;
@@ -106,10 +107,23 @@ export default function RoomDetailClient({ hotel, room }: Props) {
     return () => clearInterval(t);
   }, [slide, go, total]);
 
-  const discounted = room.pricePerNight || 0;
-  const priceToPay = hotel.discount
-    ? Math.round(discounted * (1 - hotel.discount.percentage / 100))
-    : discounted;
+  const roomHasPrecomputedDiscount = Boolean(
+    room.originalPricePerNight &&
+    room.originalPricePerNight > room.pricePerNight &&
+    (room.discountPercent ?? hotel.discount?.percentage ?? 0) > 0
+  );
+  const discountPct = roomHasPrecomputedDiscount
+    ? (room.discountPercent ?? hotel.discount?.percentage ?? 0)
+    : (hotel.discount && hotel.discount.percentage > 0 ? hotel.discount.percentage : 0);
+  const originalNightly = roomHasPrecomputedDiscount
+    ? room.originalPricePerNight!
+    : (room.pricePerNight || 0);
+  const priceToPay = roomHasPrecomputedDiscount
+    ? (room.pricePerNight || 0)
+    : (discountPct > 0
+        ? applyPercentageDiscountUsd(originalNightly, discountPct)
+        : originalNightly);
+  const hasDiscount = discountPct > 0 && originalNightly > priceToPay;
 
   const nights = checkIn && checkOut
     ? Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000))
@@ -349,11 +363,13 @@ export default function RoomDetailClient({ hotel, room }: Props) {
                   <span className="text-3xl sm:text-4xl font-black text-[#FF3B30]">{formatPrice(priceToPay)}</span>
                   <span className="text-neutral-400 text-sm">/ ليلة</span>
                 </div>
-                {hotel.discount && (
+                {hasDiscount && (
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-neutral-400 line-through text-sm">{formatPrice(discounted)}</span>
+                    <span className="text-neutral-400 line-through text-sm">{formatPrice(originalNightly)}</span>
                     <span className="text-xs font-bold text-white px-2.5 py-1 rounded-full shadow-sm" style={{ background:'#ff3b30' }}>
-                      خصم {hotel.discount.percentage}%
+                      {currentLocale === 'en'
+                        ? `${formatDiscountPercent(discountPct)}% OFF`
+                        : `خصم ${formatDiscountPercent(discountPct)}%`}
                     </span>
                   </div>
                 )}
@@ -430,13 +446,13 @@ export default function RoomDetailClient({ hotel, room }: Props) {
               {/* Price Calculation */}
               <div className="px-6 py-4 space-y-2.5 border-b border-neutral-100 text-sm">
                 <div className="flex justify-between text-neutral-500 text-xs">
-                  <span>{formatPrice(priceToPay)} × {nights} {nights === 1 ? 'ليلة' : 'ليالٍ'}</span>
-                  <span className="font-bold text-neutral-800">{formatPrice(priceToPay * nights)}</span>
+                  <span>{formatPrice(hasDiscount ? originalNightly : priceToPay)} × {nights} {nights === 1 ? 'ليلة' : 'ليالٍ'}</span>
+                  <span className="font-bold text-neutral-800">{formatPrice((hasDiscount ? originalNightly : priceToPay) * nights)}</span>
                 </div>
-                {hotel.discount && (
+                {hasDiscount && (
                   <div className="flex justify-between text-green-600 text-xs">
-                    <span>خصم {hotel.discount.percentage}%</span>
-                    <span className="font-bold">− {formatPrice((discounted - priceToPay) * nights)}</span>
+                    <span>خصم {formatDiscountPercent(discountPct)}%</span>
+                    <span className="font-bold">− {formatPrice((originalNightly - priceToPay) * nights)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-black text-sm sm:text-base border-t border-neutral-100 pt-2.5 mt-1">
