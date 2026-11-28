@@ -12,12 +12,12 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { Redis } from '@upstash/redis';
 
-import { auth } from '@/auth';
+import { auth, getServerAuthTokens } from '@/auth';
 import { apiClient, generateSlugFromHotel, type ApiResponse } from '@/lib/api-client';
 import { SERVER_ERROR_RESPONSE } from '@/lib/action-guard';
 import { clampLimit } from '@/lib/action-utils';
 import { bookingLimiter, RATE_LIMIT_RESPONSE } from '@/lib/rate-limiter';
-import { RECEIPT_MAX_BASE64_CHARS } from '@/lib/receipt-validation';
+import { RECEIPT_MAX_BASE64_CHARS, validateReceiptDataUrl } from '@/lib/receipt-validation';
 
 // Feature flag for API-first booking migration
 // Defaults to true (API-first). Set to 'false' to disable.
@@ -81,10 +81,22 @@ function calculateNights(checkIn: Date, checkOut: Date): number {
 type SessionTokenPair = { idToken: string; refreshToken?: string };
 
 async function resolveSessionTokens(): Promise<SessionTokenPair | null> {
-  const session = await auth();
-  const u = session?.user as any;
-  if (!u?.firebaseToken) return null;
-  return { idToken: u.firebaseToken, refreshToken: u.refreshToken || undefined };
+  const tokens = await getServerAuthTokens();
+  if (!tokens) return null;
+  if (tokens.idToken) {
+    return { idToken: tokens.idToken, refreshToken: tokens.refreshToken };
+  }
+  if (tokens.refreshToken) {
+    try {
+      const ref = await apiClient.refreshFirebaseToken(tokens.refreshToken);
+      if (ref.success && ref.data?.token) {
+        return { idToken: ref.data.token, refreshToken: ref.data.refreshToken || tokens.refreshToken };
+      }
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }
 
 function isAuthFailure<T>(res: ApiResponse<T>): boolean {
@@ -200,6 +212,7 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
   const limiterKey = (callerUser?.id || input.guestEmail).toLowerCase();
   const bookingAllowed = await bookingLimiter.limit(limiterKey);
   if (!bookingAllowed.success) {
+    await releaseLockSafely();
     logger('warn', 'Booking creation rate limit exceeded', { key: limiterKey.slice(0, 3) + '***' });
     return RATE_LIMIT_RESPONSE;
   }
@@ -232,13 +245,24 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
      mappedPaymentMethod = 'credit_card';
    }
 
-    // ── API-First Path (Phase 4) ──────────────────────────────────────────────
-    if (USE_BOOKING_API && callerUser?.id && (callerUser as any).firebaseToken) {
-      const pair: SessionTokenPair = {
-        idToken: (callerUser as any).firebaseToken,
-        refreshToken: (callerUser as any).refreshToken || undefined,
-      };
+   // ── Validate bank transfer receipt upfront before creating booking ──
+   let validatedReceipt: { contentType: string; buffer: Buffer } | null = null;
+   if (mappedPaymentMethod === 'transfer' && input.receiptDataUrl) {
+     const receiptCheck = validateReceiptDataUrl(input.receiptDataUrl);
+     if (!receiptCheck.ok) {
+       await releaseLockSafely();
+       logger('warn', 'Invalid receipt payload rejected', { reason: receiptCheck.reason });
+       return {
+         success: false as const,
+         error: { code: 'VALIDATION_ERROR' as const, message: 'إيصال الدفع غير صالح (يُسمح بصور JPEG/PNG/WebP حتى 5 ميجابايت)' },
+       };
+     }
+     validatedReceipt = { contentType: receiptCheck.contentType, buffer: receiptCheck.buffer };
+   }
 
+    // ── API-First Path (Phase 4) ──────────────────────────────────────────────
+    const pair = callerUser?.id ? await resolveSessionTokens() : null;
+    if (USE_BOOKING_API && callerUser?.id && pair) {
       try {
         const apiRes = await callWithFreshToken(
           (token) => apiClient.createBooking(
@@ -267,10 +291,9 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           ),
           pair
         );
-       
-       await releaseLockSafely();
-       
+
         if (!apiRes.success) {
+          await releaseLockSafely();
           logger('warn', 'API Booking Creation Failed', { error: apiRes.error });
           if (isAuthFailure(apiRes)) {
             return { success: false as const, error: { code: 'SESSION_EXPIRED', message: 'انتهت الجلسة. يرجى تسجيل الدخول مجددًا ثم إعادة المحاولة.' } };
@@ -286,23 +309,58 @@ export async function createBooking(rawData: unknown, idempotencyKey?: string) {
           }
           return { success: false as const, error: { code: 'API_ERROR', message: apiRes.error?.message || 'Booking creation failed via API' } };
         }
-       
-       logger('info', 'Booking Created via API', { bookingId: apiRes.data?.id });
-       return { 
-         success: true as const, 
-         code: apiRes.data?.bookingNumber || apiRes.data?.id,
-         id: apiRes.data?.id,
-         totalPrice: apiRes.data?.pricing?.totalInSelectedCurrency || 0,
-         currency: apiRes.data?.pricing?.selectedCurrencyCode || 'USD',
-       };
-     } catch (apiError) {
-       await releaseLockSafely();
-       logger('warn', 'API Booking Error', { error: String(apiError) });
-       return { success: false as const, error: { code: 'API_ERROR', message: 'Booking creation failed via API' } };
-     }
-   }
 
-   return { success: false as const, error: { code: 'AUTH_REQUIRED', message: 'Authentication required for booking' } };
+        // Upload bank transfer receipt to POST /v1/bookings/:id/payment immediately after creation
+        const createdBookingId = apiRes.data?.bookingNumber || apiRes.data?.id || '';
+        let receiptUploaded = false;
+        if (validatedReceipt && createdBookingId) {
+          const uploadRes = await callWithFreshToken(
+            (token) => apiClient.uploadReceiptBuffer(
+              createdBookingId,
+              validatedReceipt!.buffer,
+              validatedReceipt!.contentType,
+              input.receiptFileName || 'receipt',
+              token,
+              idempotencyKey ? `${idempotencyKey}:receipt` : undefined
+            ),
+            pair
+          );
+          receiptUploaded = Boolean(uploadRes.success);
+          if (!uploadRes.success) {
+            logger('warn', 'Booking created but receipt upload failed', {
+              bookingId: createdBookingId,
+              error: uploadRes.error,
+            });
+          }
+        }
+
+        const successResult = {
+          success: true as const,
+          code: createdBookingId,
+          id: apiRes.data?.id,
+          totalPrice: apiRes.data?.pricing?.totalInSelectedCurrency || 0,
+          currency: apiRes.data?.pricing?.selectedCurrencyCode || 'USD',
+          receiptUploaded,
+        };
+
+        if (redis && redisCacheKey) {
+          await redis.set(redisCacheKey, successResult, { ex: 3600 }).catch((e) => {
+            logger('warn', 'Idempotency cache write failed', { error: String(e) });
+          });
+        }
+
+        await releaseLockSafely();
+        logger('info', 'Booking Created via API', { bookingId: apiRes.data?.id, receiptUploaded });
+        return successResult;
+      } catch (apiError) {
+        await releaseLockSafely();
+        logger('warn', 'API Booking Error', { error: String(apiError) });
+        return { success: false as const, error: { code: 'API_ERROR', message: 'Booking creation failed via API' } };
+      }
+    }
+
+    await releaseLockSafely();
+    return { success: false as const, error: { code: 'AUTH_REQUIRED', message: 'Authentication required for booking' } };
  }
 
 // ─────────────────────────────────────────────────────────────────────────────

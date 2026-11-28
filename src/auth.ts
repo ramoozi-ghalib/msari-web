@@ -14,7 +14,8 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { decode } from 'next-auth/jwt';
 
 import { authConfig } from './auth.config';
 import { LoginSchema } from '@/schemas/auth.schema';
@@ -250,16 +251,15 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return token;
     },
 
-    // The `session` callback runs after `jwt`. We take the custom fields
-    // from the token and attach them to the `session.user` object.
+    // The `session` callback runs after `jwt`. We take only safe public fields
+    // from the token — firebaseToken & refreshToken stay strictly server-side
+    // inside the HttpOnly encrypted JWT cookie (read via getServerAuthTokens).
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
         if (token.name) session.user.name = token.name as string;
         if (token.email) session.user.email = token.email as string;
-        session.user.firebaseToken = token.firebaseToken as string;
-        session.user.refreshToken = (token.refreshToken as string) || '';
         session.user.phone = (token.phone as string) || '';
         session.user.image = (token.image as string) || (token.picture as string) || '';
         session.user.isVerified = typeof token.isVerified === 'boolean' ? token.isVerified : true;
@@ -269,3 +269,44 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
     },
   },
 });
+
+const SESSION_COOKIE_NAME = 'msari.session-token';
+
+/**
+ * Server-only helper to read Firebase ID & refresh tokens from the encrypted
+ * HttpOnly Auth.js JWT cookie without exposing them in /api/auth/session.
+ */
+export async function getServerAuthTokens(): Promise<{
+  idToken: string;
+  refreshToken?: string;
+} | null> {
+  const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  if (!secret) return null;
+
+  const cookieStore = await cookies();
+  const direct = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const rawToken =
+    direct ??
+    cookieStore
+      .getAll()
+      .filter((c) => c.name.startsWith(`${SESSION_COOKIE_NAME}.`))
+      .sort((a, b) => Number(a.name.split('.').pop()) - Number(b.name.split('.').pop()))
+      .map((c) => c.value)
+      .join('');
+
+  if (!rawToken) return null;
+
+  try {
+    const decoded = await decode({
+      token: rawToken,
+      secret,
+      salt: SESSION_COOKIE_NAME,
+    });
+    const idToken = typeof decoded?.firebaseToken === 'string' ? decoded.firebaseToken : '';
+    const refreshToken = typeof decoded?.refreshToken === 'string' ? decoded.refreshToken : '';
+    if (!idToken && !refreshToken) return null;
+    return { idToken, refreshToken: refreshToken || undefined };
+  } catch {
+    return null;
+  }
+}

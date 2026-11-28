@@ -39,8 +39,6 @@ declare module 'next-auth' {
       isVerified: boolean;
       image?: string | null;
       role: UserRole;
-      firebaseToken?: string;
-      refreshToken?: string;
     };
   }
 }

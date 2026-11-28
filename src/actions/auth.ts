@@ -1,7 +1,7 @@
 'use server';
 
 import type { Session } from 'next-auth';
-import { auth } from '@/auth';
+import { auth, getServerAuthTokens } from '@/auth';
 import { RegisterSchema } from '@/schemas/auth.schema';
 import { apiClient, type ApiResponse } from '@/lib/api-client';
 import { admin } from '@/lib/firebase-admin';
@@ -114,8 +114,9 @@ async function callAuthApiWithRefresh<T>(
     };
   }
 
-  let idToken = session.user.firebaseToken || '';
-  const refreshToken = session.user.refreshToken || '';
+  const serverTokens = await getServerAuthTokens();
+  let idToken = serverTokens?.idToken || '';
+  const refreshToken = serverTokens?.refreshToken || '';
 
   if (!idToken && refreshToken) {
     try {
@@ -512,10 +513,8 @@ export async function requestPasswordReset(rawEmail: string) {
       const data = await res.json();
       if (data.error) {
         if (data.error.message === 'EMAIL_NOT_FOUND') {
-          return {
-            success: false as const,
-            error: { code: 'EMAIL_NOT_FOUND', message: 'هذا البريد الإلكتروني غير مسجل في المنصة' },
-          };
+          // Generic success response prevents account enumeration.
+          return { success: true as const };
         }
         return {
           success: false as const,

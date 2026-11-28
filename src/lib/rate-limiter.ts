@@ -129,6 +129,8 @@ export const bookingLimiter = makeLimiter('1 h', 10, 'booking:create');
 // يُستخدم على /api/hotels/[slug] والـ routes العامة الأخرى
 export const publicApiLimiter = makeLimiter('1 m', 60, 'api:public');
 
+export const partnerRequestLimiter = makeLimiter('1 h', 5, 'partner:request');
+
 
 
 // ─── استجابة الرفض الموحَّدة ─────────────────────────────────────────────────

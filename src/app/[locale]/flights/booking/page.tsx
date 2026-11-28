@@ -13,12 +13,6 @@ export default function FlightBooking() {
   const [agreed, setAgreed] = useState(false);
   const [payment, setPayment] = useState<'card' | 'whatsapp' | 'transfer'>('transfer');
 
-  const bankAccounts = [
-    { id: 1, bank: 'بنك الكريمي', name: 'مساري للسفريات', account: '123456789' },
-    { id: 2, bank: 'بنك التضامن', name: 'مساري للسفريات', account: '987654321' },
-    { id: 3, bank: 'العمقي للصرافة', name: 'مساري للسفريات', account: '55667788' },
-  ];
-
   // Mock flight details for checkout
   const flight = {
     airline: 'الخطوط الجوية القطرية',
@@ -283,19 +277,9 @@ export default function FlightBooking() {
                 
                 {payment === 'transfer' && (
                   <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 mb-3 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-xs font-bold text-[#23096e] mb-3">قم بالتحويل إلى أحد حساباتنا:</p>
-                    <div className="space-y-2 mb-3">
-                      {bankAccounts.map(b => (
-                        <div key={b.id} className="flex items-center justify-between bg-white p-2.5 rounded-lg border border-neutral-200 text-xs">
-                          <div>
-                              <p className="font-bold text-neutral-900">{b.bank}</p>
-                              <p className="text-[10px] text-neutral-400 mt-0.5">{b.name}</p>
-                          </div>
-                          <div className="font-mono font-bold text-[#23096e]">{b.account}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-neutral-500">سوف نولد لك رقم حجز للرحلة، لتتمكن من إرسال السند عبر زر الواتساب أسفله.</p>
+                    <p className="text-xs text-neutral-600 leading-relaxed">
+                      سيتم تزويدك بأرقام الحسابات البنكية الرسمية المعتمدة وإتمام تأكيد التذكرة وإرسال السند مباشرة عبر واتساب الرسمي عند الضغط على زر المتابعة أدناه.
+                    </p>
                   </div>
                 )}
               </div>

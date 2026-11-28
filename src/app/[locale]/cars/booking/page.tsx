@@ -13,12 +13,6 @@ export default function CarBooking() {
   const [agreed, setAgreed] = useState(false);
   const [payment, setPayment] = useState<'transfer' | 'card' | 'whatsapp'>('transfer');
 
-  const bankAccounts = [
-    { id: 1, bank: 'بنك الكريمي', name: 'مساري للسفريات', account: '123456789' },
-    { id: 2, bank: 'بنك التضامن', name: 'مساري للسفريات', account: '987654321' },
-    { id: 3, bank: 'العمقي للصرافة', name: 'مساري للسفريات', account: '55667788' },
-  ];
-
   // Mock ride details for checkout
   const ride = {
     serviceType: 'توصيل مطار', // Or 'نقل بين المدن'
@@ -183,23 +177,8 @@ export default function CarBooking() {
                     
                     {payment === 'transfer' && (
                       <div className="mt-3 p-4 rounded-xl bg-neutral-50 border border-neutral-100 animate-in fade-in slide-in-from-top-2">
-                        <p className="text-sm font-bold text-neutral-500 mb-3">حسابات الشركة المعتمدة للحوالات:</p>
-                        <div className="space-y-2 mb-3">
-                          {bankAccounts.map(b => (
-                            <div key={b.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-neutral-200">
-                              <div>
-                                 <p className="text-sm font-bold text-[#23096e]">{b.bank}</p>
-                                 <p className="text-xs text-neutral-500 mt-0.5">{b.name}</p>
-                              </div>
-                              <div className="text-end">
-                                 <p className="text-xs text-neutral-400">الحساب</p>
-                                 <p className="font-mono font-bold text-neutral-800">{b.account}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-xs text-neutral-500 leading-relaxed bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-100">
-                          <span className="font-bold">ملاحظة هامة:</span> لتأكيد رحلتك بأسرع وقت، اختر الحساب المناسب وقم بتحويل المبلغ. بعد التخزين ستتمكن من التقاط صورة إشعار الدفع وإرساله عبر الواتساب لاحقاً بالضغط على زر المتابعة.
+                        <p className="text-xs text-neutral-600 leading-relaxed bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-100">
+                          <span className="font-bold">تفاصيل التحويل البنكي:</span> يتم تزويدك ببيانات الحساب البنكي الرسمي المعتمد فور الضغط على زر المتابعة عبر واتساب الرسمي لتجنب أي خطأ في رقم الحساب وتأكيد حجزك مباشرة.
                         </p>
                       </div>
                     )}

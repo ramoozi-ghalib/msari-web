@@ -23,8 +23,8 @@ export async function getExchangeRates(): Promise<ExchangeRates> {
       const data = doc.data() as any;
       cachedRates = {
         usd: 1,
-        sar: Number(data.sar) || 3.8,
-        yerSouth: Number(data.yerSouth) || 1561,
+        sar: Number(data.sar) || 3.82,
+        yerSouth: Number(data.yerSouth) || 1600,
         yerNorth: Number(data.yerNorth) || 535,
       };
       cacheTime = now;
@@ -36,8 +36,8 @@ export async function getExchangeRates(): Promise<ExchangeRates> {
 
   return {
     usd: 1,
-    sar: 3.8,
-    yerSouth: 1561,
+    sar: 3.82,
+    yerSouth: 1600,
     yerNorth: 535,
   };
 }

@@ -411,7 +411,8 @@ class ApiClient {
   }
 
   private getApiKey(): string {
-    return process.env.NEXT_PUBLIC_API_KEY || '';
+    if (typeof window !== 'undefined') return '';
+    return process.env.MSARI_API_KEY || '';
   }
 
   private async request<T>(
@@ -921,6 +922,71 @@ class ApiClient {
     }
     const res = await this.patch<ApiBookingDetail>(`/bookings/${id}`, { status }, headers);
     return res;
+  }
+
+  /**
+   * Upload payment receipt binary via multipart/form-data.
+   * Calls POST /v1/bookings/:id/payment
+   */
+  public async uploadReceiptBuffer(
+    id: string,
+    buffer: Buffer,
+    contentType: string,
+    fileName: string,
+    authToken: string,
+    idempotencyKey?: string
+  ): Promise<ApiResponse<{ success: boolean; receiptUrl: string }>> {
+    const url = `${this.getBaseUrl()}/bookings/${encodeURIComponent(id)}/payment`;
+    const form = new FormData();
+    const safeExt = contentType === 'image/png' ? 'png' : contentType === 'image/webp' ? 'webp' : 'jpg';
+    const cleanName = (fileName || `receipt.${safeExt}`).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const blob = new Blob([new Uint8Array(buffer)], { type: contentType });
+    form.append('file', blob, cleanName.includes('.') ? cleanName : `${cleanName}.${safeExt}`);
+
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    if (idempotencyKey) {
+      headers['Idempotency-Key'] = idempotencyKey;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: form,
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const text = await response.text();
+      let data: any = {};
+      if (text) {
+        try { data = JSON.parse(text); } catch { data = { message: text }; }
+      }
+      if (!response.ok) {
+        return {
+          success: false,
+          error: {
+            code: data?.type?.split('/').pop() || `HTTP_${response.status}`,
+            message: data?.detail || data?.message || response.statusText,
+          },
+        };
+      }
+      return { success: true, data };
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      const isAbort = error?.name === 'AbortError';
+      return {
+        success: false,
+        error: {
+          code: isAbort ? 'TIMEOUT_ERROR' : 'NETWORK_ERROR',
+          message: isAbort ? 'Receipt upload timed out' : (error?.message || 'Network error'),
+        },
+      };
+    }
   }
 
   /**

@@ -31,13 +31,13 @@ export async function resolveUserRole(uid: string): Promise<UserRole> {
 
     const data = (snap.data() || {}) as { role?: string };
 
-    // Support the operational registry role values; unknown values fail-closed
-    // to ADMIN only when the doc itself exists (registry membership is the
-    // authoritative signal — the dashboard only creates docs for admins).
-    const registryRole = String(data.role || 'ADMIN').toUpperCase();
+    // Explicit fail-closed mapping: only admin/super_admin become ADMIN;
+    // supervisor/booking_staff get scoped BOOKING_STAFF; anything else -> CUSTOMER.
+    const registryRole = String(data.role || '').trim().toUpperCase();
 
-    if (registryRole === 'BOOKING_STAFF') return 'BOOKING_STAFF';
-    return 'ADMIN';
+    if (registryRole === 'ADMIN' || registryRole === 'SUPER_ADMIN') return 'ADMIN';
+    if (registryRole === 'BOOKING_STAFF' || registryRole === 'SUPERVISOR') return 'BOOKING_STAFF';
+    return 'CUSTOMER';
   } catch (error) {
     // Fail-closed: never grant a role on infrastructure failure.
     console.error('[user-roles] Failed to resolve role for uid — defaulting to CUSTOMER:', error);

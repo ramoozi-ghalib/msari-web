@@ -10,6 +10,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import { db, admin, storage } from '@/lib/firebase-admin';
+import { partnerRequestLimiter } from '@/lib/rate-limiter';
+import { RECEIPT_MAX_BASE64_CHARS, validateReceiptDataUrl } from '@/lib/receipt-validation';
 
 const hotelPartnerSchema = z.object({
   hotelName: z.string().min(2, 'اسم الفندق مطلوب ويجب ألا يقل عن حرفين').max(200),
@@ -34,7 +36,7 @@ const hotelPartnerSchema = z.object({
     { message: 'عدد الأجنحة يجب أن يكون رقماً صحيحاً غير سالب' }
   ),
   amenities: z.string().min(2, 'المرافق والخدمات المتوفرة مطلوبة').max(2000),
-  facadeImageUrl: z.string().min(5, 'صورة واجهة الفندق مطلوبة كإجراء أساسي'),
+  facadeImageUrl: z.string().min(5, 'صورة واجهة الفندق مطلوبة كإجراء أساسي').max(RECEIPT_MAX_BASE64_CHARS, 'حجم صورة واجهة الفندق يتجاوز الحد المسموح (5MB)'),
   ownerName: z.string().min(3, 'اسم المسؤول الرباعي مطلوب').max(200),
   position: z.string().min(2, 'المسمى الوظيفي / الصفة مطلوبة').max(200),
   phone: z.string().min(8, 'رقم الهاتف / واتساب مطلوب').max(25).regex(
@@ -64,6 +66,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 1b. Per-user rate limit (5 requests/hour)
+    const rateGate = await partnerRequestLimiter.limit(session.user.id);
+    if (!rateGate.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'تم تجاوز الحد الأقصى لتقديم الطلبات حالياً. يرجى المحاولة لاحقاً.',
+        },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
 
     // Honeypot check against bot spam
@@ -88,31 +102,48 @@ export async function POST(req: NextRequest) {
     const payload = validatedData.data;
     const referenceNumber = `MSR-HTL-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
 
-    let storedImageUrl = payload.facadeImageUrl;
+    let storedImageUrl = '';
 
-    // If image is sent as Base64 data URL, upload to Firebase Storage
-    if (payload.facadeImageUrl.startsWith('data:image/')) {
-      try {
-        const matches = payload.facadeImageUrl.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
-        if (matches) {
-          const contentType = matches[1];
-          const buffer = Buffer.from(matches[2], 'base64');
-          const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
-          const filename = `partner_requests/${referenceNumber}/facade_${Date.now()}.${ext}`;
-
-          const bucket = storage.bucket();
-          const file = bucket.file(filename);
-
-          await file.save(buffer, {
-            metadata: { contentType, cacheControl: 'public, max-age=31536000' },
-          });
-
-          // Generate Firebase storage download URL
-          storedImageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filename)}?alt=media`;
-        }
-      } catch (uploadErr) {
-        console.warn('[hotel-requests] Failed to upload image to Firebase Storage, saving original reference:', uploadErr);
+    // Validate & upload Base64 data URL (JPEG/PNG/WebP, <=5MB, magic bytes) or require https URL
+    if (payload.facadeImageUrl.startsWith('data:')) {
+      const validated = validateReceiptDataUrl(payload.facadeImageUrl);
+      if (!validated.ok) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'صورة واجهة الفندق غير صالحة. يُسمح فقط بملفات JPEG أو PNG أو WebP بحجم أقصى 5 ميجابايت.',
+          },
+          { status: 400 }
+        );
       }
+
+      const ext = validated.contentType === 'image/png' ? 'png' : validated.contentType === 'image/webp' ? 'webp' : 'jpg';
+      const filename = `partner_requests/${referenceNumber}/facade_${Date.now()}.${ext}`;
+      const bucket = storage.bucket();
+      const file = bucket.file(filename);
+
+      await file.save(validated.buffer, {
+        metadata: { contentType: validated.contentType, cacheControl: 'public, max-age=31536000' },
+      });
+
+      storedImageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filename)}?alt=media`;
+    } else {
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(payload.facadeImageUrl);
+      } catch {
+        return NextResponse.json(
+          { success: false, error: 'رابط صورة واجهة الفندق غير صالح.' },
+          { status: 400 }
+        );
+      }
+      if (parsedUrl.protocol !== 'https:') {
+        return NextResponse.json(
+          { success: false, error: 'يجب أن يستخدم رابط صورة واجهة الفندق بروتوكول HTTPS.' },
+          { status: 400 }
+        );
+      }
+      storedImageUrl = parsedUrl.toString();
     }
 
     // Save to Firestore collection `hotel_partner_requests` linked with user account
